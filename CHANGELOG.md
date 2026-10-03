@@ -1,5 +1,13 @@
 # Changelog
 
+## CLI 0.55.0 / Material Workflow 0.7.1 — Linux branch
+
+- Add fail-closed Linux read guards with kernel lease and namespace evidence; keep Windows deny-write/delete implementation and unsupported transaction boundaries.
+- Add deterministic bundled Linux Python discovery, an explicit GUI interpreter override, and portable shell entry point.
+- Expose platform limitations in doctor, and record terminal results for rejected pipeline locks.
+- Add explicit SHA-verified shared-storage snapshot import and complete successful-job archival tools.
+- Keep Blender 5.2.1-specific adapter gates, Windows AppContainer and hard-memory pipeline requirements unchanged. This branch does not claim every Blender adapter is portable.
+
 ## Companion skills 0.1.0 — 2026-10-04
 
 - Publish public adaptations of CLI, work methodology, material authoring and asset management skills with references, scripts, templates and agent metadata.

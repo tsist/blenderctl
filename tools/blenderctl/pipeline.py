@@ -235,7 +235,15 @@ def execute(job,parent_checkpoint=None):
     guards=ExitStack()
     try:guards.enter_context(PathLocks([job]))
     except Failure as ex:
-        guards.close();return envelope('pipeline.run',job.name,error={'code':ex.code,'message':str(ex)}),CODES[ex.code]
+        # A fail-closed platform/lock refusal is terminal, including for async
+        # clients. Never leave a rejected Linux pipeline queued indefinitely.
+        guards.close()
+        request=read_json(job/'request.json');status=read_json(job/'status.json')
+        code=CODES[ex.code]
+        result=envelope(request['command'],job.name,error={'code':ex.code,'message':str(ex)},artifacts={'job_directory':str(job)})
+        status.update(state='failed',exit_code=code,finished_at=time.time(),heartbeat_at=time.time())
+        atomic_json(job/'result.json',result);atomic_json(job/'status.json',status)
+        return result,code
     started=time.monotonic();request=read_json(job/'request.json');launch=read_json(job/'launch.json');status=read_json(job/'status.json');abort=threading.Event();rows={};error=None;manifest=None;runtime=None;futures={};max_active=0;observed_disk=0;last_disk=0;prior_id=None;prior={};pool=None
     status.update(state='running',supervisor_pid=os.getpid(),started_at=time.time());artifacts={'job_directory':str(job),'pipeline_state':str(job/'pipeline-state.json'),'pipeline_report':str(job/'pipeline-report.json')}
     def child_checkpoint():

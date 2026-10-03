@@ -56,15 +56,42 @@ def _process(args, cwd, seconds):
         raise BridgeError("Cannot start CLI: " + str(exc)) from exc
 
 
+def _bundled_python(blender):
+    """Resolve one interpreter in an official Windows/Linux Blender layout.
+
+    Do not consult PATH or pick the newest directory: multiple independent
+    interpreters require an explicit choice. Bundled symlink aliases are fine
+    only when their resolved targets remain inside this Blender installation.
+    """
+    installation = blender.parent
+    matches = set()
+    for version in sorted(installation.iterdir()):
+        if not re.fullmatch(r"[0-9]+\.[0-9]+", version.name) or not version.is_dir():
+            continue
+        binary_dir = version / "python" / "bin"
+        if not binary_dir.is_dir():
+            continue
+        if not binary_dir.resolve().is_relative_to(installation):
+            raise BridgeError("Bundled Python directory escapes Blender installation; specify python_binary")
+        for candidate in sorted(binary_dir.iterdir()):
+            if not re.fullmatch(r"python(?:\.exe|3(?:\.[0-9]+)?)", candidate.name):
+                continue
+            resolved = candidate.resolve()
+            if not resolved.is_relative_to(installation):
+                raise BridgeError("Bundled Python executable escapes Blender installation; specify python_binary")
+            if resolved.is_file():
+                matches.add(resolved)
+    if len(matches) != 1:
+        raise BridgeError("Cannot uniquely locate Blender Python; found %d interpreters; specify python_binary" % len(matches))
+    return next(iter(matches))
+
+
 def configure(project_root, blender_binary, python_binary=None):
     root = _path(project_root)
     blender = _path(blender_binary, True)
     cli = _path(root / "tools/blenderctl/cli.py", True)
     if python_binary is None:
-        matches = list(blender.parent.glob("[0-9]*.[0-9]*/python/bin/python.exe"))
-        if len(matches) != 1:
-            raise BridgeError("Cannot uniquely locate Blender Python; specify python_binary")
-        python_binary = matches[0]
+        python_binary = _bundled_python(blender)
     python = _path(python_binary, True)
     key = (str(root), str(blender), str(python))
     if key not in _CONFIGS:

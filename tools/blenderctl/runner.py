@@ -13,6 +13,7 @@ import uuid
 from protocol import (CODES, DEFAULT_BLENDER, DEFAULT_JOBS, DEFAULT_TRANSACTIONS, HOST_COMMANDS, OPERATIONS, Failure, atomic_json,
                       digest, envelope, read_json, timeout_value, validate)
 from processes import ProcessTree
+from filesystem import check_all_guards
 
 
 def job_path(root, job_id):
@@ -127,6 +128,7 @@ def execute_worker(job, parent_checkpoint=None):
     limits=launch.get('limits');usage={};last_resource_check=0;memory_observations=[]
     def checkpoint():
         nonlocal last_resource_check
+        check_all_guards()
         if parent_checkpoint:
             parent_checkpoint()
         if (job / "cancel.request").exists():
@@ -421,7 +423,12 @@ def execute_worker(job, parent_checkpoint=None):
             atomic_json(job/'telemetry.json',{'memory_samples':memory_observations,'gpu':gpu_sample(),'hard_memory':'Windows Job committed bytes','hard_disk':False,'hard_vram':False,'disk':'sampling and cancellation; no per-job filesystem quota'})
             atomic_json(job/'resources.json',{'limits':limits,'usage':usage,'memory_semantics':'Windows Job Object committed memory for bootstrap and all descendants','disk_semantics':'sampled budget; may overshoot, partial files retained','gpu_semantics':'scheduler reservation only, not a VRAM allocator limit'})
             artifacts['resources']=str(job/'resources.json')
-        input_guards.close()
+        # Linux read guards validate lease and namespace evidence on release.
+        # A late conflict must still produce an authoritative failed job result.
+        try:
+            input_guards.close()
+        except Failure as exc:
+            error = error or {"code": exc.code, "message": str(exc)}
     code = CODES[error["code"]] if error else 0
     state.update(state=("cancelled" if code == 7 else "timed_out" if code == 6 else "failed" if code else "succeeded"),
                  exit_code=code, worker_exit_code=worker_exit, finished_at=time.time(), heartbeat_at=time.time(),

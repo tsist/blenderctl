@@ -19,6 +19,7 @@ def identity(item):
 
 def doctor():
     from projects import startup_profile
+    from platform_support import capabilities as platform_capabilities
     build = {key: getattr(bpy.app.build_options, key) for key in dir(bpy.app.build_options)
              if not key.startswith("_") and isinstance(getattr(bpy.app.build_options, key), bool)}
     paths = {key: bpy.utils.user_resource(key) for key in ("CONFIG", "SCRIPTS", "EXTENSIONS", "DATAFILES")}
@@ -43,7 +44,7 @@ def doctor():
                                 "id": entry.id, "status": "detected_not_render_verified"})
     except Exception as exc:
         device_error = str(exc)
-    return {"startup_profile":startup_profile(),"blender_version": bpy.app.version_string, "version": list(bpy.app.version),
+    return {"platform_support": platform_capabilities(), "startup_profile":startup_profile(),"blender_version": bpy.app.version_string, "version": list(bpy.app.version),
             "build_hash": bpy.app.build_hash.decode(), "binary": bpy.app.binary_path,
             "python_version": sys.version, "background": bpy.app.background,
             "autoexec_enabled": bpy.context.preferences.filepaths.use_scripts_auto_execute,

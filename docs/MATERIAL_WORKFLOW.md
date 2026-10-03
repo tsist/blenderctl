@@ -1,10 +1,14 @@
-# Material Workflow 0.7.0
+# Material Workflow 0.7.1
+
+The Linux branch adds bundled Python discovery and an optional sidebar interpreter
+override. See [Linux installation and snapshot retention](LINUX.md) before selecting
+a snapshot root; temporary filesystems require explicit archival of completed work.
 
 The extension and CLI share a managed material core. It assembles static layered PBR materials from explicitly identified objects, slots, UV layers and resources. It preserves unrelated edits and refuses overlapping or structural conflicts.
 
 ## Install the extension
 
-Download `material-workflow-0.7.0.zip` from Releases. In Blender use **Preferences → Extensions → Install from Disk**, select the ZIP, and enable Material Workflow. Open the View3D sidebar with **N** and select **Material Workflow**. Blender 5.2.0 is the manifest minimum; the actual verified runtime is 5.2.1 LTS. The ZIP is a Blender extension with its manifest at the archive root.
+Build this branch's `material-workflow-0.7.1.zip` with `python scripts/build_release.py --output dist`. In Blender use **Preferences → Extensions → Install from Disk**, select the ZIP, and enable Material Workflow. Open the View3D sidebar with **N** and select **Material Workflow**. Blender 5.2.0 is the manifest minimum; see the Linux verification record for the tested 5.2.2 subset. The original released 0.7.0 ZIP remains unchanged. The ZIP is a Blender extension with its manifest at the archive root.
 
 For background handoff, set the backend project directory to the unpacked CLI source root. The Windows backend discovers the selected Blender installation's bundled Python. If automatic discovery is ambiguous, the Python bridge API accepts an explicit Python binary; visible panel behavior on other operating systems remains unverified. The plugin does not bundle or download Blender or the CLI.
 

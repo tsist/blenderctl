@@ -1,5 +1,8 @@
 # Public release verification — 2026-10-04
 
+This page preserves the original Windows release record. See the separate
+[Linux branch verification](LINUX_VERIFICATION.md) for CLI 0.55.0 / extension 0.7.1.
+
 Release scope: CLI **0.54.1**, Material Workflow **0.7.0**. Native runtime: **Windows / Blender 5.2.1 LTS / build 9e2066aef7ef / Python 3.13.13**. Tests use generated geometry and numerical textures, with no private models or texture library.
 
 | Check | Result | Evidence / reproducible entry |

@@ -2,7 +2,9 @@
 
 Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-256 protected source files, isolated background jobs, editable candidates, and a matching layered-material Blender extension.
 
-**CLI 0.54.1 · Material Workflow 0.7.0 · GPL-3.0-or-later**
+**CLI 0.55.0 · Material Workflow 0.7.1 · GPL-3.0-or-later**
+
+This branch adds bounded Linux saved-file support. Read the [Linux guide](docs/LINUX.md) before choosing input/job directories: protected inputs require qualified local filesystems, and Windows transactions/pipelines remain unsupported. Existing Blender-version gates are unchanged.
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
@@ -31,7 +33,7 @@ python tools/blenderctl/cli.py material describe --operation study --section stu
 
 The path is an example: set it to your actual executable. All global options, including `--blender`, `--jobs-dir`, `--timeout`, `--async` and `--compact`, go **before** the subcommand. Use `blenderctl.ps1` on Windows if preferred; `BLENDERCTL_PYTHON` selects an explicit Python executable. See the [tested scene/render walkthrough](docs/GETTING_STARTED.md).
 
-Download `material-workflow-0.7.0.zip` separately and install it using Blender **Preferences → Extensions → Install from Disk**. Enable **Material Workflow**. Its backend project path is this repository; Blender and Python paths must point to your installed runtime. See [plugin installation and workflow](docs/MATERIAL_WORKFLOW.md).
+For this branch, build `material-workflow-0.7.1.zip` using the release command below and install it using Blender **Preferences → Extensions → Install from Disk**. Enable **Material Workflow**. Its backend project path is this repository; Blender and Python paths must point to your installed runtime. The original published 0.7.0 package is unchanged. See [plugin installation and workflow](docs/MATERIAL_WORKFLOW.md).
 
 ## Verify and build
 

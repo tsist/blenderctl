@@ -1,5 +1,10 @@
 # Compatibility and support boundaries
 
+For the Linux branch (CLI 0.55.0 / extension 0.7.1), see [Linux support](LINUX.md).
+Protected saved-file workflows have a bounded Linux lease/inotify contract. Windows
+transactions, pipeline locks/hard memory limits and AppContainer remain unsupported;
+the original exact Blender-version restrictions below are preserved.
+
 The verified native baseline is **Windows / Blender 5.2.1 LTS / build 9e2066aef7ef**. This release uses host Python 3.12+; local integration runs use Blender's Python 3.13.13. Source distribution does not install or upgrade the user's runtime.
 
 Several native drivers, links/overrides, retopology and format-time adapters explicitly restrict Blender versions. The extension minimum of Blender 5.2.0 is an installation declaration, not a statement that every Blender 5.2 build was exercised. Check the actual adapter and runtime result.

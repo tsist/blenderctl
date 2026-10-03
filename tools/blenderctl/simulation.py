@@ -134,13 +134,8 @@ def save(path):
     bpy.context.preferences.filepaths.save_version=0
     modeling.finished(bpy.ops.wm.save_as_mainfile(filepath=str(path),relative_remap=True,check_existing=False))
 def peak_memory():
-    import ctypes
-    from ctypes import wintypes
-    class Counters(ctypes.Structure):
-        _fields_=[('cb',wintypes.DWORD),('PageFaultCount',wintypes.DWORD),*[(n,ctypes.c_size_t) for n in ('PeakWorkingSetSize','WorkingSetSize','QuotaPeakPagedPoolUsage','QuotaPagedPoolUsage','QuotaPeakNonPagedPoolUsage','QuotaNonPagedPoolUsage','PagefileUsage','PeakPagefileUsage')]]
-    k=ctypes.WinDLL('kernel32',use_last_error=True);k.GetCurrentProcess.restype=wintypes.HANDLE;p=ctypes.WinDLL('psapi',use_last_error=True);p.GetProcessMemoryInfo.argtypes=[wintypes.HANDLE,ctypes.POINTER(Counters),wintypes.DWORD];p.GetProcessMemoryInfo.restype=wintypes.BOOL;c=Counters();c.cb=ctypes.sizeof(c)
-    if not p.GetProcessMemoryInfo(k.GetCurrentProcess(),ctypes.byref(c),c.cb):raise Failure('IO_ERROR','Cannot measure worker peak working set')
-    return c.PeakWorkingSetSize
+    from worker_metrics import peak_memory as observe_peak_memory
+    return observe_peak_memory()
 def inspect(params,job):
     if 'hair_frames' in params:
         import hair

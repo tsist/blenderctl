@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Windows file identity, deny-write guards, and rename without replacing a destination."""
+"""Windows transaction guards and qualified, fail-closed Linux read-only guards."""
 import ctypes
 from ctypes import wintypes as w
 import hashlib
 import os
+import sys
 from pathlib import Path
 
 from protocol import Failure
@@ -32,6 +33,8 @@ def kernel():
 
 def native_path(path):
     text = os.path.abspath(path)  # Never follow a final-component symlink before opening.
+    if os.name != "nt":
+        return text
     if text.startswith("\\\\?\\"):
         return text
     return "\\\\?\\UNC\\" + text[2:] if text.startswith("\\\\") else "\\\\?\\" + text
@@ -49,6 +52,8 @@ def read_shared_bytes(path):
     This is a status reader, NOT a transaction content guard. Share DELETE allows
     the writer to replace the path while this reader finishes the old generation.
     """
+    if os.name != "nt":
+        return Path(path).read_bytes()
     import msvcrt
     k = kernel()
     handle = k.CreateFileW(native_path(path), 0x80000000, 7, None, 3, 0x80, None)
@@ -93,6 +98,12 @@ class FileGuard:
         if not self.k.GetFileInformationByHandle(self.handle, ctypes.byref(info)):
             fail_io("GetFileInformationByHandle")
         return info
+
+    def check(self):
+        """Windows deny-write/delete sharing is enforced by the held handle."""
+        if self.handle is None:
+            raise Failure("CONFLICT", "File guard is closed")
+        return self
 
     def identity(self):
         info = self._information()
@@ -179,3 +190,12 @@ class PathLocks:
             self.k.ReleaseMutex(handle)
             self.k.CloseHandle(handle)
         self.handles.clear()
+
+
+def check_all_guards():
+    """Linux supervisors must validate before accepting work and during polling."""
+    return None  # Windows enforces deny-write/delete sharing in the kernel.
+
+
+if sys.platform == "linux":
+    from linux_file_guard import LinuxFileGuard as FileGuard, check_all_guards
