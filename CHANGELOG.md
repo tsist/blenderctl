@@ -1,5 +1,12 @@
 # Changelog
 
+## Companion skills 0.1.0 — 2026-10-04
+
+- Publish public adaptations of CLI, work methodology, material authoring and asset management skills with references, scripts, templates and agent metadata.
+- Replace private paths, fixed tasks, Wiki and asset evidence with explicit root discovery and scoped guidance. Preserve six candidate methods and PBR source/validation rules without inheriting private permissions.
+- Add a conflict-safe installer, standalone ZIP, metadata/link checks and actual helper tests. Image decoding uses optional Pillow; no dependencies or host configuration are installed automatically.
+- Keep CLI 0.54.1 and extension 0.7.0 runtime code unchanged; original release artifacts remain immutable.
+
 ## CLI 0.54.1 / Material Workflow 0.7.0 — 2026-10-04
 
 First public source release of the existing Blender automation and material toolchain.

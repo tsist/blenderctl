@@ -1,0 +1,2 @@
+# Optional, only for material image_gate.py. CLI/name/discovery helpers use stdlib.
+Pillow>=10.4

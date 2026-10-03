@@ -31,6 +31,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('dist'))
     parser.add_argument('--verify', action='store_true')
+    parser.add_argument('--skills-only', action='store_true', help='build the standalone skills companion distribution')
     args = parser.parse_args()
     files = public_files()
     errors = audit(files)
@@ -52,9 +53,32 @@ def main():
         f'blenderctl-{cli}-source.zip': archive([(f'blenderctl-{cli}/' + p.relative_to(ROOT).as_posix(), p.read_bytes()) for p in files]),
         f'material-workflow-{version}.zip': archive([(p.name, p.read_bytes()) for p in extension_files]),
     }
+    skill_manifest = ROOT / 'skills/manifest.json'
+    skill_version = None
+    skill_file_count = 0
+    if skill_manifest.is_file():
+        from check_skills import check
+        skill_check = check()
+        if not skill_check['ok']:
+            raise SystemExit('\n'.join(skill_check['errors']))
+        skill_version = json.loads(skill_manifest.read_text(encoding='utf-8'))['bundle_version']
+        skill_entries = [('blender-skills-' + skill_version + '/' + p.relative_to(ROOT).as_posix(), p.read_bytes())
+                         for p in files if p.is_relative_to(ROOT / 'skills')]
+        skill_entries.append(('blender-skills-' + skill_version + '/install_skills.py',
+                              (ROOT / 'scripts/install_skills.py').read_bytes()))
+        skill_file_count = len(skill_entries)
+        if args.skills_only:
+            payloads = {}
+        payloads[f'blender-skills-{skill_version}.zip'] = archive(skill_entries)
+    elif args.skills_only:
+        raise SystemExit('No skill bundle manifest is present')
     rows = [{'file': name, 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)} for name, data in sorted(payloads.items())]
     payloads['release-manifest.json'] = (json.dumps({'cli_version': cli, 'extension_version': version,
-        'license': 'GPL-3.0-or-later', 'source_files': len(files), 'extension_files': len(extension_files),
+        'license': 'GPL-3.0-or-later', 'skills_bundle_version': skill_version,
+        'distribution': 'skills-only' if args.skills_only else 'source-extension-skills',
+        'audited_source_files': len(files), 'skills_files': skill_file_count,
+        'source_files': None if args.skills_only else len(files),
+        'extension_files': None if args.skills_only else len(extension_files),
         'reproducible_zip_timestamp': '2026-10-04T00:00:00', 'artifacts': rows}, indent=2) + '\n').encode()
     payloads['SHA256SUMS.txt'] = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in sorted(payloads.items())).encode()
     output = args.output.resolve()

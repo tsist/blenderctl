@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "asset_id": null,
+  "parent_asset_id": null,
+  "display_name": null,
+  "type": null,
+  "category": null,
+  "tags": [],
+  "version": "v001",
+  "variant": null,
+  "lifecycle": "source",
+  "files": [{"path": null, "path_base": null, "role": "primary", "bytes": null, "sha256": null, "modified_utc": null}],
+  "blender": {"datablocks": [{"type": null, "name": null}], "saved_file_version_tuple": null, "validated_version": null, "required_extensions": null, "render_engine": null, "units": null, "axis_convention": null},
+  "catalog": {"library_root": null, "uuid": null, "path": null},
+  "source": {"original_name": null, "author": null, "url": null, "acquired_at": null, "license_name": null, "license_evidence_path": null, "intended_use": null, "permission_status": "unverified"},
+  "dependencies": null,
+  "preview": {"path": null, "asset_version": null, "render_settings": null},
+  "validation": {"status": "not_run", "checked_at": null, "report_path": null},
+  "created_at": null,
+  "updated_at": null,
+  "last_change_batch": null
+}

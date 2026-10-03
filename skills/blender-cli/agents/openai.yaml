@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender CLI"
+  short_description: "在本机通过 Blender CLI 创建、检查、渲染与验证工作副本"
+  default_prompt: "使用 $blender-cli 根据当前能力与输入快照完成任务，并独立验证结果。"

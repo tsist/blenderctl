@@ -1,0 +1,180 @@
+{
+  "pipeline_version": "1.0",
+  "policy": {
+    "max_workers": 2,
+    "cpu_threads": 4,
+    "memory_mb": 4096,
+    "gpu_mb": 0,
+    "disk_mb": 2048,
+    "min_free_mb": 256,
+    "failure": "continue"
+  },
+  "steps": [
+    {
+      "id": "studio",
+      "command": "scene.prepare",
+      "params": {
+        "manifest": {
+          "initial_scene": "Studio",
+          "context": {
+            "scene": "Studio",
+            "view_layer": "ViewLayer",
+            "frame": 1,
+            "mode": "OBJECT",
+            "active_object": null,
+            "selected_objects": []
+          },
+          "operations": [
+            {
+              "op": "collection.create",
+              "name": "Studio",
+              "parent": {
+                "scene": "Studio"
+              }
+            },
+            {
+              "op": "object.create",
+              "name": "Cube",
+              "kind": "CUBE",
+              "collection": "Studio",
+              "size": 2
+            },
+            {
+              "op": "object.create",
+              "name": "Camera",
+              "kind": "CAMERA",
+              "collection": "Studio"
+            },
+            {
+              "op": "object.transform",
+              "object": "Camera",
+              "space": "local",
+              "location": [
+                0,
+                0,
+                6
+              ]
+            },
+            {
+              "op": "camera.configure",
+              "object": "Camera",
+              "data_scope": "single_user",
+              "type": "ORTHO",
+              "ortho_scale": 5
+            },
+            {
+              "op": "object.create",
+              "name": "Light",
+              "kind": "LIGHT",
+              "light_type": "AREA",
+              "collection": "Studio"
+            },
+            {
+              "op": "object.transform",
+              "object": "Light",
+              "space": "local",
+              "location": [
+                2,
+                -2,
+                5
+              ]
+            },
+            {
+              "op": "light.configure",
+              "object": "Light",
+              "data_scope": "single_user",
+              "energy": 500,
+              "size": 3
+            }
+          ]
+        }
+      },
+      "depends_on": [],
+      "bindings": [],
+      "limits": {
+        "cpu_threads": 2,
+        "memory_mb": 2048,
+        "disk_mb": 256,
+        "gpu_mb": 0
+      },
+      "timeout_seconds": 120,
+      "reuse": true
+    },
+    {
+      "id": "picture",
+      "command": "render.run",
+      "params": {
+        "manifest": {
+          "scene": "Studio",
+          "view_layer": "ViewLayer",
+          "camera": "Camera",
+          "engine": "CYCLES",
+          "device": {
+            "backend": "CPU"
+          },
+          "frames": [
+            1
+          ],
+          "width": 256,
+          "height": 256,
+          "samples": 16,
+          "format": "PNG",
+          "depth": "8",
+          "transparent": true,
+          "color": {
+            "view": "AgX",
+            "exposure": 0,
+            "gamma": 1
+          },
+          "compositor": false,
+          "passes": [],
+          "denoise": false,
+          "motion_blur": 0
+        }
+      },
+      "depends_on": [
+        "studio"
+      ],
+      "bindings": [
+        {
+          "target": "/file",
+          "sha_target": "/expected_sha256",
+          "step": "studio",
+          "artifact": "/candidate"
+        }
+      ],
+      "limits": {
+        "cpu_threads": 2,
+        "memory_mb": 2048,
+        "disk_mb": 256,
+        "gpu_mb": 0
+      },
+      "timeout_seconds": 120,
+      "reuse": true
+    },
+    {
+      "id": "inspect",
+      "command": "inspect",
+      "params": {},
+      "depends_on": [
+        "studio"
+      ],
+      "bindings": [
+        {
+          "target": "/file",
+          "sha_target": "/expected_sha256",
+          "step": "studio",
+          "artifact": "/candidate"
+        }
+      ],
+      "limits": {
+        "cpu_threads": 1,
+        "memory_mb": 1024,
+        "disk_mb": 128,
+        "gpu_mb": 0
+      },
+      "timeout_seconds": 120,
+      "reuse": true
+    }
+  ]
+}

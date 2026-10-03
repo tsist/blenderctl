@@ -1,0 +1,1 @@
+batch_id,asset_id,operation,old_path,new_path,old_datablock,new_datablock,old_catalog_uuid,new_catalog_uuid,before_sha256,after_sha256,backup_path,status,evidence,rollback_status

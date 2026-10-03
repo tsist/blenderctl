@@ -6,6 +6,8 @@ Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
+[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.1.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+
 ## What you get
 
 - CLI adapters for scene construction, mesh/UV/node work, materials, rigs/animation, simulation, rendering, media, tracking, format exchange, dependencies, and asset workflows. Each adapter has a bounded contract; this is not every Blender operation.
