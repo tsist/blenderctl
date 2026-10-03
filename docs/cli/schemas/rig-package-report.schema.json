@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "rig-package-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rig_package_version": {
+      "const": "1.0"
+    },
+    "adapter": {
+      "const": "NATIVE_RIG_PACKAGE_V1"
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "const": "NATIVE_RIG_PACKAGE_V1"
+        },
+        "scope": {
+          "const": "WHOLE_PROJECT"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "minItems": 2,
+          "maxItems": 120,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "adapter",
+        "scope",
+        "scene",
+        "view_layer",
+        "objects",
+        "frames"
+      ]
+    },
+    "candidate": {
+      "type": "string"
+    },
+    "candidate_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_saved": {
+      "const": false
+    },
+    "byte_identical": {
+      "const": true
+    },
+    "self_contained": {
+      "const": true
+    },
+    "reopen": {
+      "const": "pass"
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rigs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "bones": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "bbones": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "constraints": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "name",
+              "bones",
+              "bbones",
+              "constraints"
+            ]
+          }
+        },
+        "meshes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "vertices": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "groups": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shape_keys": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "bindings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "rig": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "rig"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "name",
+              "vertices",
+              "groups",
+              "shape_keys",
+              "bindings"
+            ]
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "slots": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "slots"
+            ]
+          }
+        },
+        "drivers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "objects": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "collections": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "embedded_cloth": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "object": {
+                "type": "string"
+              },
+              "modifier": {
+                "type": "string"
+              },
+              "baked": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "object",
+              "modifier",
+              "baked"
+            ]
+          }
+        }
+      },
+      "required": [
+        "rigs",
+        "meshes",
+        "actions",
+        "drivers",
+        "objects",
+        "collections",
+        "embedded_cloth"
+      ]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "requested_frame": {
+            "type": "number"
+          },
+          "actual_frame": {
+            "type": "number"
+          },
+          "vertices": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "topology_ok": {
+            "type": "boolean"
+          },
+          "uv_ok": {
+            "type": "boolean"
+          },
+          "position_error": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "object",
+          "requested_frame",
+          "actual_frame",
+          "vertices",
+          "topology_ok",
+          "uv_ok",
+          "position_error",
+          "ok"
+        ]
+      }
+    },
+    "driver_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "NATIVE_SIMPLE_V1"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inventory_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "driver_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "acknowledged_unresolved": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 0,
+          "maxItems": 4096,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "mode",
+        "source_sha256",
+        "inventory_sha256",
+        "driver_count",
+        "acknowledged_unresolved"
+      ]
+    },
+    "simulation_receipt": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "seconds": {
+      "type": "number"
+    },
+    "scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "rig_package_version",
+    "adapter",
+    "settings",
+    "candidate",
+    "candidate_sha256",
+    "source_sha256",
+    "source_saved",
+    "byte_identical",
+    "self_contained",
+    "reopen",
+    "inventory",
+    "checks",
+    "driver_profile",
+    "simulation_receipt",
+    "seconds",
+    "scope"
+  ]
+}

@@ -1,0 +1,1649 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exchange-batch-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "exchange_batch_version": {
+      "const": "1.0"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "exchange_report_version": {
+            "const": "1.0"
+          },
+          "operation": {
+            "enum": [
+              "export",
+              "import",
+              "convert"
+            ]
+          },
+          "format": {
+            "enum": [
+              "GLB",
+              "OBJ",
+              "STL",
+              "PLY",
+              "FBX",
+              "USD",
+              "ABC"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "STATIC",
+              "ANIMATION"
+            ]
+          },
+          "settings": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "format": {
+                    "enum": [
+                      "GLB",
+                      "OBJ",
+                      "STL",
+                      "PLY",
+                      "FBX",
+                      "USD",
+                      "ABC"
+                    ]
+                  },
+                  "scene": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "view_layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "objects": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63,
+                      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                    },
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "uniqueItems": true
+                  },
+                  "mode": {
+                    "enum": [
+                      "STATIC",
+                      "ANIMATION"
+                    ]
+                  },
+                  "frame_start": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "frame_end": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "meters_per_unit": {
+                    "type": "number",
+                    "minimum": 1e-06,
+                    "maximum": 1000000
+                  },
+                  "materials": {
+                    "enum": [
+                      "NONE",
+                      "GLTF_PBR"
+                    ]
+                  },
+                  "rig_adapter": {
+                    "enum": [
+                      "BBONE_CAGE_V1",
+                      "BBONE_MULTI_CAGE_V1"
+                    ]
+                  },
+                  "geometry_adapter": {
+                    "enum": [
+                      "EVALUATED_MESH_CLIP_V1",
+                      "EVALUATED_MESH_CACHE_V1"
+                    ]
+                  },
+                  "sampling": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "substeps": {
+                            "type": "integer",
+                            "enum": [
+                              1,
+                              2,
+                              4,
+                              8
+                            ]
+                          },
+                          "max_position_error": {
+                            "type": "number",
+                            "minimum": 1e-07,
+                            "maximum": 0.001
+                          },
+                          "max_vertex_samples": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 16000000
+                          }
+                        },
+                        "required": [
+                          "substeps",
+                          "max_position_error",
+                          "max_vertex_samples"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "seed_substeps": {
+                            "type": "integer",
+                            "enum": [
+                              1,
+                              2,
+                              4,
+                              8
+                            ]
+                          },
+                          "max_depth": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 24
+                          },
+                          "max_evaluations": {
+                            "type": "integer",
+                            "minimum": 5,
+                            "maximum": 4096
+                          },
+                          "max_vertex_samples": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 256000000
+                          },
+                          "max_position_error": {
+                            "type": "number",
+                            "minimum": 1e-07,
+                            "maximum": 0.001
+                          }
+                        },
+                        "required": [
+                          "seed_substeps",
+                          "max_depth",
+                          "max_evaluations",
+                          "max_vertex_samples",
+                          "max_position_error"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "format",
+                  "scene",
+                  "view_layer",
+                  "objects",
+                  "mode",
+                  "frame_start",
+                  "frame_end",
+                  "meters_per_unit",
+                  "materials"
+                ],
+                "allOf": [
+                  {
+                    "if": {
+                      "required": [
+                        "rig_adapter"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "enum": [
+                            "GLB",
+                            "FBX"
+                          ]
+                        },
+                        "mode": {
+                          "const": "ANIMATION"
+                        },
+                        "materials": {
+                          "const": "NONE"
+                        },
+                        "meters_per_unit": {
+                          "const": 1
+                        },
+                        "objects": {
+                          "minItems": 2,
+                          "maxItems": 17
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "rig_adapter"
+                      ],
+                      "properties": {
+                        "rig_adapter": {
+                          "const": "BBONE_CAGE_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "const": "GLB"
+                        },
+                        "objects": {
+                          "maxItems": 2
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "sampling"
+                      ],
+                      "not": {
+                        "required": [
+                          "rig_adapter"
+                        ]
+                      },
+                      "properties": {
+                        "format": {
+                          "enum": [
+                            "GLB",
+                            "FBX",
+                            "USD"
+                          ]
+                        },
+                        "mode": {
+                          "const": "ANIMATION"
+                        },
+                        "materials": {
+                          "const": "NONE"
+                        },
+                        "meters_per_unit": {
+                          "const": 1
+                        },
+                        "objects": {
+                          "maxItems": 16
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "EVALUATED_MESH_CACHE_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "const": "USD"
+                        },
+                        "sampling": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "seed_substeps": {
+                              "type": "integer",
+                              "enum": [
+                                1,
+                                2,
+                                4,
+                                8
+                              ]
+                            },
+                            "max_depth": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 24
+                            },
+                            "max_evaluations": {
+                              "type": "integer",
+                              "minimum": 5,
+                              "maximum": 4096
+                            },
+                            "max_vertex_samples": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 256000000
+                            },
+                            "max_position_error": {
+                              "type": "number",
+                              "minimum": 1e-07,
+                              "maximum": 0.001
+                            }
+                          },
+                          "required": [
+                            "seed_substeps",
+                            "max_depth",
+                            "max_evaluations",
+                            "max_vertex_samples",
+                            "max_position_error"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "EVALUATED_MESH_CLIP_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "enum": [
+                            "GLB",
+                            "FBX"
+                          ]
+                        },
+                        "sampling": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "substeps": {
+                              "type": "integer",
+                              "enum": [
+                                1,
+                                2,
+                                4,
+                                8
+                              ]
+                            },
+                            "max_position_error": {
+                              "type": "number",
+                              "minimum": 1e-07,
+                              "maximum": 0.001
+                            },
+                            "max_vertex_samples": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 16000000
+                            }
+                          },
+                          "required": [
+                            "substeps",
+                            "max_position_error",
+                            "max_vertex_samples"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "sampling"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "geometry_adapter"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "format",
+                        "mode"
+                      ],
+                      "properties": {
+                        "format": {
+                          "const": "USD"
+                        },
+                        "mode": {
+                          "const": "ANIMATION"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "EVALUATED_MESH_CACHE_V1"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "format": {
+                    "enum": [
+                      "GLB",
+                      "OBJ",
+                      "STL",
+                      "PLY",
+                      "FBX",
+                      "USD",
+                      "ABC"
+                    ]
+                  },
+                  "scene": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "frame": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "fps": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 240
+                  },
+                  "scale_to_meters": {
+                    "type": "number",
+                    "minimum": 1e-06,
+                    "maximum": 1000000
+                  },
+                  "mode": {
+                    "enum": [
+                      "STATIC",
+                      "ANIMATION"
+                    ]
+                  },
+                  "geometry_adapter": {
+                    "enum": [
+                      "EVALUATED_MESH_CACHE_V1",
+                      "FBX_NATIVE_CLOCK_V1",
+                      "GLB_NATIVE_CLOCK_V1"
+                    ]
+                  }
+                },
+                "required": [
+                  "format",
+                  "scene",
+                  "frame",
+                  "fps",
+                  "scale_to_meters",
+                  "mode"
+                ],
+                "allOf": [
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "mode": {
+                          "const": "ANIMATION"
+                        },
+                        "scale_to_meters": {
+                          "const": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "EVALUATED_MESH_CACHE_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "const": "USD"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "FBX_NATIVE_CLOCK_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "const": "FBX"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "GLB_NATIVE_CLOCK_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "format": {
+                          "const": "GLB"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "format",
+                        "mode"
+                      ],
+                      "properties": {
+                        "format": {
+                          "const": "USD"
+                        },
+                        "mode": {
+                          "const": "ANIMATION"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "EVALUATED_MESH_CACHE_V1"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "expected_sha256"
+                    ]
+                  },
+                  "import": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "format": {
+                        "enum": [
+                          "GLB",
+                          "OBJ",
+                          "STL",
+                          "PLY",
+                          "FBX",
+                          "USD",
+                          "ABC"
+                        ]
+                      },
+                      "scene": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 63,
+                        "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                      },
+                      "frame": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100000
+                      },
+                      "fps": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 240
+                      },
+                      "scale_to_meters": {
+                        "type": "number",
+                        "minimum": 1e-06,
+                        "maximum": 1000000
+                      },
+                      "mode": {
+                        "enum": [
+                          "STATIC",
+                          "ANIMATION"
+                        ]
+                      },
+                      "geometry_adapter": {
+                        "enum": [
+                          "EVALUATED_MESH_CACHE_V1",
+                          "FBX_NATIVE_CLOCK_V1",
+                          "GLB_NATIVE_CLOCK_V1"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "format",
+                      "scene",
+                      "frame",
+                      "fps",
+                      "scale_to_meters",
+                      "mode"
+                    ],
+                    "allOf": [
+                      {
+                        "if": {
+                          "required": [
+                            "geometry_adapter"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "mode": {
+                              "const": "ANIMATION"
+                            },
+                            "scale_to_meters": {
+                              "const": 1
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "required": [
+                            "geometry_adapter"
+                          ],
+                          "properties": {
+                            "geometry_adapter": {
+                              "const": "EVALUATED_MESH_CACHE_V1"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "format": {
+                              "const": "USD"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "required": [
+                            "geometry_adapter"
+                          ],
+                          "properties": {
+                            "geometry_adapter": {
+                              "const": "FBX_NATIVE_CLOCK_V1"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "format": {
+                              "const": "FBX"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "required": [
+                            "geometry_adapter"
+                          ],
+                          "properties": {
+                            "geometry_adapter": {
+                              "const": "GLB_NATIVE_CLOCK_V1"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "format": {
+                              "const": "GLB"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "required": [
+                            "format",
+                            "mode"
+                          ],
+                          "properties": {
+                            "format": {
+                              "const": "USD"
+                            },
+                            "mode": {
+                              "const": "ANIMATION"
+                            }
+                          }
+                        },
+                        "then": {
+                          "required": [
+                            "geometry_adapter"
+                          ],
+                          "properties": {
+                            "geometry_adapter": {
+                              "const": "EVALUATED_MESH_CACHE_V1"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "output_format": {
+                    "enum": [
+                      "GLB",
+                      "OBJ",
+                      "STL",
+                      "PLY",
+                      "FBX",
+                      "USD",
+                      "ABC"
+                    ]
+                  },
+                  "geometry_adapter": {
+                    "enum": [
+                      "FBX_NATIVE_CLOCK_V1",
+                      "GLB_NATIVE_CLOCK_V1"
+                    ]
+                  }
+                },
+                "required": [
+                  "input",
+                  "import",
+                  "output_format"
+                ],
+                "allOf": [
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "import": {
+                          "required": [
+                            "geometry_adapter"
+                          ],
+                          "properties": {
+                            "format": {
+                              "const": "USD"
+                            },
+                            "mode": {
+                              "const": "ANIMATION"
+                            },
+                            "geometry_adapter": {
+                              "const": "EVALUATED_MESH_CACHE_V1"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "else": {
+                      "properties": {
+                        "import": {
+                          "properties": {
+                            "mode": {
+                              "const": "STATIC"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "FBX_NATIVE_CLOCK_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "output_format": {
+                          "const": "FBX"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "geometry_adapter"
+                      ],
+                      "properties": {
+                        "geometry_adapter": {
+                          "const": "GLB_NATIVE_CLOCK_V1"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "output_format": {
+                          "const": "GLB"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "bidirectional_vertex_distance": {
+                      "type": "number"
+                    },
+                    "position_tolerance": {
+                      "type": "number"
+                    },
+                    "triangle_counts": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "area_delta": {
+                      "type": "number"
+                    },
+                    "scope": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "source_frame": {
+                      "type": "number"
+                    },
+                    "output_frame": {
+                      "type": "number"
+                    },
+                    "declared_position_tolerance": {
+                      "type": "number"
+                    },
+                    "indexed_vertex_error": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "bidirectional_vertex_distance",
+                    "position_tolerance",
+                    "triangle_counts",
+                    "area_delta",
+                    "scope"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "requested_frame": {
+                      "type": "number"
+                    },
+                    "actual_frame": {
+                      "type": "number"
+                    },
+                    "indexed_vertex_error": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "topology_ok": {
+                      "type": "boolean"
+                    },
+                    "position_tolerance": {
+                      "type": "number"
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "scope": {
+                      "enum": [
+                        "USD_NATIVE_FRAME_INDEXED_SURFACE",
+                        "FBX_NATIVE_FRAME_INDEXED_SURFACE",
+                        "GLB_NATIVE_FRAME_INDEXED_SURFACE"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "output",
+                    "requested_frame",
+                    "actual_frame",
+                    "indexed_vertex_error",
+                    "topology_ok",
+                    "position_tolerance",
+                    "ok",
+                    "scope"
+                  ]
+                }
+              ]
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "file",
+                "sha256",
+                "bytes"
+              ]
+            }
+          },
+          "candidate": {
+            "type": "string"
+          },
+          "candidate_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_saved": {
+            "const": false
+          },
+          "reopen": {
+            "const": "pass"
+          },
+          "losses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "resource_hashes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "seconds": {
+            "type": "number"
+          },
+          "material_profile": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "base_color": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "metallic": {
+                  "type": "number"
+                },
+                "roughness": {
+                  "type": "number"
+                },
+                "textures": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "base_color",
+                "metallic",
+                "roughness",
+                "textures"
+              ]
+            }
+          },
+          "clock_transfer": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "adapter": {
+                    "const": "FBX_NATIVE_CLOCK_V1"
+                  },
+                  "fps": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "key_frames": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "clock_scale": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "source_cache_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "meshes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "vertices": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "vertices"
+                      ]
+                    }
+                  },
+                  "conversion_position_tolerance": {
+                    "type": "number"
+                  },
+                  "max_position_error": {
+                    "type": "number"
+                  },
+                  "self_contained_candidate": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "adapter",
+                  "fps",
+                  "key_frames",
+                  "clock_scale",
+                  "source_cache_sha256",
+                  "meshes",
+                  "conversion_position_tolerance",
+                  "max_position_error",
+                  "self_contained_candidate"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "adapter": {
+                    "const": "GLB_NATIVE_CLOCK_V1"
+                  },
+                  "fps": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "key_frames": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "clock_scale": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "source_cache_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "meshes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "vertices": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "expanded_vertices": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "vertices",
+                        "expanded_vertices"
+                      ]
+                    }
+                  },
+                  "conversion_position_tolerance": {
+                    "type": "number"
+                  },
+                  "max_position_error": {
+                    "type": "number"
+                  },
+                  "self_contained_candidate": {
+                    "const": true
+                  },
+                  "time_origin_frame": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "adapter",
+                  "fps",
+                  "key_frames",
+                  "clock_scale",
+                  "source_cache_sha256",
+                  "meshes",
+                  "conversion_position_tolerance",
+                  "max_position_error",
+                  "self_contained_candidate",
+                  "time_origin_frame"
+                ]
+              }
+            ]
+          },
+          "cache_transfer": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "adapter": {
+                "const": "EVALUATED_MESH_CACHE_V1"
+              },
+              "time_domain": {
+                "const": "BLENDER_EVALUATED_FRAME"
+              },
+              "source_fps": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "output_fps": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "key_frames": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "actual_samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "requested_times": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "vertex_samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "source_replay_max_error": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "interpolation_max_error": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "meshes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "vertices": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "output",
+                    "vertices"
+                  ]
+                }
+              },
+              "cache_dependency": {
+                "type": "string"
+              },
+              "source_uv_max_error": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "source_uv_tolerance": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "adapter",
+              "time_domain",
+              "source_fps",
+              "output_fps",
+              "key_frames",
+              "actual_samples",
+              "requested_times",
+              "vertex_samples",
+              "source_replay_max_error",
+              "interpolation_max_error",
+              "meshes",
+              "cache_dependency"
+            ]
+          },
+          "rig_transfer": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "adapter": {
+                    "const": "BBONE_CAGE_V1"
+                  },
+                  "source_vertices": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "source_bones": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "affine_joints": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "frames": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 1,
+                    "maxItems": 32
+                  },
+                  "independent_lbs_max_error": {
+                    "type": "number"
+                  },
+                  "map": {
+                    "type": "string"
+                  },
+                  "bones": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "vertices_after_uv_splits": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "shape_keys": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "all_vertices_weighted": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "adapter",
+                  "source_vertices",
+                  "source_bones",
+                  "affine_joints",
+                  "frames",
+                  "independent_lbs_max_error",
+                  "map",
+                  "bones",
+                  "vertices_after_uv_splits",
+                  "shape_keys",
+                  "all_vertices_weighted"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "adapter": {
+                    "const": "BBONE_MULTI_CAGE_V1"
+                  },
+                  "frames": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 1,
+                    "maxItems": 32
+                  },
+                  "meshes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "source": {
+                          "type": "string"
+                        },
+                        "output": {
+                          "type": "string"
+                        },
+                        "source_shape_keys": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "source_vertices": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "independent_lbs_max_error": {
+                          "type": "number"
+                        },
+                        "map": {
+                          "type": "string"
+                        },
+                        "omitted_post_modifiers": {
+                          "type": "array"
+                        },
+                        "bones": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "vertices_after_uv_splits": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "shape_keys": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "all_vertices_weighted": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "source",
+                        "output",
+                        "source_shape_keys",
+                        "source_vertices",
+                        "independent_lbs_max_error",
+                        "map",
+                        "omitted_post_modifiers",
+                        "bones",
+                        "vertices_after_uv_splits",
+                        "shape_keys",
+                        "all_vertices_weighted"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 16
+                  }
+                },
+                "required": [
+                  "adapter",
+                  "frames",
+                  "meshes"
+                ]
+              }
+            ]
+          },
+          "geometry_transfer": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "adapter": {
+                "const": "EVALUATED_MESH_CLIP_V1"
+              },
+              "source_fps": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "output_fps": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "source_frames": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "output_frames": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "key_frames": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "vertex_samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "source_replay_max_error": {
+                "type": "number"
+              },
+              "interpolation": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "midpoint_indexed_error": {
+                      "type": "number"
+                    },
+                    "tolerance": {
+                      "type": "number"
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "midpoint_indexed_error",
+                    "tolerance",
+                    "ok"
+                  ]
+                }
+              },
+              "modifiers_evaluated": {
+                "type": "object"
+              },
+              "meshes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "vertices": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "output",
+                    "vertices"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "adapter",
+              "source_fps",
+              "output_fps",
+              "source_frames",
+              "output_frames",
+              "key_frames",
+              "vertex_samples",
+              "source_replay_max_error",
+              "interpolation",
+              "modifiers_evaluated",
+              "meshes"
+            ]
+          }
+        },
+        "required": [
+          "exchange_report_version",
+          "operation",
+          "format",
+          "mode",
+          "settings",
+          "checks",
+          "outputs",
+          "candidate",
+          "candidate_sha256",
+          "source_saved",
+          "reopen",
+          "losses"
+        ]
+      }
+    },
+    "policy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "exchange_batch_version",
+    "items",
+    "policy"
+  ]
+}

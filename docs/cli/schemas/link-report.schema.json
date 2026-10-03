@@ -1,0 +1,1337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "link-report 1.0",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "1.0"
+        },
+        "adapter": {
+          "const": "LIBRARY_OVERRIDE_5_2_V1"
+        },
+        "candidate": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+        },
+        "candidate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "content_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "identity",
+              "content_sha256"
+            ]
+          }
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scene": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "view_layer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            }
+          },
+          "required": [
+            "scene",
+            "view_layer"
+          ]
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {},
+              "required": []
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "expected_sha256"
+              ]
+            }
+          ]
+        },
+        "blender_build": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blender_version": {
+          "type": "array",
+          "const": [
+            5,
+            2,
+            1
+          ]
+        },
+        "implementation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reopen": {
+          "const": "pass"
+        },
+        "source_saved": {
+          "type": "boolean",
+          "const": false
+        },
+        "publication": {
+          "const": "working_candidate_only"
+        },
+        "upstream_changes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "added": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "identity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "library": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "asset_id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "library"
+                    ]
+                  },
+                  "content_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "identity",
+                  "content_sha256"
+                ]
+              }
+            },
+            "removed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "identity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "library": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "asset_id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "library"
+                    ]
+                  },
+                  "content_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "identity",
+                  "content_sha256"
+                ]
+              }
+            },
+            "changed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "before": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "identity": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "library": {
+                            "oneOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "asset_id": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "name",
+                          "library"
+                        ]
+                      },
+                      "content_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "identity",
+                      "content_sha256"
+                    ]
+                  },
+                  "after": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "identity": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "library": {
+                            "oneOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "asset_id": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "name",
+                          "library"
+                        ]
+                      },
+                      "content_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "identity",
+                      "content_sha256"
+                    ]
+                  }
+                },
+                "required": [
+                  "before",
+                  "after"
+                ]
+              }
+            }
+          },
+          "required": [
+            "added",
+            "removed",
+            "changed"
+          ]
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "reference": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "root": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "system": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "identity",
+              "reference",
+              "root",
+              "system"
+            ]
+          }
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_content": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "kind": {
+          "const": "link"
+        },
+        "transaction_item": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "blend_exact"
+            },
+            "mode": {
+              "const": "create"
+            },
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 1000
+            }
+          },
+          "required": [
+            "kind",
+            "mode",
+            "file",
+            "dependencies"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "adapter",
+        "candidate",
+        "candidate_sha256",
+        "resources",
+        "references",
+        "context",
+        "source",
+        "blender_build",
+        "blender_version",
+        "implementation_sha256",
+        "reopen",
+        "source_saved",
+        "publication",
+        "upstream_changes",
+        "overrides",
+        "scope",
+        "local_content",
+        "kind",
+        "transaction_item"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "1.0"
+        },
+        "adapter": {
+          "const": "LIBRARY_OVERRIDE_5_2_V1"
+        },
+        "candidate": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+        },
+        "candidate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "content_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "identity",
+              "content_sha256"
+            ]
+          }
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scene": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "view_layer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            }
+          },
+          "required": [
+            "scene",
+            "view_layer"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "blender_build": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blender_version": {
+          "type": "array",
+          "const": [
+            5,
+            2,
+            1
+          ]
+        },
+        "implementation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reopen": {
+          "const": "pass"
+        },
+        "source_saved": {
+          "type": "boolean",
+          "const": false
+        },
+        "publication": {
+          "const": "working_candidate_only"
+        },
+        "upstream_changes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "added": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "identity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "library": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "asset_id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "library"
+                    ]
+                  },
+                  "content_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "identity",
+                  "content_sha256"
+                ]
+              }
+            },
+            "removed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "identity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "library": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "asset_id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "library"
+                    ]
+                  },
+                  "content_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "identity",
+                  "content_sha256"
+                ]
+              }
+            },
+            "changed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "before": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "identity": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "library": {
+                            "oneOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "asset_id": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "name",
+                          "library"
+                        ]
+                      },
+                      "content_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "identity",
+                      "content_sha256"
+                    ]
+                  },
+                  "after": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "identity": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "library": {
+                            "oneOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "asset_id": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "name",
+                          "library"
+                        ]
+                      },
+                      "content_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "identity",
+                      "content_sha256"
+                    ]
+                  }
+                },
+                "required": [
+                  "before",
+                  "after"
+                ]
+              }
+            }
+          },
+          "required": [
+            "added",
+            "removed",
+            "changed"
+          ]
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "reference": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "root": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "system": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "identity",
+              "reference",
+              "root",
+              "system"
+            ]
+          },
+          "minItems": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_content": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "kind": {
+          "const": "override"
+        },
+        "root": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "Object",
+                "Collection"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "asset_id": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+            },
+            "library": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+            }
+          },
+          "required": [
+            "type",
+            "name",
+            "library"
+          ]
+        },
+        "edits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "const": "Object"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "library": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "values": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "location": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": -1000000000.0,
+                      "maximum": 1000000000.0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "rotation_euler": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": -1000000000.0,
+                      "maximum": 1000000000.0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "scale": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": -1000000000.0,
+                      "maximum": 1000000000.0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "hide_render": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [],
+                "minProperties": 1
+              }
+            },
+            "required": [
+              "target",
+              "values"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "receipt": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+        },
+        "receipt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "transaction_item": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "blend_exact"
+            },
+            "mode": {
+              "const": "create"
+            },
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 1000
+            }
+          },
+          "required": [
+            "kind",
+            "mode",
+            "file",
+            "dependencies"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "adapter",
+        "candidate",
+        "candidate_sha256",
+        "resources",
+        "references",
+        "context",
+        "source",
+        "blender_build",
+        "blender_version",
+        "implementation_sha256",
+        "reopen",
+        "source_saved",
+        "publication",
+        "upstream_changes",
+        "overrides",
+        "scope",
+        "local_content",
+        "kind",
+        "root",
+        "edits",
+        "receipt",
+        "receipt_sha256",
+        "transaction_item"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "kind": {
+      "const": "native_sculpt_replay"
+    },
+    "backend": {
+      "const": "WINDOWS_GUI_DRAW_V1"
+    },
+    "request_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "object": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "brush_replay_verified": {
+      "const": true
+    },
+    "artistic_quality": {
+      "const": "pending_human_review"
+    },
+    "blender_build": {
+      "const": "9e2066aef7ef"
+    },
+    "os_sandbox": {
+      "const": false
+    },
+    "changed_vertices": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "max_displacement_local": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "protected_fields_unchanged": {
+      "const": true
+    },
+    "runtime_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "minProperties": 2,
+      "maxProperties": 2
+    }
+  },
+  "required": [
+    "version",
+    "kind",
+    "backend",
+    "request_sha256",
+    "source",
+    "candidate",
+    "verification",
+    "object",
+    "brush_replay_verified",
+    "artistic_quality",
+    "blender_build",
+    "os_sandbox",
+    "changed_vertices",
+    "max_displacement_local",
+    "protected_fields_unchanged",
+    "runtime_hashes"
+  ]
+}

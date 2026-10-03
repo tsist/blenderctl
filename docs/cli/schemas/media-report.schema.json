@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "media-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "media_report_version": {
+      "const": "1.0"
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string"
+        },
+        "fps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fps_base": {
+          "type": "number"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "strips": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "channel": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "mute": {
+                "type": "boolean"
+              },
+              "blend_type": {
+                "type": "string"
+              },
+              "blend_alpha": {
+                "type": "number"
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "file": {
+                "type": "string"
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "volume": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "type",
+              "channel",
+              "start",
+              "end",
+              "mute",
+              "blend_type",
+              "blend_alpha"
+            ]
+          }
+        }
+      },
+      "required": [
+        "scene",
+        "fps",
+        "fps_base",
+        "width",
+        "height",
+        "start",
+        "end",
+        "strips"
+      ]
+    },
+    "resource_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "reopen": {
+      "const": "pass"
+    }
+  },
+  "required": [
+    "media_report_version",
+    "state",
+    "resource_hashes",
+    "reopen"
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UV layout report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "layouts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operation_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 499
+          },
+          "uv_layout_report_version": {
+            "const": "1.0"
+          },
+          "adapter": {
+            "const": "DETERMINISTIC_UDIM_V1"
+          },
+          "density_scope": {
+            "const": "BASE_MESH_WORLD_METRIC_AT_CONTEXT_FRAME"
+          },
+          "tolerances": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "uv": {
+                "const": 2e-05
+              },
+              "overlap_area": {
+                "const": 1e-10
+              },
+              "density_relative": {
+                "const": 0.0002
+              }
+            },
+            "required": [
+              "uv",
+              "overlap_area",
+              "density_relative"
+            ]
+          },
+          "islands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "object": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "layer": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "seed_face": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 999999
+                },
+                "faces": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 999999
+                  },
+                  "minItems": 1,
+                  "maxItems": 1000000
+                },
+                "tile": {
+                  "type": "integer",
+                  "minimum": 1001,
+                  "maximum": 1100
+                },
+                "selected": {
+                  "type": "boolean"
+                },
+                "locked": {
+                  "type": "boolean"
+                },
+                "world_area_m2": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                },
+                "initial_density": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                },
+                "target_density": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                },
+                "scale": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                },
+                "bounds_before": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000.0,
+                    "maximum": 1000000.0
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "rotation_degrees": {
+                  "enum": [
+                    0,
+                    90
+                  ]
+                },
+                "bounds_after": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000.0,
+                    "maximum": 1000000.0
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "uv_area": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                },
+                "observed_density": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                },
+                "triangle_density_range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1e+300
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "density_relative_error": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1e+300
+                }
+              },
+              "required": [
+                "key",
+                "object",
+                "layer",
+                "seed_face",
+                "faces",
+                "tile",
+                "selected",
+                "locked",
+                "world_area_m2",
+                "initial_density",
+                "target_density",
+                "scale",
+                "bounds_before",
+                "rotation_degrees",
+                "bounds_after",
+                "uv_area",
+                "observed_density",
+                "triangle_density_range",
+                "density_relative_error"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 2048
+          },
+          "tiles": {
+            "type": "object",
+            "patternProperties": {
+              "^10[0-9]{2}$|^1100$": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "triangle_pairs": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2000000
+                  },
+                  "maximum_overlap_area": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1e+300
+                  },
+                  "minimum_checked_gap_uv": {
+                    "oneOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1e+300
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "triangle_pairs",
+                  "maximum_overlap_area",
+                  "minimum_checked_gap_uv"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "preservation": {
+            "const": "pass"
+          },
+          "unselected_outside_tiles": {
+            "const": "unchanged_not_validated"
+          },
+          "packing": {
+            "const": "deterministic_conservative_rectangles; failure_is_not_proof_of_geometric_infeasibility"
+          }
+        },
+        "required": [
+          "operation_index",
+          "uv_layout_report_version",
+          "adapter",
+          "density_scope",
+          "tolerances",
+          "islands",
+          "tiles",
+          "preservation",
+          "unselected_outside_tiles",
+          "packing"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 500
+    }
+  },
+  "required": [
+    "version",
+    "layouts"
+  ]
+}

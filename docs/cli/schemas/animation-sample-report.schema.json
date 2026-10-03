@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animation sample report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "animation_sample_version": {
+      "const": "1.0"
+    },
+    "scene": {
+      "type": "string",
+      "minLength": 1
+    },
+    "view_layer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fps": {
+      "type": "number"
+    },
+    "time_origin_frame": {
+      "type": "integer"
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "frame": {
+            "type": "number"
+          },
+          "time_seconds": {
+            "type": "number"
+          },
+          "objects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "matrix_world": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "bones": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "matrix_world": {
+                        "type": "array",
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 4,
+                          "maxItems": 4
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                      },
+                      "matrix_parent_local": {
+                        "oneOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "number"
+                              },
+                              "minItems": 4,
+                              "maxItems": 4
+                            },
+                            "minItems": 4,
+                            "maxItems": 4
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "head_world": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "tail_world": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      }
+                    },
+                    "required": [
+                      "matrix_world",
+                      "head_world",
+                      "tail_world"
+                    ]
+                  }
+                },
+                "vertices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "world": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      }
+                    },
+                    "required": [
+                      "index",
+                      "world"
+                    ]
+                  }
+                },
+                "evaluated_vertex_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "name",
+                "matrix_world",
+                "bones",
+                "vertices"
+              ]
+            }
+          }
+        },
+        "required": [
+          "frame",
+          "time_seconds",
+          "objects"
+        ]
+      }
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "animation_sample_version",
+    "scene",
+    "view_layer",
+    "fps",
+    "time_origin_frame",
+    "frames",
+    "scope"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "override-resync-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "adapter": {
+      "const": "LIBRARY_OVERRIDE_5_2_V1"
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 1000,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "version",
+    "adapter",
+    "receipt",
+    "updates"
+  ]
+}

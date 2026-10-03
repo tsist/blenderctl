@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cpu_threads": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 32
+    },
+    "memory_mb": {
+      "type": "integer",
+      "minimum": 256,
+      "maximum": 65536
+    },
+    "gpu_mb": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 32768
+    }
+  },
+  "required": [
+    "cpu_threads",
+    "memory_mb",
+    "gpu_mb"
+  ]
+}

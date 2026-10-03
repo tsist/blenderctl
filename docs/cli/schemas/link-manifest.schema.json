@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "link-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "adapter": {
+      "const": "LIBRARY_OVERRIDE_5_2_V1"
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer"
+      ]
+    },
+    "library": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "selections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "enum": [
+              "Object",
+              "Collection"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "asset_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+          }
+        },
+        "required": [
+          "type",
+          "name"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true
+    },
+    "placement": {
+      "enum": [
+        "ATTACH",
+        "INSTANCE"
+      ]
+    },
+    "instance_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    }
+  },
+  "required": [
+    "version",
+    "adapter",
+    "context",
+    "library",
+    "selections",
+    "placement"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "placement": {
+            "const": "INSTANCE"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "instance_name"
+        ],
+        "properties": {
+          "selections": {
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "properties": {
+                "type": {
+                  "const": "Collection"
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "required": [
+            "instance_name"
+          ]
+        }
+      }
+    }
+  ]
+}

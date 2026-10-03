@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "backend": {
+      "const": "WINDOWS_GUI_DRAW_V1"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "object": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "brush": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "DRAW"
+        },
+        "mode": {
+          "enum": [
+            "NORMAL",
+            "INVERT"
+          ]
+        },
+        "strength": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 1
+        },
+        "radius_pixels": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "type",
+        "mode",
+        "strength",
+        "radius_pixels"
+      ]
+    },
+    "view": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rotation": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "location": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": -10000,
+            "maximum": 10000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "distance": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 10000
+        },
+        "region_size": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 64,
+            "maximum": 4096
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "rotation",
+        "location",
+        "distance",
+        "region_size"
+      ]
+    },
+    "stroke": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "location": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -10000,
+              "maximum": 10000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "pressure": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "time": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3600
+          }
+        },
+        "required": [
+          "location",
+          "pressure",
+          "time"
+        ]
+      },
+      "minItems": 2,
+      "maxItems": 256
+    },
+    "max_displacement": {
+      "type": "number",
+      "minimum": 1e-06,
+      "maximum": 1000
+    }
+  },
+  "required": [
+    "version",
+    "backend",
+    "source",
+    "object",
+    "brush",
+    "view",
+    "stroke",
+    "max_displacement"
+  ]
+}

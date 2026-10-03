@@ -1,0 +1,557 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "pipeline-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "pipeline_report_version": {
+      "const": "1.0"
+    },
+    "job_id": {
+      "type": "string"
+    },
+    "manifest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pipeline_version": {
+              "const": "1.0"
+            },
+            "policy": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "max_workers": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "cpu_threads": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "memory_mb": {
+                  "type": "integer",
+                  "minimum": 256,
+                  "maximum": 65536
+                },
+                "gpu_mb": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 32768
+                },
+                "disk_mb": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65536
+                },
+                "min_free_mb": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1048576
+                },
+                "failure": {
+                  "enum": [
+                    "continue",
+                    "fail_fast"
+                  ]
+                },
+                "resource_domain": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "max_workers",
+                "cpu_threads",
+                "memory_mb",
+                "gpu_mb",
+                "disk_mb",
+                "min_free_mb",
+                "failure"
+              ]
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+                  },
+                  "command": {
+                    "enum": [
+                      "query",
+                      "diff",
+                      "dependency.audit",
+                      "validate",
+                      "identity.prepare",
+                      "asset.prepare",
+                      "asset.index",
+                      "scene.prepare",
+                      "scene.inspect",
+                      "model.prepare",
+                      "model.inspect",
+                      "node.prepare",
+                      "node.inspect",
+                      "material.preview",
+                      "texture.bake",
+                      "rig.prepare",
+                      "rig.inspect",
+                      "animation.sample",
+                      "simulation.prepare",
+                      "simulation.inspect",
+                      "simulation.bake",
+                      "render.run",
+                      "media.prepare",
+                      "media.export",
+                      "exchange.export",
+                      "exchange.import",
+                      "exchange.convert",
+                      "extension.prepare",
+                      "extension.run",
+                      "asset.preview.prepare",
+                      "dependency.plan-relink",
+                      "dependency.prepare",
+                      "sculpt.replay",
+                      "rig.package",
+                      "tracking.prepare",
+                      "tracking.inspect",
+                      "tracking.solve",
+                      "inspect",
+                      "project.verify",
+                      "project.prepare_copy",
+                      "project.link.prepare",
+                      "project.override.prepare",
+                      "project.override.resync",
+                      "exchange.analyze"
+                    ]
+                  },
+                  "params": {
+                    "type": "object"
+                  },
+                  "depends_on": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+                    },
+                    "minItems": 0,
+                    "maxItems": 32,
+                    "uniqueItems": true
+                  },
+                  "bindings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "target": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 256,
+                          "pattern": "^/[^~]+$"
+                        },
+                        "sha_target": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 256,
+                          "pattern": "^/[^~]+$"
+                        },
+                        "step": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+                        },
+                        "artifact": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 256,
+                          "pattern": "^/[^~]+$"
+                        }
+                      },
+                      "required": [
+                        "target",
+                        "sha_target",
+                        "step",
+                        "artifact"
+                      ]
+                    },
+                    "minItems": 0,
+                    "maxItems": 100
+                  },
+                  "limits": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "cpu_threads": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 8
+                      },
+                      "memory_mb": {
+                        "type": "integer",
+                        "minimum": 256,
+                        "maximum": 32768
+                      },
+                      "disk_mb": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 32768
+                      },
+                      "gpu_mb": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 32768
+                      }
+                    },
+                    "required": [
+                      "cpu_threads",
+                      "memory_mb",
+                      "disk_mb",
+                      "gpu_mb"
+                    ]
+                  },
+                  "timeout_seconds": {
+                    "type": "number",
+                    "minimum": 0.05,
+                    "maximum": 86400
+                  },
+                  "reuse": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "command",
+                  "params",
+                  "depends_on",
+                  "bindings",
+                  "limits",
+                  "timeout_seconds",
+                  "reuse"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 32
+            }
+          },
+          "required": [
+            "pipeline_version",
+            "policy",
+            "steps"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reuse_job": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtime_key": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+          },
+          "command": {
+            "enum": [
+              "query",
+              "diff",
+              "dependency.audit",
+              "validate",
+              "identity.prepare",
+              "asset.prepare",
+              "asset.index",
+              "scene.prepare",
+              "scene.inspect",
+              "model.prepare",
+              "model.inspect",
+              "node.prepare",
+              "node.inspect",
+              "material.preview",
+              "texture.bake",
+              "rig.prepare",
+              "rig.inspect",
+              "animation.sample",
+              "simulation.prepare",
+              "simulation.inspect",
+              "simulation.bake",
+              "render.run",
+              "media.prepare",
+              "media.export",
+              "exchange.export",
+              "exchange.import",
+              "exchange.convert",
+              "extension.prepare",
+              "extension.run",
+              "asset.preview.prepare",
+              "dependency.plan-relink",
+              "dependency.prepare",
+              "sculpt.replay",
+              "rig.package",
+              "tracking.prepare",
+              "tracking.inspect",
+              "tracking.solve",
+              "inspect",
+              "project.verify",
+              "project.prepare_copy",
+              "project.link.prepare",
+              "project.override.prepare",
+              "project.override.resync",
+              "exchange.analyze"
+            ]
+          },
+          "state": {
+            "enum": [
+              "planned",
+              "pending",
+              "running",
+              "succeeded",
+              "reused",
+              "failed",
+              "blocked",
+              "cancelled",
+              "timed_out"
+            ]
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+            }
+          },
+          "child_job": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "enum": [
+                      "INVALID_REQUEST",
+                      "NOT_FOUND",
+                      "CONFLICT",
+                      "WORKER_FAILED",
+                      "TIMEOUT",
+                      "CANCELLED",
+                      "VALIDATION_FAILED",
+                      "IO_ERROR",
+                      "UNSUPPORTED",
+                      "RESOURCE_LIMIT"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ]
+              }
+            ]
+          },
+          "child_directory": {
+            "type": "string"
+          },
+          "data": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "cache_key": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "input_hashes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "output_hashes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "closed_inputs": {
+            "type": "boolean"
+          },
+          "dependency_proof": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "report": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "candidate": {
+                "type": "string"
+              },
+              "candidate_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "profile": {
+                "type": "object"
+              },
+              "documents": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "temporal": {
+                "type": "boolean"
+              },
+              "scope": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "report",
+              "sha256",
+              "candidate",
+              "candidate_sha256",
+              "profile",
+              "documents",
+              "temporal",
+              "scope"
+            ]
+          },
+          "started_at": {
+            "type": "number"
+          },
+          "finished_at": {
+            "type": "number"
+          },
+          "reused_from": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "command",
+          "state",
+          "depends_on",
+          "child_job",
+          "error"
+        ]
+      }
+    },
+    "max_active_workers": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "observed_disk_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "elapsed_seconds": {
+      "type": "number"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "error": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "enum": [
+                "INVALID_REQUEST",
+                "NOT_FOUND",
+                "CONFLICT",
+                "WORKER_FAILED",
+                "TIMEOUT",
+                "CANCELLED",
+                "VALIDATION_FAILED",
+                "IO_ERROR",
+                "UNSUPPORTED",
+                "RESOURCE_LIMIT"
+              ]
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ]
+        }
+      ]
+    },
+    "execution": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pipeline_report_version",
+    "job_id",
+    "manifest",
+    "reuse_job",
+    "runtime_key",
+    "steps",
+    "max_active_workers",
+    "observed_disk_bytes",
+    "elapsed_seconds",
+    "complete",
+    "error",
+    "execution"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "acknowledgment": {
+      "enum": [
+        "reviewed_exact_request_accept_unsandboxed_local_execution",
+        "reviewed_exact_request_accept_windows_appcontainer_execution"
+      ]
+    }
+  },
+  "required": [
+    "review",
+    "reviewer",
+    "acknowledgment"
+  ]
+}

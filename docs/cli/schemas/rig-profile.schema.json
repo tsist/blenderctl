@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rig profile 1.0",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "mode": {
+      "const": "UNEVALUATED_READ_ONLY"
+    },
+    "rigs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "linked": {
+            "type": "boolean"
+          },
+          "bone_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deform_bone_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scale": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "world_matrix": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "bones": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "parent": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "use_deform": {
+                  "type": "boolean"
+                },
+                "role": {
+                  "enum": [
+                    "deform",
+                    "non_deform_unspecified"
+                  ]
+                },
+                "head": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "tail": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "length": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "rest_matrix": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "axes": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "y": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "z": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false
+                },
+                "connected": {
+                  "type": "boolean"
+                },
+                "inherit_scale": {
+                  "type": "string"
+                },
+                "constraints": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "parent",
+                "use_deform",
+                "role",
+                "head",
+                "tail",
+                "length",
+                "rest_matrix",
+                "axes",
+                "connected",
+                "inherit_scale",
+                "constraints"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "animation": {
+            "type": "object"
+          },
+          "data_animation": {
+            "type": "object"
+          },
+          "ik_fk_semantics": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "object",
+          "data",
+          "linked",
+          "bone_count",
+          "deform_bone_count",
+          "scale",
+          "world_matrix",
+          "bones",
+          "constraints",
+          "animation",
+          "data_animation",
+          "ik_fk_semantics"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "mesh_weights": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "properties": {
+        "missing_references": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "non_finite": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "structural_cycles": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "missing_references",
+        "non_finite",
+        "structural_cycles"
+      ],
+      "additionalProperties": false
+    },
+    "limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "version",
+    "mode",
+    "rigs",
+    "actions",
+    "mesh_weights",
+    "diagnostics",
+    "limits"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tracking-input 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "adapter": {
+      "const": "CLIP_INPUT_V1"
+    },
+    "kind": {
+      "enum": [
+        "PNG_SEQUENCE",
+        "MOVIE"
+      ]
+    },
+    "source_fps": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 120
+    },
+    "scene_fps": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 120
+    },
+    "scene_start": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1048455
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clip_frame": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120
+          },
+          "source_frame": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1048574
+          },
+          "scene_frame": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1048574
+          },
+          "source_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1048574
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "sha256"
+            ]
+          },
+          "decoded_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "clip_frame",
+          "source_frame",
+          "scene_frame",
+          "source_seconds",
+          "source",
+          "decoded_sha256"
+        ]
+      },
+      "minItems": 2,
+      "maxItems": 120
+    },
+    "time_basis": {
+      "type": "string"
+    },
+    "decode": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "adapter",
+    "kind",
+    "source_fps",
+    "scene_fps",
+    "scene_start",
+    "frames",
+    "time_basis",
+    "decode"
+  ]
+}

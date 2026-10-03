@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animation sample manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "view_layer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": -10000,
+        "maximum": 100000
+      },
+      "minItems": 1,
+      "maxItems": 120,
+      "uniqueItems": true
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "bones": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "minItems": 0,
+            "maxItems": 256,
+            "uniqueItems": true
+          },
+          "vertices": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 199999
+            },
+            "minItems": 0,
+            "maxItems": 256,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 32
+    }
+  },
+  "required": [
+    "scene",
+    "view_layer",
+    "frames",
+    "objects"
+  ]
+}

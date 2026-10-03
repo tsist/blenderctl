@@ -1,0 +1,651 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "state_source": {
+      "const": "SAVED_DISK_V1"
+    },
+    "gui_session": {
+      "const": "NOT_CONNECTED"
+    },
+    "unsaved_gui_edits": {
+      "const": "NOT_OBSERVED"
+    },
+    "gui_state_detection": {
+      "const": false
+    },
+    "gui_autosave": {
+      "const": false
+    },
+    "live_session_input": {
+      "const": false
+    },
+    "unsaved_gui_edits_meaning": {
+      "const": "NOT_OBSERVABLE_FROM_BACKGROUND; NOT_OBSERVED does not mean checked-and-clean"
+    },
+    "snapshot_identity": {
+      "type": "string"
+    },
+    "recovery": {
+      "type": "string"
+    },
+    "dependency_policy": {
+      "type": "string"
+    },
+    "pipeline_commands": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "query",
+          "diff",
+          "dependency.audit",
+          "validate",
+          "identity.prepare",
+          "asset.prepare",
+          "asset.index",
+          "scene.prepare",
+          "scene.inspect",
+          "model.prepare",
+          "model.inspect",
+          "node.prepare",
+          "node.inspect",
+          "material.preview",
+          "texture.bake",
+          "rig.prepare",
+          "rig.inspect",
+          "animation.sample",
+          "simulation.prepare",
+          "simulation.inspect",
+          "simulation.bake",
+          "render.run",
+          "media.prepare",
+          "media.export",
+          "exchange.export",
+          "exchange.import",
+          "exchange.convert",
+          "extension.prepare",
+          "extension.run",
+          "asset.preview.prepare",
+          "dependency.plan-relink",
+          "dependency.prepare",
+          "sculpt.replay",
+          "rig.package",
+          "tracking.prepare",
+          "tracking.inspect",
+          "tracking.solve",
+          "inspect",
+          "project.verify",
+          "project.prepare_copy",
+          "project.link.prepare",
+          "project.override.prepare",
+          "project.override.resync",
+          "exchange.analyze"
+        ]
+      },
+      "minItems": 44,
+      "maxItems": 44,
+      "uniqueItems": true
+    },
+    "pipeline_exclusions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "doctor",
+                  "capabilities",
+                  "render.devices",
+                  "exchange.formats",
+                  "extension.inspect",
+                  "doctor.verify_install"
+                ]
+              },
+              "classification": {
+                "const": "diagnostic_preflight"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "asset.plan",
+                  "project.plan_copy",
+                  "project.plan_batch",
+                  "project.plan_files",
+                  "transaction.apply",
+                  "transaction.recover",
+                  "transaction.rollback",
+                  "transaction.status"
+                ]
+              },
+              "classification": {
+                "const": "explicit_transaction"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "pipeline.plan",
+                  "pipeline.run",
+                  "pipeline.resume",
+                  "asset.preview.batch"
+                ]
+              },
+              "classification": {
+                "const": "host_orchestrator"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "resource.init",
+                  "resource.status",
+                  "cache.inspect",
+                  "cache.plan_clean",
+                  "project.package"
+                ]
+              },
+              "classification": {
+                "const": "host_resource_management"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "extension.review",
+                  "extension.approve",
+                  "sculpt.review"
+                ]
+              },
+              "classification": {
+                "const": "review_checkpoint"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "probe"
+                ]
+              },
+              "classification": {
+                "const": "development_fixture"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          }
+        ]
+      },
+      "minItems": 27,
+      "maxItems": 27,
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "doctor"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "capabilities"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "render.devices"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "exchange.formats"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "extension.inspect"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "doctor.verify_install"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "asset.plan"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "project.plan_copy"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "project.plan_batch"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "project.plan_files"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "transaction.apply"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "transaction.recover"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "transaction.rollback"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "transaction.status"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "pipeline.plan"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "pipeline.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "pipeline.resume"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "asset.preview.batch"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "resource.init"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "resource.status"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "cache.inspect"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "cache.plan_clean"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "project.package"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "extension.review"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "extension.approve"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "sculpt.review"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "probe"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "state_source",
+    "gui_session",
+    "unsaved_gui_edits",
+    "gui_state_detection",
+    "gui_autosave",
+    "live_session_input",
+    "unsaved_gui_edits_meaning",
+    "snapshot_identity",
+    "recovery",
+    "dependency_policy",
+    "pipeline_commands",
+    "pipeline_exclusions"
+  ]
+}

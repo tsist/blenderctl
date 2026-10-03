@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "media-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "fps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 16,
+      "maximum": 1920
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 16,
+      "maximum": 1080
+    },
+    "frame_start": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "frame_end": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 100000
+    },
+    "strips": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "COLOR"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "channel": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 100001
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "channel",
+              "start",
+              "end",
+              "color"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "IMAGE"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "channel": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 100001
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 120
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "channel",
+              "start",
+              "end",
+              "files"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "MOVIE"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "channel": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 100001
+              },
+              "file": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ]
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "channel",
+              "start",
+              "end",
+              "file",
+              "offset"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "SOUND"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "channel": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 100001
+              },
+              "file": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ]
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 2
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "channel",
+              "start",
+              "end",
+              "file",
+              "offset",
+              "volume"
+            ]
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 64
+    }
+  },
+  "required": [
+    "scene",
+    "fps",
+    "width",
+    "height",
+    "frame_start",
+    "frame_end",
+    "strips"
+  ]
+}

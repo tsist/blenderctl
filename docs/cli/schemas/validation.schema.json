@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "validation 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "valid_within_scope",
+    "findings",
+    "dependency_closure",
+    "publish_ready",
+    "coverage",
+    "not_run"
+  ],
+  "properties": {
+    "valid_within_scope": {
+      "type": "boolean"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "code"
+        ],
+        "properties": {
+          "severity": {
+            "enum": [
+              "error",
+              "warning"
+            ]
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dependency_closure": {
+      "const": "partial"
+    },
+    "publish_ready": {
+      "const": false
+    },
+    "coverage": {
+      "type": "object"
+    },
+    "not_run": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evaluation": {
+      "type": "object"
+    },
+    "render": {
+      "type": "object"
+    },
+    "asset_records_checked": {
+      "type": "integer"
+    },
+    "asset_index_scope": {
+      "type": "string"
+    }
+  }
+}

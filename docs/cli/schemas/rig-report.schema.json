@@ -1,0 +1,750 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rig report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rig_report_version": {
+      "const": "1.0"
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene_report_version": {
+          "const": "1.0"
+        },
+        "scenes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "datablocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "name",
+              "library",
+              "asset_id",
+              "asset",
+              "fake_user"
+            ],
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "library": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "asset_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "asset": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "fake_user": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "evaluation_context": {
+          "type": "object"
+        },
+        "coverage": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "scene_report_version",
+        "scenes",
+        "collections",
+        "objects",
+        "datablocks",
+        "evaluation_context",
+        "coverage"
+      ]
+    },
+    "rigs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "library": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "library"
+            ]
+          },
+          "rest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bones": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "parent": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "head": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "tail": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "matrix_local": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "connected": {
+                  "type": "boolean"
+                },
+                "deform": {
+                  "type": "boolean"
+                },
+                "inherit_scale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "inherit_rotation": {
+                  "type": "boolean"
+                },
+                "pose_matrix": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "basis": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                }
+              },
+              "required": [
+                "name",
+                "parent",
+                "head",
+                "tail",
+                "matrix_local",
+                "connected",
+                "deform",
+                "inherit_scale",
+                "inherit_rotation",
+                "pose_matrix",
+                "basis"
+              ]
+            }
+          }
+        },
+        "required": [
+          "object",
+          "data",
+          "rest_sha256",
+          "bones"
+        ]
+      }
+    },
+    "skins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "topology_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "locked": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "name",
+                "index",
+                "locked"
+              ]
+            }
+          },
+          "weights_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "modifier": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rig": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "weights": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "vertices": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unweighted": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "not_normalized": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "sum_min": {
+                      "type": "number"
+                    },
+                    "sum_max": {
+                      "type": "number"
+                    },
+                    "max_influences": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "invalid_weights": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "vertices",
+                    "unweighted",
+                    "not_normalized",
+                    "sum_min",
+                    "sum_max",
+                    "max_influences",
+                    "invalid_weights"
+                  ]
+                }
+              },
+              "required": [
+                "modifier",
+                "rig",
+                "weights"
+              ]
+            }
+          }
+        },
+        "required": [
+          "object",
+          "topology_sha256",
+          "groups",
+          "weights_sha256",
+          "bindings"
+        ]
+      }
+    },
+    "coverage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "driver_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "1.0"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inventory_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "driver_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "drivers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "minItems": 0,
+          "maxItems": 4096
+        },
+        "profile_template": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "const": "NATIVE_SIMPLE_V1"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "inventory_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "driver_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096
+            },
+            "acknowledged_unresolved": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "minItems": 0,
+              "maxItems": 4096,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "mode",
+            "source_sha256",
+            "inventory_sha256",
+            "driver_count",
+            "acknowledged_unresolved"
+          ]
+        },
+        "scope": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "source_sha256",
+        "inventory_sha256",
+        "driver_count",
+        "drivers",
+        "profile_template",
+        "scope"
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "1.0"
+        },
+        "mode": {
+          "const": "UNEVALUATED_READ_ONLY"
+        },
+        "rigs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "object": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string"
+              },
+              "linked": {
+                "type": "boolean"
+              },
+              "bone_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "deform_bone_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "scale": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "world_matrix": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "bones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "parent": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "use_deform": {
+                      "type": "boolean"
+                    },
+                    "role": {
+                      "enum": [
+                        "deform",
+                        "non_deform_unspecified"
+                      ]
+                    },
+                    "head": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "tail": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "length": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "rest_matrix": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                      },
+                      "minItems": 4,
+                      "maxItems": 4
+                    },
+                    "axes": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "y": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "z": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        }
+                      },
+                      "required": [
+                        "x",
+                        "y",
+                        "z"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "connected": {
+                      "type": "boolean"
+                    },
+                    "inherit_scale": {
+                      "type": "string"
+                    },
+                    "constraints": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "parent",
+                    "use_deform",
+                    "role",
+                    "head",
+                    "tail",
+                    "length",
+                    "rest_matrix",
+                    "axes",
+                    "connected",
+                    "inherit_scale",
+                    "constraints"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "constraints": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "animation": {
+                "type": "object"
+              },
+              "data_animation": {
+                "type": "object"
+              },
+              "ik_fk_semantics": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "object",
+              "data",
+              "linked",
+              "bone_count",
+              "deform_bone_count",
+              "scale",
+              "world_matrix",
+              "bones",
+              "constraints",
+              "animation",
+              "data_animation",
+              "ik_fk_semantics"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "mesh_weights": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "diagnostics": {
+          "type": "object",
+          "properties": {
+            "missing_references": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "non_finite": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "structural_cycles": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "missing_references",
+            "non_finite",
+            "structural_cycles"
+          ],
+          "additionalProperties": false
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "mode",
+        "rigs",
+        "actions",
+        "mesh_weights",
+        "diagnostics",
+        "limits"
+      ],
+      "additionalProperties": false
+    },
+    "mapping_suggestions": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "rig_report_version",
+    "scene",
+    "rigs",
+    "skins",
+    "coverage"
+  ]
+}

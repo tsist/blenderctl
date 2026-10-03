@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "preview-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "preview_report_version": {
+      "const": "1.0"
+    },
+    "mode": {
+      "enum": [
+        "rendered",
+        "reused"
+      ]
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "view": {
+            "enum": [
+              "FRONT",
+              "RIGHT",
+              "BACK",
+              "THREE_QUARTER"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 134217728
+          }
+        },
+        "required": [
+          "view",
+          "file",
+          "sha256",
+          "bytes"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 4
+    },
+    "candidate": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "candidate_sha256": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "receipt": {
+      "type": "string"
+    },
+    "receipt_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "embedded_preview": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "framing": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "minItems": 1,
+      "maxItems": 4
+    },
+    "seconds": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000000.0
+    },
+    "source_saved": {
+      "const": false
+    }
+  },
+  "required": [
+    "preview_report_version",
+    "mode",
+    "outputs",
+    "candidate",
+    "candidate_sha256",
+    "receipt",
+    "receipt_sha256",
+    "embedded_preview",
+    "framing",
+    "source_saved"
+  ]
+}

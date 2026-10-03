@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Material workflow M1 report 1.0",
+  "type": "object",
+  "required": [
+    "report_version",
+    "status",
+    "candidate",
+    "report",
+    "outputs",
+    "sheet",
+    "checks",
+    "source_saved"
+  ],
+  "properties": {
+    "report_version": {
+      "const": "1.0"
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "partial",
+        "failed"
+      ]
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "candidate_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "report": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "lighting",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lighting": {
+            "enum": [
+              "soft",
+              "raking"
+            ]
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "failed",
+              "not_run"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "channels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "format": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "infinite_values": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mean": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "required": [
+                "width",
+                "height"
+              ],
+              "additionalProperties": true
+            }
+          },
+          "frame": {
+            "type": "integer"
+          },
+          "framing": {
+            "type": "object"
+          },
+          "device": {
+            "type": "object"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "error": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "file",
+                "sha256",
+                "bytes",
+                "images"
+              ]
+            }
+          }
+        ]
+      },
+      "maxItems": 12
+    },
+    "sheet": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "status": {
+              "enum": [
+                "pass",
+                "partial",
+                "failed"
+              ]
+            },
+            "layout": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "source_saved": {
+      "type": "boolean"
+    },
+    "material": {
+      "type": "object",
+      "required": [
+        "material_name",
+        "material_id",
+        "target",
+        "counts",
+        "changed_fields",
+        "reused"
+      ],
+      "properties": {
+        "material_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "material_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "material_slot": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 63,
+              "default": 0
+            },
+            "uv_layer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            }
+          },
+          "required": [
+            "object",
+            "uv_layer"
+          ],
+          "additionalProperties": false
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "nodes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "layers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "images": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "nodes",
+            "layers",
+            "images"
+          ],
+          "additionalProperties": false
+        },
+        "changed_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reused": {
+          "type": "boolean"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "resources_file": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

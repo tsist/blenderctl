@@ -1,0 +1,4512 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "simulation-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "initial_scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": -1048574,
+          "maximum": 1048574
+        },
+        "mode": {
+          "const": "OBJECT"
+        },
+        "active_object": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selected_objects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "minItems": 0,
+          "maxItems": 1000,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer",
+        "frame",
+        "mode",
+        "active_object",
+        "selected_objects"
+      ]
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "scene.create"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "scene.configure"
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "units": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "system": {
+                    "enum": [
+                      "NONE",
+                      "METRIC",
+                      "IMPERIAL"
+                    ]
+                  },
+                  "scale_length": {
+                    "type": "number",
+                    "minimum": 1e-06,
+                    "maximum": 1000000.0
+                  },
+                  "length_unit": {
+                    "enum": [
+                      "ADAPTIVE",
+                      "METERS",
+                      "CENTIMETERS",
+                      "MILLIMETERS",
+                      "KILOMETERS",
+                      "MILES",
+                      "FEET",
+                      "INCHES"
+                    ]
+                  }
+                },
+                "required": [
+                  "system",
+                  "scale_length",
+                  "length_unit"
+                ]
+              },
+              "timeline": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "end": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "fps": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 240
+                  },
+                  "fps_base": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 1000
+                  }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "fps",
+                  "fps_base"
+                ]
+              },
+              "camera": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "scene"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "scene.remove"
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "scene"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "view_layer.create"
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "scene",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "view_layer.remove"
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "view_layer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "scene",
+              "view_layer"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "view_layer.configure"
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "view_layer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "use": {
+                "type": "boolean"
+              },
+              "collection_path": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "minItems": 1,
+                "maxItems": 64
+              },
+              "exclude": {
+                "type": "boolean"
+              },
+              "holdout": {
+                "type": "boolean"
+              },
+              "indirect_only": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "scene",
+              "view_layer"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "collection.create"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "parent": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "scene": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 63,
+                        "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                      }
+                    },
+                    "required": [
+                      "scene"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "collection": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 63,
+                        "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                      }
+                    },
+                    "required": [
+                      "collection"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "parent"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "collection.attach"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "parent": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "scene": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 63,
+                        "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                      }
+                    },
+                    "required": [
+                      "scene"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "collection": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 63,
+                        "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                      }
+                    },
+                    "required": [
+                      "collection"
+                    ]
+                  }
+                ]
+              },
+              "linked": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "collection",
+              "parent",
+              "linked"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "collection.member"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "linked": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "collection",
+              "object",
+              "linked"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "collection.rename"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "collection",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.create"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "kind": {
+                "enum": [
+                  "EMPTY",
+                  "CUBE",
+                  "PLANE",
+                  "UV_SPHERE",
+                  "CYLINDER",
+                  "CONE",
+                  "CAMERA",
+                  "LIGHT",
+                  "INSTANCE"
+                ]
+              },
+              "size": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1000000.0
+              },
+              "radius": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1000000.0
+              },
+              "depth": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1000000.0
+              },
+              "segments": {
+                "type": "integer",
+                "minimum": 3,
+                "maximum": 128
+              },
+              "rings": {
+                "type": "integer",
+                "minimum": 3,
+                "maximum": 128
+              },
+              "light_type": {
+                "enum": [
+                  "POINT",
+                  "SUN",
+                  "SPOT",
+                  "AREA"
+                ]
+              },
+              "instance_collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "collection",
+              "kind"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.duplicate"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data": {
+                "enum": [
+                  "linked",
+                  "copy"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "collection",
+              "data"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.transform"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "space": {
+                "enum": [
+                  "local",
+                  "world"
+                ]
+              },
+              "location": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation_deg": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "scale": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "space"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.parent"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "parent": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "keep_world": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "parent",
+              "keep_world"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.visibility"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "hide_render": {
+                "type": "boolean"
+              },
+              "hide_viewport": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "object"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.convert_axes"
+              },
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "minItems": 1,
+                "maxItems": 1000,
+                "uniqueItems": true
+              },
+              "from_forward": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z",
+                  "-X",
+                  "-Y",
+                  "-Z"
+                ]
+              },
+              "from_up": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z",
+                  "-X",
+                  "-Y",
+                  "-Z"
+                ]
+              },
+              "to_forward": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z",
+                  "-X",
+                  "-Y",
+                  "-Z"
+                ]
+              },
+              "to_up": {
+                "enum": [
+                  "X",
+                  "Y",
+                  "Z",
+                  "-X",
+                  "-Y",
+                  "-Z"
+                ]
+              },
+              "scale_factor": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1000000.0
+              }
+            },
+            "required": [
+              "op",
+              "objects",
+              "from_forward",
+              "from_up",
+              "to_forward",
+              "to_up",
+              "scale_factor"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "constraint.add"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "type": {
+                "enum": [
+                  "COPY_LOCATION",
+                  "COPY_ROTATION",
+                  "COPY_SCALE",
+                  "COPY_TRANSFORMS",
+                  "TRACK_TO"
+                ]
+              },
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "influence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "owner_space": {
+                "enum": [
+                  "WORLD",
+                  "LOCAL"
+                ]
+              },
+              "target_space": {
+                "enum": [
+                  "WORLD",
+                  "LOCAL"
+                ]
+              },
+              "track_axis": {
+                "enum": [
+                  "TRACK_X",
+                  "TRACK_Y",
+                  "TRACK_Z",
+                  "TRACK_NEGATIVE_X",
+                  "TRACK_NEGATIVE_Y",
+                  "TRACK_NEGATIVE_Z"
+                ]
+              },
+              "up_axis": {
+                "enum": [
+                  "UP_X",
+                  "UP_Y",
+                  "UP_Z"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "type",
+              "target"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "constraint.remove"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "camera.configure"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "type": {
+                "enum": [
+                  "PERSP",
+                  "ORTHO"
+                ]
+              },
+              "lens": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 2500
+              },
+              "ortho_scale": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 1000000.0
+              },
+              "clip_start": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 100000.0
+              },
+              "clip_end": {
+                "type": "number",
+                "minimum": 0.002,
+                "maximum": 100000000.0
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "light.configure"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "energy": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000.0
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "size": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 1000000.0
+              },
+              "radius": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000.0
+              },
+              "spot_size_deg": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 180
+              },
+              "spot_blend": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "angle_deg": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 180
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "world.create"
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "strength": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "op",
+              "scene",
+              "name",
+              "color",
+              "strength"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.create"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "vertices": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000000.0,
+                    "maximum": 1000000000.0
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "minItems": 3,
+                "maxItems": 100000
+              },
+              "edges": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 99999
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "minItems": 0,
+                "maxItems": 200000
+              },
+              "faces": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 99999
+                  },
+                  "minItems": 3,
+                  "maxItems": 1000
+                },
+                "minItems": 1,
+                "maxItems": 100000
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "collection",
+              "vertices",
+              "faces"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.positions"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              },
+              "positions": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000000.0,
+                    "maximum": 1000000000.0
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "minItems": 1,
+                "maxItems": 100000
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection",
+              "positions"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.extrude"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              },
+              "offset": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection",
+              "offset"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.inset"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              },
+              "thickness": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 10000
+              },
+              "depth": {
+                "type": "number",
+                "minimum": -10000,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection",
+              "thickness",
+              "depth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.bevel"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              },
+              "offset": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 10000
+              },
+              "segments": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection",
+              "offset",
+              "segments"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.subdivide"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              },
+              "cuts": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection",
+              "cuts"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.delete_faces"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.triangulate"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.merge_distance"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "distance": {
+                "type": "number",
+                "minimum": 1e-08,
+                "maximum": 1000
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "distance"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.normals"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "recalculate": {
+                "type": "boolean"
+              },
+              "smooth": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "recalculate",
+              "smooth"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "uv.layer"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "action": {
+                "enum": [
+                  "create",
+                  "activate",
+                  "remove"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "action",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "uv.set"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "layer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "topology_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000.0,
+                    "maximum": 1000000.0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "minItems": 1,
+                "maxItems": 1000000
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "layer",
+              "topology_sha256",
+              "coordinates"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "uv.seams"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "selection": {
+                "oneOf": [
+                  {
+                    "const": "ALL"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "indices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 999999
+                        },
+                        "minItems": 1,
+                        "maxItems": 100000,
+                        "uniqueItems": true
+                      },
+                      "topology_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "indices",
+                      "topology_sha256"
+                    ]
+                  }
+                ]
+              },
+              "marked": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "selection",
+              "marked"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "uv.unwrap"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "layer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "method": {
+                "enum": [
+                  "ANGLE_BASED",
+                  "CONFORMAL",
+                  "SMART"
+                ]
+              },
+              "margin": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.1
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "layer",
+              "method",
+              "margin"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "uv.pack"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "layer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "margin": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.1
+              },
+              "rotate": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "layer",
+              "margin",
+              "rotate"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "uv.layout"
+              },
+              "adapter": {
+                "const": "DETERMINISTIC_UDIM_V1"
+              },
+              "targets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63,
+                      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                    },
+                    "data_scope": {
+                      "enum": [
+                        "reject_shared",
+                        "single_user",
+                        "shared"
+                      ]
+                    },
+                    "layer": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63,
+                      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                    },
+                    "topology_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "uv_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "source_resolution": {
+                      "type": "integer",
+                      "minimum": 16,
+                      "maximum": 16384
+                    },
+                    "islands": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "seed_face": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 999999
+                          },
+                          "tile": {
+                            "type": "integer",
+                            "minimum": 1001,
+                            "maximum": 1100
+                          },
+                          "locked": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "seed_face",
+                          "locked"
+                        ]
+                      },
+                      "minItems": 1,
+                      "maxItems": 512
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "data_scope",
+                    "layer",
+                    "topology_sha256",
+                    "uv_sha256",
+                    "source_resolution",
+                    "islands"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 32
+              },
+              "tiles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "number": {
+                      "type": "integer",
+                      "minimum": 1001,
+                      "maximum": 1100
+                    },
+                    "resolution": {
+                      "type": "integer",
+                      "minimum": 16,
+                      "maximum": 16384
+                    }
+                  },
+                  "required": [
+                    "number",
+                    "resolution"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "density": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "mode": {
+                        "const": "PRESERVE"
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "mode": {
+                        "const": "TARGET"
+                      },
+                      "pixels_per_meter": {
+                        "type": "number",
+                        "minimum": 1e-06,
+                        "maximum": 10000000.0
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "pixels_per_meter"
+                    ]
+                  }
+                ]
+              },
+              "meters_per_unit": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1000000.0
+              },
+              "margin_pixels": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1024
+              },
+              "allow_rotate": {
+                "type": "boolean"
+              },
+              "allow_scale": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "adapter",
+              "targets",
+              "tiles",
+              "density",
+              "meters_per_unit",
+              "margin_pixels",
+              "allow_rotate",
+              "allow_scale"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.retopology"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user"
+                ]
+              },
+              "topology_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "adapter": {
+                "const": "QUADRIFLOW_CLOSED_V1"
+              },
+              "target_faces": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 10000
+              },
+              "seed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "face_count_tolerance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "max_surface_distance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "max_normal_angle_degrees": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 180
+              },
+              "boundary_policy": {
+                "const": "REJECT_OPEN"
+              },
+              "sharp_policy": {
+                "const": "REJECT"
+              },
+              "attribute_policy": {
+                "const": "REJECT_NONTRIVIAL"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "topology_sha256",
+              "adapter",
+              "target_faces",
+              "seed",
+              "face_count_tolerance",
+              "max_surface_distance",
+              "max_normal_angle_degrees",
+              "boundary_policy",
+              "sharp_policy",
+              "attribute_policy"
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "BEVEL"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "width": {
+                        "type": "number",
+                        "minimum": 1e-06,
+                        "maximum": 1000
+                      },
+                      "segments": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 8
+                      },
+                      "angle_limit_deg": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 180
+                      }
+                    },
+                    "required": [
+                      "width",
+                      "segments",
+                      "angle_limit_deg"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "BOOLEAN"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "operation": {
+                        "enum": [
+                          "DIFFERENCE",
+                          "UNION",
+                          "INTERSECT"
+                        ]
+                      },
+                      "object": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 63,
+                        "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                      },
+                      "solver": {
+                        "const": "EXACT"
+                      }
+                    },
+                    "required": [
+                      "operation",
+                      "object",
+                      "solver"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "SOLIDIFY"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "thickness": {
+                        "type": "number",
+                        "minimum": -1000,
+                        "maximum": 1000
+                      },
+                      "offset": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "thickness",
+                      "offset"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "SUBSURF"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "levels": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3
+                      }
+                    },
+                    "required": [
+                      "levels"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "MIRROR"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "axes": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "X",
+                            "Y",
+                            "Z"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 3,
+                        "uniqueItems": true
+                      },
+                      "merge_threshold": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "clip": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "axes",
+                      "merge_threshold",
+                      "clip"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "DECIMATE"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "ratio": {
+                        "type": "number",
+                        "minimum": 0.001,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "ratio"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "TRIANGULATE"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {},
+                    "required": []
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "modifier.add"
+                  },
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "const": "WELD"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "merge_threshold": {
+                        "type": "number",
+                        "minimum": 1e-08,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "merge_threshold"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "object",
+                  "name",
+                  "type",
+                  "settings"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "modifier.remove"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "modifier.apply"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "mesh.lod"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "ratio": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 0.999
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "collection",
+              "ratio"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "curve.create"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "type": {
+                "enum": [
+                  "POLY",
+                  "BEZIER"
+                ]
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000000.0,
+                    "maximum": 1000000000.0
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "minItems": 2,
+                "maxItems": 10000
+              },
+              "cyclic": {
+                "type": "boolean"
+              },
+              "bevel_depth": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "resolution": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              },
+              "settings": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "dimensions": {
+                        "const": "2D"
+                      },
+                      "fill_mode": {
+                        "enum": [
+                          "NONE",
+                          "FRONT",
+                          "BACK",
+                          "BOTH"
+                        ]
+                      },
+                      "bevel_resolution": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 8
+                      },
+                      "use_fill_caps": {
+                        "type": "boolean"
+                      },
+                      "extrude": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000
+                      }
+                    },
+                    "required": [
+                      "dimensions",
+                      "fill_mode",
+                      "bevel_resolution",
+                      "use_fill_caps",
+                      "extrude"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "dimensions": {
+                        "const": "3D"
+                      },
+                      "fill_mode": {
+                        "enum": [
+                          "FULL",
+                          "BACK",
+                          "FRONT",
+                          "HALF"
+                        ]
+                      },
+                      "bevel_resolution": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 8
+                      },
+                      "use_fill_caps": {
+                        "type": "boolean"
+                      },
+                      "extrude": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000
+                      }
+                    },
+                    "required": [
+                      "dimensions",
+                      "fill_mode",
+                      "bevel_resolution",
+                      "use_fill_caps",
+                      "extrude"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "collection",
+              "type",
+              "points",
+              "cyclic",
+              "bevel_depth",
+              "resolution"
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "text.create"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "collection": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "pattern": "^[\\x20-\\x7e\\n\\t]+$"
+                  },
+                  "size": {
+                    "type": "number",
+                    "minimum": 0.0001,
+                    "maximum": 1000
+                  },
+                  "extrude": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "layout": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "align_x": {
+                        "enum": [
+                          "LEFT",
+                          "CENTER",
+                          "RIGHT"
+                        ]
+                      },
+                      "align_y": {
+                        "enum": [
+                          "TOP",
+                          "TOP_BASELINE",
+                          "CENTER",
+                          "BOTTOM_BASELINE",
+                          "BOTTOM"
+                        ]
+                      },
+                      "space_character": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 10
+                      },
+                      "space_word": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 10
+                      },
+                      "space_line": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 10
+                      },
+                      "offset": {
+                        "type": "number",
+                        "minimum": -10,
+                        "maximum": 10
+                      },
+                      "shear": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      },
+                      "resolution": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 32
+                      },
+                      "bevel_depth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10
+                      },
+                      "bevel_resolution": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 8
+                      }
+                    },
+                    "required": [
+                      "align_x",
+                      "align_y",
+                      "space_character",
+                      "space_word",
+                      "space_line",
+                      "offset",
+                      "shear",
+                      "resolution",
+                      "bevel_depth",
+                      "bevel_resolution"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "name",
+                  "collection",
+                  "body",
+                  "size",
+                  "extrude"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "text.create"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "collection": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "pattern": "^[^\\x00-\\x08\\x0b-\\x1f\\x7f\\ud800-\\udfff]+$"
+                  },
+                  "size": {
+                    "type": "number",
+                    "minimum": 0.0001,
+                    "maximum": 1000
+                  },
+                  "extrude": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "font": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "expected_sha256"
+                    ]
+                  },
+                  "layout": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "align_x": {
+                        "enum": [
+                          "LEFT",
+                          "CENTER",
+                          "RIGHT"
+                        ]
+                      },
+                      "align_y": {
+                        "enum": [
+                          "TOP",
+                          "TOP_BASELINE",
+                          "CENTER",
+                          "BOTTOM_BASELINE",
+                          "BOTTOM"
+                        ]
+                      },
+                      "space_character": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 10
+                      },
+                      "space_word": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 10
+                      },
+                      "space_line": {
+                        "type": "number",
+                        "minimum": 0.1,
+                        "maximum": 10
+                      },
+                      "offset": {
+                        "type": "number",
+                        "minimum": -10,
+                        "maximum": 10
+                      },
+                      "shear": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      },
+                      "resolution": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 32
+                      },
+                      "bevel_depth": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10
+                      },
+                      "bevel_resolution": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 8
+                      }
+                    },
+                    "required": [
+                      "align_x",
+                      "align_y",
+                      "space_character",
+                      "space_word",
+                      "space_line",
+                      "offset",
+                      "shear",
+                      "resolution",
+                      "bevel_depth",
+                      "bevel_resolution"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "name",
+                  "collection",
+                  "body",
+                  "size",
+                  "extrude",
+                  "font"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "object.to_mesh"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "data_scope": {
+                "enum": [
+                  "reject_shared",
+                  "single_user",
+                  "shared"
+                ]
+              },
+              "verify": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "adapter": {
+                    "const": "CURVE_FONT_V1"
+                  },
+                  "fonts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ]
+                    },
+                    "minItems": 0,
+                    "maxItems": 4
+                  },
+                  "max_coordinate_error": {
+                    "type": "number",
+                    "minimum": 1e-09,
+                    "maximum": 0.001
+                  }
+                },
+                "required": [
+                  "adapter",
+                  "fonts",
+                  "max_coordinate_error"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "data_scope"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.rigid"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "type": {
+                "enum": [
+                  "ACTIVE",
+                  "PASSIVE"
+                ]
+              },
+              "mass": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 10000
+              },
+              "shape": {
+                "enum": [
+                  "BOX",
+                  "SPHERE",
+                  "CONVEX_HULL"
+                ]
+              },
+              "friction": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "restitution": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "type",
+              "mass",
+              "shape",
+              "friction",
+              "restitution"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.cloth"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "quality": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20
+              },
+              "mass": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 10
+              },
+              "air_damping": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "quality",
+              "mass",
+              "air_damping"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.soft"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "mass": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 10
+              },
+              "friction": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 50
+              },
+              "use_edges": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "mass",
+              "friction",
+              "use_edges"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.collision"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "thickness": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 0.1
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "thickness"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.world"
+              },
+              "gravity": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -100,
+                  "maximum": 100
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "substeps": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "iterations": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "op",
+              "gravity",
+              "substeps",
+              "iterations"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.fluid_domain"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "resolution": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 32
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "resolution"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.fluid_flow"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "density": {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 5
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "density"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.liquid_domain"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "resolution": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 32
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name",
+              "resolution"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.liquid_flow"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "physics.remove"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "modifier": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              }
+            },
+            "required": [
+              "op",
+              "object",
+              "modifier"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "special.grease_pencil"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "layer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "frame": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "strokes": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": -1000000000.0,
+                      "maximum": 1000000000.0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "minItems": 2,
+                  "maxItems": 1000
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "radius": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "collection",
+              "layer",
+              "frame",
+              "strokes",
+              "radius"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "special.hair"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "curves": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": -1000000000.0,
+                      "maximum": 1000000000.0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "minItems": 2,
+                  "maxItems": 1000
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "radius": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "collection",
+              "curves",
+              "radius"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "special.points"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "positions": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": -1000000000.0,
+                    "maximum": 1000000000.0
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "minItems": 1,
+                "maxItems": 10000
+              },
+              "radius": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "op",
+              "name",
+              "collection",
+              "positions",
+              "radius"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "hair.surface"
+              },
+              "adapter": {
+                "const": "SURFACE_GUIDES_V1"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "surface": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "uv_map": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "topology_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "enable_rest_position": {
+                "type": "boolean"
+              },
+              "roots": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "triangle": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000
+                    },
+                    "barycentric": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "triangle",
+                    "barycentric"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 2048
+              },
+              "points_per_curve": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 64
+              },
+              "length": {
+                "type": "number",
+                "minimum": 1e-05,
+                "maximum": 100
+              },
+              "radius": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1
+              },
+              "seed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "density": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1
+              },
+              "length_variation": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.9
+              },
+              "direction": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -10000,
+                  "maximum": 10000
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "bend": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -10000,
+                  "maximum": 10000
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "controls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "points": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "number",
+                          "minimum": -10000,
+                          "maximum": 10000
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "minItems": 2,
+                      "maxItems": 64
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "points"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 2048
+              }
+            },
+            "required": [
+              "op",
+              "adapter",
+              "name",
+              "collection",
+              "surface",
+              "uv_map",
+              "topology_sha256",
+              "enable_rest_position",
+              "roots",
+              "points_per_curve",
+              "length",
+              "radius",
+              "seed",
+              "density",
+              "length_variation",
+              "direction",
+              "bend",
+              "controls"
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "hair.dynamics"
+                  },
+                  "adapter": {
+                    "const": "RIBBON_CLOTH_V1"
+                  },
+                  "source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "proxy_name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "collection": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "width": {
+                    "type": "number",
+                    "minimum": 0.0001,
+                    "maximum": 0.2
+                  },
+                  "quality": {
+                    "type": "integer",
+                    "minimum": 4,
+                    "maximum": 20
+                  },
+                  "mass": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 1
+                  },
+                  "tension": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "bending": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 10
+                  },
+                  "air_damping": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "collision": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "collision_distance": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 0.1
+                  },
+                  "hide_source": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "op",
+                  "adapter",
+                  "source",
+                  "name",
+                  "proxy_name",
+                  "collection",
+                  "width",
+                  "quality",
+                  "mass",
+                  "tension",
+                  "bending",
+                  "air_damping",
+                  "collision",
+                  "collision_distance",
+                  "hide_source"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "const": "hair.dynamics"
+                  },
+                  "adapter": {
+                    "const": "RIBBON_COLLIDERS_V1"
+                  },
+                  "source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "proxy_name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "collection": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "width": {
+                    "type": "number",
+                    "minimum": 0.0001,
+                    "maximum": 0.2
+                  },
+                  "quality": {
+                    "type": "integer",
+                    "minimum": 4,
+                    "maximum": 20
+                  },
+                  "mass": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 1
+                  },
+                  "tension": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "bending": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 10
+                  },
+                  "air_damping": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "collision_distance": {
+                    "type": "number",
+                    "minimum": 0.001,
+                    "maximum": 0.1
+                  },
+                  "hide_source": {
+                    "type": "boolean"
+                  },
+                  "collision_collection": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "colliders": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "object": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 63,
+                          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "distance_mode": {
+                          "enum": [
+                            "ORIENTED_SURFACE",
+                            "UNSIGNED_SURFACE"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "object",
+                        "distance_mode"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 8
+                  },
+                  "frame_start": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "frame_end": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "collision_quality": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 8
+                  },
+                  "minimum_clearance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.1
+                  }
+                },
+                "required": [
+                  "op",
+                  "adapter",
+                  "source",
+                  "name",
+                  "proxy_name",
+                  "collection",
+                  "width",
+                  "quality",
+                  "mass",
+                  "tension",
+                  "bending",
+                  "air_damping",
+                  "collision_distance",
+                  "hide_source",
+                  "collision_collection",
+                  "colliders",
+                  "frame_start",
+                  "frame_end",
+                  "collision_quality"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "hair.shape"
+              },
+              "adapter": {
+                "const": "TRIANGLE_GROOM_V1"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "surface": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "region_triangles": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000
+                },
+                "minItems": 1,
+                "maxItems": 8192
+              },
+              "max_projection_distance": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1
+              },
+              "root_offset": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.05
+              },
+              "points_per_curve": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 64
+              },
+              "length": {
+                "type": "number",
+                "minimum": 1e-05,
+                "maximum": 10
+              },
+              "controls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "points": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "minItems": 2,
+                      "maxItems": 64
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "points"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 128
+              },
+              "radius_profile": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "u": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 0.05
+                    }
+                  },
+                  "required": [
+                    "u",
+                    "radius"
+                  ]
+                },
+                "minItems": 2,
+                "maxItems": 32
+              },
+              "frame_start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "frame_end": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "hide_source": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "op",
+              "adapter",
+              "source",
+              "surface",
+              "name",
+              "collection",
+              "region_triangles",
+              "max_projection_distance",
+              "root_offset",
+              "points_per_curve",
+              "length",
+              "controls",
+              "radius_profile",
+              "frame_start",
+              "frame_end",
+              "hide_source"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "hair.density"
+              },
+              "adapter": {
+                "const": "TRIANGLE_CHILDREN_V1"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "frame_start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "frame_end": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "hide_source": {
+                "type": "boolean"
+              },
+              "region_triangles": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000
+                },
+                "minItems": 1,
+                "maxItems": 8192,
+                "uniqueItems": true
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 512
+              },
+              "seed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "max_guide_distance": {
+                "type": "number",
+                "minimum": 1e-05,
+                "maximum": 10
+              },
+              "root_offset": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.05
+              },
+              "radius_scale": {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 10
+              }
+            },
+            "required": [
+              "op",
+              "adapter",
+              "source",
+              "name",
+              "collection",
+              "frame_start",
+              "frame_end",
+              "hide_source",
+              "region_triangles",
+              "count",
+              "seed",
+              "max_guide_distance",
+              "root_offset",
+              "radius_scale"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "hair.volume"
+              },
+              "adapter": {
+                "const": "CURVE_DENSITY_GRID_V1"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "collection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "frame_start": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "frame_end": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "hide_source": {
+                "type": "boolean"
+              },
+              "voxel_size": {
+                "type": "number",
+                "minimum": 0.0001,
+                "maximum": 1
+              },
+              "kernel_radius": {
+                "type": "number",
+                "minimum": 0.0002,
+                "maximum": 2
+              },
+              "density": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 100
+              },
+              "max_voxels": {
+                "type": "integer",
+                "minimum": 8,
+                "maximum": 1000000
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "op",
+              "adapter",
+              "source",
+              "name",
+              "collection",
+              "frame_start",
+              "frame_end",
+              "hide_source",
+              "voxel_size",
+              "kernel_radius",
+              "density",
+              "max_voxels",
+              "color"
+            ]
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 200
+    }
+  },
+  "required": [
+    "context",
+    "operations"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "operations"
+        ],
+        "properties": {
+          "operations": {
+            "contains": {
+              "required": [
+                "op"
+              ],
+              "properties": {
+                "op": {
+                  "enum": [
+                    "hair.surface",
+                    "hair.dynamics",
+                    "hair.shape",
+                    "hair.density",
+                    "hair.volume"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operations": {
+            "items": {
+              "properties": {
+                "op": {
+                  "enum": [
+                    "hair.surface",
+                    "hair.dynamics",
+                    "hair.shape",
+                    "hair.density",
+                    "hair.volume"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

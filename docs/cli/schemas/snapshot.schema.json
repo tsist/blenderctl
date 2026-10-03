@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "snapshot 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_version",
+    "file",
+    "reader_version",
+    "datablocks",
+    "edges",
+    "dependencies",
+    "coverage"
+  ],
+  "properties": {
+    "snapshot_version": {
+      "const": "1.0"
+    },
+    "file": {
+      "type": "string"
+    },
+    "reader_version": {
+      "type": "string"
+    },
+    "datablocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "library",
+          "asset_id",
+          "asset",
+          "fake_user"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "library": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "asset_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "asset": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "fake_user": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user",
+          "target"
+        ],
+        "properties": {
+          "user": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "name",
+              "library"
+            ],
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "library": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "target": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "name",
+              "library"
+            ],
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "library": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "dependency-audit 1.0",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audit_version",
+        "items",
+        "counts",
+        "closure",
+        "coverage"
+      ],
+      "properties": {
+        "audit_version": {
+          "const": "1.0"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "owner",
+              "kind",
+              "raw_path",
+              "resolved_path",
+              "source",
+              "reachability",
+              "status",
+              "role",
+              "binding",
+              "usage_evidence"
+            ],
+            "properties": {
+              "owner": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "library": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "kind": {
+                "type": "string"
+              },
+              "raw_path": {
+                "type": "string"
+              },
+              "resolved_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reachability": {
+                "enum": [
+                  "scene_or_asset",
+                  "referenced",
+                  "retained_unreferenced"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "packed",
+                  "builtin",
+                  "no_external_path",
+                  "generated",
+                  "directory_present_unverified",
+                  "cache_directory_missing",
+                  "incomplete",
+                  "exists",
+                  "missing",
+                  "pattern_observed",
+                  "pattern_unresolved"
+                ]
+              },
+              "role": {
+                "enum": [
+                  "input",
+                  "cache",
+                  "output"
+                ]
+              },
+              "binding": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "usage_evidence": {
+                "type": "string"
+              },
+              "completeness": {
+                "type": "string"
+              },
+              "expected_files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missing_files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "packed_members": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "scan_truncated": {
+                "type": "boolean"
+              },
+              "cache_inventory": {
+                "type": "object"
+              },
+              "contract": {
+                "type": "object"
+              },
+              "fingerprints": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "minItems": 0
+              },
+              "frame_mapping": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "minItems": 0
+              }
+            }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "closure": {
+          "const": "partial"
+        },
+        "coverage": {
+          "type": "object"
+        }
+      }
+    },
+    "coverage": {
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Geometry operation report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "operation_index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 499
+              },
+              "curve_conversion_report_version": {
+                "const": "1.0"
+              },
+              "adapter": {
+                "const": "CURVE_FONT_V1"
+              },
+              "source": {
+                "type": "object"
+              },
+              "target": {
+                "type": "object"
+              },
+              "vertices": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000000
+              },
+              "faces": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000000
+              },
+              "maximum_coordinate_error": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.001
+              },
+              "coordinate_tolerance": {
+                "type": "number",
+                "minimum": 1e-09,
+                "maximum": 0.001
+              },
+              "topology": {
+                "const": "exact_evaluated_match"
+              },
+              "materials": {
+                "const": "exact_match"
+              },
+              "world_transform": {
+                "const": "preserved"
+              },
+              "glyph_validation": {
+                "const": "cmap_not_visual_quality"
+              },
+              "source_data_retained": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "operation_index",
+              "curve_conversion_report_version",
+              "adapter",
+              "source",
+              "target",
+              "vertices",
+              "faces",
+              "maximum_coordinate_error",
+              "coordinate_tolerance",
+              "topology",
+              "materials",
+              "world_transform",
+              "glyph_validation",
+              "source_data_retained"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "operation_index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 499
+              },
+              "op": {
+                "const": "mesh.retopology"
+              },
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "adapter": {
+                "const": "QUADRIFLOW_CLOSED_V1"
+              },
+              "before": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "vertices": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30000
+                  },
+                  "edges": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 120000
+                  },
+                  "faces": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30000
+                  },
+                  "euler_characteristic": {
+                    "type": "integer",
+                    "minimum": -100000,
+                    "maximum": 2
+                  },
+                  "components": {
+                    "const": 1
+                  },
+                  "boundary_edges": {
+                    "const": 0
+                  },
+                  "nonmanifold_edges": {
+                    "const": 0
+                  },
+                  "maximum_dihedral_degrees": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 180
+                  },
+                  "quad_faces": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 30000
+                  }
+                },
+                "required": [
+                  "vertices",
+                  "edges",
+                  "faces",
+                  "euler_characteristic",
+                  "components",
+                  "boundary_edges",
+                  "nonmanifold_edges",
+                  "maximum_dihedral_degrees",
+                  "quad_faces"
+                ]
+              },
+              "after": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "vertices": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30000
+                  },
+                  "edges": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 120000
+                  },
+                  "faces": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30000
+                  },
+                  "euler_characteristic": {
+                    "type": "integer",
+                    "minimum": -100000,
+                    "maximum": 2
+                  },
+                  "components": {
+                    "const": 1
+                  },
+                  "boundary_edges": {
+                    "const": 0
+                  },
+                  "nonmanifold_edges": {
+                    "const": 0
+                  },
+                  "maximum_dihedral_degrees": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 180
+                  },
+                  "quad_faces": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 30000
+                  }
+                },
+                "required": [
+                  "vertices",
+                  "edges",
+                  "faces",
+                  "euler_characteristic",
+                  "components",
+                  "boundary_edges",
+                  "nonmanifold_edges",
+                  "maximum_dihedral_degrees",
+                  "quad_faces"
+                ]
+              },
+              "target_faces": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 10000
+              },
+              "relative_face_count_error": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "topology_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "seed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "source_to_candidate": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "samples": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000000
+                  },
+                  "maximum_distance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000000.0
+                  },
+                  "rms_distance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000000.0
+                  },
+                  "maximum_normal_angle_degrees": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 180
+                  },
+                  "rms_normal_angle_degrees": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 180
+                  }
+                },
+                "required": [
+                  "samples",
+                  "maximum_distance",
+                  "rms_distance",
+                  "maximum_normal_angle_degrees",
+                  "rms_normal_angle_degrees"
+                ]
+              },
+              "candidate_to_source": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "samples": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000000
+                  },
+                  "maximum_distance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000000.0
+                  },
+                  "rms_distance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000000.0
+                  },
+                  "maximum_normal_angle_degrees": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 180
+                  },
+                  "rms_normal_angle_degrees": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 180
+                  }
+                },
+                "required": [
+                  "samples",
+                  "maximum_distance",
+                  "rms_distance",
+                  "maximum_normal_angle_degrees",
+                  "rms_normal_angle_degrees"
+                ]
+              },
+              "material_names": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "minItems": 0,
+                "maxItems": 1
+              },
+              "smooth": {
+                "type": "boolean"
+              },
+              "sampling": {
+                "type": "string"
+              },
+              "attribute_transfer": {
+                "type": "string"
+              },
+              "limitations": {
+                "type": "string"
+              },
+              "boundary_policy": {
+                "const": "REJECT_OPEN"
+              },
+              "sharp_policy": {
+                "const": "REJECT"
+              },
+              "attribute_policy": {
+                "const": "REJECT_NONTRIVIAL"
+              }
+            },
+            "required": [
+              "operation_index",
+              "op",
+              "object",
+              "adapter",
+              "before",
+              "after",
+              "target_faces",
+              "relative_face_count_error",
+              "topology_sha256",
+              "seed",
+              "source_to_candidate",
+              "candidate_to_source",
+              "material_names",
+              "smooth",
+              "sampling",
+              "attribute_transfer",
+              "limitations",
+              "boundary_policy",
+              "sharp_policy",
+              "attribute_policy"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "operations"
+  ]
+}

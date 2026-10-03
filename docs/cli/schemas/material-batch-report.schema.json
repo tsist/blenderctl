@@ -1,0 +1,1380 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Material batch report 1.0",
+  "type": "object",
+  "required": [
+    "report_version",
+    "operation",
+    "status",
+    "report",
+    "source",
+    "source_saved",
+    "assignments",
+    "outputs",
+    "checkpoint",
+    "resources",
+    "sheet",
+    "checks",
+    "resume",
+    "seconds"
+  ],
+  "properties": {
+    "report_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "const": "material.batch"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "pass",
+        "partial",
+        "failed"
+      ]
+    },
+    "report": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "source_saved": {
+      "const": false
+    },
+    "implementation": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scope_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "Material batch manifest 1.0",
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "context": {
+          "type": "object",
+          "properties": {
+            "scene": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "view_layer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "frame": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000,
+              "default": 1
+            }
+          },
+          "required": [
+            "scene",
+            "view_layer"
+          ],
+          "additionalProperties": false
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48,
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+              },
+              "target": {
+                "type": "object",
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "material_slot": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 63,
+                    "default": 0
+                  },
+                  "uv_layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  }
+                },
+                "required": [
+                  "object",
+                  "uv_layer"
+                ],
+                "additionalProperties": false
+              },
+              "material": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48,
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "template": {
+                    "const": "pbr_layers_v2",
+                    "default": "pbr_layers_v2"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "additionalProperties": false
+              },
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 48,
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63,
+                      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                    },
+                    "enabled": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 1
+                    },
+                    "mask": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "channels": {
+                      "type": "object",
+                      "properties": {
+                        "base_color": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "roughness": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "metallic": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "normal": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "height": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "alpha": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "emission": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "color_space": {
+                              "enum": [
+                                "sRGB",
+                                "Non-Color"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256",
+                            "color_space"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [],
+                      "additionalProperties": false,
+                      "default": {}
+                    },
+                    "values": {
+                      "type": "object",
+                      "properties": {
+                        "base_color": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "minItems": 4,
+                          "maxItems": 4,
+                          "default": [
+                            0.5,
+                            0.5,
+                            0.5,
+                            1
+                          ]
+                        },
+                        "roughness": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.5
+                        },
+                        "metallic": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0
+                        },
+                        "normal_strength": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 10,
+                          "default": 1
+                        },
+                        "height_distance": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.001
+                        },
+                        "alpha": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 1
+                        },
+                        "emission_color": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "minItems": 4,
+                          "maxItems": 4,
+                          "default": [
+                            0,
+                            0,
+                            0,
+                            1
+                          ]
+                        },
+                        "emission_strength": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "default": 0
+                        },
+                        "ior": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 4,
+                          "default": 1.5
+                        },
+                        "coat_weight": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0
+                        },
+                        "coat_roughness": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.03
+                        },
+                        "coat_ior": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 4,
+                          "default": 1.5
+                        }
+                      },
+                      "required": [],
+                      "additionalProperties": false,
+                      "default": {}
+                    },
+                    "mapping": {
+                      "type": "object",
+                      "properties": {
+                        "scale": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": 1e-05,
+                            "maximum": 10000
+                          },
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "default": [
+                            1,
+                            1,
+                            1
+                          ]
+                        },
+                        "rotation": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000,
+                            "maximum": 1000
+                          },
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "default": [
+                            0,
+                            0,
+                            0
+                          ]
+                        },
+                        "translation": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -10000,
+                            "maximum": 10000
+                          },
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "default": [
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      },
+                      "required": [],
+                      "additionalProperties": false,
+                      "default": {}
+                    },
+                    "adjustments": {
+                      "type": "object",
+                      "properties": {
+                        "color_tint": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "minItems": 4,
+                          "maxItems": 4,
+                          "default": [
+                            1,
+                            1,
+                            1,
+                            1
+                          ]
+                        },
+                        "roughness_scale": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 10,
+                          "default": 1
+                        },
+                        "roughness_bias": {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1,
+                          "default": 0
+                        }
+                      },
+                      "required": [],
+                      "additionalProperties": false,
+                      "default": {}
+                    },
+                    "effect": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "group": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 63,
+                              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "input_socket": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 63,
+                              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                            },
+                            "output_socket": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 63,
+                              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                            },
+                            "parameters": {
+                              "type": "array",
+                              "maxItems": 64,
+                              "default": [],
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "socket": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 63,
+                                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                                  },
+                                  "value": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number",
+                                        "minimum": -10000,
+                                        "maximum": 10000
+                                      },
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "number",
+                                          "minimum": -10000,
+                                          "maximum": 10000
+                                        },
+                                        "minItems": 3,
+                                        "maxItems": 3,
+                                        "default": [
+                                          0,
+                                          0,
+                                          0
+                                        ]
+                                      },
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "number",
+                                          "minimum": -10000,
+                                          "maximum": 10000
+                                        },
+                                        "minItems": 4,
+                                        "maxItems": 4,
+                                        "default": [
+                                          0,
+                                          0,
+                                          0,
+                                          0
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "socket",
+                                  "value"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "group",
+                            "expected_sha256",
+                            "input_socket",
+                            "output_socket"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 8
+              },
+              "faces": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 1,
+                    "maxItems": 100000,
+                    "uniqueItems": true
+                  }
+                ],
+                "default": null
+              },
+              "depends_on": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 48,
+                  "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+                },
+                "maxItems": 64,
+                "uniqueItems": true,
+                "default": []
+              }
+            },
+            "required": [
+              "id",
+              "target",
+              "material",
+              "layers"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "preview": {
+          "type": "object",
+          "properties": {
+            "engine": {
+              "enum": [
+                "CYCLES",
+                "BLENDER_EEVEE"
+              ],
+              "default": "CYCLES"
+            },
+            "device": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "backend": {
+                      "enum": [
+                        "CPU",
+                        "GRAPHICS"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "backend"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "backend": {
+                      "enum": [
+                        "CUDA",
+                        "OPTIX"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "backend",
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 64,
+              "maximum": 2048,
+              "default": 384
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 64,
+              "maximum": 2048,
+              "default": 384
+            },
+            "samples": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "default": 16
+            },
+            "denoise": {
+              "type": "boolean"
+            },
+            "color": {
+              "type": "object",
+              "properties": {
+                "view": {
+                  "enum": [
+                    "AgX",
+                    "Standard"
+                  ],
+                  "default": "AgX"
+                },
+                "exposure": {
+                  "type": "number",
+                  "minimum": -10,
+                  "maximum": 10,
+                  "default": 0
+                },
+                "gamma": {
+                  "type": "number",
+                  "minimum": 0.25,
+                  "maximum": 4,
+                  "default": 1
+                }
+              },
+              "required": [],
+              "additionalProperties": false,
+              "default": {}
+            },
+            "margin": {
+              "type": "number",
+              "minimum": 1.01,
+              "maximum": 3,
+              "default": 1.15
+            },
+            "views": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48,
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+                  },
+                  "azimuth": {
+                    "type": "number",
+                    "minimum": -360,
+                    "maximum": 360,
+                    "default": 45
+                  },
+                  "elevation": {
+                    "type": "number",
+                    "minimum": -80,
+                    "maximum": 89,
+                    "default": 15
+                  },
+                  "lighting": {
+                    "enum": [
+                      "soft",
+                      "raking"
+                    ],
+                    "default": "soft"
+                  },
+                  "focus": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "default": [
+                      0.5,
+                      0.5,
+                      0.5
+                    ]
+                  },
+                  "zoom": {
+                    "type": "number",
+                    "minimum": 0.25,
+                    "maximum": 10,
+                    "default": 1
+                  },
+                  "objects": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63,
+                      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                    },
+                    "minItems": 1,
+                    "maxItems": 64
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 24
+            }
+          },
+          "required": [
+            "device",
+            "views"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "engine"
+                ],
+                "properties": {
+                  "engine": {
+                    "const": "BLENDER_EEVEE"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "device": {
+                    "properties": {
+                      "backend": {
+                        "const": "GRAPHICS"
+                      }
+                    }
+                  },
+                  "denoise": {
+                    "const": false
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "device": {
+                    "properties": {
+                      "backend": {
+                        "enum": [
+                          "CPU",
+                          "CUDA",
+                          "OPTIX"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "context",
+        "objects",
+        "assignments",
+        "preview"
+      ],
+      "additionalProperties": false
+    },
+    "assignments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "fingerprint",
+          "reused",
+          "applied"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "failed",
+              "blocked"
+            ]
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reused": {
+            "type": "boolean"
+          },
+          "applied": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          },
+          "result": {
+            "type": "object"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "failed",
+                    "blocked"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "error"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "objects",
+          "fingerprint",
+          "reused"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "failed",
+              "not_run"
+            ]
+          },
+          "objects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reused": {
+            "type": "boolean"
+          },
+          "file": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "code": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "pass"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "file",
+                "sha256",
+                "bytes"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "failed"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "code",
+                "error"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "checkpoint": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "file",
+            "expected_sha256",
+            "snapshot",
+            "resources",
+            "assignments"
+          ],
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "snapshot": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "expected_sha256"
+              ],
+              "additionalProperties": false
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "assignments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "status",
+                  "fingerprint",
+                  "reused",
+                  "applied"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "pass",
+                      "failed",
+                      "blocked"
+                    ]
+                  },
+                  "fingerprint": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "reused": {
+                    "type": "boolean"
+                  },
+                  "applied": {
+                    "type": "boolean"
+                  },
+                  "error": {
+                    "type": "object",
+                    "required": [
+                      "code",
+                      "message"
+                    ],
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "result": {
+                    "type": "object"
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "failed",
+                            "blocked"
+                          ]
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "error"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "sheet": {
+      "type": [
+        "null",
+        "object"
+      ]
+    },
+    "checks": {
+      "type": "object"
+    },
+    "resume": {
+      "type": "object",
+      "required": [
+        "requested",
+        "loaded",
+        "reason",
+        "assignment_reuse",
+        "view_reuse"
+      ],
+      "properties": {
+        "requested": {
+          "type": "boolean"
+        },
+        "loaded": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "assignment_reuse": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "view_reuse": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

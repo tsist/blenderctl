@@ -1,0 +1,35 @@
+name: Source and release checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host:
+    name: Host Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Host contracts
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: Public source audit
+        run: python scripts/check_release.py
+      - name: Build release artifacts
+        run: python scripts/build_release.py --output dist
+      - name: Repeat build and verify identical bytes
+        run: python scripts/build_release.py --output dist --verify
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'windows-latest' && matrix.python == '3.13'
+        with:
+          name: release-candidates
+          path: dist/*
+          if-no-files-found: error

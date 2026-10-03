@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exchange-samples 1.0",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "frame": {
+        "type": "number"
+      },
+      "vertices": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      },
+      "triangles": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "area": {
+        "type": "number"
+      },
+      "bounds": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "objects": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "vertices": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "triangles": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "uv_layers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "materials": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "required": [
+            "name",
+            "vertices",
+            "triangles",
+            "uv_layers",
+            "materials"
+          ]
+        }
+      },
+      "armatures": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "bones": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "name",
+            "bones"
+          ]
+        }
+      }
+    },
+    "required": [
+      "frame",
+      "vertices",
+      "triangles",
+      "area",
+      "bounds",
+      "objects",
+      "armatures"
+    ]
+  }
+}

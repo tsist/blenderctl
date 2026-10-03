@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tracking-quality 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tracking_quality_version": {
+      "const": "1.0"
+    },
+    "passed": {
+      "type": "boolean"
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "detail"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 40000
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "frame": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120
+          },
+          "tracks": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 256
+          }
+        },
+        "required": [
+          "frame",
+          "tracks"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 120
+    },
+    "bundle_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    },
+    "camera_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 120
+    },
+    "missing_fraction": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "native_average_error": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reprojection_max_pixels": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reprojection_rms_pixels": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "minimum_depth": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nonplanarity_ratio": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "median_parallax_degrees": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 180
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clip": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "camera_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "points_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "keyframe_a": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        },
+        "keyframe_b": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        },
+        "min_tracks": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 256
+        },
+        "max_missing_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.5
+        },
+        "min_parallax_degrees": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 45
+        },
+        "min_nonplanarity_ratio": {
+          "type": "number",
+          "minimum": 1e-05,
+          "maximum": 1
+        },
+        "max_reprojection_error": {
+          "type": "number",
+          "minimum": 0.0001,
+          "maximum": 10
+        },
+        "max_average_error": {
+          "type": "number",
+          "minimum": 0.0001,
+          "maximum": 10
+        },
+        "preview_points": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "radius_pixels": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 6
+            }
+          },
+          "required": [
+            "radius_pixels"
+          ]
+        }
+      },
+      "required": [
+        "clip",
+        "camera_name",
+        "points_name",
+        "keyframe_a",
+        "keyframe_b",
+        "min_tracks",
+        "max_missing_fraction",
+        "min_parallax_degrees",
+        "min_nonplanarity_ratio",
+        "max_reprojection_error",
+        "max_average_error"
+      ]
+    },
+    "scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "tracking_quality_version",
+    "passed",
+    "failures",
+    "frames",
+    "bundle_count",
+    "camera_count",
+    "missing_fraction",
+    "native_average_error",
+    "reprojection_max_pixels",
+    "reprojection_rms_pixels",
+    "minimum_depth",
+    "nonplanarity_ratio",
+    "median_parallax_degrees",
+    "limits",
+    "scope"
+  ]
+}

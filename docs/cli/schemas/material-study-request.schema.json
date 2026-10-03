@@ -1,0 +1,427 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "material.study request 1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "command": {
+      "const": "material.study"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "manifest": {
+          "$ref": "material-batch-manifest.schema.json",
+          "allOf": [
+            {
+              "properties": {
+                "preview": {
+                  "properties": {
+                    "views": {
+                      "maxItems": 6
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 4096
+        },
+        "resume": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "study": {
+          "type": "object",
+          "properties": {
+            "assignment_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 48,
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+            },
+            "layer_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 48,
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+            },
+            "cases": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48,
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+                  },
+                  "values": {
+                    "type": "object",
+                    "properties": {
+                      "normal_strength": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10
+                      },
+                      "roughness": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "metallic": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "ior": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 4
+                      },
+                      "coat_weight": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "coat_roughness": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "coat_ior": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 4
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "color_mode": {
+                    "enum": [
+                      "original",
+                      "white"
+                    ],
+                    "default": "original"
+                  }
+                },
+                "required": [
+                  "id",
+                  "values"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "semantic_analysis": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "required": [
+            "assignment_id",
+            "layer_id",
+            "cases"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256",
+        "manifest",
+        "resources",
+        "study"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 1,
+                    "maxItems": 1
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 6
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 6
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 3,
+                    "maxItems": 3
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 6
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 4,
+                    "maxItems": 4
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 6
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 5,
+                    "maxItems": 5
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 6
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 6,
+                    "maxItems": 6
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 5
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 7,
+                    "maxItems": 7
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 4
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "study": {
+                "properties": {
+                  "cases": {
+                    "minItems": 8,
+                    "maxItems": 8
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "manifest": {
+                "properties": {
+                  "preview": {
+                    "properties": {
+                      "views": {
+                        "maxItems": 4
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "command",
+    "params"
+  ],
+  "additionalProperties": false
+}

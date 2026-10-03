@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version_policy": {
+      "enum": [
+        "SAME_MINOR",
+        "UPGRADE"
+      ]
+    },
+    "path_policy": {
+      "enum": [
+        "REMAP_RELATIVE",
+        "MAKE_RELATIVE"
+      ]
+    },
+    "unused_ids": {
+      "const": "REJECT_LOSS"
+    },
+    "compress": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "version_policy",
+    "path_policy",
+    "unused_ids",
+    "compress"
+  ]
+}

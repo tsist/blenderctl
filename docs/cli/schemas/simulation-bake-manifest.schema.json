@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "simulation-bake-manifest 1.0",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "frame_start": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "frame_end": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10000
+        },
+        "mode": {
+          "enum": [
+            "bake",
+            "reuse"
+          ]
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "adapter": {
+          "enum": [
+            "RIG_CLOTH_V1",
+            "HAIR_CLOTH_V1",
+            "NATIVE_LIQUID_V1"
+          ]
+        },
+        "source_cloth": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer",
+        "frame_start",
+        "frame_end",
+        "mode"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "source_cloth"
+            ]
+          },
+          "then": {
+            "required": [
+              "adapter"
+            ],
+            "properties": {
+              "adapter": {
+                "const": "HAIR_CLOTH_V1"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "const": "GEOMETRY_ZONE_V1"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "frame_start": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "frame_end": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10000
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "object": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "modifier": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63,
+                      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                    },
+                    "type": {
+                      "enum": [
+                        "FLOAT",
+                        "FLOAT_VECTOR"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 8
+              }
+            },
+            "required": [
+              "object",
+              "modifier"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "mode": {
+          "enum": [
+            "bake",
+            "reuse",
+            "relocate"
+          ]
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        }
+      },
+      "required": [
+        "adapter",
+        "scene",
+        "view_layer",
+        "frame_start",
+        "frame_end",
+        "targets",
+        "mode"
+      ]
+    }
+  ]
+}

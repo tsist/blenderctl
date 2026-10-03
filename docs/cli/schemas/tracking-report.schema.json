@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tracking-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tracking_report_version": {
+      "enum": [
+        "1.0",
+        "1.1"
+      ]
+    },
+    "stage": {
+      "enum": [
+        "PREPARE",
+        "INSPECT",
+        "SOLVE"
+      ]
+    },
+    "clip": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "mode": {
+      "enum": [
+        "TRACK",
+        "EXPLICIT"
+      ]
+    },
+    "frames": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 120
+    },
+    "tracks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    },
+    "markers_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "intrinsics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "focal_length_pixels": {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        "principal_point": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": -1000000000.0,
+            "maximum": 1000000000.0
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "pixel_aspect": {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        "distortion_model": {
+          "type": "string"
+        },
+        "k1": {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        "k2": {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        "k3": {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        }
+      },
+      "required": [
+        "focal_length_pixels",
+        "principal_point",
+        "pixel_aspect",
+        "distortion_model",
+        "k1",
+        "k2",
+        "k3"
+      ]
+    },
+    "reconstruction_valid": {
+      "type": "boolean"
+    },
+    "camera_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 120
+    },
+    "bundle_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    },
+    "native_average_error": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fps": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 120
+    },
+    "fps_source": {
+      "type": "string"
+    },
+    "scale": {
+      "type": "string"
+    },
+    "quality_scope": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "adapter": {
+      "const": "CLIP_INPUT_V1"
+    },
+    "scene_start": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1048574
+    },
+    "scene_end": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1048574
+    },
+    "projection_space": {
+      "type": "string"
+    },
+    "calibration_basis": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "tracking_report_version",
+    "stage",
+    "clip",
+    "scene",
+    "mode",
+    "frames",
+    "tracks",
+    "markers_sha256",
+    "intrinsics",
+    "reconstruction_valid",
+    "camera_count",
+    "bundle_count",
+    "native_average_error",
+    "fps",
+    "fps_source",
+    "scale",
+    "quality_scope",
+    "scope"
+  ]
+}

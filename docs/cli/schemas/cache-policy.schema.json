@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "jobs_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pins": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{32}$"
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{32}$"
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "keep_days": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 36500
+    }
+  },
+  "required": [
+    "jobs_root",
+    "pins",
+    "references",
+    "keep_days"
+  ]
+}

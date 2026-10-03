@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "script": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "trust": {
+          "enum": [
+            "execute_local_python_without_sandbox",
+            "execute_local_python_in_appcontainer"
+          ]
+        },
+        "params": {
+          "type": "object"
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^output-[A-Za-z0-9_-]+\\.(json|txt|blend|png|glb)$"
+          },
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true
+        },
+        "isolation": {
+          "const": "WINDOWS_APPCONTAINER_V1"
+        }
+      },
+      "required": [
+        "script",
+        "trust",
+        "params",
+        "outputs"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "isolation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "trust": {
+                "const": "execute_local_python_in_appcontainer"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "trust": {
+                "const": "execute_local_python_without_sandbox"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 100
+    },
+    "declarations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "read_purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "write_purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "network_purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "process_purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "source",
+        "read_purpose",
+        "write_purpose",
+        "network_purpose",
+        "process_purpose"
+      ]
+    }
+  },
+  "required": [
+    "execution",
+    "resources",
+    "declarations"
+  ]
+}

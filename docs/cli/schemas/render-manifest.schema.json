@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "render-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "view_layer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "camera": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "engine": {
+      "enum": [
+        "CYCLES",
+        "BLENDER_EEVEE",
+        "BLENDER_WORKBENCH"
+      ]
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "enum": [
+            "CPU",
+            "CUDA",
+            "OPTIX",
+            "GRAPHICS"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "backend"
+      ]
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100000
+      },
+      "minItems": 1,
+      "maxItems": 120,
+      "uniqueItems": true
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 16,
+      "maximum": 2048
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 16,
+      "maximum": 2048
+    },
+    "samples": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 256
+    },
+    "format": {
+      "enum": [
+        "PNG",
+        "JPEG",
+        "OPEN_EXR",
+        "OPEN_EXR_MULTILAYER"
+      ]
+    },
+    "depth": {
+      "enum": [
+        "8",
+        "16",
+        "32"
+      ]
+    },
+    "transparent": {
+      "type": "boolean"
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "enum": [
+            "Standard",
+            "AgX",
+            "Raw"
+          ]
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": -10,
+          "maximum": 10
+        },
+        "gamma": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4
+        }
+      },
+      "required": [
+        "view",
+        "exposure",
+        "gamma"
+      ]
+    },
+    "compositor": {
+      "type": "boolean"
+    },
+    "passes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "Z",
+          "NORMAL",
+          "DIFFUSE_COLOR",
+          "EMISSION",
+          "OBJECT_INDEX"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 5,
+      "uniqueItems": true
+    },
+    "denoise": {
+      "type": "boolean"
+    },
+    "motion_blur": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "required": [
+    "scene",
+    "view_layer",
+    "camera",
+    "engine",
+    "device",
+    "frames",
+    "width",
+    "height",
+    "samples",
+    "format",
+    "depth",
+    "transparent",
+    "color",
+    "compositor",
+    "passes",
+    "denoise",
+    "motion_blur"
+  ]
+}

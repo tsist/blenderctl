@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "zone-cache-samples 1.0",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "frame": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000
+      },
+      "objects": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "vertices": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "topology_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "type": {
+                    "enum": [
+                      "FLOAT",
+                      "FLOAT_VECTOR"
+                    ]
+                  },
+                  "domain": {
+                    "const": "POINT"
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "number",
+                          "minimum": -1000000000.0,
+                          "maximum": 1000000000.0
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "type",
+                  "domain",
+                  "data"
+                ]
+              }
+            }
+          },
+          "required": [
+            "name",
+            "vertices",
+            "topology_sha256",
+            "attributes"
+          ]
+        }
+      }
+    },
+    "required": [
+      "frame",
+      "objects"
+    ]
+  }
+}

@@ -1,0 +1,481 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exchange-analysis-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "exchange_analysis_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "const": "analyze"
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true
+        },
+        "frame_start": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "frame_end": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "sampling": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "seed_substeps": {
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                4,
+                8
+              ]
+            },
+            "max_depth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 24
+            },
+            "max_evaluations": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 4096
+            },
+            "max_vertex_samples": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16000000
+            },
+            "max_position_error": {
+              "type": "number",
+              "minimum": 1e-07,
+              "maximum": 0.001
+            }
+          },
+          "required": [
+            "seed_substeps",
+            "max_depth",
+            "max_evaluations",
+            "max_vertex_samples",
+            "max_position_error"
+          ]
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer",
+        "objects",
+        "frame_start",
+        "frame_end",
+        "sampling"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "sampled_intervals_pass",
+        "needs_review"
+      ]
+    },
+    "stop_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "native_time_resolution",
+        "requested_time_resolution",
+        "max_depth",
+        "max_evaluations",
+        "max_vertex_samples"
+      ]
+    },
+    "accepted_intervals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          },
+          "actual_start": {
+            "type": "number"
+          },
+          "actual_end": {
+            "type": "number"
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max_error": {
+            "type": "number"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "requested_frame": {
+                  "type": "number"
+                },
+                "actual_frame": {
+                  "type": "number"
+                },
+                "alpha": {
+                  "type": "number"
+                },
+                "error": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "requested_frame",
+                "actual_frame",
+                "alpha",
+                "error"
+              ]
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "actual_start",
+          "actual_end",
+          "depth",
+          "max_error",
+          "checks"
+        ]
+      }
+    },
+    "unresolved_intervals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          },
+          "actual_start": {
+            "type": "number"
+          },
+          "actual_end": {
+            "type": "number"
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max_error": {
+            "type": "number"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "requested_frame": {
+                  "type": "number"
+                },
+                "actual_frame": {
+                  "type": "number"
+                },
+                "alpha": {
+                  "type": "number"
+                },
+                "error": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "requested_frame",
+                "actual_frame",
+                "alpha",
+                "error"
+              ]
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "actual_start",
+          "actual_end",
+          "depth",
+          "max_error",
+          "checks"
+        ]
+      }
+    },
+    "unexamined_ranges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      }
+    },
+    "interval_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          },
+          "actual_start": {
+            "type": "number"
+          },
+          "actual_end": {
+            "type": "number"
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max_error": {
+            "type": "number"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "requested_frame": {
+                  "type": "number"
+                },
+                "actual_frame": {
+                  "type": "number"
+                },
+                "alpha": {
+                  "type": "number"
+                },
+                "error": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "requested_frame",
+                "actual_frame",
+                "alpha",
+                "error"
+              ]
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "actual_start",
+          "actual_end",
+          "depth",
+          "max_error",
+          "checks"
+        ]
+      }
+    },
+    "key_frames": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "tolerance": {
+      "type": "number"
+    },
+    "continuous_time_verified": {
+      "const": false
+    },
+    "exchange_verified": {
+      "const": false
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_saved": {
+      "const": false
+    },
+    "source_fps": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sample_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "vertex_samples": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_replay_max_error": {
+      "type": "number"
+    },
+    "source_replay": {
+      "enum": [
+        "pass",
+        "not_run"
+      ]
+    },
+    "resource_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "requested_frame": {
+            "type": "number"
+          },
+          "actual_frame": {
+            "type": "number"
+          },
+          "file": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "requested_frame",
+          "actual_frame",
+          "file",
+          "sha256",
+          "bytes"
+        ]
+      }
+    },
+    "meshes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "vertices": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "source",
+          "vertices"
+        ]
+      }
+    },
+    "seconds": {
+      "type": "number"
+    },
+    "scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "exchange_analysis_version",
+    "operation",
+    "settings",
+    "outcome",
+    "stop_reason",
+    "accepted_intervals",
+    "unresolved_intervals",
+    "unexamined_ranges",
+    "interval_history",
+    "key_frames",
+    "tolerance",
+    "continuous_time_verified",
+    "exchange_verified",
+    "source",
+    "source_sha256",
+    "source_saved",
+    "source_fps",
+    "sample_count",
+    "vertex_samples",
+    "source_replay_max_error",
+    "source_replay",
+    "resource_hashes",
+    "samples",
+    "meshes",
+    "seconds",
+    "scope"
+  ]
+}

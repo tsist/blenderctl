@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "preview-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "preview_version": {
+      "const": "1.0"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "Object",
+            "Collection",
+            "Material",
+            "GeometryNodeTree",
+            "ShaderNodeTree"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "library": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "library"
+      ]
+    },
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "view_layer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "frame": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "fixture": {
+      "enum": [
+        "NONE",
+        "CUBE",
+        "UV_SPHERE"
+      ]
+    },
+    "appearance": {
+      "enum": [
+        "CLAY",
+        "SOURCE"
+      ]
+    },
+    "visibility": {
+      "enum": [
+        "REQUIRE_VISIBLE",
+        "INCLUDE_HIDDEN"
+      ]
+    },
+    "views": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "FRONT",
+          "RIGHT",
+          "BACK",
+          "THREE_QUARTER"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 4,
+      "uniqueItems": true
+    },
+    "projection": {
+      "enum": [
+        "ORTHO",
+        "PERSP"
+      ]
+    },
+    "margin": {
+      "type": "number",
+      "minimum": 0.03,
+      "maximum": 0.35
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 64,
+      "maximum": 1024
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 64,
+      "maximum": 1024
+    },
+    "engine": {
+      "enum": [
+        "CYCLES",
+        "BLENDER_EEVEE",
+        "BLENDER_WORKBENCH"
+      ]
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "enum": [
+            "CPU",
+            "CUDA",
+            "OPTIX",
+            "GRAPHICS"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "backend"
+      ]
+    },
+    "samples": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 128
+    },
+    "transparent": {
+      "type": "boolean"
+    },
+    "background": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "enum": [
+            "Standard",
+            "AgX",
+            "Raw"
+          ]
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": -10,
+          "maximum": 10
+        },
+        "gamma": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4
+        }
+      },
+      "required": [
+        "view",
+        "exposure",
+        "gamma"
+      ]
+    },
+    "embed": {
+      "type": "boolean"
+    },
+    "embed_view": {
+      "enum": [
+        "FRONT",
+        "RIGHT",
+        "BACK",
+        "THREE_QUARTER"
+      ]
+    }
+  },
+  "required": [
+    "preview_version",
+    "target",
+    "scene",
+    "view_layer",
+    "frame",
+    "fixture",
+    "appearance",
+    "visibility",
+    "views",
+    "projection",
+    "margin",
+    "width",
+    "height",
+    "engine",
+    "device",
+    "samples",
+    "transparent",
+    "background",
+    "color",
+    "embed",
+    "embed_view"
+  ]
+}

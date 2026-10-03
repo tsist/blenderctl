@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UV-only evaluated coordinate reopen proof 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "scope": {
+      "const": "UV_ONLY_SAVE_REOPEN_EVALUATED_COORDINATES"
+    },
+    "absolute_tolerance": {
+      "const": 1e-06
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "vertices": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200000
+          },
+          "maximum_coordinate_error": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1e+300
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "observed_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "finite": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "object",
+          "vertices",
+          "maximum_coordinate_error",
+          "expected_sha256",
+          "observed_sha256",
+          "finite"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 100000
+    },
+    "pass": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "version",
+    "scope",
+    "absolute_tolerance",
+    "objects",
+    "pass"
+  ]
+}

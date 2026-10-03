@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exchange-convert-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "input": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ]
+          },
+          "import": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "format": {
+                "enum": [
+                  "GLB",
+                  "OBJ",
+                  "STL",
+                  "PLY",
+                  "FBX",
+                  "USD",
+                  "ABC"
+                ]
+              },
+              "scene": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "frame": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "fps": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 240
+              },
+              "scale_to_meters": {
+                "type": "number",
+                "minimum": 1e-06,
+                "maximum": 1000000
+              },
+              "mode": {
+                "enum": [
+                  "STATIC",
+                  "ANIMATION"
+                ]
+              },
+              "geometry_adapter": {
+                "enum": [
+                  "EVALUATED_MESH_CACHE_V1",
+                  "FBX_NATIVE_CLOCK_V1",
+                  "GLB_NATIVE_CLOCK_V1"
+                ]
+              }
+            },
+            "required": [
+              "format",
+              "scene",
+              "frame",
+              "fps",
+              "scale_to_meters",
+              "mode"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "geometry_adapter"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "mode": {
+                      "const": "ANIMATION"
+                    },
+                    "scale_to_meters": {
+                      "const": 1
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "geometry_adapter"
+                  ],
+                  "properties": {
+                    "geometry_adapter": {
+                      "const": "EVALUATED_MESH_CACHE_V1"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "format": {
+                      "const": "USD"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "geometry_adapter"
+                  ],
+                  "properties": {
+                    "geometry_adapter": {
+                      "const": "FBX_NATIVE_CLOCK_V1"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "format": {
+                      "const": "FBX"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "geometry_adapter"
+                  ],
+                  "properties": {
+                    "geometry_adapter": {
+                      "const": "GLB_NATIVE_CLOCK_V1"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "format": {
+                      "const": "GLB"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "format",
+                    "mode"
+                  ],
+                  "properties": {
+                    "format": {
+                      "const": "USD"
+                    },
+                    "mode": {
+                      "const": "ANIMATION"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "geometry_adapter"
+                  ],
+                  "properties": {
+                    "geometry_adapter": {
+                      "const": "EVALUATED_MESH_CACHE_V1"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "output_format": {
+            "enum": [
+              "GLB",
+              "OBJ",
+              "STL",
+              "PLY",
+              "FBX",
+              "USD",
+              "ABC"
+            ]
+          },
+          "geometry_adapter": {
+            "enum": [
+              "FBX_NATIVE_CLOCK_V1",
+              "GLB_NATIVE_CLOCK_V1"
+            ]
+          }
+        },
+        "required": [
+          "input",
+          "import",
+          "output_format"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "geometry_adapter"
+              ]
+            },
+            "then": {
+              "properties": {
+                "import": {
+                  "required": [
+                    "geometry_adapter"
+                  ],
+                  "properties": {
+                    "format": {
+                      "const": "USD"
+                    },
+                    "mode": {
+                      "const": "ANIMATION"
+                    },
+                    "geometry_adapter": {
+                      "const": "EVALUATED_MESH_CACHE_V1"
+                    }
+                  }
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "import": {
+                  "properties": {
+                    "mode": {
+                      "const": "STATIC"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "geometry_adapter"
+              ],
+              "properties": {
+                "geometry_adapter": {
+                  "const": "FBX_NATIVE_CLOCK_V1"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "output_format": {
+                  "const": "FBX"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "geometry_adapter"
+              ],
+              "properties": {
+                "geometry_adapter": {
+                  "const": "GLB_NATIVE_CLOCK_V1"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "output_format": {
+                  "const": "GLB"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 8
+    }
+  },
+  "required": [
+    "items"
+  ]
+}

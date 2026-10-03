@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "override-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "adapter": {
+      "const": "LIBRARY_OVERRIDE_5_2_V1"
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer"
+      ]
+    },
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "Object",
+            "Collection"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "library": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "library"
+      ]
+    },
+    "edits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "const": "Object"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "asset_id": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "library": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "library"
+            ]
+          },
+          "values": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "location": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation_euler": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "scale": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "hide_render": {
+                "type": "boolean"
+              }
+            },
+            "required": [],
+            "minProperties": 1
+          }
+        },
+        "required": [
+          "target",
+          "values"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 128
+    }
+  },
+  "required": [
+    "version",
+    "adapter",
+    "context",
+    "root",
+    "edits"
+  ]
+}

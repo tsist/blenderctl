@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "material.batch request 1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "command": {
+      "const": "material.batch"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "manifest": {
+          "$ref": "material-batch-manifest.schema.json"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 4096
+        },
+        "resume": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256",
+        "manifest",
+        "resources"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "command",
+    "params"
+  ],
+  "additionalProperties": false
+}

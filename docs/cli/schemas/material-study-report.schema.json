@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Material study report 1.0",
+  "type": "object",
+  "required": [
+    "report_version",
+    "operation",
+    "status",
+    "source",
+    "study",
+    "cases",
+    "semantic_analysis",
+    "progress",
+    "timings"
+  ],
+  "properties": {
+    "report_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "const": "material.study"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "pass",
+        "partial",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "study": {
+      "type": "object",
+      "properties": {
+        "assignment_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "layer_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48,
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+              },
+              "values": {
+                "type": "object",
+                "properties": {
+                  "normal_strength": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "roughness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "ior": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
+                  },
+                  "coat_weight": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "coat_roughness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "coat_ior": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              },
+              "color_mode": {
+                "enum": [
+                  "original",
+                  "white"
+                ],
+                "default": "original"
+              }
+            },
+            "required": [
+              "id",
+              "values"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "semantic_analysis": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "assignment_id",
+        "layer_id",
+        "cases"
+      ],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "values",
+          "color_mode",
+          "changes",
+          "counts",
+          "outputs",
+          "resume",
+          "report"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "partial",
+              "failed"
+            ]
+          },
+          "values": {
+            "type": "object"
+          },
+          "color_mode": {
+            "enum": [
+              "original",
+              "white"
+            ]
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "before",
+                "after"
+              ]
+            }
+          },
+          "counts": {
+            "type": "object"
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "status",
+                "reused"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pass",
+                    "failed",
+                    "not_run"
+                  ]
+                },
+                "reused": {
+                  "type": "boolean"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "status": {
+                        "const": "pass"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "file",
+                      "sha256",
+                      "bytes"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "resume": {
+            "type": "object"
+          },
+          "report": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "candidate": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "timings": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "error": {
+            "type": "object"
+          }
+        }
+      },
+      "maxItems": 8
+    },
+    "semantic_analysis": {
+      "type": [
+        "object",
+        "array",
+        "null"
+      ]
+    },
+    "progress": {
+      "type": "object"
+    },
+    "timings": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

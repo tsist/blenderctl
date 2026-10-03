@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hair-samples 1.0",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "frame": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10000
+      },
+      "objects": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "object": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "surface": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "coordinate_space": {
+              "const": "WORLD"
+            },
+            "curves": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "root": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": -10000,
+                      "maximum": 10000
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "points": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": -10000,
+                        "maximum": 10000
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "minItems": 2,
+                    "maxItems": 64
+                  },
+                  "radii": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 10000
+                    },
+                    "minItems": 2,
+                    "maxItems": 64
+                  }
+                },
+                "required": [
+                  "id",
+                  "root",
+                  "points",
+                  "radii"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 2048
+            },
+            "collisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "object": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "distance_mode": {
+                    "enum": [
+                      "ORIENTED_SURFACE",
+                      "UNSIGNED_SURFACE"
+                    ]
+                  },
+                  "vertices": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "topology_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "world_positions_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "minimum_proxy_vertex_distance": {
+                    "type": "number",
+                    "minimum": -1000000000.0,
+                    "maximum": 1000000000.0
+                  },
+                  "minimum_sampled_curve_clearance": {
+                    "type": "number",
+                    "minimum": -1000000000.0,
+                    "maximum": 1000000000.0
+                  },
+                  "negative_curve_samples": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100000
+                  },
+                  "curve_samples": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100000
+                  },
+                  "clearance_threshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.1
+                  },
+                  "clearance_pass": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "object",
+                  "distance_mode",
+                  "vertices",
+                  "topology_sha256",
+                  "world_positions_sha256",
+                  "minimum_proxy_vertex_distance",
+                  "minimum_sampled_curve_clearance",
+                  "negative_curve_samples",
+                  "curve_samples"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            }
+          },
+          "required": [
+            "object",
+            "surface",
+            "coordinate_space",
+            "curves"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 128
+      },
+      "volumes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "object": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "file_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "active_voxels": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000
+            },
+            "index_min": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": -100000000,
+                "maximum": 100000000
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "index_max": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": -100000000,
+                "maximum": 100000000
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "sum": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000.0
+            },
+            "maximum": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100.00001
+            },
+            "values_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "voxel_size": {
+              "type": "number",
+              "minimum": 0.0001,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "object",
+            "file",
+            "file_sha256",
+            "source_sha256",
+            "active_voxels",
+            "index_min",
+            "index_max",
+            "sum",
+            "maximum",
+            "values_sha256",
+            "voxel_size"
+          ]
+        },
+        "minItems": 0,
+        "maxItems": 8
+      }
+    },
+    "required": [
+      "frame",
+      "objects"
+    ]
+  },
+  "minItems": 1,
+  "maxItems": 32
+}

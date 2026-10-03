@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Material workflow template bindings",
+  "type": "object",
+  "properties": {
+    "context": {
+      "type": "object",
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "default": 1
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer"
+      ],
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "material_slot": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63,
+          "default": 0
+        },
+        "uv_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "object",
+        "uv_layer"
+      ],
+      "additionalProperties": false
+    },
+    "material": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "preview": {
+      "type": "object",
+      "properties": {
+        "engine": {
+          "enum": [
+            "CYCLES",
+            "BLENDER_EEVEE"
+          ],
+          "default": "CYCLES"
+        },
+        "device": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "backend": {
+                  "enum": [
+                    "CPU",
+                    "GRAPHICS"
+                  ]
+                }
+              },
+              "required": [
+                "backend"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "backend": {
+                  "enum": [
+                    "CUDA",
+                    "OPTIX"
+                  ]
+                },
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "backend",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 2048,
+          "default": 384
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 2048,
+          "default": 384
+        },
+        "samples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256,
+          "default": 16
+        },
+        "denoise": {
+          "type": "boolean"
+        },
+        "color": {
+          "type": "object",
+          "properties": {
+            "view": {
+              "enum": [
+                "AgX",
+                "Standard"
+              ],
+              "default": "AgX"
+            },
+            "exposure": {
+              "type": "number",
+              "minimum": -10,
+              "maximum": 10,
+              "default": 0
+            },
+            "gamma": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 4,
+              "default": 1
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "default": {}
+        },
+        "margin": {
+          "type": "number",
+          "minimum": 1.01,
+          "maximum": 3,
+          "default": 1.15
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48,
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+              },
+              "azimuth": {
+                "type": "number",
+                "minimum": -360,
+                "maximum": 360,
+                "default": 45
+              },
+              "elevation": {
+                "type": "number",
+                "minimum": -80,
+                "maximum": 89,
+                "default": 15
+              },
+              "lighting": {
+                "enum": [
+                  "soft",
+                  "raking"
+                ],
+                "default": "soft"
+              },
+              "focus": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "default": [
+                  0.5,
+                  0.5,
+                  0.5
+                ]
+              },
+              "zoom": {
+                "type": "number",
+                "minimum": 0.25,
+                "maximum": 10,
+                "default": 1
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 12
+        }
+      },
+      "required": [
+        "device",
+        "views"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "engine"
+            ],
+            "properties": {
+              "engine": {
+                "const": "BLENDER_EEVEE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "device": {
+                "properties": {
+                  "backend": {
+                    "const": "GRAPHICS"
+                  }
+                }
+              },
+              "denoise": {
+                "const": false
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "device": {
+                "properties": {
+                  "backend": {
+                    "enum": [
+                      "CPU",
+                      "CUDA",
+                      "OPTIX"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "color_space": {
+            "enum": [
+              "sRGB",
+              "Non-Color"
+            ]
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256",
+          "color_space"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "groups": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 63,
+            "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "group",
+          "expected_sha256"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "context",
+    "target",
+    "material",
+    "preview",
+    "resources",
+    "groups"
+  ],
+  "additionalProperties": false
+}

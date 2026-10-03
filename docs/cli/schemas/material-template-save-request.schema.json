@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "material.template-save request 1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "command": {
+      "const": "material.template-save"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "material_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "template_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 256
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256",
+        "material_id",
+        "template_id",
+        "name",
+        "version",
+        "resources"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "command",
+    "params"
+  ],
+  "additionalProperties": false
+}

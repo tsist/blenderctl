@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "dependency-relink-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "candidate": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "candidate_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "closure": {
+      "const": "closed"
+    },
+    "closure_report": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "closure_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "owner_file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "kind": {
+            "enum": [
+              "image",
+              "image_sequence_binding",
+              "library",
+              "font",
+              "sound",
+              "movieclip",
+              "vse_image",
+              "vse_movie",
+              "vse_sound",
+              "declared_plugin",
+              "declared_cache"
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "to": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "resource_id",
+          "owner_file",
+          "kind",
+          "members"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 100
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "candidate": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "local_datablocks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "content": {
+            "const": "pass"
+          },
+          "candidate_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "source",
+          "candidate",
+          "local_datablocks",
+          "content",
+          "candidate_sha256"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 32
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ]
+      },
+      "minItems": 1
+    },
+    "reopen": {
+      "const": "pass"
+    },
+    "local_content": {
+      "const": "pass"
+    },
+    "runtime_validation": {
+      "const": "separate domain commands required"
+    },
+    "source_saved": {
+      "const": false
+    }
+  },
+  "required": [
+    "version",
+    "candidate",
+    "candidate_sha256",
+    "closure",
+    "closure_report",
+    "closure_sha256",
+    "mappings",
+    "candidates",
+    "resources",
+    "reopen",
+    "local_content",
+    "runtime_validation",
+    "source_saved"
+  ]
+}

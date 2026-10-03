@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Material workflow template export report 1.0",
+  "type": "object",
+  "properties": {
+    "report_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "const": "template-save"
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "failed"
+      ]
+    },
+    "source_saved": {
+      "const": false
+    },
+    "workflow_report": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "template": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bindings": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resources": {
+      "type": "string",
+      "minLength": 1
+    },
+    "template_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "bindings_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "report_version",
+    "operation",
+    "status",
+    "source_saved",
+    "workflow_report",
+    "checks",
+    "seconds"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "pass"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "template",
+          "bindings",
+          "resources",
+          "template_sha256",
+          "bindings_sha256",
+          "source"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "failed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "error"
+        ]
+      }
+    }
+  ]
+}

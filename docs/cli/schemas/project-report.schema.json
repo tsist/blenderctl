@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "project_report_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "enum": [
+        "VERIFY",
+        "PREPARE_COPY"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "saved_version": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "reader_version": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "BACKGROUND_FACTORY_DISK_V1"
+        },
+        "background": {
+          "type": "boolean"
+        },
+        "factory_startup": {
+          "type": "boolean"
+        },
+        "user_resources_redirected": {
+          "type": "boolean"
+        },
+        "autoexec_enabled": {
+          "type": "boolean"
+        },
+        "load_ui": {
+          "type": "boolean"
+        },
+        "use_scripts": {
+          "type": "boolean"
+        },
+        "online_access": {
+          "type": "boolean"
+        },
+        "gui_session": {
+          "const": "NOT_CONNECTED"
+        },
+        "unsaved_gui_edits": {
+          "const": "NOT_OBSERVED"
+        },
+        "extension_policy": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "state_source": {
+          "const": "SAVED_DISK_V1"
+        },
+        "gui_state_detection": {
+          "const": false
+        },
+        "gui_autosave": {
+          "const": false
+        },
+        "live_session_input": {
+          "const": false
+        },
+        "unsaved_gui_edits_meaning": {
+          "const": "NOT_OBSERVABLE_FROM_BACKGROUND; NOT_OBSERVED does not mean checked-and-clean"
+        }
+      },
+      "required": [
+        "id",
+        "background",
+        "factory_startup",
+        "user_resources_redirected",
+        "autoexec_enabled",
+        "load_ui",
+        "use_scripts",
+        "online_access",
+        "gui_session",
+        "unsaved_gui_edits",
+        "extension_policy",
+        "scope"
+      ]
+    },
+    "version_info": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "reader": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "relation": {
+          "enum": [
+            "older",
+            "newer",
+            "same"
+          ]
+        },
+        "version_converted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source",
+        "reader",
+        "relation",
+        "version_converted"
+      ]
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "BLENDER",
+            "ZSTD",
+            "GZIP",
+            "UNKNOWN"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000000
+        },
+        "compressed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "bytes",
+        "compressed"
+      ]
+    },
+    "external_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "undeclared_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "datablocks": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000000
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "open": {
+          "type": "string"
+        },
+        "render": {
+          "type": "string"
+        },
+        "animation": {
+          "type": "string"
+        },
+        "dependency_closure": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "open",
+        "render",
+        "animation",
+        "dependency_closure"
+      ]
+    },
+    "source_saved": {
+      "const": false
+    },
+    "candidate": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reopen": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "path_policy": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "version_policy": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "project_report_version",
+    "operation",
+    "source",
+    "saved_version",
+    "reader_version",
+    "profile",
+    "version_info",
+    "container",
+    "external_paths",
+    "undeclared_paths",
+    "datablocks",
+    "validation",
+    "source_saved",
+    "candidate",
+    "reopen",
+    "path_policy",
+    "version_policy"
+  ]
+}

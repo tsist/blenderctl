@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "simulation-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "simulation_report_version": {
+      "const": "1.0"
+    },
+    "scene": {
+      "type": "string"
+    },
+    "gravity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "matrix_world": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "modifiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "settings": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean"
+                    ]
+                  }
+                },
+                "fluid_type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "type"
+              ]
+            }
+          },
+          "topology_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "rigid": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          },
+          "positions": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "radii": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "curve_sizes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "drawings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "layer": {
+                  "type": "string"
+                },
+                "frame": {
+                  "type": "integer"
+                },
+                "strokes": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "position": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "radius": {
+                          "type": "number"
+                        },
+                        "opacity": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "position",
+                        "radius",
+                        "opacity"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "layer",
+                "frame",
+                "strokes"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "matrix_world",
+          "modifiers"
+        ]
+      }
+    },
+    "caches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "is_baked": {
+            "type": "boolean"
+          },
+          "start": {
+            "type": "integer"
+          },
+          "end": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "owner",
+          "is_baked",
+          "start",
+          "end"
+        ]
+      }
+    }
+  },
+  "required": [
+    "simulation_report_version",
+    "scene",
+    "gravity",
+    "objects",
+    "caches"
+  ]
+}

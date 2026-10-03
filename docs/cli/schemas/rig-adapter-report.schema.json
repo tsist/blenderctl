@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rig adapter report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 499
+          },
+          "op": {
+            "enum": [
+              "animation.retarget_pose",
+              "skin.transfer_weights",
+              "skin.auto_weights",
+              "skin.rebind"
+            ]
+          },
+          "detail": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "clips",
+                  "budget",
+                  "source_binding_restored",
+                  "original_actions_unchanged",
+                  "driver_inventory_unchanged"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "CONTROL_ACTION_SET_V1"
+                  },
+                  "clips": {
+                    "type": "array",
+                    "minItems": 1
+                  },
+                  "budget": {
+                    "type": "object"
+                  },
+                  "source_binding_restored": {
+                    "const": true
+                  },
+                  "original_actions_unchanged": {
+                    "const": true
+                  },
+                  "driver_inventory_unchanged": {
+                    "const": true
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "maximum_rest_error",
+                  "mesh_data_unchanged",
+                  "driver_changes_explicit",
+                  "samples"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "SAME_REST_SKIN_V1"
+                  },
+                  "maximum_rest_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.0001
+                  },
+                  "mesh_data_unchanged": {
+                    "const": true
+                  },
+                  "driver_changes_explicit": {
+                    "const": true
+                  },
+                  "samples": {
+                    "type": "array"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "maximum_matrix_error",
+                  "maximum_head_error",
+                  "maximum_tail_error",
+                  "mapping",
+                  "frames",
+                  "helpers"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "REST_FRAME_V1"
+                  },
+                  "maximum_matrix_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.001
+                  },
+                  "maximum_head_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "maximum_tail_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "mapping": {
+                    "type": "array"
+                  },
+                  "frames": {
+                    "type": "array"
+                  },
+                  "helpers": {
+                    "type": "object"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "maximum_matrix_error",
+                  "maximum_head_error",
+                  "maximum_tail_error",
+                  "mapping",
+                  "frames",
+                  "helpers"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "REST_CHAIN_V1"
+                  },
+                  "maximum_matrix_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.001
+                  },
+                  "maximum_head_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "maximum_tail_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "mapping": {
+                    "type": "array"
+                  },
+                  "frames": {
+                    "type": "array"
+                  },
+                  "helpers": {
+                    "type": "object"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "maximum_channel_error",
+                  "maximum_root_world_error",
+                  "source_unchanged",
+                  "driver_inventory_unchanged",
+                  "unmapped_action_curves_unchanged",
+                  "samples"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "CONTROL_CHANNELS_V1"
+                  },
+                  "maximum_channel_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.001
+                  },
+                  "maximum_root_world_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.001
+                  },
+                  "source_unchanged": {
+                    "const": true
+                  },
+                  "driver_inventory_unchanged": {
+                    "const": true
+                  },
+                  "unmapped_action_curves_unchanged": {
+                    "const": true
+                  },
+                  "samples": {
+                    "type": "array"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "source_unchanged",
+                  "max_normalization_error",
+                  "vertices"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "SURFACE_BARYCENTRIC_V1"
+                  },
+                  "source_unchanged": {
+                    "const": true
+                  },
+                  "max_normalization_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.001
+                  },
+                  "vertices": {
+                    "type": "array"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "adapter",
+                  "max_normalization_error",
+                  "vertices"
+                ],
+                "properties": {
+                  "adapter": {
+                    "const": "NEAREST_SEGMENT_V1"
+                  },
+                  "max_normalization_error": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1e-06
+                  },
+                  "vertices": {
+                    "type": "array"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "index",
+          "op",
+          "detail"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 500
+    }
+  },
+  "required": [
+    "version",
+    "operations"
+  ]
+}

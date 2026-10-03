@@ -1,0 +1,281 @@
+{
+  "initial_scene": "Model",
+  "context": {
+    "scene": "Model",
+    "view_layer": "ViewLayer",
+    "frame": 1,
+    "mode": "OBJECT",
+    "active_object": "Body",
+    "selected_objects": [
+      "Body"
+    ]
+  },
+  "operations": [
+    {
+      "op": "collection.create",
+      "name": "Geometry",
+      "parent": {
+        "scene": "Model"
+      }
+    },
+    {
+      "op": "object.create",
+      "name": "Body",
+      "collection": "Geometry",
+      "kind": "CUBE",
+      "size": 2
+    },
+    {
+      "op": "object.duplicate",
+      "object": "Body",
+      "name": "SharedOriginal",
+      "collection": "Geometry",
+      "data": "linked"
+    },
+    {
+      "op": "object.transform",
+      "object": "SharedOriginal",
+      "space": "local",
+      "location": [
+        -4,
+        0,
+        0
+      ]
+    },
+    {
+      "op": "object.create",
+      "name": "Cutter",
+      "collection": "Geometry",
+      "kind": "CYLINDER",
+      "radius": 0.45,
+      "depth": 4,
+      "segments": 32
+    },
+    {
+      "op": "modifier.add",
+      "object": "Body",
+      "name": "Bore",
+      "type": "BOOLEAN",
+      "settings": {
+        "object": "Cutter",
+        "operation": "DIFFERENCE",
+        "solver": "EXACT"
+      }
+    },
+    {
+      "op": "modifier.apply",
+      "object": "Body",
+      "data_scope": "single_user",
+      "name": "Bore"
+    },
+    {
+      "op": "object.visibility",
+      "object": "Cutter",
+      "hide_render": true
+    },
+    {
+      "op": "modifier.add",
+      "object": "Body",
+      "name": "EdgeSoftening",
+      "type": "BEVEL",
+      "settings": {
+        "width": 0.08,
+        "segments": 3,
+        "angle_limit_deg": 30
+      }
+    },
+    {
+      "op": "modifier.apply",
+      "object": "Body",
+      "data_scope": "single_user",
+      "name": "EdgeSoftening"
+    },
+    {
+      "op": "mesh.normals",
+      "object": "Body",
+      "data_scope": "single_user",
+      "recalculate": true,
+      "smooth": false
+    },
+    {
+      "op": "uv.layer",
+      "object": "Body",
+      "data_scope": "single_user",
+      "action": "create",
+      "name": "SurfaceUV"
+    },
+    {
+      "op": "uv.unwrap",
+      "object": "Body",
+      "data_scope": "single_user",
+      "layer": "SurfaceUV",
+      "method": "SMART",
+      "margin": 0.015
+    },
+    {
+      "op": "uv.pack",
+      "object": "Body",
+      "data_scope": "single_user",
+      "layer": "SurfaceUV",
+      "margin": 0.015,
+      "rotate": true
+    },
+    {
+      "op": "mesh.lod",
+      "object": "Body",
+      "name": "BodyLOD",
+      "collection": "Geometry",
+      "ratio": 0.4
+    },
+    {
+      "op": "object.transform",
+      "object": "BodyLOD",
+      "space": "local",
+      "location": [
+        4,
+        0,
+        0
+      ]
+    },
+    {
+      "op": "curve.create",
+      "name": "Cable",
+      "collection": "Geometry",
+      "type": "BEZIER",
+      "points": [
+        [
+          -2,
+          2,
+          0
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          2,
+          2,
+          0
+        ]
+      ],
+      "cyclic": false,
+      "bevel_depth": 0.06,
+      "resolution": 6
+    },
+    {
+      "op": "object.to_mesh",
+      "object": "Cable",
+      "data_scope": "single_user"
+    },
+    {
+      "op": "text.create",
+      "name": "Label",
+      "collection": "Geometry",
+      "body": "CLI 0.9",
+      "size": 0.5,
+      "extrude": 0.03
+    },
+    {
+      "op": "object.to_mesh",
+      "object": "Label",
+      "data_scope": "single_user"
+    },
+    {
+      "op": "object.transform",
+      "object": "Label",
+      "space": "local",
+      "location": [
+        -1.2,
+        -2,
+        0
+      ]
+    },
+    {
+      "op": "object.create",
+      "name": "Floor",
+      "collection": "Geometry",
+      "kind": "PLANE",
+      "size": 30
+    },
+    {
+      "op": "object.transform",
+      "object": "Floor",
+      "space": "local",
+      "location": [
+        0,
+        0,
+        -1.1
+      ]
+    },
+    {
+      "op": "object.create",
+      "name": "Camera",
+      "collection": "Geometry",
+      "kind": "CAMERA"
+    },
+    {
+      "op": "object.transform",
+      "object": "Camera",
+      "space": "local",
+      "location": [
+        8,
+        -12,
+        9
+      ]
+    },
+    {
+      "op": "object.create",
+      "name": "Aim",
+      "collection": "Geometry",
+      "kind": "EMPTY"
+    },
+    {
+      "op": "constraint.add",
+      "object": "Camera",
+      "name": "Aim",
+      "type": "TRACK_TO",
+      "target": "Aim"
+    },
+    {
+      "op": "scene.configure",
+      "scene": "Model",
+      "camera": "Camera"
+    },
+    {
+      "op": "object.create",
+      "name": "Key",
+      "collection": "Geometry",
+      "kind": "LIGHT",
+      "light_type": "AREA"
+    },
+    {
+      "op": "light.configure",
+      "object": "Key",
+      "data_scope": "single_user",
+      "energy": 2000,
+      "size": 8
+    },
+    {
+      "op": "object.transform",
+      "object": "Key",
+      "space": "local",
+      "location": [
+        2,
+        -3,
+        8
+      ]
+    },
+    {
+      "op": "world.create",
+      "scene": "Model",
+      "name": "World",
+      "color": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "strength": 0.4
+    }
+  ]
+}

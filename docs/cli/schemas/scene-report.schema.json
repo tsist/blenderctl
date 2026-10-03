@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scene report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scene_report_version": {
+      "const": "1.0"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "collections": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "datablocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "library",
+          "asset_id",
+          "asset",
+          "fake_user"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "library": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "asset_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "asset": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "fake_user": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "evaluation_context": {
+      "type": "object"
+    },
+    "coverage": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "scene_report_version",
+    "scenes",
+    "collections",
+    "objects",
+    "datablocks",
+    "evaluation_context",
+    "coverage"
+  ]
+}

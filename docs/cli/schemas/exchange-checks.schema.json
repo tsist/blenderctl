@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "exchange-checks 1.0",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "bidirectional_vertex_distance": {
+            "type": "number"
+          },
+          "position_tolerance": {
+            "type": "number"
+          },
+          "triangle_counts": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "area_delta": {
+            "type": "number"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "source_frame": {
+            "type": "number"
+          },
+          "output_frame": {
+            "type": "number"
+          },
+          "declared_position_tolerance": {
+            "type": "number"
+          },
+          "indexed_vertex_error": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ok",
+          "bidirectional_vertex_distance",
+          "position_tolerance",
+          "triangle_counts",
+          "area_delta",
+          "scope"
+        ]
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "requested_frame": {
+            "type": "number"
+          },
+          "actual_frame": {
+            "type": "number"
+          },
+          "indexed_vertex_error": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "topology_ok": {
+            "type": "boolean"
+          },
+          "position_tolerance": {
+            "type": "number"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "scope": {
+            "enum": [
+              "USD_NATIVE_FRAME_INDEXED_SURFACE",
+              "FBX_NATIVE_FRAME_INDEXED_SURFACE",
+              "GLB_NATIVE_FRAME_INDEXED_SURFACE"
+            ]
+          }
+        },
+        "required": [
+          "source",
+          "output",
+          "requested_frame",
+          "actual_frame",
+          "indexed_vertex_error",
+          "topology_ok",
+          "position_tolerance",
+          "ok",
+          "scope"
+        ]
+      }
+    ]
+  }
+}

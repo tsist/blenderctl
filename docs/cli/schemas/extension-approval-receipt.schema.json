@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "kind": {
+      "const": "script_trust_receipt"
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "binding_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "acknowledgment": {
+      "enum": [
+        "reviewed_exact_request_accept_unsandboxed_local_execution",
+        "reviewed_exact_request_accept_windows_appcontainer_execution"
+      ]
+    },
+    "created_at": {
+      "type": "number"
+    },
+    "reuse": {
+      "const": "exact_request_only"
+    },
+    "limitations": {
+      "const": {
+        "os_sandbox": false,
+        "identity_authenticated": false,
+        "signed": false,
+        "declared_inputs_complete": false,
+        "external_send_authorized": false,
+        "installation_authorized": false,
+        "artistic_quality_approved": false
+      }
+    }
+  },
+  "required": [
+    "version",
+    "kind",
+    "review",
+    "binding_sha256",
+    "reviewer",
+    "acknowledgment",
+    "created_at",
+    "reuse",
+    "limitations"
+  ]
+}

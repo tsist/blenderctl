@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "preview-batch-report 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "preview_batch_report_version": {
+      "const": "1.0"
+    },
+    "job_id": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "error": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "mode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "receipt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "candidate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "view": {
+                  "enum": [
+                    "FRONT",
+                    "RIGHT",
+                    "BACK",
+                    "THREE_QUARTER"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 134217728
+                }
+              },
+              "required": [
+                "view",
+                "file",
+                "sha256",
+                "bytes"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 4
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "error",
+          "mode",
+          "receipt",
+          "candidate",
+          "outputs"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "error": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "source_saved": {
+      "const": false
+    }
+  },
+  "required": [
+    "preview_batch_report_version",
+    "job_id",
+    "items",
+    "error",
+    "source_saved"
+  ]
+}

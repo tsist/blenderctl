@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "material.run request 1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "command": {
+      "const": "material.run"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "manifest": {
+          "$ref": "material-workflow-manifest.schema.json"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 256
+        },
+        "template": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "bindings": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256",
+        "resources"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "manifest"
+          ]
+        },
+        {
+          "required": [
+            "template",
+            "bindings"
+          ]
+        }
+      ],
+      "dependentRequired": {
+        "template": [
+          "bindings"
+        ],
+        "bindings": [
+          "template"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "command",
+    "params"
+  ],
+  "additionalProperties": false
+}

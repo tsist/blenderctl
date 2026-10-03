@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tracking-review 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "primary_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "review_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "point_count": {
+      "type": "integer",
+      "minimum": 8,
+      "maximum": 256
+    },
+    "radius_pixels_at_first_frame": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 6
+    },
+    "camera_reopen_max_error": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1e-05
+    },
+    "geometry_reopen_max_error": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1e-05
+    },
+    "projection_space": {
+      "const": "UNDISTORTED_PINHOLE"
+    },
+    "calibration": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "POLYNOMIAL_V1"
+            },
+            "principal_point_pixels": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 4096
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "k1": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "k2": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "k3": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "required": [
+            "model",
+            "principal_point_pixels",
+            "k1",
+            "k2",
+            "k3",
+            "reference"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "external_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "maxItems": 0
+    },
+    "scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "primary_sha256",
+    "review_sha256",
+    "point_count",
+    "radius_pixels_at_first_frame",
+    "camera_reopen_max_error",
+    "geometry_reopen_max_error",
+    "projection_space",
+    "calibration",
+    "external_files",
+    "scope"
+  ]
+}

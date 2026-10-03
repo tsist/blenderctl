@@ -1,0 +1,4086 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "blenderctl result envelope 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "cli_version",
+    "command",
+    "job_id",
+    "ok",
+    "data",
+    "error",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "cli_version": {
+      "type": "string"
+    },
+    "command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "job_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "error": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "enum": [
+                "INVALID_REQUEST",
+                "NOT_FOUND",
+                "CONFLICT",
+                "WORKER_FAILED",
+                "TIMEOUT",
+                "CANCELLED",
+                "VALIDATION_FAILED",
+                "IO_ERROR",
+                "UNSUPPORTED",
+                "RESOURCE_LIMIT"
+              ]
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "ok": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "null"
+          },
+          "error": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "command",
+          "ok"
+        ],
+        "properties": {
+          "command": {
+            "const": "dependency.audit"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "dependency-audit 1.0",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "audit_version",
+                  "items",
+                  "counts",
+                  "closure",
+                  "coverage"
+                ],
+                "properties": {
+                  "audit_version": {
+                    "const": "1.0"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "owner",
+                        "kind",
+                        "raw_path",
+                        "resolved_path",
+                        "source",
+                        "reachability",
+                        "status",
+                        "role",
+                        "binding",
+                        "usage_evidence"
+                      ],
+                      "properties": {
+                        "owner": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "library": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "kind": {
+                          "type": "string"
+                        },
+                        "raw_path": {
+                          "type": "string"
+                        },
+                        "resolved_path": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "source": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "reachability": {
+                          "enum": [
+                            "scene_or_asset",
+                            "referenced",
+                            "retained_unreferenced"
+                          ]
+                        },
+                        "status": {
+                          "enum": [
+                            "packed",
+                            "builtin",
+                            "no_external_path",
+                            "generated",
+                            "directory_present_unverified",
+                            "cache_directory_missing",
+                            "incomplete",
+                            "exists",
+                            "missing",
+                            "pattern_observed",
+                            "pattern_unresolved"
+                          ]
+                        },
+                        "role": {
+                          "enum": [
+                            "input",
+                            "cache",
+                            "output"
+                          ]
+                        },
+                        "binding": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "usage_evidence": {
+                          "type": "string"
+                        },
+                        "completeness": {
+                          "type": "string"
+                        },
+                        "expected_files": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "missing_files": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "packed_members": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "candidates": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "scan_truncated": {
+                          "type": "boolean"
+                        },
+                        "cache_inventory": {
+                          "type": "object"
+                        },
+                        "contract": {
+                          "type": "object"
+                        },
+                        "fingerprints": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          },
+                          "minItems": 0
+                        },
+                        "frame_mapping": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          },
+                          "minItems": 0
+                        }
+                      }
+                    }
+                  },
+                  "counts": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "closure": {
+                    "const": "partial"
+                  },
+                  "coverage": {
+                    "type": "object"
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+                  },
+                  "source_unchanged": {
+                    "type": "boolean"
+                  },
+                  "input_hashes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "const": "1.0"
+                  },
+                  "adapter": {
+                    "const": "TYPED_FILES_V1"
+                  },
+                  "source": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "expected_sha256"
+                    ]
+                  },
+                  "profile": {
+                    "type": "object",
+                    "required": [],
+                    "properties": {
+                      "timeline": {
+                        "type": "object",
+                        "required": [
+                          "scene",
+                          "start",
+                          "end"
+                        ],
+                        "properties": {
+                          "scene": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "start": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "end": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "step": {
+                            "type": "integer",
+                            "minimum": 1
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "hash_resources": {
+                        "type": "boolean"
+                      },
+                      "render": {
+                        "type": "boolean"
+                      },
+                      "require_complete": {
+                        "type": "boolean"
+                      },
+                      "resources": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "owner",
+                            "adapter",
+                            "property",
+                            "kind",
+                            "files"
+                          ],
+                          "properties": {
+                            "owner": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "type",
+                                    "name",
+                                    "library"
+                                  ],
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "library": {
+                                      "type": [
+                                        "string",
+                                        "null"
+                                      ]
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "asset_id"
+                                  ],
+                                  "properties": {
+                                    "asset_id": {
+                                      "type": "string",
+                                      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "adapter": {
+                              "const": "custom-property-files-v1"
+                            },
+                            "property": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "kind": {
+                              "enum": [
+                                "plugin",
+                                "cache"
+                              ]
+                            },
+                            "files": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "path"
+                                ],
+                                "properties": {
+                                  "path": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "frame": {
+                                    "type": "integer"
+                                  },
+                                  "sha256": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "minItems": 1
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "minItems": 0
+                      },
+                      "evaluate": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "selector"
+                          ],
+                          "properties": {
+                            "selector": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "type",
+                                    "name",
+                                    "library"
+                                  ],
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "library": {
+                                      "type": [
+                                        "string",
+                                        "null"
+                                      ]
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "asset_id"
+                                  ],
+                                  "properties": {
+                                    "asset_id": {
+                                      "type": "string",
+                                      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "expect": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "frame"
+                                ],
+                                "properties": {
+                                  "frame": {
+                                    "type": "integer"
+                                  },
+                                  "vertices": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "location": {
+                                    "type": "array",
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "items": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "bounds": {
+                                    "type": "array",
+                                    "minItems": 6,
+                                    "maxItems": 6,
+                                    "items": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "bone": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "bone_matrix": {
+                                    "type": "array",
+                                    "minItems": 16,
+                                    "maxItems": 16,
+                                    "items": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "tolerance": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "minItems": 0
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "minItems": 0
+                      },
+                      "asset_records": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        },
+                        "minItems": 0
+                      },
+                      "catalogs": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "library_root",
+                                "text"
+                              ],
+                              "properties": {
+                                "library_root": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "text": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "library_root",
+                                "file",
+                                "expected_sha256"
+                              ],
+                              "properties": {
+                                "library_root": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "minItems": 0
+                      },
+                      "asset_index": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ],
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        }
+                      },
+                      "closure": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "adapter": {
+                            "const": "TYPED_FILES_V1"
+                          },
+                          "max_depth": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 16
+                          },
+                          "max_files": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10000
+                          },
+                          "simulation_receipt": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "file": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              },
+                              "expected_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            },
+                            "required": [
+                              "file",
+                              "expected_sha256"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "adapter"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "title": "Validation profile 1.0"
+                  },
+                  "blender_build": {
+                    "type": "string"
+                  },
+                  "implementation_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "scope": {
+                    "type": "string"
+                  },
+                  "registry": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ]
+                    }
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "libraries": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "from": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        },
+                        "raw_path": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "raw_path"
+                      ]
+                    }
+                  },
+                  "visited": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "file": {
+                          "type": "string"
+                        },
+                        "depth": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "requirement": {
+                          "const": "provenance"
+                        },
+                        "purpose": {
+                          "type": "string"
+                        },
+                        "saved_version": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "depth",
+                        "requirement",
+                        "purpose",
+                        "saved_version"
+                      ]
+                    }
+                  },
+                  "cycles": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "issues": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "closure": {
+                    "enum": [
+                      "closed",
+                      "partial"
+                    ]
+                  },
+                  "file_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "bytes": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "cache_replay": {
+                    "enum": [
+                      "pass",
+                      "not_run"
+                    ]
+                  },
+                  "source_saved": {
+                    "const": false
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+                  },
+                  "source_unchanged": {
+                    "type": "boolean"
+                  },
+                  "input_hashes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+                  }
+                },
+                "required": [
+                  "version",
+                  "adapter",
+                  "source",
+                  "profile",
+                  "blender_build",
+                  "implementation_sha256",
+                  "scope",
+                  "registry",
+                  "documents",
+                  "resources",
+                  "libraries",
+                  "visited",
+                  "cycles",
+                  "issues",
+                  "closure",
+                  "file_count",
+                  "bytes",
+                  "cache_replay",
+                  "source_saved"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "command",
+          "ok"
+        ],
+        "properties": {
+          "command": {
+            "const": "dependency.plan-relink"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "1.0"
+              },
+              "plan": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "plan_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "mapping_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "inputs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "minItems": 1
+              },
+              "source_saved": {
+                "const": false
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              },
+              "source_unchanged": {
+                "type": "boolean"
+              },
+              "input_hashes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              }
+            },
+            "required": [
+              "version",
+              "plan",
+              "plan_sha256",
+              "mapping_count",
+              "inputs",
+              "source_saved"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "command",
+          "ok"
+        ],
+        "properties": {
+          "command": {
+            "const": "dependency.prepare"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "1.0"
+              },
+              "candidate": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "candidate_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "closure": {
+                "const": "closed"
+              },
+              "closure_report": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "closure_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "mappings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "resource_id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "owner_file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "kind": {
+                      "enum": [
+                        "image",
+                        "image_sequence_binding",
+                        "library",
+                        "font",
+                        "sound",
+                        "movieclip",
+                        "vse_image",
+                        "vse_movie",
+                        "vse_sound",
+                        "declared_plugin",
+                        "declared_cache"
+                      ]
+                    },
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "from": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "to": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "file": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              },
+                              "expected_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            },
+                            "required": [
+                              "file",
+                              "expected_sha256"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "from",
+                          "to"
+                        ]
+                      },
+                      "minItems": 1,
+                      "maxItems": 1000
+                    }
+                  },
+                  "required": [
+                    "resource_id",
+                    "owner_file",
+                    "kind",
+                    "members"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "candidate": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "local_datablocks": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "content": {
+                      "const": "pass"
+                    },
+                    "candidate_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "candidate",
+                    "local_datablocks",
+                    "content",
+                    "candidate_sha256"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 32
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "minItems": 1
+              },
+              "reopen": {
+                "const": "pass"
+              },
+              "local_content": {
+                "const": "pass"
+              },
+              "runtime_validation": {
+                "const": "separate domain commands required"
+              },
+              "source_saved": {
+                "const": false
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              },
+              "source_unchanged": {
+                "type": "boolean"
+              },
+              "input_hashes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              }
+            },
+            "required": [
+              "version",
+              "candidate",
+              "candidate_sha256",
+              "closure",
+              "closure_report",
+              "closure_sha256",
+              "mappings",
+              "candidates",
+              "resources",
+              "reopen",
+              "local_content",
+              "runtime_validation",
+              "source_saved"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "command",
+          "ok"
+        ],
+        "properties": {
+          "command": {
+            "const": "project.link.prepare"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "1.0"
+              },
+              "adapter": {
+                "const": "LIBRARY_OVERRIDE_5_2_V1"
+              },
+              "candidate": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "candidate_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 1000
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identity": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "content_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "identity",
+                    "content_sha256"
+                  ]
+                }
+              },
+              "context": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "scene": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "view_layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  }
+                },
+                "required": [
+                  "scene",
+                  "view_layer"
+                ]
+              },
+              "source": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {},
+                    "required": []
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "expected_sha256"
+                    ]
+                  }
+                ]
+              },
+              "blender_build": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blender_version": {
+                "type": "array",
+                "const": [
+                  5,
+                  2,
+                  1
+                ]
+              },
+              "implementation_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "reopen": {
+                "const": "pass"
+              },
+              "source_saved": {
+                "type": "boolean",
+                "const": false
+              },
+              "publication": {
+                "const": "working_candidate_only"
+              },
+              "upstream_changes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "added": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "library": {
+                              "oneOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "asset_id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "content_sha256"
+                      ]
+                    }
+                  },
+                  "removed": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "library": {
+                              "oneOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "asset_id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "content_sha256"
+                      ]
+                    }
+                  },
+                  "changed": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "before": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "identity": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "library": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "asset_id": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "library"
+                              ]
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "identity",
+                            "content_sha256"
+                          ]
+                        },
+                        "after": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "identity": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "library": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "asset_id": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "library"
+                              ]
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "identity",
+                            "content_sha256"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "before",
+                        "after"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "added",
+                  "removed",
+                  "changed"
+                ]
+              },
+              "overrides": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identity": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "reference": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "root": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "system": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "identity",
+                    "reference",
+                    "root",
+                    "system"
+                  ]
+                }
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1
+              },
+              "local_content": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "kind": {
+                "const": "link"
+              },
+              "transaction_item": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "blend_exact"
+                  },
+                  "mode": {
+                    "const": "create"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 1000
+                  }
+                },
+                "required": [
+                  "kind",
+                  "mode",
+                  "file",
+                  "dependencies"
+                ]
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              },
+              "source_unchanged": {
+                "const": true
+              },
+              "input_hashes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              }
+            },
+            "required": [
+              "version",
+              "adapter",
+              "candidate",
+              "candidate_sha256",
+              "resources",
+              "references",
+              "context",
+              "source",
+              "blender_build",
+              "blender_version",
+              "implementation_sha256",
+              "reopen",
+              "source_saved",
+              "publication",
+              "upstream_changes",
+              "overrides",
+              "scope",
+              "local_content",
+              "kind",
+              "transaction_item"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "command",
+          "ok"
+        ],
+        "properties": {
+          "command": {
+            "const": "project.override.prepare"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "1.0"
+              },
+              "adapter": {
+                "const": "LIBRARY_OVERRIDE_5_2_V1"
+              },
+              "candidate": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "candidate_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 1000
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identity": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "content_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "identity",
+                    "content_sha256"
+                  ]
+                }
+              },
+              "context": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "scene": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "view_layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  }
+                },
+                "required": [
+                  "scene",
+                  "view_layer"
+                ]
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ]
+              },
+              "blender_build": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blender_version": {
+                "type": "array",
+                "const": [
+                  5,
+                  2,
+                  1
+                ]
+              },
+              "implementation_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "reopen": {
+                "const": "pass"
+              },
+              "source_saved": {
+                "type": "boolean",
+                "const": false
+              },
+              "publication": {
+                "const": "working_candidate_only"
+              },
+              "upstream_changes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "added": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "library": {
+                              "oneOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "asset_id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "content_sha256"
+                      ]
+                    }
+                  },
+                  "removed": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "library": {
+                              "oneOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "asset_id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "content_sha256"
+                      ]
+                    }
+                  },
+                  "changed": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "before": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "identity": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "library": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "asset_id": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "library"
+                              ]
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "identity",
+                            "content_sha256"
+                          ]
+                        },
+                        "after": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "identity": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "library": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "asset_id": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "library"
+                              ]
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "identity",
+                            "content_sha256"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "before",
+                        "after"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "added",
+                  "removed",
+                  "changed"
+                ]
+              },
+              "overrides": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identity": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "reference": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "root": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "system": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "identity",
+                    "reference",
+                    "root",
+                    "system"
+                  ]
+                },
+                "minItems": 1
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1
+              },
+              "local_content": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "kind": {
+                "const": "override"
+              },
+              "root": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "Object",
+                      "Collection"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "library": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "edits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "target": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "Object"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 63,
+                          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        },
+                        "library": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "values": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "location": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "rotation_euler": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "scale": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "hide_render": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [],
+                      "minProperties": 1
+                    }
+                  },
+                  "required": [
+                    "target",
+                    "values"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 128
+              },
+              "receipt": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "receipt_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "transaction_item": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "blend_exact"
+                  },
+                  "mode": {
+                    "const": "create"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 1000
+                  }
+                },
+                "required": [
+                  "kind",
+                  "mode",
+                  "file",
+                  "dependencies"
+                ]
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              },
+              "source_unchanged": {
+                "const": true
+              },
+              "input_hashes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              }
+            },
+            "required": [
+              "version",
+              "adapter",
+              "candidate",
+              "candidate_sha256",
+              "resources",
+              "references",
+              "context",
+              "source",
+              "blender_build",
+              "blender_version",
+              "implementation_sha256",
+              "reopen",
+              "source_saved",
+              "publication",
+              "upstream_changes",
+              "overrides",
+              "scope",
+              "local_content",
+              "kind",
+              "root",
+              "edits",
+              "receipt",
+              "receipt_sha256",
+              "transaction_item"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "command",
+          "ok"
+        ],
+        "properties": {
+          "command": {
+            "const": "project.override.resync"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "version": {
+                "const": "1.0"
+              },
+              "adapter": {
+                "const": "LIBRARY_OVERRIDE_5_2_V1"
+              },
+              "candidate": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "candidate_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 1000
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identity": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "content_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "identity",
+                    "content_sha256"
+                  ]
+                }
+              },
+              "context": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "scene": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "view_layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  }
+                },
+                "required": [
+                  "scene",
+                  "view_layer"
+                ]
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "file",
+                  "expected_sha256"
+                ]
+              },
+              "blender_build": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blender_version": {
+                "type": "array",
+                "const": [
+                  5,
+                  2,
+                  1
+                ]
+              },
+              "implementation_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "reopen": {
+                "const": "pass"
+              },
+              "source_saved": {
+                "type": "boolean",
+                "const": false
+              },
+              "publication": {
+                "const": "working_candidate_only"
+              },
+              "upstream_changes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "added": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "library": {
+                              "oneOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "asset_id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "content_sha256"
+                      ]
+                    }
+                  },
+                  "removed": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "library": {
+                              "oneOf": [
+                                {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "asset_id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "name",
+                            "library"
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "content_sha256"
+                      ]
+                    }
+                  },
+                  "changed": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "before": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "identity": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "library": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "asset_id": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "library"
+                              ]
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "identity",
+                            "content_sha256"
+                          ]
+                        },
+                        "after": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "identity": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "library": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "asset_id": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "library"
+                              ]
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "identity",
+                            "content_sha256"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "before",
+                        "after"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "added",
+                  "removed",
+                  "changed"
+                ]
+              },
+              "overrides": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identity": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "reference": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "root": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "library": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "system": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "identity",
+                    "reference",
+                    "root",
+                    "system"
+                  ]
+                },
+                "minItems": 1
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1
+              },
+              "local_content": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "kind": {
+                "const": "override"
+              },
+              "root": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "Object",
+                      "Collection"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "library": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ]
+              },
+              "edits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "target": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "const": "Object"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 63,
+                          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "asset_id": {
+                          "type": "string",
+                          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        },
+                        "library": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "name",
+                        "library"
+                      ]
+                    },
+                    "values": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "location": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "rotation_euler": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "scale": {
+                          "type": "array",
+                          "items": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "hide_render": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [],
+                      "minProperties": 1
+                    }
+                  },
+                  "required": [
+                    "target",
+                    "values"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 128
+              },
+              "receipt": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+              },
+              "receipt_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "transaction_item": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "blend_exact"
+                  },
+                  "mode": {
+                    "const": "create"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+[\\\\/]|/)"
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 1000
+                  }
+                },
+                "required": [
+                  "kind",
+                  "mode",
+                  "file",
+                  "dependencies"
+                ]
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              },
+              "source_unchanged": {
+                "const": true
+              },
+              "input_hashes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "description": "Observed disk-byte hashes verified during this run; not proof of user review, GUI saved state, complete dependencies or functional correctness."
+              }
+            },
+            "required": [
+              "version",
+              "adapter",
+              "candidate",
+              "candidate_sha256",
+              "resources",
+              "references",
+              "context",
+              "source",
+              "blender_build",
+              "blender_version",
+              "implementation_sha256",
+              "reopen",
+              "source_saved",
+              "publication",
+              "upstream_changes",
+              "overrides",
+              "scope",
+              "local_content",
+              "kind",
+              "root",
+              "edits",
+              "receipt",
+              "receipt_sha256",
+              "transaction_item"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "const": "capabilities"
+          },
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "execution_contract"
+            ],
+            "properties": {
+              "execution_contract": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "const": "1.0"
+                  },
+                  "state_source": {
+                    "const": "SAVED_DISK_V1"
+                  },
+                  "gui_session": {
+                    "const": "NOT_CONNECTED"
+                  },
+                  "unsaved_gui_edits": {
+                    "const": "NOT_OBSERVED"
+                  },
+                  "gui_state_detection": {
+                    "const": false
+                  },
+                  "gui_autosave": {
+                    "const": false
+                  },
+                  "live_session_input": {
+                    "const": false
+                  },
+                  "unsaved_gui_edits_meaning": {
+                    "const": "NOT_OBSERVABLE_FROM_BACKGROUND; NOT_OBSERVED does not mean checked-and-clean"
+                  },
+                  "snapshot_identity": {
+                    "type": "string"
+                  },
+                  "recovery": {
+                    "type": "string"
+                  },
+                  "dependency_policy": {
+                    "type": "string"
+                  },
+                  "pipeline_commands": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "query",
+                        "diff",
+                        "dependency.audit",
+                        "validate",
+                        "identity.prepare",
+                        "asset.prepare",
+                        "asset.index",
+                        "scene.prepare",
+                        "scene.inspect",
+                        "model.prepare",
+                        "model.inspect",
+                        "node.prepare",
+                        "node.inspect",
+                        "material.preview",
+                        "texture.bake",
+                        "rig.prepare",
+                        "rig.inspect",
+                        "animation.sample",
+                        "simulation.prepare",
+                        "simulation.inspect",
+                        "simulation.bake",
+                        "render.run",
+                        "media.prepare",
+                        "media.export",
+                        "exchange.export",
+                        "exchange.import",
+                        "exchange.convert",
+                        "extension.prepare",
+                        "extension.run",
+                        "asset.preview.prepare",
+                        "dependency.plan-relink",
+                        "dependency.prepare",
+                        "sculpt.replay",
+                        "rig.package",
+                        "tracking.prepare",
+                        "tracking.inspect",
+                        "tracking.solve",
+                        "inspect",
+                        "project.verify",
+                        "project.prepare_copy",
+                        "project.link.prepare",
+                        "project.override.prepare",
+                        "project.override.resync",
+                        "exchange.analyze"
+                      ]
+                    },
+                    "minItems": 44,
+                    "maxItems": 44,
+                    "uniqueItems": true
+                  },
+                  "pipeline_exclusions": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "command": {
+                              "enum": [
+                                "doctor",
+                                "capabilities",
+                                "render.devices",
+                                "exchange.formats",
+                                "extension.inspect",
+                                "doctor.verify_install"
+                              ]
+                            },
+                            "classification": {
+                              "const": "diagnostic_preflight"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command",
+                            "classification",
+                            "reason"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "command": {
+                              "enum": [
+                                "asset.plan",
+                                "project.plan_copy",
+                                "project.plan_batch",
+                                "project.plan_files",
+                                "transaction.apply",
+                                "transaction.recover",
+                                "transaction.rollback",
+                                "transaction.status"
+                              ]
+                            },
+                            "classification": {
+                              "const": "explicit_transaction"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command",
+                            "classification",
+                            "reason"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "command": {
+                              "enum": [
+                                "pipeline.plan",
+                                "pipeline.run",
+                                "pipeline.resume",
+                                "asset.preview.batch"
+                              ]
+                            },
+                            "classification": {
+                              "const": "host_orchestrator"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command",
+                            "classification",
+                            "reason"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "command": {
+                              "enum": [
+                                "resource.init",
+                                "resource.status",
+                                "cache.inspect",
+                                "cache.plan_clean",
+                                "project.package"
+                              ]
+                            },
+                            "classification": {
+                              "const": "host_resource_management"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command",
+                            "classification",
+                            "reason"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "command": {
+                              "enum": [
+                                "extension.review",
+                                "extension.approve",
+                                "sculpt.review"
+                              ]
+                            },
+                            "classification": {
+                              "const": "review_checkpoint"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command",
+                            "classification",
+                            "reason"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "command": {
+                              "enum": [
+                                "probe"
+                              ]
+                            },
+                            "classification": {
+                              "const": "development_fixture"
+                            },
+                            "reason": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command",
+                            "classification",
+                            "reason"
+                          ]
+                        }
+                      ]
+                    },
+                    "minItems": 27,
+                    "maxItems": 27,
+                    "allOf": [
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "doctor"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "capabilities"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "render.devices"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "exchange.formats"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "extension.inspect"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "doctor.verify_install"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "asset.plan"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "project.plan_copy"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "project.plan_batch"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "project.plan_files"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "transaction.apply"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "transaction.recover"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "transaction.rollback"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "transaction.status"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "pipeline.plan"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "pipeline.run"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "pipeline.resume"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "asset.preview.batch"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "resource.init"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "resource.status"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "cache.inspect"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "cache.plan_clean"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "project.package"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "extension.review"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "extension.approve"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "sculpt.review"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      },
+                      {
+                        "contains": {
+                          "properties": {
+                            "command": {
+                              "const": "probe"
+                            }
+                          },
+                          "required": [
+                            "command"
+                          ]
+                        },
+                        "minContains": 1,
+                        "maxContains": 1
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "version",
+                  "state_source",
+                  "gui_session",
+                  "unsaved_gui_edits",
+                  "gui_state_detection",
+                  "gui_autosave",
+                  "live_session_input",
+                  "unsaved_gui_edits_meaning",
+                  "snapshot_identity",
+                  "recovery",
+                  "dependency_policy",
+                  "pipeline_commands",
+                  "pipeline_exclusions"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

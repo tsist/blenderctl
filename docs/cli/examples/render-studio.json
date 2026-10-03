@@ -1,0 +1,74 @@
+{
+  "initial_scene": "Studio",
+  "context": {
+    "scene": "Studio",
+    "view_layer": "ViewLayer",
+    "frame": 1,
+    "mode": "OBJECT",
+    "active_object": null,
+    "selected_objects": []
+  },
+  "operations": [
+    {
+      "op": "collection.create",
+      "name": "Studio",
+      "parent": {
+        "scene": "Studio"
+      }
+    },
+    {
+      "op": "object.create",
+      "name": "Cube",
+      "kind": "CUBE",
+      "collection": "Studio",
+      "size": 2
+    },
+    {
+      "op": "object.create",
+      "name": "Camera",
+      "kind": "CAMERA",
+      "collection": "Studio"
+    },
+    {
+      "op": "object.transform",
+      "object": "Camera",
+      "space": "local",
+      "location": [
+        0,
+        0,
+        6
+      ]
+    },
+    {
+      "op": "camera.configure",
+      "object": "Camera",
+      "data_scope": "single_user",
+      "type": "ORTHO",
+      "ortho_scale": 5
+    },
+    {
+      "op": "object.create",
+      "name": "Light",
+      "kind": "LIGHT",
+      "light_type": "AREA",
+      "collection": "Studio"
+    },
+    {
+      "op": "object.transform",
+      "object": "Light",
+      "space": "local",
+      "location": [
+        2,
+        -2,
+        5
+      ]
+    },
+    {
+      "op": "light.configure",
+      "object": "Light",
+      "data_scope": "single_user",
+      "energy": 500,
+      "size": 3
+    }
+  ]
+}

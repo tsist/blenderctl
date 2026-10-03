@@ -1,0 +1,467 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tracking-prepare-manifest 1.0",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clip_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "sequence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "frame": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "frame",
+              "file",
+              "expected_sha256"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 120
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 4096
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 4096
+        },
+        "fps": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 120
+        },
+        "focal_length_pixels": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "distortion": {
+          "const": "NONE"
+        },
+        "mode": {
+          "enum": [
+            "TRACK",
+            "EXPLICIT"
+          ]
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "markers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "frame": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 120
+                    },
+                    "co": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  },
+                  "required": [
+                    "frame",
+                    "co"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 120
+              }
+            },
+            "required": [
+              "name",
+              "markers"
+            ]
+          },
+          "minItems": 8,
+          "maxItems": 256
+        },
+        "pattern_size": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 101
+        },
+        "search_size": {
+          "type": "integer",
+          "minimum": 7,
+          "maximum": 301
+        },
+        "correlation_min": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "clip_name",
+        "scene",
+        "sequence",
+        "width",
+        "height",
+        "fps",
+        "focal_length_pixels",
+        "distortion",
+        "mode",
+        "tracks",
+        "pattern_size",
+        "search_size",
+        "correlation_min"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "const": "CLIP_INPUT_V1"
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "PNG_SEQUENCE"
+                },
+                "first_frame": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1048574
+                },
+                "frame_step": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 120
+                },
+                "frame_count": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 120
+                },
+                "fps": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 120
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "frame": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 1048574
+                      },
+                      "file": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "frame",
+                      "file",
+                      "expected_sha256"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 120
+                }
+              },
+              "required": [
+                "kind",
+                "first_frame",
+                "frame_step",
+                "frame_count",
+                "fps",
+                "files"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "MOVIE"
+                },
+                "first_frame": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1048574
+                },
+                "frame_step": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 120
+                },
+                "frame_count": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 120
+                },
+                "fps": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 120
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "first_frame",
+                "frame_step",
+                "frame_count",
+                "fps",
+                "file",
+                "expected_sha256"
+              ]
+            }
+          ]
+        },
+        "scene_start": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048455
+        },
+        "clip_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 4096
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 4096
+        },
+        "fps": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 120
+        },
+        "focal_length_pixels": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "distortion": {
+          "enum": [
+            "NONE",
+            "POLYNOMIAL"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "TRACK",
+            "EXPLICIT"
+          ]
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 63,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              "markers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "frame": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 120
+                    },
+                    "co": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  },
+                  "required": [
+                    "frame",
+                    "co"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 120
+              }
+            },
+            "required": [
+              "name",
+              "markers"
+            ]
+          },
+          "minItems": 8,
+          "maxItems": 256
+        },
+        "pattern_size": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 101
+        },
+        "search_size": {
+          "type": "integer",
+          "minimum": 7,
+          "maximum": 301
+        },
+        "correlation_min": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1
+        },
+        "calibration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "POLYNOMIAL_V1"
+            },
+            "principal_point_pixels": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 4096
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "k1": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "k2": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "k3": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "required": [
+            "model",
+            "principal_point_pixels",
+            "k1",
+            "k2",
+            "k3",
+            "reference"
+          ]
+        }
+      },
+      "required": [
+        "adapter",
+        "source",
+        "scene_start",
+        "clip_name",
+        "scene",
+        "width",
+        "height",
+        "fps",
+        "focal_length_pixels",
+        "distortion",
+        "mode",
+        "tracks",
+        "pattern_size",
+        "search_size",
+        "correlation_min"
+      ]
+    }
+  ]
+}

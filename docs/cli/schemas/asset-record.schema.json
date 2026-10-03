@@ -1,0 +1,262 @@
+{
+  "type": "object",
+  "required": [
+    "schema_version",
+    "asset_id",
+    "display_name",
+    "type",
+    "category",
+    "version",
+    "lifecycle",
+    "files",
+    "blender",
+    "catalog",
+    "source",
+    "dependencies",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "enum": [
+        "MOD",
+        "MAT",
+        "TEX",
+        "HDR",
+        "LGT",
+        "GEO",
+        "SHD",
+        "CMP",
+        "RIG",
+        "ANI",
+        "SCN",
+        "BRU"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]{3,}$"
+    },
+    "lifecycle": {
+      "enum": [
+        "source",
+        "master",
+        "working",
+        "published",
+        "quarantine",
+        "archived"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "path_base",
+          "role",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path_base": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": true
+      },
+      "minItems": 1
+    },
+    "blender": {
+      "type": "object",
+      "required": [
+        "datablocks"
+      ],
+      "properties": {
+        "datablocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "name"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "catalog": {
+      "type": "object",
+      "required": [
+        "library_root",
+        "uuid",
+        "path"
+      ],
+      "properties": {
+        "library_root": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "uuid": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-fA-F-]{36}$"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "permission_status",
+        "intended_use",
+        "license_evidence_path"
+      ],
+      "properties": {
+        "permission_status": {
+          "enum": [
+            "unverified",
+            "verified",
+            "denied"
+          ]
+        },
+        "intended_use": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "license_evidence_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "license_evidence_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "dependencies": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_run",
+            "not_applicable"
+          ]
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file", "expected_sha256"],
+          "properties": {
+            "file": {"type":"string","minLength":1},
+            "expected_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Blender asset record 1.0 populated index entry"
+}

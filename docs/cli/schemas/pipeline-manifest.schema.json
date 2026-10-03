@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "pipeline-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "pipeline_version": {
+      "const": "1.0"
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_workers": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "cpu_threads": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 65536
+        },
+        "gpu_mb": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32768
+        },
+        "disk_mb": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "min_free_mb": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "failure": {
+          "enum": [
+            "continue",
+            "fail_fast"
+          ]
+        },
+        "resource_domain": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "max_workers",
+        "cpu_threads",
+        "memory_mb",
+        "gpu_mb",
+        "disk_mb",
+        "min_free_mb",
+        "failure"
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+          },
+          "command": {
+            "enum": [
+              "query",
+              "diff",
+              "dependency.audit",
+              "validate",
+              "identity.prepare",
+              "asset.prepare",
+              "asset.index",
+              "scene.prepare",
+              "scene.inspect",
+              "model.prepare",
+              "model.inspect",
+              "node.prepare",
+              "node.inspect",
+              "material.preview",
+              "texture.bake",
+              "rig.prepare",
+              "rig.inspect",
+              "animation.sample",
+              "simulation.prepare",
+              "simulation.inspect",
+              "simulation.bake",
+              "render.run",
+              "media.prepare",
+              "media.export",
+              "exchange.export",
+              "exchange.import",
+              "exchange.convert",
+              "extension.prepare",
+              "extension.run",
+              "asset.preview.prepare",
+              "dependency.plan-relink",
+              "dependency.prepare",
+              "sculpt.replay",
+              "rig.package",
+              "tracking.prepare",
+              "tracking.inspect",
+              "tracking.solve",
+              "inspect",
+              "project.verify",
+              "project.prepare_copy",
+              "project.link.prepare",
+              "project.override.prepare",
+              "project.override.resync",
+              "exchange.analyze"
+            ]
+          },
+          "params": {
+            "type": "object"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+            },
+            "minItems": 0,
+            "maxItems": 32,
+            "uniqueItems": true
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 256,
+                  "pattern": "^/[^~]+$"
+                },
+                "sha_target": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 256,
+                  "pattern": "^/[^~]+$"
+                },
+                "step": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,47}$"
+                },
+                "artifact": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 256,
+                  "pattern": "^/[^~]+$"
+                }
+              },
+              "required": [
+                "target",
+                "sha_target",
+                "step",
+                "artifact"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 100
+          },
+          "limits": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "cpu_threads": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              },
+              "memory_mb": {
+                "type": "integer",
+                "minimum": 256,
+                "maximum": 32768
+              },
+              "disk_mb": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32768
+              },
+              "gpu_mb": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 32768
+              }
+            },
+            "required": [
+              "cpu_threads",
+              "memory_mb",
+              "disk_mb",
+              "gpu_mb"
+            ]
+          },
+          "timeout_seconds": {
+            "type": "number",
+            "minimum": 0.05,
+            "maximum": 86400
+          },
+          "reuse": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "command",
+          "params",
+          "depends_on",
+          "bindings",
+          "limits",
+          "timeout_seconds",
+          "reuse"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 32
+    }
+  },
+  "required": [
+    "pipeline_version",
+    "policy",
+    "steps"
+  ]
+}

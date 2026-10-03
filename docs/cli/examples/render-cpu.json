@@ -1,0 +1,27 @@
+{
+  "scene": "Studio",
+  "view_layer": "ViewLayer",
+  "camera": "Camera",
+  "engine": "CYCLES",
+  "device": {
+    "backend": "CPU"
+  },
+  "frames": [
+    1
+  ],
+  "width": 256,
+  "height": 256,
+  "samples": 16,
+  "format": "PNG",
+  "depth": "8",
+  "transparent": true,
+  "color": {
+    "view": "AgX",
+    "exposure": 0,
+    "gamma": 1
+  },
+  "compositor": false,
+  "passes": [],
+  "denoise": false,
+  "motion_blur": 0
+}

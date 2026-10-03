@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Driver audit 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "inventory_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "driver_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    },
+    "drivers": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "minItems": 0,
+      "maxItems": 4096
+    },
+    "profile_template": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "NATIVE_SIMPLE_V1"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inventory_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "driver_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "acknowledged_unresolved": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 0,
+          "maxItems": 4096,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "mode",
+        "source_sha256",
+        "inventory_sha256",
+        "driver_count",
+        "acknowledged_unresolved"
+      ]
+    },
+    "scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "source_sha256",
+    "inventory_sha256",
+    "driver_count",
+    "drivers",
+    "profile_template",
+    "scope"
+  ]
+}

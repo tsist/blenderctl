@@ -1,0 +1,365 @@
+{
+  "type": "object",
+  "required": [],
+  "properties": {
+    "timeline": {
+      "type": "object",
+      "required": [
+        "scene",
+        "start",
+        "end"
+      ],
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "integer",
+          "minimum": -1048574,
+          "maximum": 1048574
+        },
+        "end": {
+          "type": "integer",
+          "minimum": -1048574,
+          "maximum": 1048574
+        },
+        "step": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "hash_resources": {
+      "type": "boolean"
+    },
+    "render": {
+      "type": "boolean"
+    },
+    "require_complete": {
+      "type": "boolean"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "owner",
+          "adapter",
+          "property",
+          "kind",
+          "files"
+        ],
+        "properties": {
+          "owner": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "asset_id"
+                ],
+                "properties": {
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                }
+              }
+            ]
+          },
+          "adapter": {
+            "const": "custom-property-files-v1"
+          },
+          "property": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "plugin",
+              "cache"
+            ]
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frame": {
+                  "type": "integer"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "evaluate": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "selector"
+        ],
+        "properties": {
+          "selector": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "name",
+                  "library"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "library": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "asset_id"
+                ],
+                "properties": {
+                  "asset_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  }
+                }
+              }
+            ]
+          },
+          "expect": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "frame"
+              ],
+              "properties": {
+                "frame": {
+                  "type": "integer"
+                },
+                "vertices": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "location": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "bounds": {
+                  "type": "array",
+                  "minItems": 6,
+                  "maxItems": 6,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "bone": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bone_matrix": {
+                  "type": "array",
+                  "minItems": 16,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "tolerance": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "asset_records": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "minItems": 0
+    },
+    "catalogs": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "library_root",
+              "text"
+            ],
+            "properties": {
+              "library_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "text": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "library_root",
+              "file",
+              "expected_sha256"
+            ],
+            "properties": {
+              "library_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        ]
+      },
+      "minItems": 0
+    },
+    "asset_index": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "const": "TYPED_FILES_V1"
+        },
+        "max_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "simulation_receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        }
+      },
+      "required": [
+        "adapter"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Validation profile 1.0"
+}

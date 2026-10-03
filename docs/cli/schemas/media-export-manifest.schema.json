@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "media-export-manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+    },
+    "format": {
+      "enum": [
+        "PNG_SEQUENCE",
+        "MP4_H264_AAC",
+        "WAV_PCM16"
+      ]
+    },
+    "frame_start": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "frame_end": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 100000
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "enum": [
+            "Standard",
+            "AgX",
+            "Raw"
+          ]
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": -10,
+          "maximum": 10
+        },
+        "gamma": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4
+        }
+      },
+      "required": [
+        "view",
+        "exposure",
+        "gamma"
+      ]
+    }
+  },
+  "required": [
+    "scene",
+    "format",
+    "frame_start",
+    "frame_end",
+    "color"
+  ]
+}

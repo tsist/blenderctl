@@ -1,0 +1,24 @@
+name: Bug report
+description: Reproducible CLI or material extension problem
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Environment
+      description: OS, Blender version/build, Python, CLI and extension versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Exact command or sanitized request and a generated fixture. Exclude secrets and private assets.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+      description: Include the exit code, error code and relevant sanitized log.
+    validations:
+      required: true

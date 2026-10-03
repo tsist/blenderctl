@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "kind": {
+      "const": "sculpt_geometry_review"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "after": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "object": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "artistic_intent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "before",
+        "after",
+        "object",
+        "artistic_intent"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "topology_unchanged": {
+      "type": "boolean"
+    },
+    "changed_vertices": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "max_displacement_local": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "target_transform_unchanged": {
+      "type": "boolean"
+    },
+    "non_target_geometry_unchanged": {
+      "type": "boolean"
+    },
+    "non_target_before": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "non_target_after": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "previews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "view": {
+            "enum": [
+              "front",
+              "oblique"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "view",
+          "file",
+          "expected_sha256"
+        ]
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "artistic_quality": {
+      "const": "pending_human_review"
+    },
+    "brush_replay_verified": {
+      "const": false
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "version",
+    "kind",
+    "inputs",
+    "target",
+    "topology_unchanged",
+    "changed_vertices",
+    "max_displacement_local",
+    "target_transform_unchanged",
+    "non_target_geometry_unchanged",
+    "non_target_before",
+    "non_target_after",
+    "previews",
+    "recovery",
+    "artistic_quality",
+    "brush_replay_verified",
+    "scope"
+  ]
+}

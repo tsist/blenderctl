@@ -1,0 +1,574 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "extension-report 1.0/1.1",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "extension_report_version": {
+          "const": "1.0"
+        },
+        "script": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "file",
+              "sha256",
+              "bytes"
+            ]
+          }
+        },
+        "result": {},
+        "execution": {
+          "type": "string"
+        },
+        "authorization": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "const": "trust_literal"
+                },
+                "limitations": {
+                  "const": {
+                    "os_sandbox": false,
+                    "identity_authenticated": false,
+                    "signed": false,
+                    "declared_inputs_complete": false,
+                    "external_send_authorized": false,
+                    "installation_authorized": false,
+                    "artistic_quality_approved": false
+                  }
+                }
+              },
+              "required": [
+                "mode",
+                "limitations"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "const": "review_receipt"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "review": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "binding_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewer": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "reuse": {
+                  "const": "exact_request_only"
+                },
+                "limitations": {
+                  "const": {
+                    "os_sandbox": false,
+                    "identity_authenticated": false,
+                    "signed": false,
+                    "declared_inputs_complete": false,
+                    "external_send_authorized": false,
+                    "installation_authorized": false,
+                    "artistic_quality_approved": false
+                  }
+                }
+              },
+              "required": [
+                "mode",
+                "receipt",
+                "review",
+                "binding_sha256",
+                "reviewer",
+                "reuse",
+                "limitations"
+              ]
+            }
+          ]
+        },
+        "script_sha256_observed": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "extension_report_version",
+        "script",
+        "outputs",
+        "result",
+        "execution"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "extension_report_version": {
+          "const": "1.0"
+        },
+        "adapter": {
+          "const": "extra_mesh_star_v1"
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {
+              "const": "extra_mesh_star_v1"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 63,
+              "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+            },
+            "points": {
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 32
+            },
+            "outer_radius": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            },
+            "inner_radius": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            },
+            "height": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "adapter",
+            "name",
+            "points",
+            "outer_radius",
+            "inner_radius",
+            "height"
+          ]
+        },
+        "reviewed_package_version": {
+          "type": "string"
+        },
+        "source_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "candidate": {
+          "type": "string"
+        },
+        "candidate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ok": {
+                "type": "boolean"
+              },
+              "bidirectional_vertex_distance": {
+                "type": "number"
+              },
+              "position_tolerance": {
+                "type": "number"
+              },
+              "triangle_counts": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "area_delta": {
+                "type": "number"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "output": {
+                "type": "string"
+              },
+              "source_frame": {
+                "type": "number"
+              },
+              "output_frame": {
+                "type": "number"
+              },
+              "declared_position_tolerance": {
+                "type": "number"
+              },
+              "indexed_vertex_error": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "ok",
+              "bidirectional_vertex_distance",
+              "position_tolerance",
+              "triangle_counts",
+              "area_delta",
+              "scope"
+            ]
+          }
+        },
+        "reopen": {
+          "const": "pass"
+        },
+        "scope": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "extension_report_version",
+        "adapter",
+        "settings",
+        "reviewed_package_version",
+        "source_files",
+        "candidate",
+        "candidate_sha256",
+        "checks",
+        "reopen",
+        "scope"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "extension_report_version": {
+          "const": "1.1"
+        },
+        "script": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "file",
+              "sha256",
+              "bytes"
+            ]
+          }
+        },
+        "result": {},
+        "execution": {
+          "type": "string"
+        },
+        "authorization": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "const": "trust_literal"
+                },
+                "limitations": {
+                  "const": {
+                    "os_sandbox": false,
+                    "identity_authenticated": false,
+                    "signed": false,
+                    "declared_inputs_complete": false,
+                    "external_send_authorized": false,
+                    "installation_authorized": false,
+                    "artistic_quality_approved": false
+                  }
+                }
+              },
+              "required": [
+                "mode",
+                "limitations"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "const": "review_receipt"
+                },
+                "receipt": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "review": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "binding_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reviewer": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+                },
+                "reuse": {
+                  "const": "exact_request_only"
+                },
+                "limitations": {
+                  "const": {
+                    "os_sandbox": false,
+                    "identity_authenticated": false,
+                    "signed": false,
+                    "declared_inputs_complete": false,
+                    "external_send_authorized": false,
+                    "installation_authorized": false,
+                    "artistic_quality_approved": false
+                  }
+                }
+              },
+              "required": [
+                "mode",
+                "receipt",
+                "review",
+                "binding_sha256",
+                "reviewer",
+                "reuse",
+                "limitations"
+              ]
+            }
+          ]
+        },
+        "script_sha256_observed": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "result_trust": {
+          "const": "untrusted_script_claim"
+        },
+        "isolation": {
+          "type": "object",
+          "required": [
+            "profile",
+            "os_enforced",
+            "process",
+            "phase"
+          ],
+          "properties": {
+            "profile": {
+              "const": "WINDOWS_APPCONTAINER_V1"
+            },
+            "os_enforced": {
+              "const": true
+            },
+            "phase": {
+              "const": "accepted"
+            },
+            "process": {
+              "type": "object",
+              "required": [
+                "is_appcontainer",
+                "capability_count",
+                "integrity_sid",
+                "job_assigned_at_creation"
+              ],
+              "properties": {
+                "is_appcontainer": {
+                  "const": true
+                },
+                "capability_count": {
+                  "const": 0
+                },
+                "integrity_sid": {
+                  "const": "S-1-16-4096"
+                },
+                "job_assigned_at_creation": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "extension_report_version",
+        "script",
+        "outputs",
+        "result",
+        "execution",
+        "isolation",
+        "result_trust",
+        "authorization",
+        "script_sha256_observed"
+      ]
+    }
+  ]
+}
