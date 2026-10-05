@@ -20,14 +20,7 @@ def public_files():
         paths = [ROOT / p.decode('utf-8') for p in result.stdout.split(b'\0') if p]
         if not paths:
             raise RuntimeError('Stage the reviewed source files before packaging')
-        expanded = []
-        for path in paths:
-            if path.is_dir():
-                dependency = subprocess.run(['git', 'ls-files', '-z'], cwd=path, capture_output=True, check=True)
-                expanded.extend(path / p.decode('utf-8') for p in dependency.stdout.split(b'\0') if p)
-            else:
-                expanded.append(path)
-        return sorted(expanded)
+        return sorted(paths)
     return sorted(p for p in ROOT.rglob('*') if p.is_file() and not set(p.relative_to(ROOT).parts) & EXCLUDED)
 
 

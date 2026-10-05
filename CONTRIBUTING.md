@@ -4,7 +4,7 @@ Use GitHub issues for reproducible bugs and proposals; use pull requests for foc
 
 Run host tests with `python -m unittest discover -s tests -p "test_*.py" -v`. Changes to Blender execution should also pass `python tests/run_blender_smoke.py --blender <absolute executable> --output <new directory>` and a representative test for the affected adapter. Changes to schemas must preserve request validation and discovery consistency. Do not claim cross-platform or artistic acceptance from a host-only test.
 
-Production CLI modules live in `tools/blenderctl`; shared material core and Blender UI are owned by the independent Material Workflow repository and pinned as the submodule `tools/material_workflow_addon`; public schemas live in `docs/cli/schemas`. Keep explicit hashes, source protection, dependency retention, conflict detection and process ownership. Do not silently weaken a guard or retry a submission whose acceptance is unknown.
+Production CLI modules live in `tools/blenderctl`; shared material core and Blender UI live in `tools/material_workflow_addon`; public schemas live in `docs/cli/schemas`. Keep explicit hashes, source protection, dependency retention, conflict detection and process ownership. Do not silently weaken a guard or retry a submission whose acceptance is unknown.
 
 Build distribution artifacts with `python scripts/build_release.py --output ./dist` from a clean Git checkout. Check the complete file list and checksums. A material core change should increment both the extension manifest and `bl_info` versions; CLI changes increment `protocol.VERSION`. Include user-facing changes in CHANGELOG.md.
 

@@ -51,6 +51,7 @@ def main():
         raise SystemExit('Incomplete extension source')
     payloads = {
         f'blenderctl-{cli}-source.zip': archive([(f'blenderctl-{cli}/' + p.relative_to(ROOT).as_posix(), p.read_bytes()) for p in files]),
+        f'material-workflow-{version}.zip': archive([(p.name, p.read_bytes()) for p in extension_files]),
     }
     skill_manifest = ROOT / 'skills/manifest.json'
     skill_version = None
@@ -68,19 +69,16 @@ def main():
         skill_file_count = len(skill_entries)
         if args.skills_only:
             payloads = {}
-        if args.skills_only:
-            payloads[f'blender-skills-{skill_version}.zip'] = archive(skill_entries)
+        payloads[f'blender-skills-{skill_version}.zip'] = archive(skill_entries)
     elif args.skills_only:
         raise SystemExit('No skill bundle manifest is present')
     rows = [{'file': name, 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)} for name, data in sorted(payloads.items())]
     payloads['release-manifest.json'] = (json.dumps({'cli_version': cli, 'extension_version': version,
         'license': 'GPL-3.0-or-later', 'skills_bundle_version': skill_version,
-        'distribution': 'skills-only' if args.skills_only else 'cli-source-with-pinned-material-dependency',
+        'distribution': 'skills-only' if args.skills_only else 'source-extension-skills',
         'audited_source_files': len(files), 'skills_files': skill_file_count,
         'source_files': None if args.skills_only else len(files),
         'extension_files': None if args.skills_only else len(extension_files),
-        'extension_repository': 'https://github.com/tsist/blender-material-workflow',
-        'extension_distribution': 'Separate repository/release; pinned dependency included in CLI source ZIP',
         'reproducible_zip_timestamp': '2026-10-04T00:00:00', 'artifacts': rows}, indent=2) + '\n').encode()
     payloads['SHA256SUMS.txt'] = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in sorted(payloads.items())).encode()
     output = args.output.resolve()

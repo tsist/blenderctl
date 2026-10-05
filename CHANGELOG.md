@@ -1,11 +1,5 @@
 # Changelog
 
-## 0.54.2 — 2026-10-06
-
-- Split Material Workflow and new material companion releases into tsist/blender-material-workflow. Pin extension 0.7.1 as a Git submodule without a second editable core.
-- Preserve material commands and recoverable job contracts. Complete source ZIPs contain the pinned dependency; recursive Git checkout is required.
-- CLI releases no longer publish extension ZIPs; previous releases and compatibility skill snapshots remain intact.
-
 ## Companion skills 0.1.0 — 2026-10-04
 
 - Publish public adaptations of CLI, work methodology, material authoring and asset management skills with references, scripts, templates and agent metadata.
