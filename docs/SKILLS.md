@@ -1,8 +1,14 @@
-# Companion Blender skills 0.1.0
+# Companion Blender skills 0.2.0
 
 [Installation and contents](../skills/README.md). Four sibling skill folders are distributed separately from the CLI and Blender extension. The source package also contains them under `skills/`.
 
 The public adaptations preserve the existing plugin/CLI work-unit priority, technical/visual acceptance separation, six candidate methods, PBR channel/source rules and asset identity/UUID/dependency protection. They remove private machine locations, fixed task IDs, Wiki roots, current project progress, asset provenance judgments and user conversations. Historical examples are explicitly limited guidance; original case artifacts are not published.
+
+## Changes in 0.2.0
+
+The methodology, material and CLI guidance now retains compact contract/evidence identities, discovers real interfaces before forming requests, reuses verified parameterized steps, checks regions/UV and critical viewing conditions before the first probe, and prepares delivery evidence before final quality feedback. Material diagnostics distinguish single-layer numeric studies from channel/layer changes and explicit camera/light setup. Resource classification requires real reference evidence; orphan images are retained unless their removal is authorized. Timing separates parent jobs from their included stages and preserves unmeasured session intervals.
+
+These are guidance changes derived from a prior production review. Request builders, general diagnostic presets, live/orphan reports and end-to-end client telemetry remain development candidates. No new Blender runtime, artistic equivalence or speedup benchmark was performed for this revision. Asset-management guidance is unchanged apart from the common bundle metadata version; CLI and extension versions remain 0.54.1 and 0.7.0.
 
 ## Verification
 

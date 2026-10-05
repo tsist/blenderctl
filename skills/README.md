@@ -1,6 +1,6 @@
 # Blender agent skills / Blender 配套技能
 
-Four companion skills for **blenderctl 0.54.1** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.1.0**.
+Four companion skills for **blenderctl 0.54.1** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.2.0**.
 
 | Skill | Use |
 | --- | --- |
@@ -11,7 +11,7 @@ Four companion skills for **blenderctl 0.54.1** and **Material Workflow 0.7.0**,
 
 ## Install in Codex
 
-Download `blender-skills-0.1.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/skills-v0.1.0), or use the repository. Keep all four skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
+Download `blender-skills-0.2.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/skills-v0.2.0), or use the repository. Keep all four skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
 
 From the repository root:
 
@@ -43,6 +43,8 @@ The CLI discovery and name-check helpers use the Python standard library. Materi
 Live Blender MCP, native image generation, optional fallback services and memory/Wiki are host capabilities, not bundled dependencies. Missing memory/Wiki does not block work or imply prior task state. Third-party image services require the current user's authorization/configuration; this public package inherits no private service permission.
 
 ## 中文说明
+
+0.2.0修订方法论、材质与CLI指导：按需回读合同和证据，前移区域/UV与关键区域可观察性检查，按依赖准备生图与有界诊断，复制前核对依赖，最终质量反馈前备齐交付说明。构建器、通用诊断预设和全链路遥测仍是待开发候选，不宣称本次指导修订已测得提速。资产管理指导内容不变，仅随技能包更新版本标识；CLI与插件未升级。
 
 四个技能保持同级安装：CLI操作、制作方法论、材质制作、资产管理。`BLENDERCTL_ROOT` 指向另行解压的公开源码，`BLENDER_PATH` 指向实际 Blender。辅助脚本不启动 Blender；只有本次实际制作/验收才走已授权 CLI。资产根由用户当次明确，随包资产标准是新项目可采用的基线，已有项目规则优先。
 

@@ -2,7 +2,7 @@
 name: blender-asset-manager
 description: 管理 Blender 资产分类、命名、标签、Catalog 与索引；用于整理、入库、命名规划及分类迁移，不用于普通建模渲染。
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Blender 资产管理
