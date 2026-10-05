@@ -9,7 +9,7 @@ from pathlib import Path
 import time
 import uuid
 
-VERSION = "0.55.0"
+VERSION = "0.55.1"
 SCHEMA = "1.0"
 ROOT = Path(__file__).resolve().parents[2]
 _PORTABLE_BLENDER = ROOT / "runtime/blender/releases/5.2.1/blender-5.2.1-windows-x64/blender.exe"

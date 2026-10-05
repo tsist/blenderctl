@@ -2,9 +2,11 @@
 
 Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-256 protected source files, isolated background jobs, editable candidates, and a matching layered-material Blender extension.
 
-**CLI 0.55.0 · Material Workflow 0.7.1 · GPL-3.0-or-later**
+**CLI 0.55.1 · Material Workflow 0.7.1 · GPL-3.0-or-later**
 
 This branch adds bounded Linux saved-file support. Read the [Linux guide](docs/LINUX.md) before choosing input/job directories: protected inputs require qualified local filesystems, and Windows transactions/pipelines remain unsupported. Existing Blender-version gates are unchanged.
+
+Optional: connect a separately reviewed Hard Surface Workbench **0.2.0** source checkout using the explicit `BLENDERCTL_HARDSURFACE_ROOT` setting. See [Hard Surface integration](docs/HARD_SURFACE.md). The plugin is distributed in its own repository; it is never fetched or installed by blenderctl.
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## CLI 0.55.1 / Hard Surface Workbench integration 0.2.0 — Linux branch
+
+- Dispatch explicit hard-surface work units to a separately reviewed 0.2.0 source checkout selected by `BLENDERCTL_HARDSURFACE_ROOT`; no automatic download, install or in-process plugin import.
+- Validate checkout paths, manifest/package versions and exact job-store ownership before dispatch. Preserve legacy commands and isolate child Python import paths.
+- Add source-only dispatch regressions and sibling-checkout setup guidance. Material Workflow remains 0.7.1; existing native adapter support is unchanged.
+
 ## CLI 0.55.0 / Material Workflow 0.7.1 — Linux branch
 
 - Add fail-closed Linux read guards with kernel lease and namespace evidence; keep Windows deny-write/delete implementation and unsupported transaction boundaries.

@@ -1,6 +1,6 @@
 # Linux installation and support boundary
 
-This Linux branch pairs **CLI 0.55.0** with **Material Workflow 0.7.1**.
+This Linux branch pairs **CLI 0.55.1** with **Material Workflow 0.7.1**.
 Python 3.12+ and an independently installed Blender are required. No pip package,
 network service, credentials, MCP server or kernel configuration changes are needed.
 The original Windows 5.2.1 release remains available under `v0.54.1`.

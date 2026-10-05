@@ -2,7 +2,9 @@
 
 面向代理与人工的 Blender 自动化工具：用明确 JSON 清单与 SHA-256 保护源文件，通过独立后台作业产出可编辑候选，配套材质插件共用同一执行核心。
 
-**CLI 0.55.0 · 材质插件 0.7.1 · GPL-3.0-or-later**
+**CLI 0.55.1 · 材质插件 0.7.1 · GPL-3.0-or-later**
+
+可选：通过 `BLENDERCTL_HARDSURFACE_ROOT` 明确指定经过审阅的独立 Hard Surface Workbench 0.2.0 源码目录。插件独立发布，blenderctl 不会自动下载或安装。配置与运行边界见 [硬表面集成说明](docs/HARD_SURFACE.md)。
 
 本分支提供有限 Linux 支持。先阅读 [Linux 安装与安全边界](docs/LINUX.md)：受保护输入必须放在合格的本地文件系统，Windows 文件事务与管线仍不支持，原有 Blender 精确版本检查不会放宽。
 
