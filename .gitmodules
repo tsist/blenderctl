@@ -1,0 +1,3 @@
+[submodule "tools/material_workflow_addon"]
+	path = tools/material_workflow_addon
+	url = https://github.com/tsist/blender-material-workflow.git

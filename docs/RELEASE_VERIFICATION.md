@@ -1,3 +1,9 @@
+# 0.54.2 repository split verification
+
+The CLI now consumes a pinned Material Workflow 0.7.1 submodule. Host contracts, actual CPU material candidate/render/reopen, recursive clone and complete source archive are verified for this split. The runtime baseline and unverified GUI/GPU/animation scopes remain unchanged. Plugin install/operator checks are owned by its separate repository.
+
+## Historical verification (0.54.1)
+
 # Public release verification — 2026-10-04
 
 Release scope: CLI **0.54.1**, Material Workflow **0.7.0**. Native runtime: **Windows / Blender 5.2.1 LTS / build 9e2066aef7ef / Python 3.13.13**. Tests use generated geometry and numerical textures, with no private models or texture library.

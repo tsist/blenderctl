@@ -1,8 +1,17 @@
 # blenderctl 与 Material Workflow
 
+## Material Workflow 独立仓库 / separate repository
+
+Material Workflow 插件与配套技能现由 [tsist/blender-material-workflow](https://github.com/tsist/blender-material-workflow) 独立维护和发布。CLI 保留 `material.*` 调度接口，通过固定提交的 Git 子模块引用核心。
+
+Clone with `git clone --recurse-submodules https://github.com/tsist/blenderctl.git`. Existing clones: after updating, run `git submodule update --init --recursive`. Use the release asset `blenderctl-0.54.2-source.zip` for a complete unpacked backend; GitHub automatic source archives omit submodules.
+
+Extension ZIPs and new material companion skill bundles are published in the [separate release](https://github.com/tsist/blender-material-workflow/releases/tag/v0.7.1). This repository retains its previous four-skill snapshot for compatibility. Historical release assets are unchanged.
+
+
 面向代理与人工的 Blender 自动化工具：用明确 JSON 清单与 SHA-256 保护源文件，通过独立后台作业产出可编辑候选，配套材质插件共用同一执行核心。
 
-**CLI 0.54.1 · 材质插件 0.7.0 · GPL-3.0-or-later**
+**CLI 0.54.2 · 材质插件 0.7.1 · GPL-3.0-or-later**
 
 另提供[四个配套 Blender 技能](skills/README.md)：CLI 操作、制作方法论、材质制作、资产管理。技能包 **0.1.0** 可独立下载安装，见[安装与验证](docs/SKILLS.md)。
 
@@ -16,7 +25,7 @@
 
 ## 安装与第一步
 
-从 [GitHub Releases](https://github.com/tsist/blenderctl/releases) 下载源码 ZIP 与插件 ZIP。另行安装 Python **3.12+** 和 Blender。实际运行基线为 **Windows / Blender 5.2.1 LTS / build 9e2066aef7ef / Python 3.13**；部分适配器明确要求该 Blender 版本。
+从 [blenderctl Releases](https://github.com/tsist/blenderctl/releases) 下载完整 CLI 源码 ZIP；插件 ZIP 与新配套技能包从 [Material Workflow Releases](https://github.com/tsist/blender-material-workflow/releases) 下载。另行安装 Python **3.12+** 和 Blender。实际运行基线为 **Windows / Blender 5.2.1 LTS / build 9e2066aef7ef / Python 3.13**；部分适配器明确要求该 Blender 版本。
 
 解压源码后在目录内执行：
 
@@ -29,7 +38,7 @@ python tools/blenderctl/cli.py material describe --operation run --schema
 
 将示例路径换为实际 Blender。Windows 可使用 `./blenderctl.ps1`；设置 `BLENDERCTL_PYTHON` 可指定 Python。没有 Blender 时仍可读取版本、帮助和材质 Schema。
 
-在 Blender 的 **Preferences → Extensions → Install from Disk** 安装 `material-workflow-0.7.0.zip` 并启用。材质面板在 View3D 侧栏；后台项目目录填写本源码目录，运行时使用实际 Blender 路径。
+在 Blender 的 **Preferences → Extensions → Install from Disk** 安装 `material-workflow-0.7.1.zip` 并启用。材质面板在 View3D 侧栏；后台项目目录填写本源码目录，运行时使用实际 Blender 路径。
 
 完整操作参见 [快速开始](docs/GETTING_STARTED.md)、[材质工作流](docs/MATERIAL_WORKFLOW.md)、[命令索引](docs/CLI_REFERENCE.md) 与 [兼容范围](docs/COMPATIBILITY.md)。详细 JSON 合同位于 `docs/cli/schemas/`；全局参数必须放在子命令之前。
 

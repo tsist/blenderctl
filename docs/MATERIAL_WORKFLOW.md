@@ -1,10 +1,16 @@
-# Material Workflow 0.7.0
+# Material Workflow integration
+
+The extension and current material companion skill releases moved to [blender-material-workflow](https://github.com/tsist/blender-material-workflow). Read its [current workflow](https://github.com/tsist/blender-material-workflow/blob/main/docs/MATERIAL_WORKFLOW.md). This CLI keeps backend commands and consumes its pinned extension submodule.
+
+Clone/update with recursive submodules, or unpack this repository's complete source release asset. Automatic GitHub source archives omit the dependency. For historical 0.7.0 behavior, see the previous Git tag.
+
+# Backend contract (compatible with 0.7.1)
 
 The extension and CLI share a managed material core. It assembles static layered PBR materials from explicitly identified objects, slots, UV layers and resources. It preserves unrelated edits and refuses overlapping or structural conflicts.
 
 ## Install the extension
 
-Download `material-workflow-0.7.0.zip` from Releases. In Blender use **Preferences → Extensions → Install from Disk**, select the ZIP, and enable Material Workflow. Open the View3D sidebar with **N** and select **Material Workflow**. Blender 5.2.0 is the manifest minimum; the actual verified runtime is 5.2.1 LTS. The ZIP is a Blender extension with its manifest at the archive root.
+Download `material-workflow-0.7.1.zip` from the separate Material Workflow Releases. In Blender use **Preferences → Extensions → Install from Disk**, select the ZIP, and enable Material Workflow. Open the View3D sidebar with **N** and select **Material Workflow**. Blender 5.2.0 is the manifest minimum; the actual verified runtime is 5.2.1 LTS. The ZIP is a Blender extension with its manifest at the archive root.
 
 For background handoff, set the backend project directory to the unpacked CLI source root. The Windows backend discovers the selected Blender installation's bundled Python. If automatic discovery is ambiguous, the Python bridge API accepts an explicit Python binary; visible panel behavior on other operating systems remains unverified. The plugin does not bundle or download Blender or the CLI.
 
