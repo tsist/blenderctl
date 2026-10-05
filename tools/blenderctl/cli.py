@@ -35,6 +35,7 @@ def parser():
             a=act.add_parser(action)
             if group=='resource':a.add_argument('domain')
             if group=='cache' or action=='init':a.add_argument('--manifest',type=Path,required=True)
+    sub.add_parser("hardsurface", help="opt-in Hard Surface Workbench; see docs/HARD_SURFACE.md")
     sub.add_parser("capabilities", help="runtime registrations; existence is not functional support")
     pipes=sub.add_parser('pipeline',help='bounded candidate DAGs, isolated failures and explicit resume').add_subparsers(dest='action',required=True,parser_class=Parser)
     for action in ('plan','run'):
@@ -221,6 +222,10 @@ def parser():
 
 
 def main(argv=None):
+    from hardsurface_dispatch import dispatch
+    routed = dispatch(list(sys.argv[1:] if argv is None else argv))
+    if routed is not None:
+        return routed
     args = None
     compact_command = None
     code = 0
