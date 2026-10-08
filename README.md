@@ -6,7 +6,7 @@ Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.1.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring, asset management and development-stage hard-surface guidance. The **0.3.0-dev.21-r1** development bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
 
 ## What you get
 

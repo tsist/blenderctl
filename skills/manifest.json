@@ -1,14 +1,40 @@
 {
-  "bundle_version": "0.2.0",
+  "bundle_version": "0.3.0-dev.21-r1",
   "license": "GPL-3.0-or-later",
   "cli_version": "0.54.1",
   "extension_version": "0.7.0",
   "skills": [
-    {"name": "blender-cli", "source_guidance": "Blender CLI local skill, efficiency revision 2026-10-06", "version": "0.2.0"},
-    {"name": "blender-work-methodology", "source_guidance": "0.30.0", "version": "0.2.0"},
-    {"name": "blender-material-authoring", "source_guidance": "0.4.0", "version": "0.2.0"},
-    {"name": "blender-asset-manager", "source_guidance": "Asset management standard 1.0, guidance unchanged", "version": "0.2.0"}
+    {
+      "name": "blender-cli",
+      "source_guidance": "Blender CLI local skill, efficiency revision 2026-10-06",
+      "version": "0.2.0"
+    },
+    {
+      "name": "blender-work-methodology",
+      "source_guidance": "0.30.0",
+      "version": "0.2.0"
+    },
+    {
+      "name": "blender-material-authoring",
+      "source_guidance": "0.4.0",
+      "version": "0.2.0"
+    },
+    {
+      "name": "blender-asset-manager",
+      "source_guidance": "Asset management standard 1.0, guidance unchanged",
+      "version": "0.2.0"
+    },
+    {
+      "name": "blender-hard-surface-authoring",
+      "source_guidance": "Hard-surface closure guidance r3, public dev21 adaptation",
+      "version": "0.1.0-dev.21-r1"
+    }
   ],
-  "optional_dependencies": {"image_gate": "Pillow>=10.4", "live_scene": "User-configured Blender MCP", "image_generation": "Available authorized native or fallback provider", "memory": "Host-provided memory/Wiki tools, if present"},
+  "optional_dependencies": {
+    "image_gate": "Pillow>=10.4",
+    "live_scene": "User-configured Blender MCP",
+    "image_generation": "Available authorized native or fallback provider",
+    "memory": "Host-provided memory/Wiki tools, if present"
+  },
   "provenance": "Public adaptations of project skills. Personal paths, fixed task IDs, private Wiki and case artifacts are excluded. Historical candidate guidance is not a new runtime or aesthetic certification."
 }

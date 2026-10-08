@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender Hard Surface Authoring"
+  short_description: "规划低密度可编辑硬表面，按证据核查源笼、细分与高光"
+  default_prompt: "使用 $blender-hard-surface-authoring 核对参考、当前插件能力和证据范围，组织完整工作单元并审查硬表面候选。"

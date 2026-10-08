@@ -19,9 +19,10 @@ def check():
     manifest = json.loads((SKILLS / 'manifest.json').read_text(encoding='utf-8'))
     names = [entry['name'] for entry in manifest['skills']]
     errors, links = [], 0
-    if len(names) != 4 or len(set(names)) != 4:
-        errors.append('Bundle must identify four unique companion skills')
-    for name in names:
+    if not names or len(set(names)) != len(names):
+        errors.append('Bundle must identify unique companion skills')
+    for entry in manifest['skills']:
+        name = entry['name']
         path = SKILLS / name / 'SKILL.md'
         content = path.read_text(encoding='utf-8')
         match = re.match(r'\A---\n(.*?)\n---\n', content, re.S)
@@ -36,8 +37,8 @@ def check():
         description = re.search(r'^description: (.+)$', header, re.M)
         if not description or ': ' in description.group(1) or description.group(1).startswith(('{', '[', '*', '&')):
             errors.append(name + ': description must be a plain YAML scalar')
-        if not re.search(r'^metadata:\n  version: "' + re.escape(manifest['bundle_version']) + r'"$', header, re.M):
-            errors.append(name + ': bundle metadata version mismatch')
+        if not re.search(r'^metadata:\n  version: "' + re.escape(entry['version']) + r'"$', header, re.M):
+            errors.append(name + ': skill metadata version mismatch')
         ui = SKILLS / name / 'agents/openai.yaml'
         metadata = ui.read_text(encoding='utf-8')
         if '$' + name not in metadata or 'allow_implicit_invocation: false' in metadata:
