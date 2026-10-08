@@ -6,9 +6,9 @@
 - 技能来源：[blenderctl companion skills](https://github.com/tsist/blenderctl)
 - 插件协议版本保持 `0.2.0`；协议版本不是开发候选的唯一身份。
 - 候选标识 `reflection-anchor-diagnostic-dev.21-r1`；执行前必须核对实际源码、当前 Schema 和相应回执，不仅比较版本字符串。
-- 固定公开源码提交：[487406c6b29c8ef9bc352cb7fb9d11fdfe27389b](https://github.com/tsist/blender-hard-surface-workbench/tree/487406c6b29c8ef9bc352cb7fb9d11fdfe27389b)，对应 Git tree `ef6db0a7c3bee4b443fb9d73b46d2b45cac53723`。
-- [同提交开发计划](https://github.com/tsist/blender-hard-surface-workbench/blob/487406c6b29c8ef9bc352cb7fb9d11fdfe27389b/docs/development-plan.md)记录 C1 暂停而非完成；新实用案例重新确认参考。
-- 该公开源码树本地完整 HOST 回归为 1489 通过、2 个可选跳过；这是代码检查，不包含 dev21 原生运行或视觉验收。CI 以该提交的实际运行结果为准，不由本技能预先宣称通过。
+- 固定公开源码提交：[1bee43d7c6acf6b7cf0c08f6eb71d589580aed94](https://github.com/tsist/blender-hard-surface-workbench/tree/1bee43d7c6acf6b7cf0c08f6eb71d589580aed94)，对应 Git tree `6aecd3c203a31e872d047ee0e40cc833a4d8d9da`。
+- [同提交开发计划](https://github.com/tsist/blender-hard-surface-workbench/blob/1bee43d7c6acf6b7cf0c08f6eb71d589580aed94/docs/development-plan.md)记录 C1 暂停而非完成；新实用案例重新确认参考。
+- 运行时和测试源码与前一提交保持一致，已完成的本地完整 HOST 回归为 1489 通过、2 个可选跳过；当前提交仅为 CI 补齐固定版本测试依赖。这是代码检查，不包含 dev21 原生运行或视觉验收。CI 以该提交的实际运行结果为准，不由本技能预先宣称通过。
 
 ## 证据解释
 
