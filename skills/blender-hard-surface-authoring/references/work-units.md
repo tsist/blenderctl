@@ -13,6 +13,7 @@
 | dev19 参数编辑整链 | 孔径、孔位两个独立整链有原生通过记录 | 不证明其他参数域、连续组合或厚度/外缘圆角整链；视觉与用途资格未授予 |
 | dev20 稀疏表面导出与 L2 观察 | 限定案例导出、源保护、原生法线绑定及独立技术审计通过 | 实际图中广阔平面高光覆盖不足，整体形体/高光未接受 |
 | dev21 reflected-anchor 观察灯架 | opt-in HOST 实现并测试；未原生运行 | 反射预测与 HOST 成功不证明实际像素覆盖或表面通过 |
+| dev22 通用研究证据工作单元 | HOST 证据收取、身份绑定及有限检查；具体字段与实测状态须核对匹配实现 | 不运行 LP，不生成新模型，不包含完整实验 solver；不授予 native 反射或成品资格 |
 | 游戏派生、任意网格修复 | 不包含完整链路 | 不能调用拟议命令或继承母版资格 |
 
 上述原生结果是有限历史证据摘要，私有模型、参数和回执不随本包公开，不能视为公开可复现测试。当前源码身份和公开检查范围见[发布来源与状态](provenance.md)。
@@ -109,3 +110,11 @@
 观察中只有局部角部条带被照亮、大片平面缺少足够高光覆盖时，记录观察不足；不要把“未看见缺陷”写成表面通过。HOST 反射诊断可检验朝相机灯带是否错过平面的镜面反射方向，但它不是包括遮挡、粗糙度和逐像素积分的完整渲染模型；射线命中率不是亮像素比例。
 
 dev21 增加 opt-in reflected-anchor 灯架的 HOST 实现和测试。它未原生运行，不默认启用，也不改变 dev20 的观察不足结论。执行前读取当前 Schema，保持源保护、版本绑定和独立输出；有实际原生图后才能评价区域覆盖和表面。
+
+## dev22 研究证据入口
+
+入口为 `hardsurface research-evidence --request <request.json>`；`hardsurface describe --section research-evidence` 提供 `schemas/research-evidence.schema.json`；输入 `research-evidence/1.0`，报告 `research-evidence-report/1.0`，协议仍为 `0.2.0`。准备调用前读取[研究证据关口](research-evidence.md)，核对当前实现与公开合成测试。单元接收 inline source、线性 model、保护顶点 ID、coverage 与外部 LP 记录，以 canonical SHA 绑定源和模型；通过残差/边界检查的 q 用于显式重建 source + basis × q 候选坐标，不接受任意独立候选。
+
+外部 LP 仅验证，不求解、不证明最优性或 infeasibility；没有有效候选 q 时 geometry 为 `not_run`。当前 coverage 仅候选顶点分箱占用，不是曲率或原 CC 研究覆盖。自交与 native 反射未执行，明确为 `not_run`；即使已实施检查全部通过，整体也仅为 `incomplete`，不会输出 `evidence_complete` 或 production pass。seed/assignment/inner-box 未设独立字段，不能声称已验证这些研究语义。
+
+此单元不替代已保存 Blender 文件的原生身份、自交审计、求值或高光，也不授权新建模、新 LP 或设计变化。首次 CLI 集成需通过适用 HOST 回归；原生生产仍遵循 G0–G5。

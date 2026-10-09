@@ -26,8 +26,8 @@
     },
     {
       "name": "blender-hard-surface-authoring",
-      "source_guidance": "Hard-surface closure guidance r3, public dev21 adaptation",
-      "version": "0.1.0-dev.21-r1"
+      "source_guidance": "Hard-surface closure and research evidence guidance, public dev22 adaptation",
+      "version": "0.1.0-dev.22-r1"
     }
   ],
   "optional_dependencies": {

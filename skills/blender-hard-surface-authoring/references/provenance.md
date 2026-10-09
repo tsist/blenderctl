@@ -1,14 +1,15 @@
 # 公开来源与当前能力边界
 
-本技能是与 Hard Surface Workbench dev21 同步的公开开发版指导，版本 `0.1.0-dev.21-r1`；它不安装插件，不携带可执行生产请求，也不授予过去任务的许可。
+本技能是与 Hard Surface Workbench dev22 同步的公开开发版指导，版本 `0.1.0-dev.22-r1`；它不安装插件，不携带可执行生产请求，也不授予过去任务的许可。
 
 - 软件来源：[Hard Surface Workbench](https://github.com/tsist/blender-hard-surface-workbench)
 - 技能来源：[blenderctl companion skills](https://github.com/tsist/blenderctl)
 - 插件协议版本保持 `0.2.0`；协议版本不是开发候选的唯一身份。
-- 候选标识 `reflection-anchor-diagnostic-dev.21-r1`；执行前必须核对实际源码、当前 Schema 和相应回执，不仅比较版本字符串。
-- 固定公开源码提交：[1bee43d7c6acf6b7cf0c08f6eb71d589580aed94](https://github.com/tsist/blender-hard-surface-workbench/tree/1bee43d7c6acf6b7cf0c08f6eb71d589580aed94)，对应 Git tree `6aecd3c203a31e872d047ee0e40cc833a4d8d9da`。
-- [同提交开发计划](https://github.com/tsist/blender-hard-surface-workbench/blob/1bee43d7c6acf6b7cf0c08f6eb71d589580aed94/docs/development-plan.md)记录 C1 暂停而非完成；新实用案例重新确认参考。
-- 运行时和测试源码与前一提交保持一致，已完成的本地完整 HOST 回归为 1489 通过、2 个可选跳过；当前提交仅为 CI 补齐固定版本测试依赖。这是代码检查，不包含 dev21 原生运行或视觉验收。CI 以该提交的实际运行结果为准，不由本技能预先宣称通过。
+- 候选标识 `research-evidence-host-dev.22-r1`。dev22 新增通用 HOST research-evidence 工作单元；不是完整实验 solver 移植，不改变历史 native 或产品资格。
+- 固定 dev22 公开源码提交：[797d8fcd6504b6809a11b6103b16e8a385046162](https://github.com/tsist/blender-hard-surface-workbench/tree/797d8fcd6504b6809a11b6103b16e8a385046162)，对应 Git tree `219fb3ec11505e979d3a1ae9ddbd817cfa270694`。
+- [同提交开发计划](https://github.com/tsist/blender-hard-surface-workbench/blob/797d8fcd6504b6809a11b6103b16e8a385046162/docs/development-plan.md)说明当前开发范围与未完成关口；新设计仍需当前参考冻结与许可。
+- 历史 dev21 源码为 [1bee43d7c6acf6b7cf0c08f6eb71d589580aed94](https://github.com/tsist/blender-hard-surface-workbench/tree/1bee43d7c6acf6b7cf0c08f6eb71d589580aed94)，对应 Git tree `6aecd3c203a31e872d047ee0e40cc833a4d8d9da`；仅用于历史追溯。
+- 匹配 dev22 源码的本地完整 HOST 回归发现 1525 项，其中 1523 通过、2 项因 slvs 未配置而跳过。34 项新增模块检查属于该回归的子集；22 项独立反例另计，不与完整回归混加。远端 CI 在本次发布核验时仍为 pending，不能据本地结果宣称远端 CI 通过。技能结构检查和 HOST 回归均不包含 Blender 原生运行、反射验收或用户成品接受。
 
 ## 证据解释
 
