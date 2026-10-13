@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Portable JSON templates; all scene and physical resource bindings are explicit."""
 from copy import deepcopy
 import json

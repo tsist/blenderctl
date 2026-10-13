@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """M1 static mesh studio. Source RNA is read only; rendering is caller owned.
 
 Requires the selected source scene/view layer/frame to be active before capture.

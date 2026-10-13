@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """S05 bounded library workflows, shared by host validation and schema export."""
 from pathlib import Path
 from protocol import Failure, read_json

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Full evaluated USD surfaces sampled in Blender's actual native frame domain."""
 import math,time,heapq,shutil,re
 from collections import OrderedDict

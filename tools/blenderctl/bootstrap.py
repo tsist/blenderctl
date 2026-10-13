@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Gate child creation until the supervisor owns this process tree."""
 from pathlib import Path
 import os

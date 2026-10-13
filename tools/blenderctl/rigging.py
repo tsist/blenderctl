@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Declarative local rigs, explicit weights and layered animation candidates."""
 import json,math
 from pathlib import Path

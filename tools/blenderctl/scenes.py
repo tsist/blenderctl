@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Scene candidates using explicit data APIs, bounded operations and reopen verification."""
 import math
 from pathlib import Path

@@ -1,9 +1,10 @@
 # Blender agent skills / Blender 配套技能
 
-Four companion skills for **blenderctl 0.54.1** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.2.0**.
+Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.3.0**.
 
 | Skill | Use |
 | --- | --- |
+| `blender-video-editing` | Whitebox/AI/CG editing, shot candidates, audio/subtitles, manual continuation and SDR templates |
 | `blender-cli` | Saved-file CLI operations, discovery, rendering, job/transaction protection and recovery |
 | `blender-work-methodology` | Plugin/CLI work units, reference/assembly decisions, progress, preview and acceptance |
 | `blender-material-authoring` | References, PBR layers/channels, image budgets, managed material operations and validation |
@@ -11,20 +12,20 @@ Four companion skills for **blenderctl 0.54.1** and **Material Workflow 0.7.0**,
 
 ## Install in Codex
 
-Download `blender-skills-0.2.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/skills-v0.2.0), or use the repository. Keep all four skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
+Download `blenderctl-skills-0.3.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0), or use the repository. Keep all five skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
 
 From the repository root:
 
 ```powershell
-# List the four skills without changing anything.
+# List the five skills without changing anything.
 python scripts/install_skills.py --list
 # Use an explicit installation destination; existing skills are never replaced.
 python scripts/install_skills.py --destination '<CODEX_HOME>\skills'
 ```
 
-When `CODEX_HOME` is unset, Codex's personal skill location is `~/.codex/skills`. Replace the example with the actual absolute destination. The same installer is at the root of the skill ZIP. You can also copy the four folders manually, preserving their sibling layout. If a same-named skill already exists, compare versions and choose your migration explicitly; the installer refuses before copying any skill. Restart the agent session if needed for its host's discovery mechanism.
+When `CODEX_HOME` is unset, Codex's personal skill location is `~/.codex/skills`. Replace the example with the actual absolute destination. The same installer is at the root of the skill ZIP. You can also copy the five folders manually, preserving their sibling layout. If a same-named skill already exists, compare versions and choose your migration explicitly; the installer refuses before copying any skill. Restart the agent session if needed for its host's discovery mechanism.
 
-From an extracted skill ZIP root, use `python install_skills.py --destination '<actual-skill-directory>'`. Installation copies the four sibling directories only; it never replaces existing skills or automatically configures the CLI/runtime.
+From an extracted skill ZIP root, use `python install_skills.py --destination '<actual-skill-directory>'`. Installation copies the five sibling directories only; it never replaces existing skills or automatically configures the CLI/runtime.
 
 Configure the separate software checkout and runtime:
 
@@ -46,7 +47,7 @@ Live Blender MCP, native image generation, optional fallback services and memory
 
 0.2.0修订方法论、材质与CLI指导：按需回读合同和证据，前移区域/UV与关键区域可观察性检查，按依赖准备生图与有界诊断，复制前核对依赖，最终质量反馈前备齐交付说明。构建器、通用诊断预设和全链路遥测仍是待开发候选，不宣称本次指导修订已测得提速。资产管理指导内容不变，仅随技能包更新版本标识；CLI与插件未升级。
 
-四个技能保持同级安装：CLI操作、制作方法论、材质制作、资产管理。`BLENDERCTL_ROOT` 指向另行解压的公开源码，`BLENDER_PATH` 指向实际 Blender。辅助脚本不启动 Blender；只有本次实际制作/验收才走已授权 CLI。资产根由用户当次明确，随包资产标准是新项目可采用的基线，已有项目规则优先。
+五个技能保持同级安装：CLI操作、制作方法论、材质制作、资产管理、视频剪辑。`BLENDERCTL_ROOT` 指向另行解压的公开源码，`BLENDER_PATH` 可保存实际 Blender 路径；调用时仍显式传 `--blender $env:BLENDER_PATH`。辅助脚本不启动 Blender；只有本次实际制作/验收才走已授权 CLI。资产根由用户当次明确，随包资产标准是新项目可采用的基线，已有项目规则优先。
 
 原个人技能和工作区规则保持完整。公开版移除本机盘符/用户名、私人 Wiki、固定任务编号、原资产及用户对话；六个领域方法仍是 candidate，历史教训不冒充公开可复现或跨模型验证。本包保留原生生图优先的材质路线，用户当前明确要求优先。
 

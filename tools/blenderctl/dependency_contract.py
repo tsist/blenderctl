@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Versioned typed dependency and same-content relink contracts (no bpy)."""
 from pathlib import Path
 from protocol import Failure, read_json

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit rest-frame/chain retargeting, with no automatic mapping application."""
 from copy import deepcopy
 from scene_contract import obj,enum,array,number,integer,NAME,BOOL

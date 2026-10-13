@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host-side acceptance of fixed native replay outputs and reopen evidence."""
 from pathlib import Path
 from protocol import Failure,read_json

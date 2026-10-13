@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Geometry report-backed compact result 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "cli_version",
+    "command",
+    "job_id",
+    "ok",
+    "error",
+    "output_format",
+    "data",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "cli_version": {
+      "type": "string"
+    },
+    "command": {
+      "type": "string"
+    },
+    "job_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "output_format": {
+      "const": "compact"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "operation",
+        "counts",
+        "targets"
+      ],
+      "additionalProperties": true
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "job_directory": {
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/reference"
+        },
+        "result": {
+          "$ref": "#/$defs/reference"
+        },
+        "report": {
+          "$ref": "#/$defs/reference"
+        },
+        "progress": {
+          "$ref": "#/$defs/reference"
+        },
+        "temporal_report": {
+          "$ref": "#/$defs/reference"
+        },
+        "cache_manifest": {
+          "$ref": "#/$defs/reference"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "required": [
+        "file",
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

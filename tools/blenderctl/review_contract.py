@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit local review records: content bindings, never an OS security boundary."""
 import hashlib,json,os
 from pathlib import Path

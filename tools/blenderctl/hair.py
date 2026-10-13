@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Managed surface guides and native ribbon-cloth integration; no custom cache store."""
 import bpy
 import scenes, simulation, hair_surface, hair_dynamics, hair_shape, hair_density, hair_volume

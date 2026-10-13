@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Fixed worker. All user data arrives through JSON, never Python interpolation."""
 import json
 import os
@@ -240,6 +239,36 @@ def main():
         elif command in ('media.prepare','media.export'):
             import media
             data=getattr(media,command.split('.')[1])(request['params'],job)
+        elif command in ('video.run','video.inspect'):
+            import video_workflow
+            data=getattr(video_workflow,command.split('.')[1])(request['params'],job)
+        elif command in ('compositing.run','compositing.inspect'):
+            import compositing_workflow
+            data=getattr(compositing_workflow,command.split('.')[1])(request['params'],job)
+        elif command=='compositing.template-save':
+            import compositing_templates
+            data=compositing_templates.save_template(request['params'],job,cancel_parent=job)
+        elif command=='compositing.template-run':
+            import compositing_template_run
+            data=compositing_template_run.run(request['params'],job,cancel_parent=job)
+        elif command=='compositing.batch':
+            import compositing_batch
+            data=compositing_batch.run(request['params'],job,cancel_parent=job)
+        elif command=='compositing.study':
+            import compositing_study
+            data=compositing_study.run(request['params'],job,cancel_parent=job)
+        elif command in ('lighting.run','lighting.inspect'):
+            import lighting_workflow
+            data=getattr(lighting_workflow,command.split('.')[1])(request['params'],job)
+        elif command in ('lighting.template-save','lighting.template-edit'):
+            import lighting_workflow
+            data=getattr(lighting_workflow, 'save_template' if command=='lighting.template-save' else 'edit_template')(request['params'],job)
+        elif command=='lighting.batch':
+            import lighting_batch
+            data=lighting_batch.run(request['params'],job)
+        elif command in ('geometry.run','geometry.inspect'):
+            import geometry_workflow
+            data=getattr(geometry_workflow,command.split('.')[1])(request['params'],job)
         elif command=='material.run':
             import material_workflow
             data=material_workflow.run(request['params'],job)

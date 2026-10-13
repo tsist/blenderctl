@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Stage-9 declarative shader/compositor/geometry node and image contracts."""
 import re
 from pathlib import Path

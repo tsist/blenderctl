@@ -1,0 +1,10 @@
+schema_version = "1.0.0"
+id = "lighting_workflow"
+version = "0.2.1"
+name = "Lighting Workflow"
+tagline = "Create and edit managed lighting rigs with explicit recovery"
+maintainer = "Blender AI"
+type = "add-on"
+tags = ["Lighting", "Render"]
+blender_version_min = "5.2.0"
+license = ["SPDX:GPL-3.0-or-later"]

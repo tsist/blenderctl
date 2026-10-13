@@ -1,0 +1,18 @@
+{
+  "schema_version": "video-template/1.0",
+  "id": "subtitle-readable",
+  "name": "中文字幕优先",
+  "description": "为对白和说明较多的剪辑设置较大中文字幕，并把字幕位置上移以留出底部安全区。字号和位置按画幅高度换算，仍需针对行长、亮背景及阅读时间检查产出。",
+  "layout": "SEQUENCE",
+  "style": {
+    "background_color": [0.015, 0.015, 0.02, 1.0],
+    "show_shot_labels": false,
+    "label_prefix": "镜头",
+    "fit": "FIT",
+    "transition_frames": 0,
+    "grade": {"multiply": 1.0, "saturation": 1.0},
+    "title": {"font_ratio": 0.08, "y_ratio": 0.35, "color": [1.0, 1.0, 1.0, 1.0]},
+    "label": {"font_ratio": 0.045, "y_ratio": 0.39, "color": [1.0, 0.85, 0.35, 1.0]},
+    "subtitle": {"font_ratio": 0.065, "y_ratio": -0.30, "color": [1.0, 1.0, 1.0, 1.0]}
+  }
+}

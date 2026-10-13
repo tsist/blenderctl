@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "properties": {
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "view_layer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "rig_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 1,
+      "maxItems": 64
+    },
+    "mode": {
+      "enum": [
+        "relight",
+        "adapt"
+      ]
+    },
+    "anchor": {
+      "enum": [
+        "world",
+        "target",
+        "camera"
+      ]
+    },
+    "power_policy": {
+      "enum": [
+        "native",
+        "scale_squared"
+      ]
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "maxProperties": 256
+    },
+    "keep_lights": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 0,
+      "maxItems": 256
+    }
+  },
+  "required": [
+    "scene",
+    "view_layer",
+    "rig_id",
+    "targets",
+    "mode",
+    "anchor",
+    "power_policy"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lighting-target.schema.json"
+}

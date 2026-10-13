@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Windows file identity, deny-write guards, and rename without replacing a destination."""
 import ctypes
 from ctypes import wintypes as w

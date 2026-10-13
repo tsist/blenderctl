@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded, witness-based adaptive analysis; never a continuous-time certificate."""
 import heapq
 import numpy as np

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit mixed rig/cloth cache admission. No changes to rig or solver settings."""
 import bpy
 from protocol import Failure

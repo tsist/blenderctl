@@ -1,12 +1,14 @@
-# blenderctl + Material Workflow
+# blenderctl + Blender workflows
+
+**0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
 
 Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-256 protected source files, isolated background jobs, editable candidates, and a matching layered-material Blender extension.
 
-**CLI 0.54.1 · Material Workflow 0.7.0 · GPL-3.0-or-later**
+**CLI 0.63.0 · Material Workflow 0.7.0 · GPL-3.0-or-later**
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.1.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.3.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
 
 ## What you get
 
@@ -25,13 +27,13 @@ Download the source ZIP from [Releases](https://github.com/tsist/blenderctl/rele
 ```powershell
 $env:BLENDER_PATH = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
 python tools/blenderctl/cli.py --version
-python tools/blenderctl/cli.py --jobs-dir ./runtime/jobs doctor
+python tools/blenderctl/cli.py --blender $env:BLENDER_PATH --jobs-dir ./runtime/jobs doctor
 python tools/blenderctl/cli.py material describe --operation study --section study
 ```
 
 The path is an example: set it to your actual executable. All global options, including `--blender`, `--jobs-dir`, `--timeout`, `--async` and `--compact`, go **before** the subcommand. Use `blenderctl.ps1` on Windows if preferred; `BLENDERCTL_PYTHON` selects an explicit Python executable. See the [tested scene/render walkthrough](docs/GETTING_STARTED.md).
 
-Download `material-workflow-0.7.0.zip` separately and install it using Blender **Preferences → Extensions → Install from Disk**. Enable **Material Workflow**. Its backend project path is this repository; Blender and Python paths must point to your installed runtime. See [plugin installation and workflow](docs/MATERIAL_WORKFLOW.md).
+The historical material extension remains in the [v0.54.1 release](https://github.com/tsist/blenderctl/releases/tag/v0.54.1); download `material-workflow-0.7.0.zip` there separately and install it using Blender **Preferences → Extensions → Install from Disk**. Enable **Material Workflow**. Its backend project path is this repository; Blender and Python paths must point to your installed runtime. See [plugin installation and workflow](docs/MATERIAL_WORKFLOW.md).
 
 ## Verify and build
 

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded native Mantaflow liquid surface and owned cache validation."""
 import bpy,bmesh,math,json
 from pathlib import Path

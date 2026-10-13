@@ -1,0 +1,1188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compositing-compact-result.schema.json",
+  "title": "Compositing compact result: bounded still/temporal summaries",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "cli_version": {
+      "type": "string"
+    },
+    "command": {
+      "oneOf": [
+        {
+          "enum": [
+            "compositing.run",
+            "compositing.inspect",
+            "job.submit",
+            "job.status",
+            "job.result",
+            "job.wait",
+            "job.cancel"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "job_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "details": {}
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "output_format": {
+      "const": "compact"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "running",
+            "passed",
+            "failed",
+            "cancelled",
+            "timed_out"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "candidate": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "scene": {
+          "type": "string"
+        },
+        "workflow_id": {
+          "type": "string"
+        },
+        "implementation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "protection": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "passed",
+                "failed"
+              ]
+            },
+            "non_target_protection": {
+              "type": "string"
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {}
+              },
+              "required": [
+                "code",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "verification": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "passed",
+                "failed",
+                "managed",
+                "conflict",
+                "detached"
+              ]
+            },
+            "scene": {
+              "type": "string"
+            },
+            "workflow_id": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "managed_group": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "root_group": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "bridge_node": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "non_target_protection": {
+              "type": "string"
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {}
+              },
+              "required": [
+                "code",
+                "message"
+              ],
+              "additionalProperties": false
+            },
+            "blender": {},
+            "build": {
+              "type": "string"
+            },
+            "conflicts": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "type": "object"
+              }
+            },
+            "conflict_count": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "inspection": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "passed",
+                "failed",
+                "managed",
+                "conflict",
+                "detached"
+              ]
+            },
+            "scene": {
+              "type": "string"
+            },
+            "workflow_id": {
+              "type": "string"
+            },
+            "fingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "managed_group": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "root_group": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "bridge_node": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "non_target_protection": {
+              "type": "string"
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {}
+              },
+              "required": [
+                "code",
+                "message"
+              ],
+              "additionalProperties": false
+            },
+            "blender": {},
+            "build": {
+              "type": "string"
+            },
+            "conflicts": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "type": "object"
+              }
+            },
+            "conflict_count": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "device": {
+          "type": "object"
+        },
+        "job_state": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string"
+            },
+            "status": {},
+            "exit_code": {
+              "type": "integer"
+            },
+            "finished_at": {
+              "type": "number"
+            },
+            "elapsed_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "pending": {
+              "type": "boolean"
+            },
+            "status_file": {
+              "type": "string"
+            },
+            "result_file": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "recovery": {
+          "type": "object",
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "checkpoint": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "sha256"
+              ],
+              "additionalProperties": false
+            },
+            "resume_report": {
+              "type": "string"
+            },
+            "binding": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "instruction": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "available"
+          ],
+          "additionalProperties": false
+        },
+        "checks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "properties": {
+            "preview_settings_restored": {
+              "enum": [
+                "passed",
+                "pending_owned_candidate_reopen",
+                "passed_via_owned_candidate_reopen",
+                "failed"
+              ]
+            }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "wall_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "static_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 300,
+              "description": "Historical field name: count of distinct observed result output frames; finite temporal workflow 1.2 allows up to 300."
+            },
+            "result_files": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "baseline_files": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "support": {
+          "type": "object"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "details": {}
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "format": {
+                "enum": [
+                  "PNG",
+                  "OPEN_EXR"
+                ]
+              },
+              "frame": {
+                "type": "integer"
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 4096
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 4096
+              },
+              "status": {
+                "type": "string"
+              },
+              "requested_device": {
+                "type": "object"
+              },
+              "used_device": {
+                "type": "object"
+              },
+              "device_fallback": {
+                "type": "object"
+              },
+              "device_scope": {
+                "type": "string"
+              },
+              "working_space": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "interop_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "evidence": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "additionalProperties": true
+              },
+              "output_color_space": {
+                "type": "object",
+                "properties": {
+                  "color_management": {
+                    "type": "string"
+                  },
+                  "scope": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "interop_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "has_linear_colorspace": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "additionalProperties": true
+              },
+              "denoise_execution": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "request_mode": {
+                    "type": "string"
+                  },
+                  "requested_device": {
+                    "type": "string"
+                  },
+                  "selected_device": {
+                    "type": "string"
+                  },
+                  "selected_compositor_context": {
+                    "type": "string"
+                  },
+                  "resolved_device_request": {
+                    "type": "string"
+                  },
+                  "used_backend": {
+                    "type": "string"
+                  },
+                  "native_cpu_fallback": {
+                    "type": "string"
+                  },
+                  "allow_cpu_fallback": {
+                    "type": "boolean"
+                  },
+                  "source_preview_quality": {
+                    "type": "string"
+                  },
+                  "source_final_quality": {
+                    "type": "string"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "file",
+              "sha256",
+              "format",
+              "frame",
+              "width",
+              "height"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "baselines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "format": {
+                "enum": [
+                  "PNG",
+                  "OPEN_EXR"
+                ]
+              },
+              "frame": {
+                "type": "integer"
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 4096
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 4096
+              },
+              "status": {
+                "type": "string"
+              },
+              "requested_device": {
+                "type": "object"
+              },
+              "used_device": {
+                "type": "object"
+              },
+              "device_fallback": {
+                "type": "object"
+              },
+              "device_scope": {
+                "type": "string"
+              },
+              "working_space": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "interop_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "evidence": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "additionalProperties": true
+              },
+              "output_color_space": {
+                "type": "object",
+                "properties": {
+                  "color_management": {
+                    "type": "string"
+                  },
+                  "scope": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "interop_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "has_linear_colorspace": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "additionalProperties": true
+              },
+              "denoise_execution": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "request_mode": {
+                    "type": "string"
+                  },
+                  "requested_device": {
+                    "type": "string"
+                  },
+                  "selected_device": {
+                    "type": "string"
+                  },
+                  "selected_compositor_context": {
+                    "type": "string"
+                  },
+                  "resolved_device_request": {
+                    "type": "string"
+                  },
+                  "used_backend": {
+                    "type": "string"
+                  },
+                  "native_cpu_fallback": {
+                    "type": "string"
+                  },
+                  "allow_cpu_fallback": {
+                    "type": "boolean"
+                  },
+                  "source_preview_quality": {
+                    "type": "string"
+                  },
+                  "source_final_quality": {
+                    "type": "string"
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "file",
+              "sha256",
+              "format",
+              "frame",
+              "width",
+              "height"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "preview_runtime_recovery": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "candidate": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "sha256"
+              ],
+              "additionalProperties": false
+            },
+            "scope": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "additionalProperties": true
+        },
+        "denoise_execution": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "request_mode": {
+              "type": "string"
+            },
+            "requested_device": {
+              "type": "string"
+            },
+            "selected_device": {
+              "type": "string"
+            },
+            "selected_compositor_context": {
+              "type": "string"
+            },
+            "resolved_device_request": {
+              "type": "string"
+            },
+            "used_backend": {
+              "type": "string"
+            },
+            "native_cpu_fallback": {
+              "type": "string"
+            },
+            "allow_cpu_fallback": {
+              "type": "boolean"
+            },
+            "source_preview_quality": {
+              "type": "string"
+            },
+            "source_final_quality": {
+              "type": "string"
+            },
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "scope": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "additionalProperties": true
+        },
+        "color_identity": {
+          "type": "object",
+          "properties": {
+            "working_space": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "interop_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            },
+            "scope": {
+              "type": "string"
+            },
+            "ocio": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "file_transform_scan": {
+                  "type": "string"
+                },
+                "luts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "configured_source": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "sha256"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          "required": [],
+          "additionalProperties": true
+        },
+        "input_bindings": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "input_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "inputs": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "node_id": {
+                    "type": "string"
+                  },
+                  "binding": {
+                    "type": "object"
+                  },
+                  "required_outputs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [],
+          "additionalProperties": true
+        },
+        "temporal": {
+          "type": "object"
+        },
+        "frame_receipts": {
+          "type": "object"
+        },
+        "video": {
+          "type": "object"
+        },
+        "media_digest_validation": {
+          "type": "object"
+        },
+        "outputs_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputs_scope": {
+          "type": "string"
+        },
+        "baselines_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baselines_scope": {
+          "type": "string"
+        },
+        "immutable_media_digest_scope": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "outputs",
+        "baselines"
+      ],
+      "additionalProperties": false
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "job_directory": {
+          "type": "string"
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "compositing-report": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "compositing-progress": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "compositing-reopen-saved": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "compositing-reopen-outputs": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "cli_version",
+    "command",
+    "job_id",
+    "ok",
+    "error",
+    "output_format",
+    "data",
+    "artifacts"
+  ],
+  "additionalProperties": false
+}

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Windows AppContainer primitives. No global ACL changes.
 
 Only newly owned staging paths may be granted access. The caller must attach a

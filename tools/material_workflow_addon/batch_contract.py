@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Strict host-safe material batch contracts and dependency ordering."""
 from copy import deepcopy
 import os

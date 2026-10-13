@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host-only resource, cache planning and deployment contracts."""
 from pathlib import Path
 from scene_contract import obj,array,integer,validate

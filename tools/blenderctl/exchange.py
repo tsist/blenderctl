@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Isolated import/export adapters with fresh-import geometric verification."""
 import json,math,struct,time
 from pathlib import Path

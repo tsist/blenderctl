@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Parent rest-frame deltas with explicit mapping, sampled motion and error proof."""
 import math
 import bpy

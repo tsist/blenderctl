@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Exact-input Geometry Nodes disk caches; relocation produces a new receipt."""
 from scene_contract import obj,enum,array,integer,number,NAME,BOOL,validate
 from node_contract import FILE,SHA

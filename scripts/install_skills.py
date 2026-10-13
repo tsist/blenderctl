@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Install the four companion skill folders into an explicit destination.
+"""Install the manifest-listed companion skill folders into an explicit destination.
 
 No downloads, dependency installations or existing skill replacement. Works
 from the repository or the standalone skill ZIP; --list is read-only.

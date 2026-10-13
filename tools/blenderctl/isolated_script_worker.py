@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Minimal sandbox entry. Everything written by this process is untrusted output."""
 import hashlib,json,sys,traceback
 from pathlib import Path

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded native surface-attached curves. No UV or mesh-coordinate writes."""
 import hashlib,json,math
 import bpy

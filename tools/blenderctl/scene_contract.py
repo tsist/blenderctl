@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded stage-7 declarative operations. Shared by runtime and JSON Schema export."""
 import math,re
 from protocol import Failure

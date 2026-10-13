@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Independent bounded reconstruction checks; no native-average-only acceptance."""
 import math
 import numpy as np

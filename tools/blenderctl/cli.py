@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Project entry point: python tools/blenderctl/cli.py --help."""
 import argparse
 import json
@@ -6,7 +5,7 @@ from pathlib import Path
 import sys
 
 from protocol import (CODES, COMMANDS, DEFAULT_BLENDER, DEFAULT_JOBS, DEFAULT_TRANSACTIONS, SCHEMA,
-                      VERSION, Failure, envelope, read_json)
+                      VERSION, Failure, envelope, read_json, validate)
 import runner
 
 
@@ -24,7 +23,8 @@ def parser():
     p.add_argument("--timeout", type=float, default=120)
     p.add_argument("--async", dest="background", action="store_true", help="submit a detached job")
     p.add_argument("--human", action="store_true", help="brief human-readable output; default is JSON")
-    p.add_argument("--compact", action="store_true", help="material-only summary with hashed full report references; disk results stay complete")
+    p.add_argument("--compact", action="store_true", help="bounded evidence summary with hashed full reports; disk results stay complete")
+    p.add_argument("--full", action="store_true", help="read full workflow envelope instead of its default evidence summary")
     sub = p.add_subparsers(dest="command", required=True, parser_class=Parser)
     doctor=sub.add_parser("doctor", help="inspect isolated worker environment")
     da=doctor.add_subparsers(dest='doctor_action',parser_class=Parser)
@@ -41,6 +41,10 @@ def parser():
         a=pipes.add_parser(action);a.add_argument('--manifest',type=Path,required=True)
         if action=='run':a.add_argument('--reuse-job',help='prior pipeline in the same jobs directory; verify before reuse')
     pipes.add_parser('resume').add_argument('job_id')
+    work=sub.add_parser('workflow',help='full-scale preflight and explicit sequential work units').add_subparsers(dest='action',required=True,parser_class=Parser)
+    work.add_parser('preflight').add_argument('--requests',type=Path,required=True)
+    work.add_parser('run').add_argument('--manifest',type=Path,required=True)
+    work.add_parser('resume').add_argument('job_id')
     for group,actions in [('exchange',('formats','export','import','convert','analyze')),('extension',('inspect','prepare','run','review','approve')),('sculpt',('review','replay'))]:
         act=sub.add_parser(group).add_subparsers(dest='action',required=True,parser_class=Parser)
         for action in actions:
@@ -109,6 +113,64 @@ def parser():
     sample=animation.add_subparsers(dest='action',required=True,parser_class=Parser).add_parser('sample')
     sample.add_argument('file');sample.add_argument('--manifest',type=Path,required=True);sample.add_argument('--expected-sha256')
     sample.add_argument('--driver-profile',type=Path,help='explicit source-bound native simple-driver profile')
+    video=sub.add_parser('video',help='protected saved-file native VSE editing; development candidate')
+    va=video.add_subparsers(dest='action',required=True,parser_class=Parser)
+    vd=va.add_parser('describe',help='cheap video contract discovery; no Blender or job')
+    vd.add_argument('--operation',choices=['run','inspect','manifest','output','clip'])
+    vd.add_argument('--schema',action='store_true');vd.add_argument('--section')
+    vr=va.add_parser('run');vr.add_argument('file');vr.add_argument('--expected-sha256',required=True)
+    vr.add_argument('--manifest',type=Path,required=True);vr.add_argument('--resources',type=Path,required=True)
+    vr.add_argument('--output',type=Path);vr.add_argument('--resume',type=Path);vr.add_argument('--resume-sha256')
+    vi=va.add_parser('inspect');vi.add_argument('file');vi.add_argument('--expected-sha256',required=True)
+    vi.add_argument('--resources',type=Path,required=True);vi.add_argument('--scene',required=True);vi.add_argument('--workflow-id')
+    compositing=sub.add_parser('compositing',help='protected native compositing graphs and observed saved-file outputs')
+    ca=compositing.add_subparsers(dest='action',required=True,parser_class=Parser)
+    cd=ca.add_parser('describe',help='cheap compositing contract discovery; no Blender or job')
+    cd.add_argument('--operation',choices=['run','inspect','manifest','preview','encode','template-save','template-run','template-document','batch','study']);cd.add_argument('--schema',action='store_true');cd.add_argument('--section',help='legacy manifest section (encode uses its profile fields); preview is --operation preview --schema')
+    cd.add_argument('--param',help='exact top-level field of --operation schema; mutually exclusive with --schema/--section; not a request validator')
+    ce=ca.add_parser('encode',help='Host-only named-reference HDR10 codec work unit; no viewing/certification claim');ce.add_argument('--manifest',type=Path,required=True)
+    for action in ('template-save','template-run','batch','study'):
+        action_parser=ca.add_parser(action)
+        action_parser.add_argument('--params',type=Path,required=True,help='complete UTF-8 params object')
+    cr=ca.add_parser('run');cr.add_argument('file');cr.add_argument('--expected-sha256',required=True)
+    cr.add_argument('--manifest',type=Path,required=True);cr.add_argument('--resources',type=Path,required=True);cr.add_argument('--preview',type=Path)
+    cr.add_argument('--resume',type=Path);cr.add_argument('--resume-sha256')
+    ci=ca.add_parser('inspect');ci.add_argument('file');ci.add_argument('--expected-sha256',required=True)
+    ci.add_argument('--resources',type=Path,required=True);ci.add_argument('--scene',required=True);ci.add_argument('--workflow-id',required=True)
+    lighting=sub.add_parser('lighting',help='protected saved-file lighting plans, previews and restore')
+    la=lighting.add_subparsers(dest='action',required=True,parser_class=Parser)
+    ld=la.add_parser('describe',help='cheap lighting domain contract discovery')
+    ld.add_argument('--operation',choices=['run','inspect','manifest','template','target','template-save','template-edit','batch']);ld.add_argument('--schema',action='store_true');ld.add_argument('--section')
+    lr=la.add_parser('run');lr.add_argument('file');lr.add_argument('--expected-sha256',required=True)
+    lm=lr.add_mutually_exclusive_group(required=True)
+    lm.add_argument('--manifest',type=Path);lm.add_argument('--template',type=Path)
+    lr.add_argument('--template-sha256');lr.add_argument('--target',type=Path)
+    lr.add_argument('--resources',type=Path,required=True);lr.add_argument('--preview',type=Path)
+    lr.add_argument('--resume',type=Path);lr.add_argument('--resume-sha256')
+    li=la.add_parser('inspect');li.add_argument('file');li.add_argument('--expected-sha256',required=True)
+    li.add_argument('--resources',type=Path,required=True);li.add_argument('--scene',required=True);li.add_argument('--rig-id')
+    ls=la.add_parser('template-save',help='export actual saved rig as a new versioned template')
+    ls.add_argument('file');ls.add_argument('--expected-sha256',required=True);ls.add_argument('--resources',type=Path,required=True)
+    ls.add_argument('--scene',required=True);ls.add_argument('--rig-id',required=True);ls.add_argument('--template-id',required=True);ls.add_argument('--revision',type=int,required=True)
+    le=la.add_parser('template-edit',help='create a new template revision; preserve original bytes')
+    le.add_argument('--template',type=Path,required=True);le.add_argument('--template-sha256',required=True)
+    le.add_argument('--revision',type=int,required=True);le.add_argument('--edits',type=Path,required=True)
+    lb=la.add_parser('batch',help='bounded sequential independent candidates and partial recovery')
+    lb.add_argument('--manifest',type=Path,required=True);lb.add_argument('--resume',type=Path);lb.add_argument('--resume-sha256')
+    geometry=sub.add_parser('geometry',help='managed native geometry graphs, observed output and live-session handoff')
+    geometry_actions=geometry.add_subparsers(dest='action',required=True,parser_class=Parser)
+    gd=geometry_actions.add_parser('describe',help='read-only geometry contract index; no Blender or job')
+    gd.add_argument('--operation',choices=['run','inspect','manifest','report']);gd.add_argument('--schema',action='store_true')
+    gd.add_argument('--section',choices=['context','targets','preview','observations'])
+    gr=geometry_actions.add_parser('run',help='one protected project candidate, independent target outcomes and reopen')
+    gr.add_argument('--manifest',type=Path,required=True);gr.add_argument('--file');gr.add_argument('--expected-sha256')
+    gr.add_argument('--resources',type=Path,required=True);gr.add_argument('--resume',type=Path);gr.add_argument('--resume-sha256')
+    gi=geometry_actions.add_parser('inspect',help='read-only actual graph, instances, geometry and optional field observations')
+    gi.add_argument('file');gi.add_argument('--expected-sha256',required=True);gi.add_argument('--resources',type=Path,required=True)
+    gi.add_argument('--context',type=Path);gi.add_argument('--targets',type=Path);gi.add_argument('--observations',type=Path);gi.add_argument('--discover',action='store_true')
+    gs=geometry_actions.add_parser('session',help='bounded request to an explicitly owned Blender session queue')
+    gs.add_argument('--session-dir',required=True);gs.add_argument('--session-action',choices=['capture','status','apply'],default='status')
+    gs.add_argument('--payload',type=Path);gs.add_argument('--request-id');gs.add_argument('--wait-seconds',type=float,default=0)
     material=sub.add_parser('material',help='isolated material output')
     material_actions=material.add_subparsers(dest='action',required=True,parser_class=Parser)
     describe=material_actions.add_parser('describe',help='read-only material capability/schema index; no Blender or job')
@@ -226,6 +288,39 @@ def main(argv=None):
     code = 0
     try:
         args = parser().parse_args(argv)
+        if args.compact and args.full:
+            raise Failure('INVALID_REQUEST', 'Choose --compact or --full')
+        if args.command == 'video' and args.action == 'describe':
+            if args.background or args.compact:raise Failure('INVALID_REQUEST','--async/--compact does not apply to video describe')
+            from video_interface import describe
+            print(json.dumps(describe(args.operation,args.schema,args.section),ensure_ascii=False,allow_nan=False))
+            return 0
+        if args.command == 'compositing' and args.action == 'describe':
+            if args.background or args.compact:raise Failure('INVALID_REQUEST','--async/--compact does not apply to compositing describe')
+            from compositing_interface import describe
+            print(json.dumps(describe(args.operation,args.schema,args.section,args.param),ensure_ascii=False,allow_nan=False))
+            return 0
+        if args.command == 'lighting' and args.action == 'describe':
+            if args.background or args.compact:raise Failure('INVALID_REQUEST','--async/--compact does not apply to lighting describe')
+            from lighting_interface import describe
+            print(json.dumps(describe(args.operation,args.schema,args.section),ensure_ascii=False,allow_nan=False))
+            return 0
+        if args.command == 'geometry' and args.action == 'describe':
+            if args.background or args.compact:
+                raise Failure('INVALID_REQUEST','--async/--compact does not apply to geometry describe')
+            from geometry_interface import describe
+            print(json.dumps(describe(args.operation,args.schema,args.section),ensure_ascii=False,allow_nan=False))
+            return 0
+        if args.command == 'geometry' and args.action == 'session':
+            if args.background or args.compact:raise Failure('INVALID_REQUEST','Session requests use their own bounded wait')
+            from geometry_session import dispatch
+            payload=read_json(args.payload) if args.payload else {}
+            payload.update(session_dir=args.session_dir,action=args.session_action,wait_seconds=args.wait_seconds)
+            if args.request_id:payload['request_id']=args.request_id
+            result=dispatch(payload)
+            print(json.dumps(result,ensure_ascii=False,allow_nan=False))
+            error = result.get('error')
+            return 0 if result.get('ok') else CODES.get(error.get('code'),8) if isinstance(error,dict) else 8
         if args.command == 'material' and args.action == 'describe':
             if args.background or args.compact:
                 raise Failure('INVALID_REQUEST', '--async/--compact does not apply to material describe')
@@ -233,8 +328,8 @@ def main(argv=None):
             print(json.dumps(describe(args.operation, args.schema, args.section), ensure_ascii=False, allow_nan=False))
             return 0
         if args.compact:
-            if args.command == 'material':
-                compact_command = 'material.' + args.action
+            if args.command in ('material', 'geometry', 'workflow', 'lighting', 'compositing', 'video'):
+                compact_command = args.command + '.' + args.action
             elif args.command == 'request':
                 compact_request = read_json(args.file)
                 if not isinstance(compact_request, dict):
@@ -243,9 +338,10 @@ def main(argv=None):
             elif args.command == 'job':
                 compact_command = read_json(runner.job_path(args.jobs_dir, args.job_id) / 'request.json').get('command')
             else:
-                compact_command = None
-            if compact_command not in ('material.run', 'material.batch', 'material.study', 'material.template-save', 'material.preview'):
-                raise Failure('INVALID_REQUEST', '--compact supports material jobs only')
+                action = getattr(args, 'action', None)
+                compact_command = args.command + '.' + action if action else args.command
+            if compact_command not in COMMANDS:
+                raise Failure('INVALID_REQUEST', '--compact requires an executable request/job command')
         if args.command == "job":
             if args.background:
                 raise Failure("INVALID_REQUEST", "--async does not apply to job commands")
@@ -271,6 +367,9 @@ def main(argv=None):
                 if getattr(args,'domain',None):params['domain']=args.domain
                 if getattr(args,'manifest',None):params['manifest']=read_json(args.manifest)
                 request={'schema_version':SCHEMA,'command':args.command+'.'+args.action.replace('-','_'),'params':params}
+            elif args.command=='workflow':
+                params={'requests':read_json(args.requests)} if args.action=='preflight' else {'manifest':read_json(args.manifest)} if args.action=='run' else {'job_id':args.job_id}
+                request={'schema_version':SCHEMA,'command':'workflow.'+args.action,'params':params}
             elif args.command=='pipeline':
                 params={'job_id':args.job_id} if args.action=='resume' else {'manifest':read_json(args.manifest)}
                 if getattr(args,'reuse_job',None):params['reuse_job']=args.reuse_job
@@ -331,6 +430,74 @@ def main(argv=None):
                 if getattr(args,'hair_frames',None):params['hair_frames']=args.hair_frames
                 if getattr(args,'simulation_receipt',None):params['simulation_receipt']=read_json(args.simulation_receipt)
                 request={'schema_version':SCHEMA,'command':args.command+'.'+args.action,'params':params}
+            elif args.command=='video':
+                params={'file':args.file,'expected_sha256':args.expected_sha256,'resources':read_json(args.resources)}
+                if args.action=='run':
+                    params['manifest']=read_json(args.manifest)
+                    if args.output:params['output']=read_json(args.output)
+                    if args.resume:
+                        if not args.resume_sha256:raise Failure('INVALID_REQUEST','--resume requires SHA')
+                        params['resume']={'file':str(args.resume.resolve()),'expected_sha256':args.resume_sha256}
+                    elif args.resume_sha256:raise Failure('INVALID_REQUEST','Resume SHA needs report')
+                else:
+                    params['scene']=args.scene
+                    if args.workflow_id:params['workflow_id']=args.workflow_id
+                request={'schema_version':SCHEMA,'command':'video.'+args.action,'params':params}
+            elif args.command=='compositing' and args.action in ('template-save','template-run','batch','study'):
+                request={'schema_version':SCHEMA,'command':'compositing.'+args.action,'params':read_json(args.params)}
+            elif args.command=='compositing':
+                if args.action=='encode':
+                    params=read_json(args.manifest)
+                else:
+                    params={'file':args.file,'expected_sha256':args.expected_sha256,'resources':read_json(args.resources)}
+                    if args.action=='run':
+                        params['manifest']=read_json(args.manifest)
+                        if args.preview:params['preview']=read_json(args.preview)
+                        if args.resume:
+                            if not args.resume_sha256:raise Failure('INVALID_REQUEST','--resume requires SHA')
+                            params['resume']={'file':str(args.resume.resolve()),'expected_sha256':args.resume_sha256}
+                        elif args.resume_sha256:raise Failure('INVALID_REQUEST','Resume SHA needs report')
+                    else:params.update(scene=args.scene,workflow_id=args.workflow_id)
+                request={'schema_version':SCHEMA,'command':'compositing.'+args.action,'params':params}
+            elif args.command=='lighting':
+                if args.action=='batch':
+                    params=read_json(args.manifest)
+                elif args.action=='template-edit':
+                    params={'template':{'file':str(args.template.resolve()),'expected_sha256':args.template_sha256},'revision':args.revision,'edits':read_json(args.edits)}
+                else:
+                    params={'file':args.file,'expected_sha256':args.expected_sha256,'resources':read_json(args.resources)}
+                if args.action=='run':
+                    if args.template:
+                        if not args.template_sha256 or not args.target:raise Failure('INVALID_REQUEST','Template run requires --template-sha256 and --target')
+                        params['template']={'file':str(args.template.resolve()),'expected_sha256':args.template_sha256}
+                        params['target']=read_json(args.target)
+                    else:
+                        if args.template_sha256 or args.target:raise Failure('INVALID_REQUEST','Template SHA/target require template')
+                        params['manifest']=read_json(args.manifest)
+                    if args.preview:params['preview']=read_json(args.preview)
+                if args.action in ('run','batch'):
+                    if args.resume:
+                        if not args.resume_sha256:raise Failure('INVALID_REQUEST','--resume requires SHA')
+                        params['resume']={'file':str(args.resume.resolve()),'expected_sha256':args.resume_sha256}
+                    elif args.resume_sha256:raise Failure('INVALID_REQUEST','Resume SHA needs report')
+                if args.action in ('inspect','template-save'):
+                    params['scene']=args.scene
+                    if args.rig_id:params['rig_id']=args.rig_id
+                    if args.action=='template-save':params.update(template_id=args.template_id,revision=args.revision)
+                request={'schema_version':SCHEMA,'command':'lighting.'+args.action,'params':params}
+            elif args.command=='geometry':
+                params={'resources':read_json(args.resources)}
+                if args.action=='run':params['manifest']=read_json(args.manifest)
+                if getattr(args,'file',None):params['file']=args.file
+                if getattr(args,'expected_sha256',None):params['expected_sha256']=args.expected_sha256
+                for key in ('context','targets','observations'):
+                    if getattr(args,key,None):params[key]=read_json(getattr(args,key))
+                if getattr(args,'discover',False):params['discover']=True
+                if getattr(args,'resume',None):
+                    if not args.resume_sha256:raise Failure('INVALID_REQUEST','--resume requires --resume-sha256')
+                    params['resume']={'file':str(args.resume.resolve()),'expected_sha256':args.resume_sha256}
+                elif getattr(args,'resume_sha256',None):raise Failure('INVALID_REQUEST','--resume-sha256 requires --resume')
+                request={'schema_version':SCHEMA,'command':'geometry.'+args.action,'params':params}
             elif args.command=='animation':
                 params={'file':args.file,'manifest':read_json(args.manifest)}
                 if args.expected_sha256:params['expected_sha256']=args.expected_sha256
@@ -384,6 +551,14 @@ def main(argv=None):
                 params = {"file": args.file} if args.command == "inspect" else {"case": args.case} if args.command == "probe" else {}
                 if args.command=='inspect' and args.expected_sha256:params['expected_sha256']=args.expected_sha256
                 request = {"schema_version": SCHEMA, "command": args.command, "params": params}
+            if request.get('command') == 'geometry.session':
+                if args.background or args.compact:raise Failure('INVALID_REQUEST','Session requests use their own bounded wait')
+                from geometry_session import dispatch
+                normalized=validate(request)
+                result=dispatch(normalized['params'])
+                print(json.dumps(result,ensure_ascii=False,allow_nan=False))
+                error = result.get('error')
+                return 0 if result.get('ok') else CODES.get(error.get('code'),8) if isinstance(error,dict) else 8
             job = runner.prepare(request, args.blender, args.jobs_dir, args.timeout, args.transactions_dir)
             if args.background:
                 result = runner.submit(job)
@@ -398,9 +573,25 @@ def main(argv=None):
     except ValueError as exc:
         result = envelope(error={"code": "INVALID_REQUEST", "message": str(exc)})
         code = 2
-    if args and args.compact:
+    if args and not args.full and not args.compact:
+        if args.command == 'workflow':
+            compact_command = 'workflow.' + args.action
+        elif args.command == 'request' and 'request' in locals() and isinstance(request, dict) and str(request.get('command', '')).startswith('workflow.'):
+            compact_command = request['command']
+    if args and (args.compact or (compact_command and compact_command.startswith('workflow.') and not args.full)):
         try:
-            from material_interface import compact
+            if compact_command and compact_command.startswith('video.'):
+                from video_interface import compact
+            elif compact_command and compact_command.startswith('compositing.'):
+                from compositing_interface import compact
+            elif compact_command and compact_command.startswith('lighting.'):
+                from lighting_interface import compact
+            elif compact_command and compact_command.startswith('geometry.'):
+                from geometry_interface import compact
+            elif compact_command and compact_command.startswith('material.'):
+                from material_interface import compact
+            else:
+                from workflow_evidence import compact
             result = compact(result, compact_command)
         except (Failure, OSError, ValueError):
             # Projection is optional. Full execution evidence and exit code win.

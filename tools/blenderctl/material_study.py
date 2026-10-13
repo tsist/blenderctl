@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """One owned worker for bounded material candidates, diagnostics and evidence."""
 from contextlib import ExitStack
 from copy import deepcopy

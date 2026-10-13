@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Small, read-only discovery and lossless report-backed output for material agents."""
 from collections import Counter
 from copy import deepcopy

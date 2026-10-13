@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded modeling operations; shared runtime/JSON Schema contract."""
 from scene_contract import (obj, enum, array, number, integer, NAME, BOOL, VEC,
                             CONTEXT, OPS as SCENE_OPS, validate, normalize as scene_normalize)

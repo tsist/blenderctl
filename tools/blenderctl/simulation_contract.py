@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded physics authoring and exact-input cache receipts."""
 from pathlib import Path
 from protocol import Failure,read_json

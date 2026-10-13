@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Owned AppContainer journal and explicit crash recovery. No PID-based killing.
 
 Lifecycle lock precedes intent and profile creation, and remains held through

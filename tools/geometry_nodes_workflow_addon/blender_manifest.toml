@@ -1,0 +1,12 @@
+schema_version = "1.0.0"
+id = "geometry_nodes_workflow_addon"
+version = "0.2.0"
+name = "Geometry Nodes Workflow"
+tagline = "Managed geometry cores and verified CLI workflows"
+maintainer = "Blender AI"
+type = "add-on"
+blender_version_min = "5.2.0"
+license = ["SPDX:GPL-3.0-or-later"]
+
+[permissions]
+files = "Read CLI inputs and write owned checkpoints and results"

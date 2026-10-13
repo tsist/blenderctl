@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender 视频剪辑"
+  short_description: "白膜与 AI 成片剪辑、人工接续、声音字幕、模板及公共 CLI 验收"
+  default_prompt: "使用 $blender-video-editing，按已确认方案制作白膜参考或 AI 成片，保护源与人工修改，交付可编辑工程、镜头表和已验未验说明。"

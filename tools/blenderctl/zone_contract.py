@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Paired zone edits; socket identifiers survive item rename and reordering."""
 from scene_contract import obj,enum,array,integer,NAME
 ITEM=obj({'name':NAME,'type':enum('GEOMETRY','FLOAT','VECTOR')})

@@ -1,0 +1,3950 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compositing-manifest.schema.json",
+  "title": "Compositing manifest shared workflow 1.0/1.1/1.2/1.3",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "workflow_version": {
+          "enum": [
+            "1.0",
+            "1.1"
+          ]
+        },
+        "workflow_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "operation": {
+          "enum": [
+            "create",
+            "update",
+            "adopt",
+            "detach"
+          ]
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": -100000,
+          "maximum": 100000
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "render_layers",
+                "existing",
+                "image"
+              ]
+            },
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "colorspace": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "alpha_mode": {
+              "enum": [
+                "STRAIGHT",
+                "PREMUL",
+                "CHANNEL_PACKED",
+                "NONE"
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "kind": {
+                "enum": [
+                  "exposure",
+                  "blur",
+                  "glare",
+                  "hue_saturation",
+                  "color_spill",
+                  "transform",
+                  "scale",
+                  "lens_distortion"
+                ]
+              },
+              "params": {
+                "type": "object",
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "graph": {
+          "type": "object",
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 128,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                  },
+                  "type": {
+                    "enum": [
+                      "CompositorNodeExposure",
+                      "CompositorNodeBlur",
+                      "CompositorNodeGlare",
+                      "CompositorNodeHueSat",
+                      "CompositorNodeBrightContrast",
+                      "CompositorNodeInvert",
+                      "CompositorNodeAlphaOver",
+                      "CompositorNodeSetAlpha",
+                      "CompositorNodePremulKey",
+                      "CompositorNodeRGB",
+                      "CompositorNodeCombineColor",
+                      "CompositorNodeSeparateColor",
+                      "ShaderNodeMath",
+                      "ShaderNodeVectorMath",
+                      "ShaderNodeMix",
+                      "ShaderNodeMapRange",
+                      "ShaderNodeClamp",
+                      "ShaderNodeValToRGB",
+                      "ShaderNodeRGBCurve",
+                      "ShaderNodeFloatCurve",
+                      "ShaderNodeVectorCurve",
+                      "ShaderNodeSeparateXYZ",
+                      "ShaderNodeCombineXYZ",
+                      "ShaderNodeValue",
+                      "CompositorNodeImage",
+                      "CompositorNodeRLayers",
+                      "CompositorNodeDenoise",
+                      "CompositorNodeDefocus",
+                      "CompositorNodeDilateErode",
+                      "CompositorNodeBoxMask",
+                      "CompositorNodeEllipseMask",
+                      "CompositorNodeKeying",
+                      "CompositorNodeColorSpill",
+                      "CompositorNodeTransform",
+                      "CompositorNodeScale",
+                      "CompositorNodeLensdist"
+                    ]
+                  },
+                  "inputs": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "properties": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "outputs": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "binding": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "image"
+                          },
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "colorspace": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "alpha_mode": {
+                            "enum": [
+                              "STRAIGHT",
+                              "PREMUL",
+                              "CHANNEL_PACKED",
+                              "NONE"
+                            ]
+                          },
+                          "layer": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "file",
+                          "expected_sha256",
+                          "colorspace",
+                          "alpha_mode"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "render_layers"
+                          },
+                          "scene": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "view_layer": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "scene",
+                          "view_layer"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "type"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "CompositorNodeImage"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "binding"
+                      ],
+                      "properties": {
+                        "binding": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "const": "image"
+                            },
+                            "file": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "colorspace": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "alpha_mode": {
+                              "enum": [
+                                "STRAIGHT",
+                                "PREMUL",
+                                "CHANNEL_PACKED",
+                                "NONE"
+                              ]
+                            },
+                            "layer": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "file",
+                            "expected_sha256",
+                            "colorspace",
+                            "alpha_mode"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "CompositorNodeRLayers"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "binding"
+                      ],
+                      "properties": {
+                        "binding": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "const": "render_layers"
+                            },
+                            "scene": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "view_layer": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "scene",
+                            "view_layer"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "CompositorNodeImage",
+                            "CompositorNodeRLayers"
+                          ]
+                        }
+                      }
+                    },
+                    "else": {
+                      "not": {
+                        "required": [
+                          "binding"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "links": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 256,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from_node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "from_socket": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "to_node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "to_socket": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  }
+                },
+                "required": [
+                  "from_node",
+                  "from_socket",
+                  "to_node",
+                  "to_socket"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "nodes",
+            "links"
+          ],
+          "additionalProperties": false
+        },
+        "patches": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "properties": {
+              "node": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "inputs": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              },
+              "properties": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              },
+              "outputs": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              }
+            },
+            "required": [
+              "node"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "replace_graph": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "workflow_version",
+        "workflow_id",
+        "scene",
+        "view_layer",
+        "operation"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "workflow_version": {
+                "const": "1.0"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "graph": {
+                "type": "object",
+                "properties": {
+                  "nodes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 128,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "type": {
+                          "enum": [
+                            "CompositorNodeExposure",
+                            "CompositorNodeBlur",
+                            "CompositorNodeGlare",
+                            "CompositorNodeHueSat",
+                            "CompositorNodeBrightContrast",
+                            "CompositorNodeInvert",
+                            "CompositorNodeAlphaOver",
+                            "CompositorNodeSetAlpha",
+                            "CompositorNodePremulKey",
+                            "CompositorNodeRGB",
+                            "CompositorNodeCombineColor",
+                            "CompositorNodeSeparateColor",
+                            "ShaderNodeMath",
+                            "ShaderNodeVectorMath",
+                            "ShaderNodeMix",
+                            "ShaderNodeMapRange",
+                            "ShaderNodeClamp",
+                            "ShaderNodeValToRGB",
+                            "ShaderNodeRGBCurve",
+                            "ShaderNodeFloatCurve",
+                            "ShaderNodeVectorCurve",
+                            "ShaderNodeSeparateXYZ",
+                            "ShaderNodeCombineXYZ",
+                            "ShaderNodeValue"
+                          ]
+                        },
+                        "inputs": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 64
+                        },
+                        "properties": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 64
+                        },
+                        "outputs": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 64
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "links": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 256,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "from_node": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 255
+                        },
+                        "from_socket": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 255
+                        },
+                        "to_node": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 255
+                        },
+                        "to_socket": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 255
+                        }
+                      },
+                      "required": [
+                        "from_node",
+                        "from_socket",
+                        "to_node",
+                        "to_socket"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "nodes",
+                  "links"
+                ],
+                "additionalProperties": false
+              },
+              "components": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                    },
+                    "kind": {
+                      "enum": [
+                        "exposure",
+                        "blur",
+                        "glare",
+                        "hue_saturation"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "maxProperties": 16
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "params"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "components": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                    },
+                    "kind": {
+                      "enum": [
+                        "exposure",
+                        "blur",
+                        "glare",
+                        "hue_saturation",
+                        "color_spill",
+                        "transform",
+                        "scale",
+                        "lens_distortion"
+                      ]
+                    },
+                    "params": {
+                      "type": "object",
+                      "maxProperties": 16
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "params"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "exposure"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "ev": {
+                                "type": "number",
+                                "x-socket-identifier": "Exposure"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeExposure",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "blur"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "size": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 2,
+                                "items": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 4096
+                                },
+                                "x-socket-identifier": "Size"
+                              },
+                              "type": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Flat",
+                                  "Tent",
+                                  "Quadratic",
+                                  "Cubic",
+                                  "Gaussian",
+                                  "Fast Gaussian",
+                                  "Catrom",
+                                  "Mitch"
+                                ],
+                                "x-socket-identifier": "Type"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeBlur",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "glare"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Bloom",
+                                  "Ghosts",
+                                  "Streaks",
+                                  "Fog Glow",
+                                  "Simple Star",
+                                  "Sun Beams",
+                                  "Kernel"
+                                ],
+                                "x-socket-identifier": "Type"
+                              },
+                              "quality": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "High",
+                                  "Medium",
+                                  "Low"
+                                ],
+                                "x-socket-identifier": "Quality"
+                              },
+                              "threshold": {
+                                "type": "number",
+                                "x-socket-identifier": "Highlights Threshold"
+                              },
+                              "strength": {
+                                "type": "number",
+                                "x-socket-identifier": "Strength"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeGlare",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "hue_saturation"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "hue": {
+                                "type": "number",
+                                "x-socket-identifier": "Hue"
+                              },
+                              "saturation": {
+                                "type": "number",
+                                "x-socket-identifier": "Saturation"
+                              },
+                              "value": {
+                                "type": "number",
+                                "x-socket-identifier": "Value"
+                              },
+                              "factor": {
+                                "type": "number",
+                                "x-socket-identifier": "Fac"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeHueSat",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "color_spill"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "factor": {
+                                "type": "number",
+                                "x-socket-identifier": "Fac"
+                              },
+                              "spill_channel": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "R",
+                                  "G",
+                                  "B"
+                                ],
+                                "x-socket-identifier": "Spill Channel"
+                              },
+                              "limit_method": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Single",
+                                  "Average"
+                                ],
+                                "x-socket-identifier": "Limit Method"
+                              },
+                              "limit_channel": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "R",
+                                  "G",
+                                  "B"
+                                ],
+                                "x-socket-identifier": "Limit Channel"
+                              },
+                              "limit_strength": {
+                                "type": "number",
+                                "x-socket-identifier": "Limit Strength"
+                              },
+                              "use_spill_strength": {
+                                "type": "boolean",
+                                "x-socket-identifier": "Use Spill Strength"
+                              },
+                              "spill_strength": {
+                                "type": "array",
+                                "minItems": 4,
+                                "maxItems": 4,
+                                "items": {
+                                  "type": "number"
+                                },
+                                "x-socket-identifier": "Spill Strength"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeColorSpill",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "transform"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "x": {
+                                "type": "number",
+                                "x-socket-identifier": "X"
+                              },
+                              "y": {
+                                "type": "number",
+                                "x-socket-identifier": "Y"
+                              },
+                              "angle": {
+                                "type": "number",
+                                "x-socket-identifier": "Angle"
+                              },
+                              "scale": {
+                                "type": "number",
+                                "x-socket-identifier": "Scale"
+                              },
+                              "interpolation": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Nearest",
+                                  "Bilinear",
+                                  "Bicubic",
+                                  "Anisotropic"
+                                ],
+                                "x-socket-identifier": "Interpolation"
+                              },
+                              "extension_x": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Clip",
+                                  "Extend",
+                                  "Repeat"
+                                ],
+                                "x-socket-identifier": "Extension X"
+                              },
+                              "extension_y": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Clip",
+                                  "Extend",
+                                  "Repeat"
+                                ],
+                                "x-socket-identifier": "Extension Y"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeTransform",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "scale"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Relative",
+                                  "Absolute",
+                                  "Scene Size",
+                                  "Render Size"
+                                ],
+                                "x-socket-identifier": "Type"
+                              },
+                              "x": {
+                                "type": "number",
+                                "x-socket-identifier": "X"
+                              },
+                              "y": {
+                                "type": "number",
+                                "x-socket-identifier": "Y"
+                              },
+                              "frame_type": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Stretch",
+                                  "Fit",
+                                  "Crop"
+                                ],
+                                "x-socket-identifier": "Frame Type"
+                              },
+                              "interpolation": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Nearest",
+                                  "Bilinear",
+                                  "Bicubic",
+                                  "Anisotropic"
+                                ],
+                                "x-socket-identifier": "Interpolation"
+                              },
+                              "extension_x": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Clip",
+                                  "Extend",
+                                  "Repeat"
+                                ],
+                                "x-socket-identifier": "Extension X"
+                              },
+                              "extension_y": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Clip",
+                                  "Extend",
+                                  "Repeat"
+                                ],
+                                "x-socket-identifier": "Extension Y"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeScale",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "kind": {
+                            "const": "lens_distortion"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "params": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255,
+                                "enum": [
+                                  "Radial",
+                                  "Horizontal"
+                                ],
+                                "x-socket-identifier": "Type"
+                              },
+                              "distortion": {
+                                "type": "number",
+                                "x-socket-identifier": "Distortion"
+                              },
+                              "dispersion": {
+                                "type": "number",
+                                "x-socket-identifier": "Dispersion"
+                              },
+                              "jitter": {
+                                "type": "boolean",
+                                "x-socket-identifier": "Jitter"
+                              },
+                              "fit": {
+                                "type": "boolean",
+                                "x-socket-identifier": "Fit"
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false,
+                            "maxProperties": 16,
+                            "x-node-type": "CompositorNodeLensdist",
+                            "x-scope": "Actual RNA setter choices; rendered effect acceptance remains separate"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "workflow_version": {
+          "const": "1.2"
+        },
+        "workflow_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "operation": {
+          "enum": [
+            "create",
+            "update",
+            "adopt",
+            "detach"
+          ]
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": -100000,
+          "maximum": 100000
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "render_layers",
+                    "existing",
+                    "image"
+                  ]
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "colorspace": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "alpha_mode": {
+                  "enum": [
+                    "STRAIGHT",
+                    "PREMUL",
+                    "CHANNEL_PACKED",
+                    "NONE"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "image_sequence"
+                },
+                "frames": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 300,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_frame": {
+                        "type": "integer",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "source_frame",
+                      "file",
+                      "expected_sha256"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "mapping": {
+                  "type": "object",
+                  "properties": {
+                    "scene_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "source_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "frame_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    },
+                    "rate": {
+                      "const": "ONE_TO_ONE"
+                    },
+                    "scene_fps": {
+                      "type": "object",
+                      "properties": {
+                        "numerator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 120000
+                        },
+                        "denominator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "numerator",
+                        "denominator"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "scene_start",
+                    "source_start",
+                    "frame_count",
+                    "rate",
+                    "scene_fps"
+                  ],
+                  "additionalProperties": false
+                },
+                "colorspace": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "alpha_mode": {
+                  "enum": [
+                    "STRAIGHT",
+                    "PREMUL",
+                    "CHANNEL_PACKED",
+                    "NONE"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "frames",
+                "mapping",
+                "colorspace",
+                "alpha_mode"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "kind": {
+                "enum": [
+                  "exposure",
+                  "blur",
+                  "glare",
+                  "hue_saturation",
+                  "color_spill",
+                  "transform",
+                  "scale",
+                  "lens_distortion"
+                ]
+              },
+              "params": {
+                "type": "object",
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "graph": {
+          "type": "object",
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 128,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                  },
+                  "type": {
+                    "enum": [
+                      "CompositorNodeExposure",
+                      "CompositorNodeBlur",
+                      "CompositorNodeGlare",
+                      "CompositorNodeHueSat",
+                      "CompositorNodeBrightContrast",
+                      "CompositorNodeInvert",
+                      "CompositorNodeAlphaOver",
+                      "CompositorNodeSetAlpha",
+                      "CompositorNodePremulKey",
+                      "CompositorNodeRGB",
+                      "CompositorNodeCombineColor",
+                      "CompositorNodeSeparateColor",
+                      "ShaderNodeMath",
+                      "ShaderNodeVectorMath",
+                      "ShaderNodeMix",
+                      "ShaderNodeMapRange",
+                      "ShaderNodeClamp",
+                      "ShaderNodeValToRGB",
+                      "ShaderNodeRGBCurve",
+                      "ShaderNodeFloatCurve",
+                      "ShaderNodeVectorCurve",
+                      "ShaderNodeSeparateXYZ",
+                      "ShaderNodeCombineXYZ",
+                      "ShaderNodeValue",
+                      "CompositorNodeImage",
+                      "CompositorNodeRLayers",
+                      "CompositorNodeDenoise",
+                      "CompositorNodeDefocus",
+                      "CompositorNodeDilateErode",
+                      "CompositorNodeBoxMask",
+                      "CompositorNodeEllipseMask",
+                      "CompositorNodeKeying",
+                      "CompositorNodeColorSpill",
+                      "CompositorNodeTransform",
+                      "CompositorNodeScale",
+                      "CompositorNodeLensdist"
+                    ]
+                  },
+                  "inputs": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "properties": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "outputs": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "binding": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "image"
+                          },
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "colorspace": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "alpha_mode": {
+                            "enum": [
+                              "STRAIGHT",
+                              "PREMUL",
+                              "CHANNEL_PACKED",
+                              "NONE"
+                            ]
+                          },
+                          "layer": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "file",
+                          "expected_sha256",
+                          "colorspace",
+                          "alpha_mode"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "render_layers"
+                          },
+                          "scene": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "view_layer": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "scene",
+                          "view_layer"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "image_sequence"
+                          },
+                          "frames": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 300,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "source_frame": {
+                                  "type": "integer",
+                                  "minimum": -100000,
+                                  "maximum": 100000
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                }
+                              },
+                              "required": [
+                                "source_frame",
+                                "file",
+                                "expected_sha256"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "mapping": {
+                            "type": "object",
+                            "properties": {
+                              "scene_start": {
+                                "type": "integer",
+                                "minimum": -100000,
+                                "maximum": 100000
+                              },
+                              "source_start": {
+                                "type": "integer",
+                                "minimum": -100000,
+                                "maximum": 100000
+                              },
+                              "frame_count": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 300
+                              },
+                              "rate": {
+                                "const": "ONE_TO_ONE"
+                              },
+                              "scene_fps": {
+                                "type": "object",
+                                "properties": {
+                                  "numerator": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 120000
+                                  },
+                                  "denominator": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                  }
+                                },
+                                "required": [
+                                  "numerator",
+                                  "denominator"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "scene_start",
+                              "source_start",
+                              "frame_count",
+                              "rate",
+                              "scene_fps"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "colorspace": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "alpha_mode": {
+                            "enum": [
+                              "STRAIGHT",
+                              "PREMUL",
+                              "CHANNEL_PACKED",
+                              "NONE"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "frames",
+                          "mapping",
+                          "colorspace",
+                          "alpha_mode"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "type"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "CompositorNodeImage"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "binding"
+                      ],
+                      "properties": {
+                        "binding": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "const": "image"
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                },
+                                "colorspace": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255
+                                },
+                                "alpha_mode": {
+                                  "enum": [
+                                    "STRAIGHT",
+                                    "PREMUL",
+                                    "CHANNEL_PACKED",
+                                    "NONE"
+                                  ]
+                                },
+                                "layer": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "file",
+                                "expected_sha256",
+                                "colorspace",
+                                "alpha_mode"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "const": "image_sequence"
+                                },
+                                "frames": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 300,
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "source_frame": {
+                                        "type": "integer",
+                                        "minimum": -100000,
+                                        "maximum": 100000
+                                      },
+                                      "file": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 1024
+                                      },
+                                      "expected_sha256": {
+                                        "type": "string",
+                                        "pattern": "^[0-9a-f]{64}$"
+                                      }
+                                    },
+                                    "required": [
+                                      "source_frame",
+                                      "file",
+                                      "expected_sha256"
+                                    ],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "mapping": {
+                                  "type": "object",
+                                  "properties": {
+                                    "scene_start": {
+                                      "type": "integer",
+                                      "minimum": -100000,
+                                      "maximum": 100000
+                                    },
+                                    "source_start": {
+                                      "type": "integer",
+                                      "minimum": -100000,
+                                      "maximum": 100000
+                                    },
+                                    "frame_count": {
+                                      "type": "integer",
+                                      "minimum": 1,
+                                      "maximum": 300
+                                    },
+                                    "rate": {
+                                      "const": "ONE_TO_ONE"
+                                    },
+                                    "scene_fps": {
+                                      "type": "object",
+                                      "properties": {
+                                        "numerator": {
+                                          "type": "integer",
+                                          "minimum": 1,
+                                          "maximum": 120000
+                                        },
+                                        "denominator": {
+                                          "type": "integer",
+                                          "minimum": 1,
+                                          "maximum": 10000
+                                        }
+                                      },
+                                      "required": [
+                                        "numerator",
+                                        "denominator"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "scene_start",
+                                    "source_start",
+                                    "frame_count",
+                                    "rate",
+                                    "scene_fps"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "colorspace": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255
+                                },
+                                "alpha_mode": {
+                                  "enum": [
+                                    "STRAIGHT",
+                                    "PREMUL",
+                                    "CHANNEL_PACKED",
+                                    "NONE"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "frames",
+                                "mapping",
+                                "colorspace",
+                                "alpha_mode"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "CompositorNodeRLayers"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "binding"
+                      ],
+                      "properties": {
+                        "binding": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "const": "render_layers"
+                            },
+                            "scene": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "view_layer": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "scene",
+                            "view_layer"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "CompositorNodeImage",
+                            "CompositorNodeRLayers"
+                          ]
+                        }
+                      }
+                    },
+                    "else": {
+                      "not": {
+                        "required": [
+                          "binding"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "links": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 256,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from_node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "from_socket": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "to_node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "to_socket": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  }
+                },
+                "required": [
+                  "from_node",
+                  "from_socket",
+                  "to_node",
+                  "to_socket"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "nodes",
+            "links"
+          ],
+          "additionalProperties": false
+        },
+        "patches": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "properties": {
+              "node": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "inputs": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              },
+              "properties": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              },
+              "outputs": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              }
+            },
+            "required": [
+              "node"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "replace_graph": {
+          "type": "boolean"
+        },
+        "reference_frame": {
+          "type": "integer",
+          "minimum": -100000,
+          "maximum": 100000
+        },
+        "animation": {
+          "type": "object",
+          "properties": {
+            "animation_version": {
+              "const": "1.0"
+            },
+            "tracks": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "keys": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 300,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "frame": {
+                          "type": "integer",
+                          "minimum": -100000,
+                          "maximum": 100000
+                        },
+                        "value": {
+                          "oneOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 4,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          ]
+                        },
+                        "interpolation": {
+                          "enum": [
+                            "LINEAR",
+                            "CONSTANT"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "frame",
+                        "value",
+                        "interpolation"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "extrapolation": {
+                    "const": "CONSTANT"
+                  }
+                },
+                "required": [
+                  "target",
+                  "keys",
+                  "extrapolation"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "animation_version",
+            "tracks"
+          ],
+          "additionalProperties": false
+        },
+        "animation_patches": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "const": "replace"
+                  },
+                  "track": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "node": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                          },
+                          "domain": {
+                            "enum": [
+                              "inputs",
+                              "outputs",
+                              "properties"
+                            ]
+                          },
+                          "identifier": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "node",
+                          "domain",
+                          "identifier"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "keys": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 300,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "frame": {
+                              "type": "integer",
+                              "minimum": -100000,
+                              "maximum": 100000
+                            },
+                            "value": {
+                              "oneOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 4,
+                                  "items": {
+                                    "type": "number"
+                                  }
+                                }
+                              ]
+                            },
+                            "interpolation": {
+                              "enum": [
+                                "LINEAR",
+                                "CONSTANT"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "frame",
+                            "value",
+                            "interpolation"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "extrapolation": {
+                        "const": "CONSTANT"
+                      }
+                    },
+                    "required": [
+                      "target",
+                      "keys",
+                      "extrapolation"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "operation",
+                  "track"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "const": "remove"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "static_value": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 4,
+                        "items": {
+                          "type": "number"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "operation",
+                  "target",
+                  "static_value"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "tracking_imports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_binding": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "targets": {
+                "type": "object",
+                "properties": {
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "size": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "rotation": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "position",
+                  "size",
+                  "rotation"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256",
+              "source_binding",
+              "targets"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "workflow_version",
+        "workflow_id",
+        "scene",
+        "view_layer",
+        "operation"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "workflow_version": {
+          "const": "1.3"
+        },
+        "workflow_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "operation": {
+          "enum": [
+            "create",
+            "update",
+            "adopt",
+            "detach"
+          ]
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": -100000,
+          "maximum": 100000
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "render_layers",
+                    "existing",
+                    "image"
+                  ]
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "colorspace": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "alpha_mode": {
+                  "enum": [
+                    "STRAIGHT",
+                    "PREMUL",
+                    "CHANNEL_PACKED",
+                    "NONE"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "image_sequence"
+                },
+                "frames": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 300,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_frame": {
+                        "type": "integer",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "source_frame",
+                      "file",
+                      "expected_sha256"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "mapping": {
+                  "type": "object",
+                  "properties": {
+                    "scene_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "source_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "frame_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    },
+                    "rate": {
+                      "const": "ONE_TO_ONE"
+                    },
+                    "scene_fps": {
+                      "type": "object",
+                      "properties": {
+                        "numerator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 120000
+                        },
+                        "denominator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "numerator",
+                        "denominator"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "scene_start",
+                    "source_start",
+                    "frame_count",
+                    "rate",
+                    "scene_fps"
+                  ],
+                  "additionalProperties": false
+                },
+                "colorspace": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "alpha_mode": {
+                  "enum": [
+                    "STRAIGHT",
+                    "PREMUL",
+                    "CHANNEL_PACKED",
+                    "NONE"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "frames",
+                "mapping",
+                "colorspace",
+                "alpha_mode"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "movie"
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "mapping": {
+                  "type": "object",
+                  "properties": {
+                    "scene_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "source_start": {
+                      "type": "integer",
+                      "const": 1
+                    },
+                    "frame_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    },
+                    "rate": {
+                      "const": "ONE_TO_ONE"
+                    },
+                    "scene_fps": {
+                      "type": "object",
+                      "properties": {
+                        "numerator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 120000
+                        },
+                        "denominator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "numerator",
+                        "denominator"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "scene_start",
+                    "source_start",
+                    "frame_count",
+                    "rate",
+                    "scene_fps"
+                  ],
+                  "additionalProperties": false
+                },
+                "interpretation": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "const": "BT709_OETF_INVERSE_V1"
+                    },
+                    "coded_orientation": {
+                      "const": "AS_CODED"
+                    },
+                    "audio": {
+                      "const": "IGNORE"
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "coded_orientation",
+                    "audio"
+                  ],
+                  "additionalProperties": false
+                },
+                "decoder_runtime": {
+                  "type": "object",
+                  "properties": {
+                    "ffmpeg": {
+                      "type": "object",
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "ffprobe": {
+                      "type": "object",
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ffmpeg",
+                    "ffprobe"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "kind",
+                "file",
+                "expected_sha256",
+                "mapping",
+                "interpretation",
+                "decoder_runtime"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "kind": {
+                "enum": [
+                  "exposure",
+                  "blur",
+                  "glare",
+                  "hue_saturation",
+                  "color_spill",
+                  "transform",
+                  "scale",
+                  "lens_distortion"
+                ]
+              },
+              "params": {
+                "type": "object",
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "params"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "graph": {
+          "type": "object",
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 128,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                  },
+                  "type": {
+                    "enum": [
+                      "CompositorNodeExposure",
+                      "CompositorNodeBlur",
+                      "CompositorNodeGlare",
+                      "CompositorNodeHueSat",
+                      "CompositorNodeBrightContrast",
+                      "CompositorNodeInvert",
+                      "CompositorNodeAlphaOver",
+                      "CompositorNodeSetAlpha",
+                      "CompositorNodePremulKey",
+                      "CompositorNodeRGB",
+                      "CompositorNodeCombineColor",
+                      "CompositorNodeSeparateColor",
+                      "ShaderNodeMath",
+                      "ShaderNodeVectorMath",
+                      "ShaderNodeMix",
+                      "ShaderNodeMapRange",
+                      "ShaderNodeClamp",
+                      "ShaderNodeValToRGB",
+                      "ShaderNodeRGBCurve",
+                      "ShaderNodeFloatCurve",
+                      "ShaderNodeVectorCurve",
+                      "ShaderNodeSeparateXYZ",
+                      "ShaderNodeCombineXYZ",
+                      "ShaderNodeValue",
+                      "CompositorNodeImage",
+                      "CompositorNodeRLayers",
+                      "CompositorNodeDenoise",
+                      "CompositorNodeDefocus",
+                      "CompositorNodeDilateErode",
+                      "CompositorNodeBoxMask",
+                      "CompositorNodeEllipseMask",
+                      "CompositorNodeKeying",
+                      "CompositorNodeColorSpill",
+                      "CompositorNodeTransform",
+                      "CompositorNodeScale",
+                      "CompositorNodeLensdist"
+                    ]
+                  },
+                  "inputs": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "properties": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "outputs": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 64
+                  },
+                  "binding": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "image"
+                          },
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "colorspace": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "alpha_mode": {
+                            "enum": [
+                              "STRAIGHT",
+                              "PREMUL",
+                              "CHANNEL_PACKED",
+                              "NONE"
+                            ]
+                          },
+                          "layer": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "file",
+                          "expected_sha256",
+                          "colorspace",
+                          "alpha_mode"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "render_layers"
+                          },
+                          "scene": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "view_layer": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "scene",
+                          "view_layer"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "image_sequence"
+                          },
+                          "frames": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 300,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "source_frame": {
+                                  "type": "integer",
+                                  "minimum": -100000,
+                                  "maximum": 100000
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                }
+                              },
+                              "required": [
+                                "source_frame",
+                                "file",
+                                "expected_sha256"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "mapping": {
+                            "type": "object",
+                            "properties": {
+                              "scene_start": {
+                                "type": "integer",
+                                "minimum": -100000,
+                                "maximum": 100000
+                              },
+                              "source_start": {
+                                "type": "integer",
+                                "minimum": -100000,
+                                "maximum": 100000
+                              },
+                              "frame_count": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 300
+                              },
+                              "rate": {
+                                "const": "ONE_TO_ONE"
+                              },
+                              "scene_fps": {
+                                "type": "object",
+                                "properties": {
+                                  "numerator": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 120000
+                                  },
+                                  "denominator": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                  }
+                                },
+                                "required": [
+                                  "numerator",
+                                  "denominator"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "scene_start",
+                              "source_start",
+                              "frame_count",
+                              "rate",
+                              "scene_fps"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "colorspace": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          },
+                          "alpha_mode": {
+                            "enum": [
+                              "STRAIGHT",
+                              "PREMUL",
+                              "CHANNEL_PACKED",
+                              "NONE"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "frames",
+                          "mapping",
+                          "colorspace",
+                          "alpha_mode"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "movie"
+                          },
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "mapping": {
+                            "type": "object",
+                            "properties": {
+                              "scene_start": {
+                                "type": "integer",
+                                "minimum": -100000,
+                                "maximum": 100000
+                              },
+                              "source_start": {
+                                "type": "integer",
+                                "const": 1
+                              },
+                              "frame_count": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 300
+                              },
+                              "rate": {
+                                "const": "ONE_TO_ONE"
+                              },
+                              "scene_fps": {
+                                "type": "object",
+                                "properties": {
+                                  "numerator": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 120000
+                                  },
+                                  "denominator": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 10000
+                                  }
+                                },
+                                "required": [
+                                  "numerator",
+                                  "denominator"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "scene_start",
+                              "source_start",
+                              "frame_count",
+                              "rate",
+                              "scene_fps"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "interpretation": {
+                            "type": "object",
+                            "properties": {
+                              "method": {
+                                "const": "BT709_OETF_INVERSE_V1"
+                              },
+                              "coded_orientation": {
+                                "const": "AS_CODED"
+                              },
+                              "audio": {
+                                "const": "IGNORE"
+                              }
+                            },
+                            "required": [
+                              "method",
+                              "coded_orientation",
+                              "audio"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "decoder_runtime": {
+                            "type": "object",
+                            "properties": {
+                              "ffmpeg": {
+                                "type": "object",
+                                "properties": {
+                                  "file": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 1024
+                                  },
+                                  "expected_sha256": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                  }
+                                },
+                                "required": [
+                                  "file",
+                                  "expected_sha256"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "ffprobe": {
+                                "type": "object",
+                                "properties": {
+                                  "file": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 1024
+                                  },
+                                  "expected_sha256": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                  }
+                                },
+                                "required": [
+                                  "file",
+                                  "expected_sha256"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "ffmpeg",
+                              "ffprobe"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "file",
+                          "expected_sha256",
+                          "mapping",
+                          "interpretation",
+                          "decoder_runtime"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "type"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "CompositorNodeImage"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "binding"
+                      ],
+                      "properties": {
+                        "binding": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "const": "image"
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                },
+                                "colorspace": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255
+                                },
+                                "alpha_mode": {
+                                  "enum": [
+                                    "STRAIGHT",
+                                    "PREMUL",
+                                    "CHANNEL_PACKED",
+                                    "NONE"
+                                  ]
+                                },
+                                "layer": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "file",
+                                "expected_sha256",
+                                "colorspace",
+                                "alpha_mode"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "const": "image_sequence"
+                                },
+                                "frames": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 300,
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "source_frame": {
+                                        "type": "integer",
+                                        "minimum": -100000,
+                                        "maximum": 100000
+                                      },
+                                      "file": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 1024
+                                      },
+                                      "expected_sha256": {
+                                        "type": "string",
+                                        "pattern": "^[0-9a-f]{64}$"
+                                      }
+                                    },
+                                    "required": [
+                                      "source_frame",
+                                      "file",
+                                      "expected_sha256"
+                                    ],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "mapping": {
+                                  "type": "object",
+                                  "properties": {
+                                    "scene_start": {
+                                      "type": "integer",
+                                      "minimum": -100000,
+                                      "maximum": 100000
+                                    },
+                                    "source_start": {
+                                      "type": "integer",
+                                      "minimum": -100000,
+                                      "maximum": 100000
+                                    },
+                                    "frame_count": {
+                                      "type": "integer",
+                                      "minimum": 1,
+                                      "maximum": 300
+                                    },
+                                    "rate": {
+                                      "const": "ONE_TO_ONE"
+                                    },
+                                    "scene_fps": {
+                                      "type": "object",
+                                      "properties": {
+                                        "numerator": {
+                                          "type": "integer",
+                                          "minimum": 1,
+                                          "maximum": 120000
+                                        },
+                                        "denominator": {
+                                          "type": "integer",
+                                          "minimum": 1,
+                                          "maximum": 10000
+                                        }
+                                      },
+                                      "required": [
+                                        "numerator",
+                                        "denominator"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "scene_start",
+                                    "source_start",
+                                    "frame_count",
+                                    "rate",
+                                    "scene_fps"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "colorspace": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 255
+                                },
+                                "alpha_mode": {
+                                  "enum": [
+                                    "STRAIGHT",
+                                    "PREMUL",
+                                    "CHANNEL_PACKED",
+                                    "NONE"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "frames",
+                                "mapping",
+                                "colorspace",
+                                "alpha_mode"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "const": "movie"
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                },
+                                "mapping": {
+                                  "type": "object",
+                                  "properties": {
+                                    "scene_start": {
+                                      "type": "integer",
+                                      "minimum": -100000,
+                                      "maximum": 100000
+                                    },
+                                    "source_start": {
+                                      "type": "integer",
+                                      "const": 1
+                                    },
+                                    "frame_count": {
+                                      "type": "integer",
+                                      "minimum": 1,
+                                      "maximum": 300
+                                    },
+                                    "rate": {
+                                      "const": "ONE_TO_ONE"
+                                    },
+                                    "scene_fps": {
+                                      "type": "object",
+                                      "properties": {
+                                        "numerator": {
+                                          "type": "integer",
+                                          "minimum": 1,
+                                          "maximum": 120000
+                                        },
+                                        "denominator": {
+                                          "type": "integer",
+                                          "minimum": 1,
+                                          "maximum": 10000
+                                        }
+                                      },
+                                      "required": [
+                                        "numerator",
+                                        "denominator"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "scene_start",
+                                    "source_start",
+                                    "frame_count",
+                                    "rate",
+                                    "scene_fps"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "interpretation": {
+                                  "type": "object",
+                                  "properties": {
+                                    "method": {
+                                      "const": "BT709_OETF_INVERSE_V1"
+                                    },
+                                    "coded_orientation": {
+                                      "const": "AS_CODED"
+                                    },
+                                    "audio": {
+                                      "const": "IGNORE"
+                                    }
+                                  },
+                                  "required": [
+                                    "method",
+                                    "coded_orientation",
+                                    "audio"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "decoder_runtime": {
+                                  "type": "object",
+                                  "properties": {
+                                    "ffmpeg": {
+                                      "type": "object",
+                                      "properties": {
+                                        "file": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 1024
+                                        },
+                                        "expected_sha256": {
+                                          "type": "string",
+                                          "pattern": "^[0-9a-f]{64}$"
+                                        }
+                                      },
+                                      "required": [
+                                        "file",
+                                        "expected_sha256"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "ffprobe": {
+                                      "type": "object",
+                                      "properties": {
+                                        "file": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 1024
+                                        },
+                                        "expected_sha256": {
+                                          "type": "string",
+                                          "pattern": "^[0-9a-f]{64}$"
+                                        }
+                                      },
+                                      "required": [
+                                        "file",
+                                        "expected_sha256"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "ffmpeg",
+                                    "ffprobe"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "file",
+                                "expected_sha256",
+                                "mapping",
+                                "interpretation",
+                                "decoder_runtime"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "const": "CompositorNodeRLayers"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "binding"
+                      ],
+                      "properties": {
+                        "binding": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "const": "render_layers"
+                            },
+                            "scene": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            },
+                            "view_layer": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 255
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "scene",
+                            "view_layer"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "CompositorNodeImage",
+                            "CompositorNodeRLayers"
+                          ]
+                        }
+                      }
+                    },
+                    "else": {
+                      "not": {
+                        "required": [
+                          "binding"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "links": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 256,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from_node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "from_socket": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "to_node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "to_socket": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  }
+                },
+                "required": [
+                  "from_node",
+                  "from_socket",
+                  "to_node",
+                  "to_socket"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "nodes",
+            "links"
+          ],
+          "additionalProperties": false
+        },
+        "patches": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "properties": {
+              "node": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "inputs": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              },
+              "properties": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              },
+              "outputs": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 64
+              }
+            },
+            "required": [
+              "node"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "replace_graph": {
+          "type": "boolean"
+        },
+        "reference_frame": {
+          "type": "integer",
+          "minimum": -100000,
+          "maximum": 100000
+        },
+        "animation": {
+          "type": "object",
+          "properties": {
+            "animation_version": {
+              "const": "1.0"
+            },
+            "tracks": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "keys": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 300,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "frame": {
+                          "type": "integer",
+                          "minimum": -100000,
+                          "maximum": 100000
+                        },
+                        "value": {
+                          "oneOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 4,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          ]
+                        },
+                        "interpolation": {
+                          "enum": [
+                            "LINEAR",
+                            "CONSTANT"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "frame",
+                        "value",
+                        "interpolation"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "extrapolation": {
+                    "const": "CONSTANT"
+                  }
+                },
+                "required": [
+                  "target",
+                  "keys",
+                  "extrapolation"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "animation_version",
+            "tracks"
+          ],
+          "additionalProperties": false
+        },
+        "animation_patches": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "const": "replace"
+                  },
+                  "track": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "node": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                          },
+                          "domain": {
+                            "enum": [
+                              "inputs",
+                              "outputs",
+                              "properties"
+                            ]
+                          },
+                          "identifier": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                          }
+                        },
+                        "required": [
+                          "node",
+                          "domain",
+                          "identifier"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "keys": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 300,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "frame": {
+                              "type": "integer",
+                              "minimum": -100000,
+                              "maximum": 100000
+                            },
+                            "value": {
+                              "oneOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 4,
+                                  "items": {
+                                    "type": "number"
+                                  }
+                                }
+                              ]
+                            },
+                            "interpolation": {
+                              "enum": [
+                                "LINEAR",
+                                "CONSTANT"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "frame",
+                            "value",
+                            "interpolation"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "extrapolation": {
+                        "const": "CONSTANT"
+                      }
+                    },
+                    "required": [
+                      "target",
+                      "keys",
+                      "extrapolation"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "operation",
+                  "track"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "const": "remove"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "static_value": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 4,
+                        "items": {
+                          "type": "number"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "operation",
+                  "target",
+                  "static_value"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "tracking_imports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_binding": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "targets": {
+                "type": "object",
+                "properties": {
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "size": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "rotation": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+                      },
+                      "domain": {
+                        "enum": [
+                          "inputs",
+                          "outputs",
+                          "properties"
+                        ]
+                      },
+                      "identifier": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "required": [
+                      "node",
+                      "domain",
+                      "identifier"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "position",
+                  "size",
+                  "rotation"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256",
+              "source_binding",
+              "targets"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "workflow_version",
+        "workflow_id",
+        "scene",
+        "view_layer",
+        "operation"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

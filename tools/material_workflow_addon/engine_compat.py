@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Conservative static surface-node compatibility for independent previews.
 
 This is an explicit supported subset, not Blender's complete node catalogue.

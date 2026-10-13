@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Current-scene draft editor; Apply uses the shared conflict-aware core."""
 import copy, hashlib, json, uuid
 from pathlib import Path
@@ -252,3 +251,4 @@ def unregister():
     for name in PROPS:
         if hasattr(bpy.types.Scene,name): delattr(bpy.types.Scene,name)
     for cls in reversed(CLASSES): bpy.utils.unregister_class(cls)
+

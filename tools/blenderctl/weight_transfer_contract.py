@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit, bounded rest-surface weight transfer contract."""
 from scene_contract import obj,enum,array,number,integer,NAME,BOOL
 from model_contract import SHA

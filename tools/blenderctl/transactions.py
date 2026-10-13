@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Journaled file transactions; preserve originals before explicit replacement. Never delete."""
 from contextlib import ExitStack
 import hashlib

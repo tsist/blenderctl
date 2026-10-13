@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit collider sets, bounded evaluated witnesses and surface distances.
 
 Geometry witnesses bind the declared integer frame range, not arbitrary

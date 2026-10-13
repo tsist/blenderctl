@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only multi-object static studio, reusing the single studio renderer.
 
 Caller builds one rig per explicit visible-object set and cleans it after render.

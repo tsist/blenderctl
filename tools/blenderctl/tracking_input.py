@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit source-index windows decoded with the bundled Blender backend."""
 import bpy,math,shutil,struct,zlib
 from pathlib import Path

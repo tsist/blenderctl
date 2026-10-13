@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded rig/animation authoring contracts, shared by the CLI and exported schemas."""
 from protocol import Failure
 from scene_contract import obj,enum,array,number,integer,NAME,BOOL,VEC,CONTEXT,validate

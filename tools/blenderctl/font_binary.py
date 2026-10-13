@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded Unicode cmap reader for SFNT TTF/OTF and TTC face zero. No dependencies."""
 import struct,hashlib,unicodedata
 from protocol import Failure

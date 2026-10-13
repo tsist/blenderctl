@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Static script review and local, self-asserted trust receipts. Never imports reviewed code."""
 import ast,hashlib,time
 from pathlib import Path

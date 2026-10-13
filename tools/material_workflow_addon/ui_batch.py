@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit batch drafts; single-material edits are committed only by button."""
 import copy, json, uuid
 from pathlib import Path

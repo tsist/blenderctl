@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Same-content path repair into new job-owned blend candidates."""
 import copy
 import json

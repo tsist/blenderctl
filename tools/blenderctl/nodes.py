@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded node authoring with explicit resource ownership and candidate verification."""
 import json,math,hashlib
 from contextlib import ExitStack

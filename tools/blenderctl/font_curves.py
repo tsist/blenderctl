@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit font dependencies and verified curve/font conversion."""
 import hashlib,math
 from pathlib import Path

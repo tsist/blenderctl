@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Defined scalar envelope: max over quadratic compact segment kernels."""
 import numpy as np
 from protocol import Failure

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Fixed GUI native worker and separate-process reopen verifier; no user Python execution."""
 import os,sys,time,traceback,subprocess
 from pathlib import Path

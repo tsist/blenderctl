@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Deterministic rectangular UDIM packing with exact triangle verification.
 
 Only base-mesh UV corners change. No unwrap, arbitrary fit scaling or texture edit.

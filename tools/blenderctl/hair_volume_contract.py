@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Separate strand population and sampled density-field contracts."""
 from scene_contract import obj,array,number,integer,NAME,BOOL,validate
 from protocol import Failure

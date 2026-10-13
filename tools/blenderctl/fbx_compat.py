@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Scoped Blender 5.2.1 FBX importer traversal correction; no installed-file edits."""
 from contextlib import contextmanager
 import bpy

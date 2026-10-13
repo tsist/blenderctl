@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded, hashed PNG sequence contract for native camera tracking."""
 from pathlib import Path
 import math

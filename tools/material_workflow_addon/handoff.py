@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Persistent GUI snapshot bundles. No source save, background wait, or auto-import."""
 import copy
 import hashlib

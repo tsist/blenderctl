@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Workflow acceptance recipe configuration, not a production request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["recipe_version", "final_domain", "short_domain", "targets", "consumers", "context_matrix", "request_sets", "checks"],
+  "properties": {
+    "recipe_version": {"const": "1.0"},
+    "final_domain": {"$ref": "#/$defs/domain"},
+    "short_domain": {"$ref": "#/$defs/domain"},
+    "targets": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/target"}},
+    "consumers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["inspect", "render", "package", "reopen", "GUI"]}},
+    "context_matrix": {
+      "type": "object", "additionalProperties": false,
+      "required": ["active", "parameter_rounds", "fake_user", "temperature", "relocation", "final_scale_preflight", "gui_owned_session"],
+      "properties": {
+        "active": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["none", "non_target", "target"]}},
+        "parameter_rounds": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/round"}},
+        "fake_user": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"enum": ["preserve", "exact_transfer"]}},
+        "temperature": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"enum": ["cold", "hot"]}},
+        "relocation": {"type": "object", "additionalProperties": false, "required": ["destination", "old_cache", "isolate_old_cache"], "properties": {"destination": {"$ref": "#/$defs/path"}, "old_cache": {"$ref": "#/$defs/path"}, "isolate_old_cache": {"const": true}}},
+        "final_scale_preflight": {"const": true},
+        "gui_owned_session": {"type": "boolean"}
+      }
+    },
+    "request_sets": {"type": "object", "additionalProperties": false, "required": ["final_preflight", "short_workflow"], "properties": {"final_preflight": {"$ref": "#/$defs/file"}, "short_workflow": {"$ref": "#/$defs/file"}}},
+    "checks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/check"}}
+  },
+  "$defs": {
+    "path": {"type": "string", "minLength": 1, "pattern": "^(?:[A-Za-z]:[\\\\/]|/|\\\\\\\\)"},
+    "file": {"type": "object", "additionalProperties": false, "required": ["file", "expected_sha256"], "properties": {"file": {"$ref": "#/$defs/path"}, "expected_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "domain": {"type": "object", "additionalProperties": false, "required": ["id", "areas", "frames"], "properties": {"id": {"type": "string", "minLength": 1}, "areas": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}, "frames": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer"}}, "notes": {"type": "string"}}},
+    "target": {"type": "object", "additionalProperties": false, "required": ["id", "kind", "reference"], "properties": {"id": {"type": "string", "minLength": 1}, "kind": {"enum": ["object", "modifier", "group", "material", "scene", "collection"]}, "reference": {"type": "object", "minProperties": 1, "additionalProperties": {"type": ["string", "null"]}}}},
+    "round": {"type": "object", "additionalProperties": false, "required": ["id", "request", "expected_change"], "properties": {"id": {"type": "string", "minLength": 1}, "request": {"$ref": "#/$defs/file"}, "expected_change": {"type": "string", "minLength": 1}}},
+    "check": {"type": "object", "additionalProperties": false, "required": ["id", "entry", "status", "reason", "evidence"], "properties": {"id": {"type": "string", "minLength": 1}, "entry": {"enum": ["preflight", "producer", "inspect", "render", "package", "reopen", "GUI", "context", "parameters", "fake_user", "cold", "hot", "relocation", "source_protection", "identity"]}, "status": {"enum": ["pass", "fail", "not_run", "not_applicable"]}, "reason": {"type": "string"}, "evidence": {"type": "array", "items": {"$ref": "#/$defs/file"}}}, "allOf": [{"if": {"properties": {"status": {"const": "pass"}}}, "then": {"properties": {"evidence": {"minItems": 1}}}, "else": {"properties": {"reason": {"minLength": 1}}}}]}
+  }
+}

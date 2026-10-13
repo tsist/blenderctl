@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded DAG and resource declarations; candidate production only, no publication."""
 import copy,os,re
 from pathlib import Path
@@ -38,8 +37,8 @@ def put(v,pointer,value):
         else:raise TypeError()
     except (KeyError,ValueError,IndexError,TypeError) as ex:raise Failure('INVALID_REQUEST','Invalid binding target: '+pointer) from ex
 
-def normalize(v):
-    v=copy.deepcopy(v);validate(v,MANIFEST);steps=v['steps'];ids=[s['id'] for s in steps];policy=v['policy']
+def normalize(v, schema=MANIFEST):
+    v=copy.deepcopy(v);validate(v,schema);steps=v['steps'];ids=[s['id'] for s in steps];policy=v['policy']
     if 'resource_domain' in policy:
         from resource_leases import domain_path
         policy['resource_domain']=str(domain_path(policy['resource_domain']))
@@ -85,3 +84,4 @@ def disk_usage(root):
                 if not p.is_symlink():total+=p.stat().st_size
             except FileNotFoundError:pass
     return total
+

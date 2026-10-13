@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Versioned read-only content snapshots. The legacy transaction inspector stays frozen."""
 from array import array
 import hashlib

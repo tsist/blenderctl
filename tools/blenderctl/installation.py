@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Content identities for the managed runtime, excluding mutable user configuration."""
 from pathlib import Path
 from protocol import Failure

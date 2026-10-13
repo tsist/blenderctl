@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded static closed mesh QuadriFlow adapter; no attribute transfer."""
 import math
 import bpy

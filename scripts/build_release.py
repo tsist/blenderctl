@@ -1,98 +1,73 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
-"""Build deterministic source/Blender extension ZIPs and SHA-256 release metadata.
-
-Run from a clean, reviewed checkout. --verify compares rebuilt bytes to existing
-artifacts without replacing them. Source releases can also rebuild without Git.
-"""
+"""Deterministic source, extension, skill and template archives from PUBLICATION.json."""
 import argparse
-import hashlib
 import io
 import json
 from pathlib import Path
-import re
-import tomllib
+import sys
 import zipfile
-from check_release import ROOT, public_files, audit
-
+sys.dont_write_bytecode = True
+from verify_release import ROOT, ADDON, load_publication, release_files, safe_file, sha, verify
 
 def archive(entries):
-    output = io.BytesIO()
-    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-        for name, content in sorted(entries):
-            item = zipfile.ZipInfo(name, date_time=(2026, 10, 4, 0, 0, 0))
-            item.create_system = 3
-            item.external_attr = 0o100644 << 16
-            item.compress_type = zipfile.ZIP_DEFLATED
-            z.writestr(item, content, compresslevel=9)
-    return output.getvalue()
+    if len(entries) != len({name for name, _ in entries}):
+        raise ValueError('Duplicate archive member')
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_STORED) as output:
+        for name, data in sorted(entries):
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.create_system = 3
+            info.external_attr = 0o100644 << 16
+            info.compress_type = zipfile.ZIP_STORED
+            output.writestr(info, data)
+    return buffer.getvalue()
 
-
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=Path('dist'))
-    parser.add_argument('--verify', action='store_true')
-    parser.add_argument('--skills-only', action='store_true', help='build the standalone skills companion distribution')
-    args = parser.parse_args()
-    files = public_files()
-    errors = audit(files)
-    if errors:
-        raise SystemExit('\n'.join(errors))
-    cli = re.search(r'^VERSION = "([0-9.]+)"', (ROOT / 'tools/blenderctl/protocol.py').read_text(), re.M).group(1)
-    addon = ROOT / 'tools/material_workflow_addon'
-    manifest = tomllib.loads((addon / 'blender_manifest.toml').read_text())
-    version = manifest['version']
-    init = (addon / '__init__.py').read_text()
-    if tuple(int(n) for n in version.split('.')) != tuple(int(n) for n in re.search(r'"version": \(([^)]+)\)', init).group(1).split(',')):
-        raise SystemExit('Extension manifest and bl_info versions differ')
-    extension_files = [p for p in files if p.parent == addon and
-                       (p.suffix == '.py' or p.name in {'blender_manifest.toml', 'LICENSE', 'README.md'}) and
-                       not p.name.startswith('test')]
-    if not {addon / name for name in ('__init__.py', 'blender_manifest.toml', 'LICENSE')} <= set(extension_files):
-        raise SystemExit('Incomplete extension source')
-    payloads = {
-        f'blenderctl-{cli}-source.zip': archive([(f'blenderctl-{cli}/' + p.relative_to(ROOT).as_posix(), p.read_bytes()) for p in files]),
-        f'material-workflow-{version}.zip': archive([(p.name, p.read_bytes()) for p in extension_files]),
-    }
-    skill_manifest = ROOT / 'skills/manifest.json'
-    skill_version = None
-    skill_file_count = 0
-    if skill_manifest.is_file():
-        from check_skills import check
-        skill_check = check()
-        if not skill_check['ok']:
-            raise SystemExit('\n'.join(skill_check['errors']))
-        skill_version = json.loads(skill_manifest.read_text(encoding='utf-8'))['bundle_version']
-        skill_entries = [('blender-skills-' + skill_version + '/' + p.relative_to(ROOT).as_posix(), p.read_bytes())
-                         for p in files if p.is_relative_to(ROOT / 'skills')]
-        skill_entries.append(('blender-skills-' + skill_version + '/install_skills.py',
-                              (ROOT / 'scripts/install_skills.py').read_bytes()))
-        skill_file_count = len(skill_entries)
-        if args.skills_only:
-            payloads = {}
-        payloads[f'blender-skills-{skill_version}.zip'] = archive(skill_entries)
-    elif args.skills_only:
-        raise SystemExit('No skill bundle manifest is present')
-    rows = [{'file': name, 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)} for name, data in sorted(payloads.items())]
-    payloads['release-manifest.json'] = (json.dumps({'cli_version': cli, 'extension_version': version,
-        'license': 'GPL-3.0-or-later', 'skills_bundle_version': skill_version,
-        'distribution': 'skills-only' if args.skills_only else 'source-extension-skills',
-        'audited_source_files': len(files), 'skills_files': skill_file_count,
-        'source_files': None if args.skills_only else len(files),
-        'extension_files': None if args.skills_only else len(extension_files),
-        'reproducible_zip_timestamp': '2026-10-04T00:00:00', 'artifacts': rows}, indent=2) + '\n').encode()
-    payloads['SHA256SUMS.txt'] = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in sorted(payloads.items())).encode()
-    output = args.output.resolve()
-    output.mkdir(parents=True, exist_ok=True)
-    for name, data in payloads.items():
-        path = output / name
-        if args.verify:
-            if not path.is_file() or path.read_bytes() != data:
-                raise SystemExit('Reproducibility check failed: ' + name)
-        else:
-            with path.open('xb') as stream:
-                stream.write(data)
-    print(json.dumps({'ok': True, 'mode': 'verify' if args.verify else 'build', 'output': str(output), 'artifacts': rows}, indent=2))
-
+def build(out):
+    checked = verify()
+    p = load_publication()
+    source = [(name, safe_file(ROOT, name).read_bytes()) for name in release_files(p)]
+    license_data = safe_file(ROOT, 'LICENSE').read_bytes()
+    skill = [(n[len('skills/'):], b) for n, b in source if n.startswith('skills/blender-video-editing/')]
+    skill.append(('LICENSE', license_data))
+    template = [(n[len('templates/'):], b) for n, b in source if n.startswith('templates/video/')]
+    template.append(('LICENSE', license_data))
+    bundles = {p['repository'] + '-' + p['release'] + '-source.zip': source,
+               'video_editing_workflow_addon-' + p['addon'] + '.zip': [(n[len(ADDON):], b) for n, b in source if n.startswith(ADDON)],
+               'blender-video-editing-skill-' + p['distribution'] + '.zip': skill,
+               'blender-video-templates-' + p['template_library'] + '.zip': template}
+    if p['repository'] == 'blenderctl':
+        all_skills = [(n, b) for n, b in source if n.startswith('skills/')]
+        all_skills.append(('install_skills.py', safe_file(ROOT, 'scripts/install_skills.py').read_bytes()))
+        if not any(n == 'LICENSE' for n, _ in all_skills):
+            all_skills.append(('LICENSE', license_data))
+        bundles['blenderctl-skills-' + p['skill_bundle'] + '.zip'] = all_skills
+    if out.is_symlink():
+        raise ValueError('Refusing symlink output')
+    out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for name, entries in bundles.items():
+        data = archive(entries)
+        if data != archive(entries):
+            raise ValueError('Reproducibility failure: ' + name)
+        path = out / name
+        if path.exists() and path.read_bytes() != data:
+            raise ValueError('Refusing to overwrite differing artifact: ' + name)
+        if not path.exists():
+            path.write_bytes(data)
+        with zipfile.ZipFile(path) as z:
+            if z.namelist() != sorted(n for n, _ in entries) or any(z.read(n) != b for n, b in entries):
+                raise ValueError('Archive member mismatch: ' + name)
+        rows.append({'file': name, 'sha256': sha(data), 'bytes': len(data), 'entries': len(entries)})
+    sums = ''.join(row['sha256'] + '  ' + row['file'] + '\n' for row in sorted(rows, key=lambda row: row['file'])).encode()
+    checksum = out / 'SHA256SUMS'
+    if checksum.exists() and checksum.read_bytes() != sums:
+        raise ValueError('Refusing to overwrite differing SHA256SUMS')
+    if not checksum.exists():
+        checksum.write_bytes(sums)
+    return {'status': 'passed', 'validation': checked, 'artifacts': rows}
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', type=Path, default=ROOT / 'dist')
+    parser.add_argument('--verify', action='store_true', help='Accepted for older CI; every build verifies bytes')
+    args = parser.parse_args()
+    print(json.dumps(build(args.output.resolve()), indent=2))

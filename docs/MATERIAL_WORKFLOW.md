@@ -22,7 +22,7 @@ Before a GUI background submission, choose a new persistent snapshot directory. 
 python tools/blenderctl/cli.py material describe
 python tools/blenderctl/cli.py material describe --operation run --schema
 python tools/blenderctl/cli.py material describe --operation study --section study
-python tools/blenderctl/cli.py --jobs-dir ./runtime/material-jobs --compact request <absolute-request.json>
+python tools/blenderctl/cli.py --blender $env:BLENDER_PATH --jobs-dir ./runtime/material-jobs --compact request <absolute-request.json>
 ```
 
 A request has `schema_version: "1.0"`, a dotted command and `params`. Material manifests use schema 1.0 / `pbr_layers_v1`, or 1.1 / `pbr_layers_v2`. The public request schemas distinguish:

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host-safe public request contracts shared by adapters and schema generation."""
 from copy import deepcopy
 from pathlib import Path

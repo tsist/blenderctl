@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Cooperative same-Windows-session reservations, with owned Job crash recovery."""
 import ctypes,os,time,uuid
 from ctypes import wintypes as w

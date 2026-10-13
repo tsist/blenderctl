@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded, explicit action sets on native control rigs with midpoint quality gates."""
 import math
 import bpy

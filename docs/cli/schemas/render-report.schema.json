@@ -154,6 +154,12 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1
+        },
+        "pixel_frame_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 512000000,
+          "default": 32000000
         }
       },
       "required": [
@@ -310,6 +316,31 @@
       "items": {
         "type": "string"
       }
+    },
+    "geometry_cache_read_snapshot": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "required": [

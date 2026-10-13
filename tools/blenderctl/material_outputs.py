@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Isolated CPU previews and UV baking; only write new artifacts in the job directory."""
 import math
 from contextlib import ExitStack

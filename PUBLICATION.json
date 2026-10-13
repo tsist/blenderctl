@@ -1,0 +1,2479 @@
+{
+  "repository": "blenderctl",
+  "release": "0.63.0",
+  "cli": "0.63.0",
+  "distribution": "0.1.3",
+  "addon": "0.1.1",
+  "template_library": "0.1.0",
+  "skill_bundle": "0.3.0",
+  "runtime_identity": "4a6e44b18e1187baf1569e0f93f3eda4ae2ffa170a3d73b8c7083c0ca8f38bcb",
+  "runtime_files": 189,
+  "license": "GPL-3.0-or-later",
+  "files": [
+    {
+      "file": ".gitattributes",
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "bytes": 8
+    },
+    {
+      "file": ".github/ISSUE_TEMPLATE/bug_report.yml",
+      "sha256": "78322dd2515745c2417a68eafb4c38c8012d20b982a4d7a29b0330e706db19a0",
+      "bytes": 717
+    },
+    {
+      "file": ".github/ISSUE_TEMPLATE/feature_request.yml",
+      "sha256": "5c8cf4bb8d64e4100629a8ab7c52c7f7fa59e0ccf0a04472c03fe2ebdd379a29",
+      "bytes": 465
+    },
+    {
+      "file": ".github/PULL_REQUEST_TEMPLATE.md",
+      "sha256": "175715e5bac9c3183bce8ba0d2da5f2283469ab88c1474a0a700f144fa1c2f03",
+      "bytes": 280
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "sha256": "9783a6548f99e061e55cd1222f743d4aee1e5aa744d0cb29c667667430b15708",
+      "bytes": 1225
+    },
+    {
+      "file": ".gitignore",
+      "sha256": "81e7b4689ac37db97043a79b181524a5a0d3682934b740d566eb9fcac3367735",
+      "bytes": 191
+    },
+    {
+      "file": "blenderctl.ps1",
+      "sha256": "4f8a4f915df164310ae4c89586535db76bdc194d5230c5e848e2a31d8de86d6a",
+      "bytes": 865
+    },
+    {
+      "file": "CHANGELOG.md",
+      "sha256": "da613483c760cc66ee075bc49bbe97adb2237146b95881e78f857d10039b4adb",
+      "bytes": 2355
+    },
+    {
+      "file": "CONTRIBUTING.md",
+      "sha256": "e66af03ff334c28c3ad2ff8d4aaab55076c74f8788acea05ff96133646b9ec2d",
+      "bytes": 1638
+    },
+    {
+      "file": "docs/cli/examples/model-hard-surface.json",
+      "sha256": "38548bff507c7b1210b03dc4be6ed3ea93f1e9c09d87d679cb27928e8245f342",
+      "bytes": 5185
+    },
+    {
+      "file": "docs/cli/examples/render-cpu.json",
+      "sha256": "9da19e6d30a78aef0394968560b79b9c8c60692f9a1190770acadbc2d140334e",
+      "bytes": 420
+    },
+    {
+      "file": "docs/cli/examples/render-studio.json",
+      "sha256": "60275424ca30c10bde07d7d060bef3b6efebeeb5ea223b98fd7a43cb712cb32f",
+      "bytes": 1341
+    },
+    {
+      "file": "docs/cli/schemas/animation-sample-manifest.schema.json",
+      "sha256": "9c12357d5fbb5036c8cc3c6464cd088e3fc2a5c38f478231b47d5775ac420099",
+      "bytes": 1803
+    },
+    {
+      "file": "docs/cli/schemas/animation-sample-report.schema.json",
+      "sha256": "12d80ec641eee0c2dbc8723e3d0d01025670fefa00384124c6aa90b7a4aa3761",
+      "bytes": 5194
+    },
+    {
+      "file": "docs/cli/schemas/asset-record.schema.json",
+      "sha256": "0beaccf2e8031eb0ec91bd6cbe44749a3aa830e8f688852a42829679fb8c63d0",
+      "bytes": 5529
+    },
+    {
+      "file": "docs/cli/schemas/cache-policy.schema.json",
+      "sha256": "4489928f91885f78841755e33ce11d222b99e3c08da0b74eb211bcfe41f72f73",
+      "bytes": 746
+    },
+    {
+      "file": "docs/cli/schemas/compositing-batch-report.schema.json",
+      "sha256": "7c7ebedfaaf6748322093bb800657409955c33537ed66b91ac2aa48d380cd0b2",
+      "bytes": 11922
+    },
+    {
+      "file": "docs/cli/schemas/compositing-batch-request.schema.json",
+      "sha256": "19e4f8a221e310be916ea72c93b3acf6c5ea2badf228aec34e901bcecd6266a4",
+      "bytes": 253048
+    },
+    {
+      "file": "docs/cli/schemas/compositing-compact-result.schema.json",
+      "sha256": "931de88ab76c9c8611ff0bd0873b69c529cdf217d13dd4848762a59b82b73808",
+      "bytes": 31677
+    },
+    {
+      "file": "docs/cli/schemas/compositing-encode-request.schema.json",
+      "sha256": "b32b0d7b71a65e16aa70e7e27934c89735e6f7ca1213cb9d020d8449853fb85c",
+      "bytes": 33576
+    },
+    {
+      "file": "docs/cli/schemas/compositing-inspect-request.schema.json",
+      "sha256": "99d3e6fa65a79f7ed5b0c30980adc8313ecb9b85c3a629c44eccba89559abb3b",
+      "bytes": 1936
+    },
+    {
+      "file": "docs/cli/schemas/compositing-manifest.schema.json",
+      "sha256": "02ddb41bf7378878986388952bfcfcbca80eb5035314e83e6e4f60a289f39848",
+      "bytes": 148605
+    },
+    {
+      "file": "docs/cli/schemas/compositing-orchestration-compact-data.schema.json",
+      "sha256": "3df312ce50b2bfb3ff687a1e83dad911313572404b9c9c478f19273e8e2c4178",
+      "bytes": 3497
+    },
+    {
+      "file": "docs/cli/schemas/compositing-orchestration-compact-result.schema.json",
+      "sha256": "b3875f56f47a51ecdc999be5a0cb6bf79ac6e43481fb970aa34e3b7e5a436514",
+      "bytes": 4961
+    },
+    {
+      "file": "docs/cli/schemas/compositing-preview.schema.json",
+      "sha256": "a2ba64365cefb92ab55fefb6a677dca3ad5d6bf2eab1404eaa8198864895ff2c",
+      "bytes": 5833
+    },
+    {
+      "file": "docs/cli/schemas/compositing-report.schema.json",
+      "sha256": "5bbac0d8ccf2f135eb216040f49d8ad32170dffa98c887bd6fbce490b43bd0fe",
+      "bytes": 418831
+    },
+    {
+      "file": "docs/cli/schemas/compositing-run-request.schema.json",
+      "sha256": "4a9b37ec9334c1c8e23c3453418fd57f33009a15e427738759b918c16dd08df8",
+      "bytes": 193345
+    },
+    {
+      "file": "docs/cli/schemas/compositing-study-report.schema.json",
+      "sha256": "efb2d1226f8094ce4eff0fe54b7bea0baa34933ec78c9604e7c4cac44d5370a4",
+      "bytes": 12457
+    },
+    {
+      "file": "docs/cli/schemas/compositing-study-request.schema.json",
+      "sha256": "7505c41d142b7a433d53ec6c1742130b63aa412bcf65440c876fc9ab8f5dde2f",
+      "bytes": 209197
+    },
+    {
+      "file": "docs/cli/schemas/compositing-template-document.schema.json",
+      "sha256": "cb492aa52de0f563b8a53fd3b8e0329092c66f668e1e960ced978e67af0d1014",
+      "bytes": 12651
+    },
+    {
+      "file": "docs/cli/schemas/compositing-template-run-report.schema.json",
+      "sha256": "f49470c2727892f993646d3aa644ec2b06cc555a9babe475de5690b6f45ef6e5",
+      "bytes": 9038
+    },
+    {
+      "file": "docs/cli/schemas/compositing-template-run-request.schema.json",
+      "sha256": "096f0c3171661b7d24d3b0034f635067c36a1ce5db2b181d1f8f6a79ba778fe5",
+      "bytes": 32206
+    },
+    {
+      "file": "docs/cli/schemas/compositing-template-save-report.schema.json",
+      "sha256": "61af47d01fe5f072f148028192124eb327e763d6fe6b4bd992327b7eb901ee79",
+      "bytes": 7734
+    },
+    {
+      "file": "docs/cli/schemas/compositing-template-save-request.schema.json",
+      "sha256": "fff9ae54c86adfb2813577188fa5b2b2b26facae853f8d4545673b352cb44354",
+      "bytes": 1283
+    },
+    {
+      "file": "docs/cli/schemas/dependency-audit.schema.json",
+      "sha256": "5892bab71e695c2e6ac02b27a16fed6a2713c3ec97b001f53d36d8520766df35",
+      "bytes": 4153
+    },
+    {
+      "file": "docs/cli/schemas/dependency-closure.schema.json",
+      "sha256": "b8a27ad8b1061c67de817c56bb17d94f0da743c68cd555cae65d13519cc9df7e",
+      "bytes": 14216
+    },
+    {
+      "file": "docs/cli/schemas/dependency-relink-manifest.schema.json",
+      "sha256": "ace6147dc924e81bdb38ca357bc1fb0d405fa2cf977792410ae6534e05660d46",
+      "bytes": 2212
+    },
+    {
+      "file": "docs/cli/schemas/dependency-relink-plan.schema.json",
+      "sha256": "d7a5c9305c6fd045d4dc93a476a404a66891aec5defe27449ddc68f915e68297",
+      "bytes": 17705
+    },
+    {
+      "file": "docs/cli/schemas/dependency-relink-report.schema.json",
+      "sha256": "feb9b515316e04530b830d496b2efb832592e5365929abcc4033b77c890e0225",
+      "bytes": 4616
+    },
+    {
+      "file": "docs/cli/schemas/driver-audit.schema.json",
+      "sha256": "eed81170fe24b07d058767e6dc199a81f752615cae8e3b35b745eac628d02967",
+      "bytes": 1764
+    },
+    {
+      "file": "docs/cli/schemas/driver-profile.schema.json",
+      "sha256": "8f3d9ddef9f56aa3c3f6e764a92e752aa31115ffe5419f902bc3776f0e09c4c7",
+      "bytes": 866
+    },
+    {
+      "file": "docs/cli/schemas/exchange-analysis-report.schema.json",
+      "sha256": "4c20d74f18925de181188aaa7b67b110696d4b9a97cca155745b7e8d6b82353e",
+      "bytes": 10675
+    },
+    {
+      "file": "docs/cli/schemas/exchange-analyze-manifest.schema.json",
+      "sha256": "07d9c9492336561cf3b9cc8c9c397b9e2418460849af754ce0a0e1b424a23ca6",
+      "bytes": 1939
+    },
+    {
+      "file": "docs/cli/schemas/exchange-batch-report.schema.json",
+      "sha256": "0059f0851941a6fd4708596a6eeb95d75be160295aaef8ff97466669c28a4818",
+      "bytes": 52797
+    },
+    {
+      "file": "docs/cli/schemas/exchange-checks.schema.json",
+      "sha256": "51115c102cfe124bd05da65ea05ca3bf1f627d01c3e75d3c7650014a11e3bea8",
+      "bytes": 2670
+    },
+    {
+      "file": "docs/cli/schemas/exchange-convert-manifest.schema.json",
+      "sha256": "673d9124bebb40298a57b6c957ec7714cd8c390691066d43bad26fe3ff747805",
+      "bytes": 7767
+    },
+    {
+      "file": "docs/cli/schemas/exchange-export-manifest.schema.json",
+      "sha256": "1da6979af72e2d0f64e54f791021990bb410627f72e8d39a2968813fc073cdfb",
+      "bytes": 8595
+    },
+    {
+      "file": "docs/cli/schemas/exchange-import-manifest.schema.json",
+      "sha256": "b78d508d2d095ad37647f49b9e0ddd7734568b357ea7fbd2566d8474869f5501",
+      "bytes": 2890
+    },
+    {
+      "file": "docs/cli/schemas/exchange-report.schema.json",
+      "sha256": "531adde8d887bcfc86cc9ed6340e2ec89bacedac83affc7124961895b7593909",
+      "bytes": 42714
+    },
+    {
+      "file": "docs/cli/schemas/exchange-samples.schema.json",
+      "sha256": "afd62821b8a4a92924ee27231148385b44ff9db61d051f9b459948e6dd3dfb4f",
+      "bytes": 2387
+    },
+    {
+      "file": "docs/cli/schemas/execution-contract.schema.json",
+      "sha256": "6ab79463896df95d6acabbaa1d790ded61d059afa0c76e95d6ad54a20b366125",
+      "bytes": 24846
+    },
+    {
+      "file": "docs/cli/schemas/extension-approval-receipt.schema.json",
+      "sha256": "5440210d27bf85e8077e2b27300f0cca972c21868238ed72f1268a6aae7f75d1",
+      "bytes": 1662
+    },
+    {
+      "file": "docs/cli/schemas/extension-approve-manifest.schema.json",
+      "sha256": "98e85f85ee10442a024a562d483b31ba7ee51715bbd9bb02b89b96f001d818bf",
+      "bytes": 943
+    },
+    {
+      "file": "docs/cli/schemas/extension-report.schema.json",
+      "sha256": "ab185ae81cdd0c899830d65057b753dd8aac91836f7f752bd010fcaa7eb26adf",
+      "bytes": 16426
+    },
+    {
+      "file": "docs/cli/schemas/extension-review-manifest.schema.json",
+      "sha256": "30af54b385ac454615df6b6b0feb7ee965354c1577ed86b984b6f89d1c21514a",
+      "bytes": 3442
+    },
+    {
+      "file": "docs/cli/schemas/extension-review.schema.json",
+      "sha256": "cece77ada36407d4a758c64e01f2421ef77be6b19e4ce1787393b1e2a07c9ea9",
+      "bytes": 5627
+    },
+    {
+      "file": "docs/cli/schemas/extension-run-manifest.schema.json",
+      "sha256": "a0d40d7bb7af07bc3be667231c523cd16a7dd02fc3e5cc1d12fb906a58bc5a19",
+      "bytes": 1570
+    },
+    {
+      "file": "docs/cli/schemas/extension-script-manifest.schema.json",
+      "sha256": "bb6c1537c8c5e70c5583624923191885ee3ec4960956843361cb2c9cbfa144d5",
+      "bytes": 1614
+    },
+    {
+      "file": "docs/cli/schemas/extension-star-manifest.schema.json",
+      "sha256": "efe52672bef7d8ec07a2350704d682e6fc2df584788a497f7ec5b1addeb0571c",
+      "bytes": 861
+    },
+    {
+      "file": "docs/cli/schemas/geometry-cache-manifest.schema.json",
+      "sha256": "72d4eec8492952d08e8319b3c9bef11cf8e95d52a403a443673bd52446dc9d76",
+      "bytes": 13898
+    },
+    {
+      "file": "docs/cli/schemas/geometry-compact-result.schema.json",
+      "sha256": "ef06b154e16fec6eaa550346c89d6a7ea4ea2eefebbb4d37f337318ce0c87b60",
+      "bytes": 2254
+    },
+    {
+      "file": "docs/cli/schemas/geometry-inspect-request.schema.json",
+      "sha256": "d6a46f1f2b025d2f4b4ed26de3f010662ea53ecfa9be71747e3ffd34465ac84f",
+      "bytes": 4409
+    },
+    {
+      "file": "docs/cli/schemas/geometry-operation-report.schema.json",
+      "sha256": "ed95cb73ac537bacdbf9aeface2bc5b7283e95fedad3595cc2f0b14d04446414",
+      "bytes": 11632
+    },
+    {
+      "file": "docs/cli/schemas/geometry-run-request.schema.json",
+      "sha256": "d5b2bcbabd6272987171d59f0f70ba9c056b977087252d9a9986faa56d6222c7",
+      "bytes": 40174
+    },
+    {
+      "file": "docs/cli/schemas/geometry-workflow-manifest.schema.json",
+      "sha256": "760579c0a696980fa74040ca24e8f35b96c339b1dce5530c9c0d227101d7a48d",
+      "bytes": 26074
+    },
+    {
+      "file": "docs/cli/schemas/geometry-workflow-report.schema.json",
+      "sha256": "2b2174375a7ab5886975d8703285992ebfe9dbe79004b6b82a504a4ba1de5fd9",
+      "bytes": 71629
+    },
+    {
+      "file": "docs/cli/schemas/hair-report.schema.json",
+      "sha256": "ec35b6bcbdfe9bb99a10b9936532bc35f15f680f6782bec14ecfa6cb9763f00f",
+      "bytes": 10403
+    },
+    {
+      "file": "docs/cli/schemas/hair-samples.schema.json",
+      "sha256": "c069f4b57e61c9d71a6918f18558ec0e2f387fccfab276009624c37de76c58cf",
+      "bytes": 7896
+    },
+    {
+      "file": "docs/cli/schemas/job-resources.schema.json",
+      "sha256": "9c6c3054a9b2948d9725557efcff6cc2edea4df15b57b3ac6c52075aff79a320",
+      "bytes": 1639
+    },
+    {
+      "file": "docs/cli/schemas/lighting-batch-request.schema.json",
+      "sha256": "2f0d5240b4c6d0118b235aabd912b971b376f501f662521b7c2716aac3585ab7",
+      "bytes": 32710
+    },
+    {
+      "file": "docs/cli/schemas/lighting-inspect-request.schema.json",
+      "sha256": "bdb9ecf90f649dd255f485ba33493e0b241300b2168b3fe2f63efe96d2dae780",
+      "bytes": 1325
+    },
+    {
+      "file": "docs/cli/schemas/lighting-manifest.schema.json",
+      "sha256": "91dbc19cf01212606326afa5d5ec3204050b952828e35db68bf8d97c8a559126",
+      "bytes": 14458
+    },
+    {
+      "file": "docs/cli/schemas/lighting-run-request.schema.json",
+      "sha256": "f0ca158d4e116de37c9f4dd17811c00904149ef60c7a2136b173e0a9ea1b65dc",
+      "bytes": 22831
+    },
+    {
+      "file": "docs/cli/schemas/lighting-target.schema.json",
+      "sha256": "b15c754c50f4ea9ecb45c108568f22e19fa70f5114c82ec6b5edd985d53bb56d",
+      "bytes": 1518
+    },
+    {
+      "file": "docs/cli/schemas/lighting-template-edit-request.schema.json",
+      "sha256": "0ef28b12ef254ffed092c1b465ca4e34b2ad23b825cba62f3d736402c5de7839",
+      "bytes": 27794
+    },
+    {
+      "file": "docs/cli/schemas/lighting-template-save-request.schema.json",
+      "sha256": "0a22b29be9dd06282af6a26a22ea07c3f4f98ad9c35ed4a2204c99b6b3a145b1",
+      "bytes": 1588
+    },
+    {
+      "file": "docs/cli/schemas/lighting-template.schema.json",
+      "sha256": "2ec6149a4af7d16ea8e5c4d81ef67e7c48ebba2a5a1442685c1e1c5ddbfeb0fa",
+      "bytes": 20738
+    },
+    {
+      "file": "docs/cli/schemas/link-manifest.schema.json",
+      "sha256": "fa53f43c753e3783707876543eea54f9cb248fc9dfa742393d42b64aafa3021c",
+      "bytes": 3032
+    },
+    {
+      "file": "docs/cli/schemas/link-report.schema.json",
+      "sha256": "5ef6b3f67643174d44da8c43f67cf44b186b71b0e82f3346a8dccd3679237672",
+      "bytes": 41885
+    },
+    {
+      "file": "docs/cli/schemas/material-batch-manifest.schema.json",
+      "sha256": "d59b2b3c0882b0247752ae16959c07e0b51f3a8ce5782eafabe59132e21b65cc",
+      "bytes": 29769
+    },
+    {
+      "file": "docs/cli/schemas/material-batch-report.schema.json",
+      "sha256": "45421f632148bec9a67f2663cd57f205c45757cfd026adc261e2c108d4715a2c",
+      "bytes": 43876
+    },
+    {
+      "file": "docs/cli/schemas/material-batch-request.schema.json",
+      "sha256": "f78fa23303b653423eb5901bc4feee6b77295c67dac3cf758a3164645c0c91ad",
+      "bytes": 1954
+    },
+    {
+      "file": "docs/cli/schemas/material-compact-result.schema.json",
+      "sha256": "67132fca3f5201345bc3632f35a0832676b208fb20f3e753bcff0d7e77ce9c10",
+      "bytes": 1263
+    },
+    {
+      "file": "docs/cli/schemas/material-run-request.schema.json",
+      "sha256": "97ebf5c3b4730003e32751d1e093652137e94fb95eee532d7b130270e956ae98",
+      "bytes": 2772
+    },
+    {
+      "file": "docs/cli/schemas/material-study-report.schema.json",
+      "sha256": "80ced5ff5c12e7480bbf2707941f3a519183e57ec04b147ff907b5fc4fed2494",
+      "bytes": 8041
+    },
+    {
+      "file": "docs/cli/schemas/material-study-request.schema.json",
+      "sha256": "2ba0603cbf2e9c53f5a8f3dd6acd22a5f99dad80dd7702869d9a8e6503cdd04e",
+      "bytes": 11095
+    },
+    {
+      "file": "docs/cli/schemas/material-template-save-request.schema.json",
+      "sha256": "23a18b1e9f98180ca7bf973a7434d7bc56ecc0db8ad053bad10afca3e666b239",
+      "bytes": 2124
+    },
+    {
+      "file": "docs/cli/schemas/material-workflow-bindings.schema.json",
+      "sha256": "c160c2dff0ec1164969d81ed1adc53cf3ccf19fd8401cd36648f58e081f85123",
+      "bytes": 8989
+    },
+    {
+      "file": "docs/cli/schemas/material-workflow-manifest.schema.json",
+      "sha256": "a2961bf37055fca304ac6d3a18aba47bdd5fb260afbf7a4706572ec12b38df97",
+      "bytes": 73529
+    },
+    {
+      "file": "docs/cli/schemas/material-workflow-report.schema.json",
+      "sha256": "0fa70ba5c5d48bacb668c08a0586c6592ef16ea1f3b605411ac634ec8ee3bdaa",
+      "bytes": 8731
+    },
+    {
+      "file": "docs/cli/schemas/material-workflow-template-report.schema.json",
+      "sha256": "c5892402c6c09a7243db643a4324f2b5918c44cb02a9504b2d6be8343102062f",
+      "bytes": 2742
+    },
+    {
+      "file": "docs/cli/schemas/material-workflow-template.schema.json",
+      "sha256": "2663719313ec6c67f9185577d0f6f9114f5f58cfc948e0b8786a485f5e6ad97e",
+      "bytes": 17932
+    },
+    {
+      "file": "docs/cli/schemas/media-export-manifest.schema.json",
+      "sha256": "a8a627c77ebfebaf7c3fa8fb203d784bad97f13b952719147a7164482017a7f5",
+      "bytes": 1249
+    },
+    {
+      "file": "docs/cli/schemas/media-export-report.schema.json",
+      "sha256": "243376e02321dc44cf3cd127bbb2cea00b00ed25ba3620c8d77893fb946be045",
+      "bytes": 6169
+    },
+    {
+      "file": "docs/cli/schemas/media-manifest.schema.json",
+      "sha256": "6e6de4c288f884e6ff350cd4d5b5042a3208a5cb0d2714aaf6836330aa76a994",
+      "bytes": 8180
+    },
+    {
+      "file": "docs/cli/schemas/media-report.schema.json",
+      "sha256": "0751dd7ff2b7afb0c29a0ccb7daf7ba6af1c5a3d47acdf387409b52ba6406d07",
+      "bytes": 3036
+    },
+    {
+      "file": "docs/cli/schemas/model-evaluation-reopen.schema.json",
+      "sha256": "bbebe0fdbdea87af74d95c6cb3b624ca6fb10114acbe605f929bfd0ccf876bb1",
+      "bytes": 1660
+    },
+    {
+      "file": "docs/cli/schemas/model-manifest.schema.json",
+      "sha256": "4b58df1106c2f1511b4b55f40bd9afff110da9c162f43c098a7df7b36533dafe",
+      "bytes": 93618
+    },
+    {
+      "file": "docs/cli/schemas/model-report.schema.json",
+      "sha256": "8392509c1467ed09c9fd2879a0ae161fd18d2961816c11ffbc38c7753f49b0f4",
+      "bytes": 3357
+    },
+    {
+      "file": "docs/cli/schemas/node-manifest.schema.json",
+      "sha256": "2b8503460e087560dbee20caa4cf22663d1fc969790a6a28693e4d74cf32a481",
+      "bytes": 133059
+    },
+    {
+      "file": "docs/cli/schemas/node-report.schema.json",
+      "sha256": "67c25c509fda368249820c1316dde025418363d2f5d5a4635c3d0ca6b0867211",
+      "bytes": 11295
+    },
+    {
+      "file": "docs/cli/schemas/override-manifest.schema.json",
+      "sha256": "f456e5407f2e0e049a0b4b807f2486e0b0e5e4f931d860e9eb6bbef6d9e4d393",
+      "bytes": 4143
+    },
+    {
+      "file": "docs/cli/schemas/override-receipt.schema.json",
+      "sha256": "31fed771d42122cfe2c31100ae4787f840dcd1ef54e56b3b35c062d40a211378",
+      "bytes": 18452
+    },
+    {
+      "file": "docs/cli/schemas/override-resync-manifest.schema.json",
+      "sha256": "67b8916f4978ae3759a2a2d15a1e0f962a8f330f7c16b46a51ddbf925f8168b6",
+      "bytes": 1510
+    },
+    {
+      "file": "docs/cli/schemas/package-policy.schema.json",
+      "sha256": "f4e3c9151e54ebce2fe903dc5dd5e9648c88ee808608c66651124d6581fd10a4",
+      "bytes": 355
+    },
+    {
+      "file": "docs/cli/schemas/pipeline-manifest.schema.json",
+      "sha256": "5603af7bd887858720e8c35ce9a6524c9c58bef8cb3bdf4fdae672ebf4883ce8",
+      "bytes": 6066
+    },
+    {
+      "file": "docs/cli/schemas/pipeline-report.schema.json",
+      "sha256": "84acbe9a6d1bc5c4f74a82be33f66e3cd7a17d93448e294ca9e58f89269786f2",
+      "bytes": 15662
+    },
+    {
+      "file": "docs/cli/schemas/pipeline-runtime.schema.json",
+      "sha256": "b1d50d064645357eb91c11713463afcd88a83f88b67c9df4ef50a0829d98b5e7",
+      "bytes": 1411
+    },
+    {
+      "file": "docs/cli/schemas/preview-batch-manifest.schema.json",
+      "sha256": "e56e18a2cd399d0ca06da4b9a1f9e4858921cd1a4eefde60cff949be15e5516e",
+      "bytes": 13734
+    },
+    {
+      "file": "docs/cli/schemas/preview-batch-report.schema.json",
+      "sha256": "7bfbfb6a146a178a86e58c169952bf6fe78170c119633a528c0d3ab20280d7cc",
+      "bytes": 2502
+    },
+    {
+      "file": "docs/cli/schemas/preview-manifest.schema.json",
+      "sha256": "6f7c0b1720f6db820682dfabc30de8394b37c0aec62456f9d23589ef61291faf",
+      "bytes": 3966
+    },
+    {
+      "file": "docs/cli/schemas/preview-receipt.schema.json",
+      "sha256": "bad22152980596fb0aee241b6447190363a99c0edb26df83a3c574301c484380",
+      "bytes": 2424
+    },
+    {
+      "file": "docs/cli/schemas/preview-report.schema.json",
+      "sha256": "84c376a9f0f7f6f0d098bc30189fd2cedb7a5818cff52af1dcf49afcb1aee85e",
+      "bytes": 2091
+    },
+    {
+      "file": "docs/cli/schemas/project-copy-manifest.schema.json",
+      "sha256": "cf5fecb50630c1f5abef4ecfbc9ffb22baa539e554c960f92b1a102ce3c5eba4",
+      "bytes": 536
+    },
+    {
+      "file": "docs/cli/schemas/project-report.schema.json",
+      "sha256": "aea37a6b03e78c4b533d08f4843afaec2b118006b2dcaf4b38c9fd83f1bb1b5c",
+      "bytes": 5975
+    },
+    {
+      "file": "docs/cli/schemas/render-manifest.schema.json",
+      "sha256": "9e580315ecf354e858b811ce9b67535afad83311f713c2b76bb81d1f276aa2d8",
+      "bytes": 3423
+    },
+    {
+      "file": "docs/cli/schemas/render-report.schema.json",
+      "sha256": "c037be1655f91e84760d9184e315a87678b51f673c6fce0f59be339438ad0567",
+      "bytes": 8243
+    },
+    {
+      "file": "docs/cli/schemas/render-run-request.schema.json",
+      "sha256": "e7b9e6be65672d3136bda77b5bff11e19599ff51a11894a1627f41c5e00d989c",
+      "bytes": 7035
+    },
+    {
+      "file": "docs/cli/schemas/request.schema.json",
+      "sha256": "c2e7dd63235ab1b4fbb912812ebebae90c08aa705c11a9407f4a81b0ff634b3b",
+      "bytes": 1231264
+    },
+    {
+      "file": "docs/cli/schemas/resource-budget.schema.json",
+      "sha256": "1bca7b345d7410d4b2bbc822b4021849bb390321253c04e411721427762d8639",
+      "bytes": 489
+    },
+    {
+      "file": "docs/cli/schemas/result.schema.json",
+      "sha256": "aab25154c85945ef1e38230d7f4dba0ff20800752b634f48a06be1670b27e0c3",
+      "bytes": 232302
+    },
+    {
+      "file": "docs/cli/schemas/rig-adapter-report.schema.json",
+      "sha256": "0d3e7b2ca686dc283c3a018c2fe1165a96c1bdac9d1808d684065e4ea2b88ad4",
+      "bytes": 8169
+    },
+    {
+      "file": "docs/cli/schemas/rig-manifest.schema.json",
+      "sha256": "fe50b95d525e7a4481ecb5c9228ac58691a1e1a85b9f87f152309b4a41c8b03b",
+      "bytes": 172133
+    },
+    {
+      "file": "docs/cli/schemas/rig-package-manifest.schema.json",
+      "sha256": "d757e4e7623e94535d4707c33a26c8306d2ea26973d05b0774ee9feffedc2a52",
+      "bytes": 1150
+    },
+    {
+      "file": "docs/cli/schemas/rig-package-report.schema.json",
+      "sha256": "4aabc7c94af3fe0b359dfd1aecbebc5288cc1e2128b3f2bfd1b910ac4b5f13d4",
+      "bytes": 8692
+    },
+    {
+      "file": "docs/cli/schemas/rig-profile.schema.json",
+      "sha256": "c68be70ab3b44faea00baf5f95e64d66819ba027dbaf1aa70a5bc2faf7f5039c",
+      "bytes": 7262
+    },
+    {
+      "file": "docs/cli/schemas/rig-report.schema.json",
+      "sha256": "93fe064e3ebffbe6edc37db8fe1c270cd8ff31e62344b48f8e46945206198f7b",
+      "bytes": 19929
+    },
+    {
+      "file": "docs/cli/schemas/scene-manifest.schema.json",
+      "sha256": "d0c5ca72aa8e23d56a45a42c3f99bc94782ef28c970ed66ecf03565367c7ec30",
+      "bytes": 29261
+    },
+    {
+      "file": "docs/cli/schemas/scene-report.schema.json",
+      "sha256": "59de5cadca1a702d8404599a373d5a874067c57ea48a7dfccfcbcb13bae09332",
+      "bytes": 1635
+    },
+    {
+      "file": "docs/cli/schemas/sculpt-replay-manifest.schema.json",
+      "sha256": "cf3b8fba72b480670bfcaac4a38e14a47d1900a0d25dbf209b90d955638bc81f",
+      "bytes": 3450
+    },
+    {
+      "file": "docs/cli/schemas/sculpt-replay-report.schema.json",
+      "sha256": "e84695b7f3fb76f6397573b52efe65dd723491517f11ade60749c602ddbb95be",
+      "bytes": 2806
+    },
+    {
+      "file": "docs/cli/schemas/sculpt-review-manifest.schema.json",
+      "sha256": "72dfe0a56b6bcf3f38ab137e26d99e0fddee9c45d7283201f227123227c86645",
+      "bytes": 1260
+    },
+    {
+      "file": "docs/cli/schemas/sculpt-review.schema.json",
+      "sha256": "1101e94ef783f94929164968174c2c4cd89458d9ad749c43eee6d5c2848a62a2",
+      "bytes": 4387
+    },
+    {
+      "file": "docs/cli/schemas/simulation-bake-manifest.schema.json",
+      "sha256": "c0e4620e8ee49ce163163a12a0c8c6e55616c6fc5216d37eb5a8971c0e62c137",
+      "bytes": 5351
+    },
+    {
+      "file": "docs/cli/schemas/simulation-manifest.schema.json",
+      "sha256": "296fba11a8a903b69c2fe334bed84ddd01dbc43d60a47c93e9dc2ff672d119f9",
+      "bytes": 132937
+    },
+    {
+      "file": "docs/cli/schemas/simulation-receipt.schema.json",
+      "sha256": "0e1543a62ab4d5bad6debf333469494c6f85d920ee703cab6d9d449382de1c68",
+      "bytes": 56921
+    },
+    {
+      "file": "docs/cli/schemas/simulation-report.schema.json",
+      "sha256": "a534e75df5fdbf651a78d1db4494cd16aeada71a12fce349333eb1088f07334e",
+      "bytes": 5189
+    },
+    {
+      "file": "docs/cli/schemas/simulation-samples.schema.json",
+      "sha256": "b9216c191d07f45a1223b7f055130469de23fae722e22899ac400c24dfa28994",
+      "bytes": 3292
+    },
+    {
+      "file": "docs/cli/schemas/snapshot.schema.json",
+      "sha256": "156edd3db4fe36a46d70b812fedf1925551d15e7c713acbee98d15d4a1bb72da",
+      "bytes": 7695
+    },
+    {
+      "file": "docs/cli/schemas/tracking-input.schema.json",
+      "sha256": "49ac608faabae5684bd76c2c88e98d4b99f367f7bab022068ede166efa3c8937",
+      "bytes": 2377
+    },
+    {
+      "file": "docs/cli/schemas/tracking-observation.schema.json",
+      "sha256": "27c27bada9177a6295eb8be3d0d364e3302116b965df672a4a7423e17962a44c",
+      "bytes": 3152
+    },
+    {
+      "file": "docs/cli/schemas/tracking-prepare-manifest.schema.json",
+      "sha256": "65c98fbb80cd8bedf7c2ccdcc1a3d5937f936976f6c0649034f76550785056b2",
+      "bytes": 12075
+    },
+    {
+      "file": "docs/cli/schemas/tracking-quality.schema.json",
+      "sha256": "b2bc152cd59a1d61f7f6d3dfbcb2dcd9d28b6f198d6ae042882d94ce89060a5d",
+      "bytes": 5226
+    },
+    {
+      "file": "docs/cli/schemas/tracking-report.schema.json",
+      "sha256": "16a479aef2ce395045cd9988538e0c0229bbfe4d73b380ab0056884824d51579",
+      "bytes": 3708
+    },
+    {
+      "file": "docs/cli/schemas/tracking-resources.schema.json",
+      "sha256": "346deee379cbc8b52f76e34d0cb654f4b50515040762a708b8be53431940aa9b",
+      "bytes": 604
+    },
+    {
+      "file": "docs/cli/schemas/tracking-review.schema.json",
+      "sha256": "d0ca8813d0f41b960e311dc915d1119e5c3d3197dfb504269af9700789e6789d",
+      "bytes": 2635
+    },
+    {
+      "file": "docs/cli/schemas/tracking-solve-manifest.schema.json",
+      "sha256": "472195797c2a8a2f6ccd3d515d4d97a4605ddfb05262eca65a65a74126cd7029",
+      "bytes": 1945
+    },
+    {
+      "file": "docs/cli/schemas/transaction-plan.schema.json",
+      "sha256": "370d977832899b01281c30bcfd7de7f7aba7f318152291860e714941db1a673b",
+      "bytes": 49727
+    },
+    {
+      "file": "docs/cli/schemas/uv-layout-report.schema.json",
+      "sha256": "da5891ee8b050fafa38a96cedcfe081200ac1df1686e16df38da052d5d52600b",
+      "bytes": 7720
+    },
+    {
+      "file": "docs/cli/schemas/validation-profile.schema.json",
+      "sha256": "71f218f24c3a6c9ebb543830f44c8854010798b397f67bfbef6f6285f540cf2f",
+      "bytes": 8972
+    },
+    {
+      "file": "docs/cli/schemas/validation.schema.json",
+      "sha256": "c6be1f4f2e3203e952862d99691a07f038a8abea2eb8e61c61d6a147f0837190",
+      "bytes": 1286
+    },
+    {
+      "file": "docs/cli/schemas/video-inspect-params.schema.json",
+      "sha256": "bd0aed9f2b9f4f2b76ddad653d1237ef22204b87c24acd74275dbf6877a58738",
+      "bytes": 1816
+    },
+    {
+      "file": "docs/cli/schemas/video-manifest.schema.json",
+      "sha256": "d2427cffdab8b3a30b302807f20e6be768e114ce5ee953697c397597c259e9b9",
+      "bytes": 113589
+    },
+    {
+      "file": "docs/cli/schemas/video-output.schema.json",
+      "sha256": "c3231c92c6ac1725b716c9c645bc16e871e80583ded5a9d9cb6d2d72811fdaf7",
+      "bytes": 7748
+    },
+    {
+      "file": "docs/cli/schemas/video-run-params.schema.json",
+      "sha256": "a4d179e92e62521f9af8ed2271da93e146f550456e0419c1b6e4a437826ab099",
+      "bytes": 135548
+    },
+    {
+      "file": "docs/cli/schemas/workflow-acceptance-recipe.schema.json",
+      "sha256": "c3476c9ca3f5a7b20ce32cea7a6e6d020a684fa7f478158c77b2cf200755fb62",
+      "bytes": 4243
+    },
+    {
+      "file": "docs/cli/schemas/workflow-manifest.schema.json",
+      "sha256": "1eb6eb4369c8b956534940b26fdf38a4fd0385c799f0d4f4e8789dbfbadaa609",
+      "bytes": 6118
+    },
+    {
+      "file": "docs/cli/schemas/workflow-preflight-request.schema.json",
+      "sha256": "353a3637e5215c90582c1bfe4315e22e98c24e5de604190acc908c269421c11a",
+      "bytes": 701
+    },
+    {
+      "file": "docs/cli/schemas/workflow-resume-request.schema.json",
+      "sha256": "3e494cd16c2371b7e91fbc00264b3d13d0aaae7007f0919e9a88bff11ed72c2b",
+      "bytes": 617
+    },
+    {
+      "file": "docs/cli/schemas/workflow-run-request.schema.json",
+      "sha256": "9c0b6650e2ad0a4de80bb11bd061d86ee2b67666b7e90477991a7186a385d3e4",
+      "bytes": 8517
+    },
+    {
+      "file": "docs/cli/schemas/zone-cache-samples.schema.json",
+      "sha256": "c4495be47d6471b63effabaf3bbc9f0bbac95505aed2eec7b0242ca3680f85c9",
+      "bytes": 3039
+    },
+    {
+      "file": "docs/CLI_REFERENCE.md",
+      "sha256": "f8317a7c2f896e87a6411f9fcaf2f766f7ffa776adc72ad7a237ea13c836578d",
+      "bytes": 3099
+    },
+    {
+      "file": "docs/COMPATIBILITY.md",
+      "sha256": "68b0e0e3d24d0d9bd8b8a0665c7e63bfbffaaa4037a22497ff9a4a38ee8e8a9a",
+      "bytes": 1710
+    },
+    {
+      "file": "docs/GETTING_STARTED.md",
+      "sha256": "42523388ac0a925825234919e7986fb329160f082727e682f306f274ce7f5cbb",
+      "bytes": 3697
+    },
+    {
+      "file": "docs/MATERIAL_WORKFLOW.md",
+      "sha256": "69af8711020be426cdd0d5184b83f9962cd35bb70449b5f0dafeaec8a6b0ab60",
+      "bytes": 5032
+    },
+    {
+      "file": "docs/RELEASE_VERIFICATION.md",
+      "sha256": "5d45bd1f3465eec47249d3b7969162b673ccf917f686d3b5243e3635c3bbcb94",
+      "bytes": 3546
+    },
+    {
+      "file": "docs/SKILLS.md",
+      "sha256": "dc5a420d31bce37b0eabc03a8b34dfd917de5ed3ae636a1fce91674fd975d80b",
+      "bytes": 4899
+    },
+    {
+      "file": "docs/VALIDATION.md",
+      "sha256": "b91a562366c473aa9f4d919a2b2422295300dd66944424ae28a333f1d5cb9c9b",
+      "bytes": 2325
+    },
+    {
+      "file": "docs/VIDEO-EDITING.md",
+      "sha256": "19942aaaa8ad6cac8b5d5eb324aae760d7577a1d06cf00aa05241d9ab0b59562",
+      "bytes": 5702
+    },
+    {
+      "file": "examples/create_fixture.py",
+      "sha256": "178ca315c362059e990936d3488b95a879d8d29ad7fe5b4cef5d9e9b8d61565e",
+      "bytes": 658
+    },
+    {
+      "file": "examples/make_input.py",
+      "sha256": "f97e9708ab328fe65ab6d9eb96f7dc75270d981e438e636f6e7a5ee45bd0b92d",
+      "bytes": 1376
+    },
+    {
+      "file": "LICENSE",
+      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
+      "bytes": 35821
+    },
+    {
+      "file": "README.md",
+      "sha256": "9a63dd39de7f10729d3640fa3c6d2c3522872fa213be05c2fea417664d690c80",
+      "bytes": 5042
+    },
+    {
+      "file": "README.zh-CN.md",
+      "sha256": "1d2d4ab0fd716922472ebcd4fd59bb069b3d27e9bd8ae081941589271638f760",
+      "bytes": 3880
+    },
+    {
+      "file": "RELEASE-VALIDATION.json",
+      "sha256": "d6bf2a03d3826442c5d2061811c111352fd25e359e835588b1113c892b2a381c",
+      "bytes": 2056
+    },
+    {
+      "file": "scripts/build_release.py",
+      "sha256": "877b8b9dc53804c81826d499b00a351202751875b218a4c1b109b32f1dc594b7",
+      "bytes": 3808
+    },
+    {
+      "file": "scripts/check_release.py",
+      "sha256": "ca8a4c8457dc32649484be85572ed08432fa2cfbe404dc1a2892bb29ec53fe02",
+      "bytes": 84
+    },
+    {
+      "file": "scripts/check_skills.py",
+      "sha256": "99f3b0898e71c992e1d33b7d2b80a72eb38670d196812fccd0975635fffeb8b0",
+      "bytes": 3707
+    },
+    {
+      "file": "scripts/install_skills.py",
+      "sha256": "5ba1c8a1e9791d0c6fd70539dd55e7faaf569f3690277883e51a227752efd6a4",
+      "bytes": 2783
+    },
+    {
+      "file": "scripts/verify_release.py",
+      "sha256": "36dca465e34dce74d7a8f1e3a6c6149e17235fb632d28b9d59fda2683a344c80",
+      "bytes": 4706
+    },
+    {
+      "file": "SECURITY.md",
+      "sha256": "8d23e727f2f24ba94ac90d44e25d4117230a3891bb48b89fc87684dbc5cb14af",
+      "bytes": 1264
+    },
+    {
+      "file": "skills/blender-asset-manager/agents/openai.yaml",
+      "sha256": "4d467e7f1d84f2d98428e55e1b1160587ccf01013f6ef3c80ad9cd95f13a6888",
+      "bytes": 334
+    },
+    {
+      "file": "skills/blender-asset-manager/assets/templates/acceptance.md",
+      "sha256": "d286ad3d99441e459e86dad17c606cf5be6c9196ef6e7229b327b124fb464274",
+      "bytes": 985
+    },
+    {
+      "file": "skills/blender-asset-manager/assets/templates/asset-record.json",
+      "sha256": "b171b0fa1269b3d2a9a709132ee5166d8a83526f6591259c3657fb411321ca57",
+      "bytes": 1066
+    },
+    {
+      "file": "skills/blender-asset-manager/assets/templates/change-batch.md",
+      "sha256": "18e9b5a5113937d188de3a7b5c5eae20b834dc5adad2cfb41b7995a0c0b3d3aa",
+      "bytes": 945
+    },
+    {
+      "file": "skills/blender-asset-manager/assets/templates/migration-map.csv",
+      "sha256": "ce86e0f4409c19ed6b5a8d67b4ba4ee571e727c5d35774a82946c9c29e5bab0e",
+      "bytes": 179
+    },
+    {
+      "file": "skills/blender-asset-manager/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-asset-manager/references/asset-standard.md",
+      "sha256": "c8c6c6f1d8924b2c759058a17b90dfff5ec174b7248b82a0c9a8f0d6e765378a",
+      "bytes": 11126
+    },
+    {
+      "file": "skills/blender-asset-manager/references/catalog-and-execution.md",
+      "sha256": "1e26ccf468125772e3371c2f73a6ad36c35d585cdca9662b5853897f8b693197",
+      "bytes": 5460
+    },
+    {
+      "file": "skills/blender-asset-manager/references/classification-and-naming.md",
+      "sha256": "33333b4d832d800fce9886b0b1d34e824ac42b61e2afe0e52229322294efbaa5",
+      "bytes": 5447
+    },
+    {
+      "file": "skills/blender-asset-manager/references/project-evidence.md",
+      "sha256": "0e0ebd93b694297325fd2964c144d189f920a572816cd86943c320bb986dc7b8",
+      "bytes": 1089
+    },
+    {
+      "file": "skills/blender-asset-manager/scripts/check_names.py",
+      "sha256": "2fbeeee6d2c264dce267eb8d9297d1f3ef08f23dffcf2c3695b34f9da127b8eb",
+      "bytes": 5330
+    },
+    {
+      "file": "skills/blender-asset-manager/SKILL.md",
+      "sha256": "f554b9ff0278cf227de4658a4d914ad69859769099376aff1b57025a89dd5531",
+      "bytes": 3188
+    },
+    {
+      "file": "skills/blender-cli/agents/openai.yaml",
+      "sha256": "e1c40938dd0d74b8e5d3f8ca94d4e6f64df3b34d30b5284ffb98d477fb14157b",
+      "bytes": 251
+    },
+    {
+      "file": "skills/blender-cli/assets/studio-pipeline.json",
+      "sha256": "e4eec009300f47d05470e55bceaec78d4f861fed6dec3090ca5c1f18857a963d",
+      "bytes": 4124
+    },
+    {
+      "file": "skills/blender-cli/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-cli/references/domains.md",
+      "sha256": "d9447f5e805ad766c23675b13274958af453b6772e6e6c024fa1c022cec2107e",
+      "bytes": 2031
+    },
+    {
+      "file": "skills/blender-cli/references/execution.md",
+      "sha256": "4c8dcbeb57280ebeeecef4e8b55a646a5636782c538609cb2deb6fcb54bad918",
+      "bytes": 4316
+    },
+    {
+      "file": "skills/blender-cli/references/recovery.md",
+      "sha256": "60a87834f6b70aa0ad27e49c99f24bd7e35911ab4b41961499d87bab3ddd8c7a",
+      "bytes": 4191
+    },
+    {
+      "file": "skills/blender-cli/scripts/discover.py",
+      "sha256": "bcf51d2d3373036a2128a1b872478388d97bbec93df377380cc390c3e99b184f",
+      "bytes": 4465
+    },
+    {
+      "file": "skills/blender-cli/SKILL.md",
+      "sha256": "c7ca2df8ecf7c6b1ffeaaa6399a5964e674b82a43d59637954d7ab374c719556",
+      "bytes": 5711
+    },
+    {
+      "file": "skills/blender-material-authoring/agents/openai.yaml",
+      "sha256": "8039b8e13ab4c26e61bfb7b8a2f61af1f3af3c8c9fc3baeaa8683bd6173750bd",
+      "bytes": 331
+    },
+    {
+      "file": "skills/blender-material-authoring/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/acceptance-and-promotion.md",
+      "sha256": "fa6e8469d957425c420bfccf156c715ee6f9b05d427123c5469ae6313d5b74ad",
+      "bytes": 4540
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/bluewhite-glaze-case.md",
+      "sha256": "b98656a8c09c212b61d37c4b94ff4fc2fbe5e6f6df6d99894b148f3ddd11030d",
+      "bytes": 950
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/channel-contract.md",
+      "sha256": "a1c00995dd67cad3989dfbf3e5a5c40a047bedcc817f3f3d87ee4a87d6cbfa6e",
+      "bytes": 4895
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/framework.md",
+      "sha256": "d5ef88b26c24416c17b43bd06c01cb418647cc473efb6045e71545273c1ad483",
+      "bytes": 9965
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/plugin-cli-authoring.md",
+      "sha256": "2d1015a3354307b5125e24ad13da3223dda1547fecede9daefd7d83c4ac961bd",
+      "bytes": 14757
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/reference-and-images.md",
+      "sha256": "588b9f26781b162c8dca4ca511f56fe1842d8434ab5fc870a571f7c67da20834",
+      "bytes": 4374
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/terracotta-case.md",
+      "sha256": "606fc879535de819eb1281e0e3c059a804932b2260146fd5ebaf37b807ab63c9",
+      "bytes": 937
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/tool-routing.md",
+      "sha256": "04fac7b37ffbc6a154a14714793e58c5e9e7934e86d910de0c16853d13fe0dd2",
+      "bytes": 5145
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/wiki-and-evidence.md",
+      "sha256": "0e7a16615217b728163c0d3c94491e69fcd765d3f1501e53b20c189f0e66999a",
+      "bytes": 1015
+    },
+    {
+      "file": "skills/blender-material-authoring/scripts/image_gate.py",
+      "sha256": "a43bc09710f7e3e444138b012dcb33507ffa3453b0593bba58c0c7a1f80610c5",
+      "bytes": 2616
+    },
+    {
+      "file": "skills/blender-material-authoring/SKILL.md",
+      "sha256": "872c27940810dbaee09bde4d65ec4738867a57719c5cdb7f569899c2f507883e",
+      "bytes": 3902
+    },
+    {
+      "file": "skills/blender-video-editing/agents/openai.yaml",
+      "sha256": "fe68f5299b1fc5ef52d71b8cb497f2d3e3635af271e7a6ea94c839816091ac29",
+      "bytes": 347
+    },
+    {
+      "file": "skills/blender-video-editing/references/acceptance.md",
+      "sha256": "3ecbe045b1644642764123729f51f832119fe9193550b053161ff3f6ca34abb5",
+      "bytes": 4423
+    },
+    {
+      "file": "skills/blender-video-editing/references/editorial.md",
+      "sha256": "7f5554dbd5768dc2691cb9677a4b5dd579f88a9ff83b120726cab409a6e6006a",
+      "bytes": 3999
+    },
+    {
+      "file": "skills/blender-video-editing/references/execution.md",
+      "sha256": "a43a3de6fa8002f94ce54c442e91f17da012644c4d84e197547dc51399b9f384",
+      "bytes": 9661
+    },
+    {
+      "file": "skills/blender-video-editing/references/media-handoff.md",
+      "sha256": "ee7ceaa5b203c06d5810bdf3b24fa07e6d07efe1129a44f6c66e8311598a70be",
+      "bytes": 1746
+    },
+    {
+      "file": "skills/blender-video-editing/references/qualification.md",
+      "sha256": "99997be668820f5e5f58eae5562106809333945f22cfa2ffeb176c08835e0275",
+      "bytes": 6202
+    },
+    {
+      "file": "skills/blender-video-editing/references/templates.md",
+      "sha256": "5db6733d5fd6a66ac50948aeb2839799acac5d548d302fb049c4acc6b160cbe6",
+      "bytes": 5565
+    },
+    {
+      "file": "skills/blender-video-editing/scripts/prepare_media.py",
+      "sha256": "844c557bce224a97866cce6868fe8e883e6854ede86652e64f0d4902e92de712",
+      "bytes": 19622
+    },
+    {
+      "file": "skills/blender-video-editing/scripts/prepare_proxy.py",
+      "sha256": "59b4285370bb9a70903a2b6b6cb77b9706464e3512cbd6fb656638fc73ff4df9",
+      "bytes": 8207
+    },
+    {
+      "file": "skills/blender-video-editing/scripts/srt_to_clips.py",
+      "sha256": "d67793054af0ea5c25b8b04311eb9e64d2cce2aa6d5739e394f85613b04475c1",
+      "bytes": 1791
+    },
+    {
+      "file": "skills/blender-video-editing/SKILL.md",
+      "sha256": "90029d75f4d31f867c6c75952f8a34edd9439c188c8222d71bae4a6c5045be41",
+      "bytes": 6707
+    },
+    {
+      "file": "skills/blender-work-methodology/agents/openai.yaml",
+      "sha256": "efed45cf1ebc84ef81289dacef1bab7111b7fb4cb4e5f7b0734c324bf616f5fc",
+      "bytes": 308
+    },
+    {
+      "file": "skills/blender-work-methodology/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-work-methodology/references/architecture-basics.md",
+      "sha256": "f7d8e36f1ede74c9751b17a88cda7d67ccd4320338697efd98a7efb5560fa4d6",
+      "bytes": 3362
+    },
+    {
+      "file": "skills/blender-work-methodology/references/efficient-work-units.md",
+      "sha256": "974093e748abc0d30ad11ff0c9f53ea2b00bd72e9878e73e7ad66811267758f9",
+      "bytes": 7153
+    },
+    {
+      "file": "skills/blender-work-methodology/references/method-index.md",
+      "sha256": "52d1e98d83b9169799cb653603271df56c85a4049a99fe714ab2c8ed2ab2b9ad",
+      "bytes": 5322
+    },
+    {
+      "file": "skills/blender-work-methodology/references/methods/complex-surface.md",
+      "sha256": "bea1ad8f528c817b41d83fd212b4617c03b0fd77d1028481db0f54df53b349db",
+      "bytes": 5000
+    },
+    {
+      "file": "skills/blender-work-methodology/references/methods/drawing-spec.md",
+      "sha256": "d5e00efab47785f823629acfb5b022999bd2976cda27c53ef83b791ef531fd52",
+      "bytes": 2469
+    },
+    {
+      "file": "skills/blender-work-methodology/references/methods/mechanical-interface-detailing.md",
+      "sha256": "db49447d3f054732f8bf53700a159e5caf89669da5bf57c3926d1489ac89e66d",
+      "bytes": 7101
+    },
+    {
+      "file": "skills/blender-work-methodology/references/methods/motion-sweep-check.md",
+      "sha256": "4d4e2fc921b112cfe0ce3112a0bb4b651c6ab6e08888ec6a3846657c1904d7f9",
+      "bytes": 4262
+    },
+    {
+      "file": "skills/blender-work-methodology/references/methods/part-reference-chain.md",
+      "sha256": "b302008d20339ff63357289226eac792b8c038af86a12926ad77259bd4b12202",
+      "bytes": 8532
+    },
+    {
+      "file": "skills/blender-work-methodology/references/methods/reference-fidelity.md",
+      "sha256": "a282d54436ab480c95fd397aceb8a69caa924a929ad7a4d35d75b0b524084beb",
+      "bytes": 3081
+    },
+    {
+      "file": "skills/blender-work-methodology/references/plugin-cli-work-units.md",
+      "sha256": "2b5c80350541592fe576d7714598eb4f811d936649b57db3b87384a64887f4b1",
+      "bytes": 3674
+    },
+    {
+      "file": "skills/blender-work-methodology/references/practice-record.md",
+      "sha256": "4fb790dad27b67f03dd33dbf483fc9d5f52b9e8986fa86e598ef6b741fe7f062",
+      "bytes": 3141
+    },
+    {
+      "file": "skills/blender-work-methodology/references/self-improvement.md",
+      "sha256": "1cf9ddcecf8d4b4e2d63aa91408f41a70c4b0d15a69305ad0096693dcc210694",
+      "bytes": 6237
+    },
+    {
+      "file": "skills/blender-work-methodology/SKILL.md",
+      "sha256": "33fc1f86a15a073a2787ebd92764b5fa084ae38fe669cb438ba79662249eaa57",
+      "bytes": 16598
+    },
+    {
+      "file": "skills/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/manifest.json",
+      "sha256": "70ca39cba230e98102c652278a1a25a5c01754ae84a4a2083925ccbaa5b5cc01",
+      "bytes": 1310
+    },
+    {
+      "file": "skills/README.md",
+      "sha256": "937ddafeb54a06023fbb438ddcf8afb50e48d97fa08686d65ed53a0c80a0b431",
+      "bytes": 5146
+    },
+    {
+      "file": "skills/requirements-images.txt",
+      "sha256": "3c7e3add6a37541634b47e7c39ab033f8ae36f2edc9c69c5bd9bfabebc9cb98f",
+      "bytes": 97
+    },
+    {
+      "file": "templates/video/catalog.json",
+      "sha256": "9f41f0e04de4404d16c8c10d6bef8da3d59f514a82316d5d0c7252629681862f",
+      "bytes": 958
+    },
+    {
+      "file": "templates/video/cli.py",
+      "sha256": "c3795affa3c91e74430c902f3a22d401d34ce901487196e5b60e276305b78127",
+      "bytes": 3764
+    },
+    {
+      "file": "templates/video/examples/example-input.json",
+      "sha256": "fec6e045d0a9db97a082f96d41df48f5ea0401f00575674237ee025f1abe05db",
+      "bytes": 1183
+    },
+    {
+      "file": "templates/video/README.md",
+      "sha256": "206dc9420b44995b5950cca990b570180034e4d14c6d4358fcbaf984fe05c87f",
+      "bytes": 8064
+    },
+    {
+      "file": "templates/video/template_library.py",
+      "sha256": "db6027a1b6f8629ae6a7a38e3bac08f8d2dd04000913b8c44c31efdcb70fd94a",
+      "bytes": 32601
+    },
+    {
+      "file": "templates/video/templates/ai-final.json",
+      "sha256": "cb0c26eca7e5671d3e7eeadd0eefb5b5c3871f312cc99fb2eee964e158ec62ba",
+      "bytes": 790
+    },
+    {
+      "file": "templates/video/templates/cg-clean.json",
+      "sha256": "eb08d157a3483c2f914c626001c225e3ec3669f2206d8aed9e4dea40880b8805",
+      "bytes": 774
+    },
+    {
+      "file": "templates/video/templates/subtitle-readable.json",
+      "sha256": "8dee281c4712116f0a640ebdccc8ef6170fa66097a7f8e50c18514b02f422114",
+      "bytes": 844
+    },
+    {
+      "file": "templates/video/templates/whitebox-board.json",
+      "sha256": "c4e114844effbf38f149567b941877611de14106a23970e38c7237fb5ce68c73",
+      "bytes": 767
+    },
+    {
+      "file": "templates/video/test_template_library.py",
+      "sha256": "6d3bd38dd7ae2090447d7b4f1b3c820f3fa2ea1fa2b867905624829edfbf6ce1",
+      "bytes": 24253
+    },
+    {
+      "file": "tests/blender_smoke.py",
+      "sha256": "4f44c5234195c9cc5e919599b0574f89137981d4c17c9af656f49f5932e83628",
+      "bytes": 4536
+    },
+    {
+      "file": "tests/extension_install_smoke.py",
+      "sha256": "a9086f04a3391c304489241b07b818a491036a2feb54de6acd3edaafd99b1ee9",
+      "bytes": 2317
+    },
+    {
+      "file": "tests/run_blender_smoke.py",
+      "sha256": "9ef77125c99bcbcda188e16953ca29a1c1c92283c9024aa8e83cd2fd196fbf7e",
+      "bytes": 3870
+    },
+    {
+      "file": "tests/test_host.py",
+      "sha256": "548c413175e8bb6100716f13c9351165192d3696726dae4564a29e439ee15d8f",
+      "bytes": 5118
+    },
+    {
+      "file": "tests/test_job_bridge.py",
+      "sha256": "41bdd6e7df2174aca56d7075ffc494a348b49a17d2faea908cd429e36f82407c",
+      "bytes": 8838
+    },
+    {
+      "file": "tests/test_skill_install.py",
+      "sha256": "c42a24c59b12096d948d86908f151ce922e5776b92527b6bb7e81d5cb3646ef4",
+      "bytes": 2457
+    },
+    {
+      "file": "tests/test_skill_tools.py",
+      "sha256": "fea3cd01728eb9558cf89bf21d8a89fbc58abee6e36c86748a97ab69f0f8b44a",
+      "bytes": 6232
+    },
+    {
+      "file": "tests/video_smoke.py",
+      "sha256": "7dd938fa5975b4fd4fb7dd1a4205747f924c14e2fc5063d305eaf7ab8452e3b6",
+      "bytes": 4950
+    },
+    {
+      "file": "THIRD_PARTY_NOTICES.md",
+      "sha256": "dcf6ebe759d808c63a03927057aa4fd1e26a4ca63a219f908eea03ad6f8e47bd",
+      "bytes": 2399
+    },
+    {
+      "file": "tools/blenderctl/adaptive_sampling.py",
+      "sha256": "f148577f5f771db1a6ccd2102382ecae2d4370882379285dfdfedf3fbd17b220",
+      "bytes": 2710
+    },
+    {
+      "file": "tools/blenderctl/asset_contract.py",
+      "sha256": "e3a1273d94296a9afa791537ed0ccd40d98d2d42893b79459b27c916d12cf1d8",
+      "bytes": 5191
+    },
+    {
+      "file": "tools/blenderctl/asset_previews.py",
+      "sha256": "53b13bdc964935ff077631bd009923d3ec699cdc61968d5c69b4b3c010a0a51c",
+      "bytes": 14430
+    },
+    {
+      "file": "tools/blenderctl/asset_validation.py",
+      "sha256": "047db68732534da4217c01106f95ec5481da0203aceb0474ae0f779d67d65be7",
+      "bytes": 9383
+    },
+    {
+      "file": "tools/blenderctl/assets.py",
+      "sha256": "15ce8e4f4c25688c1c861e7bedd0b7f48bfd5f67c2abf8995b300b441e70e1a1",
+      "bytes": 16796
+    },
+    {
+      "file": "tools/blenderctl/bootstrap.py",
+      "sha256": "e91f623858909bed006f70cbe0b09f25acd946dfad388aabe526b11f0d83366e",
+      "bytes": 676
+    },
+    {
+      "file": "tools/blenderctl/cli.py",
+      "sha256": "8c4edee85db65fa95fe5ecca7445c7a374cb4da5d487157bab1342ae94516afa",
+      "bytes": 52177
+    },
+    {
+      "file": "tools/blenderctl/compositing_batch.py",
+      "sha256": "fefa9aeaffae174284e9b68efca6cf410b94719509fa6f18dcd709cf99addb39",
+      "bytes": 19387
+    },
+    {
+      "file": "tools/blenderctl/compositing_batch_contract.py",
+      "sha256": "f76cd6ab3c4f88afe26ec74f06923af0c71c250951214cbf790cf960b658fa1b",
+      "bytes": 8803
+    },
+    {
+      "file": "tools/blenderctl/compositing_encode.py",
+      "sha256": "2183203d2d5cfd8fdfc81c1a8dc67a155f3987d561abcb9f9dcdcf49b3ddebce",
+      "bytes": 38253
+    },
+    {
+      "file": "tools/blenderctl/compositing_encode_contract.py",
+      "sha256": "1239827cf28674588349577eff2d511ac8b5b4eaef14211b647332df7f449bcd",
+      "bytes": 10147
+    },
+    {
+      "file": "tools/blenderctl/compositing_encode_public.py",
+      "sha256": "51ff18c290b30ce2d4a1b377c68aeb64dd492de014a99845e101ac79d2dafb3b",
+      "bytes": 24733
+    },
+    {
+      "file": "tools/blenderctl/compositing_identity.py",
+      "sha256": "48cbe5fd66634e1cabc25c1a39960e97182a303f4be0f3fd2c10702cd4492919",
+      "bytes": 812
+    },
+    {
+      "file": "tools/blenderctl/compositing_interface.py",
+      "sha256": "47c9d31101d49a3516dcb2ee0e80941b607c5c8fc0f819e4defa2fcb562145bc",
+      "bytes": 14648
+    },
+    {
+      "file": "tools/blenderctl/compositing_m5_guards.py",
+      "sha256": "63d73a59d29588abdc9d15f87f1fb0735ec688cb6a1c30ad2a269bf10c73406e",
+      "bytes": 4223
+    },
+    {
+      "file": "tools/blenderctl/compositing_m5_schema_draft.py",
+      "sha256": "58718622ef9d33054c77dad8d9f9f5458507682b6d0d2e82cbe297eafaf8b4a1",
+      "bytes": 8403
+    },
+    {
+      "file": "tools/blenderctl/compositing_media.py",
+      "sha256": "e0789873cb86e517f1225a0bc9ec53e09450cf13153b08330f50057bbfdaf3ac",
+      "bytes": 37505
+    },
+    {
+      "file": "tools/blenderctl/compositing_movie.py",
+      "sha256": "2018c0d937d6a2fd03d997b0b45a8da51d771ab3eb372795422f7c3d2457b8ec",
+      "bytes": 18907
+    },
+    {
+      "file": "tools/blenderctl/compositing_orchestration_interface.py",
+      "sha256": "ab3e24899998825caea58156415fccb57a3899f131134521098775d72a6aebdf",
+      "bytes": 4656
+    },
+    {
+      "file": "tools/blenderctl/compositing_study.py",
+      "sha256": "2591972a299012e098b5fc6e9c4c67c5fc4af8ffdb9e30200a45bb3eb612d8df",
+      "bytes": 9825
+    },
+    {
+      "file": "tools/blenderctl/compositing_template_run.py",
+      "sha256": "e4c43c53639894da490f3b1663bdaace066823a6fcf2bdcb351db29aee7bad75",
+      "bytes": 10078
+    },
+    {
+      "file": "tools/blenderctl/compositing_template_run_contract.py",
+      "sha256": "2f8c09c8969a924016b8b347a3191a598fdfdbd9a1f7e9574dce5c33f475262c",
+      "bytes": 11645
+    },
+    {
+      "file": "tools/blenderctl/compositing_templates.py",
+      "sha256": "3fd99e36ba0f929f26e8f508e1da03b4f77fa681db6af3a6152c6a432accfd5e",
+      "bytes": 8435
+    },
+    {
+      "file": "tools/blenderctl/compositing_temporal.py",
+      "sha256": "48f8fec8d9abc25136d9aad624bb624f84345d32515d3d2a32d31fc49d70d958",
+      "bytes": 9025
+    },
+    {
+      "file": "tools/blenderctl/compositing_verifier.py",
+      "sha256": "c33df6a8eb6e23559969af196f9654b088ce1bd1d09faac75d3afaa9ccb95a7e",
+      "bytes": 39461
+    },
+    {
+      "file": "tools/blenderctl/compositing_workflow.py",
+      "sha256": "24adec7903471d2fc0f24d64f5b67465247aec99ba4ad2e1962a489b678492be",
+      "bytes": 71244
+    },
+    {
+      "file": "tools/blenderctl/compositing_workflow_contract.py",
+      "sha256": "a0f3929aa5578bfb3ae112d2b399ebb3738db34bdd8524f2cc143bbc312975ec",
+      "bytes": 9089
+    },
+    {
+      "file": "tools/blenderctl/curve_contract.py",
+      "sha256": "bf4289b0cbd21861d08679eab56b9f6a7d51330eed355e5c54a69bfa05a1e0c1",
+      "bytes": 1808
+    },
+    {
+      "file": "tools/blenderctl/dependencies.py",
+      "sha256": "7bd212cf44e715edc8c693413dfce4ccc32fc2a83808fed3dd46475b137c8df5",
+      "bytes": 14670
+    },
+    {
+      "file": "tools/blenderctl/dependency_contract.py",
+      "sha256": "2a3a1d173490b7af656b8deee4cae7d777f2ece58f53c17a4d476bb14a1aeb4e",
+      "bytes": 2879
+    },
+    {
+      "file": "tools/blenderctl/dependency_relink.py",
+      "sha256": "b0090fde4d33a1448dfd7a7d0ecc747b0a7f06e7bd27e568467a8a6ad4bf03ff",
+      "bytes": 15674
+    },
+    {
+      "file": "tools/blenderctl/directory_handles.py",
+      "sha256": "91abeb61513e7e9d6dca13bdd94143d87d0cf17400ff359384f0d61ea1899b5e",
+      "bytes": 5825
+    },
+    {
+      "file": "tools/blenderctl/driver_contract.py",
+      "sha256": "08848753f342e523e81c98bb133c1c876f4b1b4f72875c100a695fd29518405d",
+      "bytes": 865
+    },
+    {
+      "file": "tools/blenderctl/driver_math.py",
+      "sha256": "e5236871a599826581fc837a5d398c12bb869812d1c36e3474dda9c0dfc1db06",
+      "bytes": 4985
+    },
+    {
+      "file": "tools/blenderctl/drivers.py",
+      "sha256": "bbda9d0b49ca76e2f8e09ba287669b6d6ea6ca45f9d93daecbb0b3cd7889c1f4",
+      "bytes": 9166
+    },
+    {
+      "file": "tools/blenderctl/exchange.py",
+      "sha256": "a259b5c1b1a9f308c94befe1781a5f20e839d21576c79b10408565fceb3a128f",
+      "bytes": 24035
+    },
+    {
+      "file": "tools/blenderctl/exchange_contract.py",
+      "sha256": "4d420d2cac2d29303ab08c8e947f98bbcd40be62d618fa05fb8740adc70a4760",
+      "bytes": 11518
+    },
+    {
+      "file": "tools/blenderctl/execution_contract.py",
+      "sha256": "c28e3040bed29bc2d72dfac124c2642b90bd71c3149a6f4a64c6ef49e6d1e50f",
+      "bytes": 3806
+    },
+    {
+      "file": "tools/blenderctl/extensions.py",
+      "sha256": "69c6641cf5b9844ba7215728aa515478788316dacce377a17fcf22b348c14f47",
+      "bytes": 5450
+    },
+    {
+      "file": "tools/blenderctl/fbx_clock.py",
+      "sha256": "6c9b656129428b09ce5819112e7a878595904c17b9a0ad8d6b7b12cebc29c86d",
+      "bytes": 23261
+    },
+    {
+      "file": "tools/blenderctl/fbx_compat.py",
+      "sha256": "ffb28ff96538e492d1f5eb7d39b126ea46cfe871479b4f40f6aeec5bacb0af9e",
+      "bytes": 829
+    },
+    {
+      "file": "tools/blenderctl/filesystem.py",
+      "sha256": "d8cb1f07feb9dac590ea1103d7d6c0a8c0fcdca6377c49b57cce07e0369bed0e",
+      "bytes": 7642
+    },
+    {
+      "file": "tools/blenderctl/font_binary.py",
+      "sha256": "4083f7ca7e6ac5bc0fcb78851fdadcdce25cc52f596926b3fc1fb6355c47c596",
+      "bytes": 5874
+    },
+    {
+      "file": "tools/blenderctl/font_curves.py",
+      "sha256": "d2dbd9b16b82f04bbb2cef787d47aa5834d5b70878e241209fe03d39fec0d178",
+      "bytes": 9510
+    },
+    {
+      "file": "tools/blenderctl/geometry_cache_layout.py",
+      "sha256": "52554037defe3c962ad3f0f9895f8416dc922584252fe4d521fb35a1934fdd39",
+      "bytes": 3088
+    },
+    {
+      "file": "tools/blenderctl/geometry_cache_reader.py",
+      "sha256": "11ce7e66666d6eb9769fb12d3a7b4ccd3931cdd6ac7ff73e68aa35762a32d859",
+      "bytes": 5913
+    },
+    {
+      "file": "tools/blenderctl/geometry_identity.py",
+      "sha256": "0d248906e3b81f5891315c8e2e2af51e66520463fcb2a6ddfbb3c7e85c1bac02",
+      "bytes": 797
+    },
+    {
+      "file": "tools/blenderctl/geometry_interface.py",
+      "sha256": "9f26e67577f252b87ee78a52d56da41e480b84467a168b14b17187a4533e6ce9",
+      "bytes": 7333
+    },
+    {
+      "file": "tools/blenderctl/geometry_session.py",
+      "sha256": "09deebe731dd501c03af72f27e8d498bcf694c327f169f09ca0e0df3cd54e323",
+      "bytes": 2173
+    },
+    {
+      "file": "tools/blenderctl/geometry_temporal.py",
+      "sha256": "5a2329bdb52828ad79df7662d8751ebd69f67c266322d684fbff9283d3f0fc6a",
+      "bytes": 34702
+    },
+    {
+      "file": "tools/blenderctl/geometry_verifier.py",
+      "sha256": "dc7c7b3048f133eab37681ed25ad2ee7b698232fb3e0566f87fc2c0b5277443a",
+      "bytes": 7093
+    },
+    {
+      "file": "tools/blenderctl/geometry_workflow.py",
+      "sha256": "85d972479501f897afe1a41985b52bfaecb9b4a8871f01ef76c46d01c5cb25fd",
+      "bytes": 38094
+    },
+    {
+      "file": "tools/blenderctl/geometry_workflow_contract.py",
+      "sha256": "3feca73f0c11bf33c40ff452f4058e3be76a0a4c6575f29199fa2016237e208c",
+      "bytes": 3087
+    },
+    {
+      "file": "tools/blenderctl/glb_clock.py",
+      "sha256": "436163ce65913d293dc3c255f28ba15559caf1f2cf5e6833b94a5bf81abdac30",
+      "bytes": 24183
+    },
+    {
+      "file": "tools/blenderctl/hair.py",
+      "sha256": "d255a35c96119c07b89a333982e69ecba95a0488833cb77bd93d2bddda7ec54f",
+      "bytes": 12293
+    },
+    {
+      "file": "tools/blenderctl/hair_collision.py",
+      "sha256": "57f7d06b1cf7c7f0e30ec0d24a2ef26fbe73d4153c56f214153594d6d2557e14",
+      "bytes": 9032
+    },
+    {
+      "file": "tools/blenderctl/hair_contract.py",
+      "sha256": "c349999bfc71e68f2f9d02cb9b7847d20caa895166872bb9c0efb50726cb2af2",
+      "bytes": 2577
+    },
+    {
+      "file": "tools/blenderctl/hair_density.py",
+      "sha256": "a556da7d5bc039ee724e8f747c1eb27a5a752137e4fe1b03bc0a560d02fffa1a",
+      "bytes": 11142
+    },
+    {
+      "file": "tools/blenderctl/hair_dynamics.py",
+      "sha256": "7c4ace00cc52ecde89f93beb493d379afb7f5a1ba7fb309a6107d3d39dc237c4",
+      "bytes": 19370
+    },
+    {
+      "file": "tools/blenderctl/hair_dynamics_contract.py",
+      "sha256": "ffce203dfea964c028332f229f33473106624dfb8f310954f861bae8d16f1124",
+      "bytes": 1003
+    },
+    {
+      "file": "tools/blenderctl/hair_shape.py",
+      "sha256": "7bb80557c83e9fc1f6868997f8ef48ad75b54667f60e576cc2f3702710fb9cae",
+      "bytes": 14377
+    },
+    {
+      "file": "tools/blenderctl/hair_shape_contract.py",
+      "sha256": "279e0891e57d65681d1f5b6ab9d7a0fc8369869f56214c56ff38e336b7d47195",
+      "bytes": 1733
+    },
+    {
+      "file": "tools/blenderctl/hair_shape_nodes.py",
+      "sha256": "276199582afddb5bc58657c96d1e9db05de689e43482941f07314c66d5d7cbeb",
+      "bytes": 2480
+    },
+    {
+      "file": "tools/blenderctl/hair_surface.py",
+      "sha256": "c5835dc1e68d07fd13e6b65ade46e03e4e6b399e31c5abcec0388a709f992548",
+      "bytes": 12835
+    },
+    {
+      "file": "tools/blenderctl/hair_volume.py",
+      "sha256": "239f66b84b6e2f86923d244ead041304b9884f042d64b77e6dc357896924a273",
+      "bytes": 9813
+    },
+    {
+      "file": "tools/blenderctl/hair_volume_contract.py",
+      "sha256": "f52a649220ff4371935d216a333db0190bff34b17dc9f2f678b43b8e06b97fd4",
+      "bytes": 1321
+    },
+    {
+      "file": "tools/blenderctl/hair_voxels.py",
+      "sha256": "606f49731099429e27a2f909942fc9deb31aadf59896db43d759353d10c385f4",
+      "bytes": 2174
+    },
+    {
+      "file": "tools/blenderctl/inspection.py",
+      "sha256": "6620586b037744e32662d1dcc6f40e0c57a5cf53341023ee05922316d8dac740",
+      "bytes": 24775
+    },
+    {
+      "file": "tools/blenderctl/installation.py",
+      "sha256": "99c97dfe89663103492bd8024bed52399dcfcd9611043cf9608ff9eea8c39c1e",
+      "bytes": 1101
+    },
+    {
+      "file": "tools/blenderctl/isolated_script_worker.py",
+      "sha256": "a4b6d86cb12edf5227463d96465ef7df8b5d569aa82c4a5ad61fd9408856a315",
+      "bytes": 977
+    },
+    {
+      "file": "tools/blenderctl/isolation_lifecycle.py",
+      "sha256": "890c2264b55a16206a0515fa89bb8851f194248129bc64a36f2a6b6bd6586f8d",
+      "bytes": 8600
+    },
+    {
+      "file": "tools/blenderctl/library.py",
+      "sha256": "ba2056bb6946cfc69fc483ceeb74b393be031b77e03eb623f553d25e51c65687",
+      "bytes": 15298
+    },
+    {
+      "file": "tools/blenderctl/lighting_batch.py",
+      "sha256": "dc2ca558b7a820838afd3070406699371a9b6c27a26339708d0b6c4cf786db21",
+      "bytes": 5796
+    },
+    {
+      "file": "tools/blenderctl/lighting_identity.py",
+      "sha256": "8f1b4e22fc81d3c21293f8e762e58c29ba102333ea5a0211365d75c36bbddfcb",
+      "bytes": 672
+    },
+    {
+      "file": "tools/blenderctl/lighting_interface.py",
+      "sha256": "5be893198042f94950ebf1c72ae55a0ffd4395e1ec767edc062a1b7b7798edb7",
+      "bytes": 4354
+    },
+    {
+      "file": "tools/blenderctl/lighting_verifier.py",
+      "sha256": "60e35ebc0f4370d55677e9d8c9ddb63e5d7538b71ffbf79ae2cb6c5b0a9564a1",
+      "bytes": 2162
+    },
+    {
+      "file": "tools/blenderctl/lighting_workflow.py",
+      "sha256": "fad8f064cc6ab9667ebee0c6ef558c0d4e5c0948d989e736c6a036251bc03844",
+      "bytes": 17041
+    },
+    {
+      "file": "tools/blenderctl/lighting_workflow_contract.py",
+      "sha256": "7d83495ec04c7007769e5c77c20f821810e45d979297b21d82179bd6a9a77ed9",
+      "bytes": 11272
+    },
+    {
+      "file": "tools/blenderctl/link_contract.py",
+      "sha256": "308dd0d146363ac04cc55f52467c5fcdbcc34f774b06fc3a43313f0933281a80",
+      "bytes": 7436
+    },
+    {
+      "file": "tools/blenderctl/linking.py",
+      "sha256": "cf77b959a091c4cb1daf857aba87353435fa73ad96dfaa4529d403fa6b37389d",
+      "bytes": 23249
+    },
+    {
+      "file": "tools/blenderctl/liquid.py",
+      "sha256": "533c76b50e82317aa78576efb455398a54e2d0e5be7a0d384a81ca09a6bc17d3",
+      "bytes": 4407
+    },
+    {
+      "file": "tools/blenderctl/material_batch.py",
+      "sha256": "948acb68efbd45944394fe411d640148fd250953250eb863f5ca06585786f4f4",
+      "bytes": 29001
+    },
+    {
+      "file": "tools/blenderctl/material_batch_contract.py",
+      "sha256": "e14b68e59b1284c0649efdb1a7ec536d5379e4d3d1da6a29747593725fc8d003",
+      "bytes": 662
+    },
+    {
+      "file": "tools/blenderctl/material_deformation.py",
+      "sha256": "b5834d09d16a94a9548a957bea873bed1e9c2ab647e371fa01634b60ea1de57f",
+      "bytes": 8002
+    },
+    {
+      "file": "tools/blenderctl/material_interface.py",
+      "sha256": "a21412a713e95b8ea840d0b5d33e9f3326a7bc3e5782b93394791bb8f58179d4",
+      "bytes": 12310
+    },
+    {
+      "file": "tools/blenderctl/material_interface_contract.py",
+      "sha256": "e69d50d9be4147e2e2f5f0aa75ad7f1a773ac34bd1fd43854ef87cd96cfc09e0",
+      "bytes": 3896
+    },
+    {
+      "file": "tools/blenderctl/material_outputs.py",
+      "sha256": "e38d623c2def39457205e3154ef1a57d20575e142223eebdc580662347bcee27",
+      "bytes": 8951
+    },
+    {
+      "file": "tools/blenderctl/material_progress.py",
+      "sha256": "87f9682655be53bca4a211f3734b6edb61a96435e2cf41b907c4294b92b27541",
+      "bytes": 5445
+    },
+    {
+      "file": "tools/blenderctl/material_study.py",
+      "sha256": "1f460999fe60b533bae56ffbfc178546deeabf2f039ed169f7d6c33e6606d14b",
+      "bytes": 14419
+    },
+    {
+      "file": "tools/blenderctl/material_study_contract.py",
+      "sha256": "f35b8dc7358bfc3899e81b70cad23a221eea03bbd70bd62406e50e592b8423d7",
+      "bytes": 3470
+    },
+    {
+      "file": "tools/blenderctl/material_workflow.py",
+      "sha256": "1095a47635b8927156c24739ccbc5fe7201360ce61e369fa81f0691fb890cd13",
+      "bytes": 22189
+    },
+    {
+      "file": "tools/blenderctl/material_workflow_contract.py",
+      "sha256": "b64dc84f2df5be58e517c494079e43ad2990d5efcc33a612968d3fd09e3db9f5",
+      "bytes": 3137
+    },
+    {
+      "file": "tools/blenderctl/media.py",
+      "sha256": "2fad9d525c5d36f746996caf1f5155beeae5d48993754f3ee9356d4d1cd593b0",
+      "bytes": 11763
+    },
+    {
+      "file": "tools/blenderctl/mesh_clip.py",
+      "sha256": "e50ffc32ba790a07dc0c243902cd63e560682e4f841752ded2712237e9b67fe6",
+      "bytes": 13459
+    },
+    {
+      "file": "tools/blenderctl/mesh_clip_analysis.py",
+      "sha256": "90baa811e98dd9c64c8bf1640556310c45c974eb580f5f8b4f02cef438bae16a",
+      "bytes": 5660
+    },
+    {
+      "file": "tools/blenderctl/model_contract.py",
+      "sha256": "bc9f9e13ae67f5335092b45465539a5d82b0e41e8c9fd8fd8fe199e43268637e",
+      "bytes": 5885
+    },
+    {
+      "file": "tools/blenderctl/modeling.py",
+      "sha256": "b090bd6c13db381ec3c880c6de4153e3242a6019bb47818e25432d05eb4f7d47",
+      "bytes": 22186
+    },
+    {
+      "file": "tools/blenderctl/native_mesh_cache.py",
+      "sha256": "51920753a9af143de0f579ee3f7b73b14320dde5b9c878e938fe2d76f0f5847b",
+      "bytes": 23729
+    },
+    {
+      "file": "tools/blenderctl/node_contract.py",
+      "sha256": "34326e9a2fb5b5fd842b4a54565554587272e54e35b9b848eb328084602d52b0",
+      "bytes": 8873
+    },
+    {
+      "file": "tools/blenderctl/node_zones.py",
+      "sha256": "1a3f4a12b4d32f2649478b986f0e0c64156c73cfeebf8ca8f6dbfd2e767afe30",
+      "bytes": 12258
+    },
+    {
+      "file": "tools/blenderctl/nodes.py",
+      "sha256": "008104cd8113d98c5684181e2ac914d692bd80492cc8f939992d3dc867dc2448",
+      "bytes": 28281
+    },
+    {
+      "file": "tools/blenderctl/operations.py",
+      "sha256": "1436b109e066abd3baa4652451864e379272d8ceaebce6a79a0695d71b585133",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/blenderctl/operations_contract.py",
+      "sha256": "494092de3d74c4bb2f2ebeaafe266e8159f13a5f1710295915fbc75a548ffe06",
+      "bytes": 1231
+    },
+    {
+      "file": "tools/blenderctl/pipeline.py",
+      "sha256": "d78b0bfdc655aa4b7eacd16bf18f6eecaf6de543368614278dc22c55bbb9bdb9",
+      "bytes": 33551
+    },
+    {
+      "file": "tools/blenderctl/pipeline_contract.py",
+      "sha256": "6069a01487e205869fd202fa5b71375367e3b0b5dcd7c984684d9c643fc7b5f3",
+      "bytes": 5731
+    },
+    {
+      "file": "tools/blenderctl/preview_contract.py",
+      "sha256": "6caea67d6af02cb101a167028248b35050a9274a11b8c0aaeab4fe2eae7071d4",
+      "bytes": 4671
+    },
+    {
+      "file": "tools/blenderctl/preview_framing.py",
+      "sha256": "ef4efb178f8be0a75d72820c63fa348542e6be00105e1a8d756795de8f1b6826",
+      "bytes": 2872
+    },
+    {
+      "file": "tools/blenderctl/probes.py",
+      "sha256": "53ea8742f76ea8c514301ad5d03edb8cdfdcc83b45120d9be348750425d19d0d",
+      "bytes": 9915
+    },
+    {
+      "file": "tools/blenderctl/processes.py",
+      "sha256": "2ce3f395008a75534c93976d2204b5e4d66b6338ddff471163778cf160709dc9",
+      "bytes": 5444
+    },
+    {
+      "file": "tools/blenderctl/project_contract.py",
+      "sha256": "dc64bc637c84c48f2f41ff0aca16bd18c424076b34b2c23608dda31b677daf1c",
+      "bytes": 1315
+    },
+    {
+      "file": "tools/blenderctl/projects.py",
+      "sha256": "2b09cd41e5170677a624b514e3aec39099b90421548de649ef62bb866867b130",
+      "bytes": 8084
+    },
+    {
+      "file": "tools/blenderctl/protocol.py",
+      "sha256": "8bf8fbf5d5582a24c32caded004b4d85299f00db2e0dcb250d4c9acf07d84786",
+      "bytes": 31087
+    },
+    {
+      "file": "tools/blenderctl/render_contract.py",
+      "sha256": "7bb62a297b5dec81eba752cd15bede472d66e89636160c05479130ed8f6e0335",
+      "bytes": 6802
+    },
+    {
+      "file": "tools/blenderctl/rendering.py",
+      "sha256": "0f8ab588ae4ee9134afa6b9452d000c95caa1227fe43a1a47f271dc1afe7970f",
+      "bytes": 26647
+    },
+    {
+      "file": "tools/blenderctl/resource_leases.py",
+      "sha256": "d91cc702ae67d5414c26642610d8d9c6bf99bcd5696b76bd4db8fbb81d6450b7",
+      "bytes": 6777
+    },
+    {
+      "file": "tools/blenderctl/retarget_actions.py",
+      "sha256": "6bf366f34d9ef4b6baee7cd255276df34034db9a9340862ee2e05b3a3d0ce1d2",
+      "bytes": 13885
+    },
+    {
+      "file": "tools/blenderctl/retarget_affine.py",
+      "sha256": "aa207a2f46a1c25321e7e2c9237af05f837e49b0ebe982c9a24f9a2a2cf586bd",
+      "bytes": 6294
+    },
+    {
+      "file": "tools/blenderctl/retarget_contract.py",
+      "sha256": "722a0ec17f8fa39e05b74cc79d9c11614bf9b900484595944e8f63ae51f301a8",
+      "bytes": 3291
+    },
+    {
+      "file": "tools/blenderctl/retarget_controls.py",
+      "sha256": "5b89b6611edff2b8ba64326ffa287daa4ce7def3213f8a097e5ac014ce8256e1",
+      "bytes": 11864
+    },
+    {
+      "file": "tools/blenderctl/retargeting.py",
+      "sha256": "3a6e1e7ff3581a8781f2e4eb68077a3f4ecf88abfb4f9b212cd7d7a123f99b07",
+      "bytes": 11652
+    },
+    {
+      "file": "tools/blenderctl/retopology.py",
+      "sha256": "11c9d4a03879c6517f0b80a78b1975f2d4fee646c2c48576f024eb4721169295",
+      "bytes": 9341
+    },
+    {
+      "file": "tools/blenderctl/retopology_contract.py",
+      "sha256": "848abbed8e0c55e2f34ab8ec9057275c7420925803820403458a6467fa30e651",
+      "bytes": 1956
+    },
+    {
+      "file": "tools/blenderctl/review_contract.py",
+      "sha256": "8e071da5bc0a600f10f61958791134c0b71a8384340e06160d9b4c1528f69bd8",
+      "bytes": 3816
+    },
+    {
+      "file": "tools/blenderctl/reviews.py",
+      "sha256": "02c4993e57c36c0802535a78616bfef30b13d3d38d41e660b117e77f63044dc0",
+      "bytes": 5514
+    },
+    {
+      "file": "tools/blenderctl/rig_adapter_contract.py",
+      "sha256": "57ffc4d3c64539115fcbe3472e2657899528de1f242a253afefd2e8c91dccc57",
+      "bytes": 1806
+    },
+    {
+      "file": "tools/blenderctl/rig_cloth.py",
+      "sha256": "d3b4706e9b47b5a05e406c0cc70b1585eead7a580013eb49d807ef9bc8deea60",
+      "bytes": 3576
+    },
+    {
+      "file": "tools/blenderctl/rig_contract.py",
+      "sha256": "15db1f6498f7b9f092727adf4ff2bf026d322b0011c6700db3a9e450d90d421a",
+      "bytes": 8593
+    },
+    {
+      "file": "tools/blenderctl/rig_exchange.py",
+      "sha256": "6e0579cf7485f3211f073edc026f0709feaf9ab22a34a32820fdc1e53213f8c2",
+      "bytes": 18124
+    },
+    {
+      "file": "tools/blenderctl/rig_package.py",
+      "sha256": "90012da4b41a547095158d8ec9caaa50b50fdfae951fb2c76a3cffa0f40b6e84",
+      "bytes": 6971
+    },
+    {
+      "file": "tools/blenderctl/rig_package_contract.py",
+      "sha256": "526ee8191275cb253f6906f8c5b49b3982f10252baea533a7c778391ec86f4b2",
+      "bytes": 637
+    },
+    {
+      "file": "tools/blenderctl/rig_profile.py",
+      "sha256": "84e1e686e4d45b7fedc46938e968fcee7c08985fea9869cc84125497ac684c1a",
+      "bytes": 13633
+    },
+    {
+      "file": "tools/blenderctl/rig_profile_contract.py",
+      "sha256": "c9121899b3198ca46958d305ae66d82855f3cba947c4301e81ead02c22ff96cb",
+      "bytes": 1445
+    },
+    {
+      "file": "tools/blenderctl/rigging.py",
+      "sha256": "848a81f6da39296adb5a02e4a0ec331750d31a9dc6ac392e268fb2ed7fa0c842",
+      "bytes": 37341
+    },
+    {
+      "file": "tools/blenderctl/runner.py",
+      "sha256": "630856e059016f6aa7cabad8d7b8f0840d84f6a97bd8e26e93624d3b1d703f7e",
+      "bytes": 42233
+    },
+    {
+      "file": "tools/blenderctl/scene_contract.py",
+      "sha256": "f46c9f0cc38d9cedc2e68d6cb5e249e9930bbc11e34e33f2960438d166700208",
+      "bytes": 8660
+    },
+    {
+      "file": "tools/blenderctl/scenes.py",
+      "sha256": "bfafcc63b5bfb38bf2d956b05de300aa16d5a210c26a0a770e386d36fde7b833",
+      "bytes": 23453
+    },
+    {
+      "file": "tools/blenderctl/script_isolation.py",
+      "sha256": "4a1540f6001d939acf13f2f9d20d02404891b5012933b37b13f072ea00736886",
+      "bytes": 12523
+    },
+    {
+      "file": "tools/blenderctl/sculpt_contract.py",
+      "sha256": "6f440224842f9cf3e8cec7ee43674fec0f92248fb3d26cb8a0d67734c012140f",
+      "bytes": 1715
+    },
+    {
+      "file": "tools/blenderctl/sculpt_host.py",
+      "sha256": "f6046e5a3a9d9907e7689cf5c31f9610e3086aeb3d57b988c961a8350b424908",
+      "bytes": 2111
+    },
+    {
+      "file": "tools/blenderctl/sculpt_review.py",
+      "sha256": "e2f7cc01a33c7460fa3ce399c694f61e03255d697e3f8ab8364e7a58f9586db1",
+      "bytes": 5577
+    },
+    {
+      "file": "tools/blenderctl/sculpt_state.py",
+      "sha256": "fe57bf0ba169ae7e217116dbe1d4825f30153942499b10f03eb39b85c6838492",
+      "bytes": 6971
+    },
+    {
+      "file": "tools/blenderctl/sculpt_worker.py",
+      "sha256": "d712d6db687bd5a69c1ae4f37253beea552047a9b061562a583c5c9be31c3bd4",
+      "bytes": 11673
+    },
+    {
+      "file": "tools/blenderctl/simulation.py",
+      "sha256": "0e815b29d659dfd09d03026ef1f2aec2de228421682ae0c6d2cb280d7f0efb8e",
+      "bytes": 27163
+    },
+    {
+      "file": "tools/blenderctl/simulation_contract.py",
+      "sha256": "ab6be266b41a5b6d59d76eb58c83e505f513b4590c8a4004ef8c7c689eddc17d",
+      "bytes": 9560
+    },
+    {
+      "file": "tools/blenderctl/skin_exchange.py",
+      "sha256": "d17065ad992ae42a39e2a358b355902bc02dfddd7ad996ebf68d68b70d929439",
+      "bytes": 5310
+    },
+    {
+      "file": "tools/blenderctl/skin_rebind.py",
+      "sha256": "24fc20b09be76764c93cc30ee2fa8f4a46d3c900c4137e7e82789a443cf775af",
+      "bytes": 8241
+    },
+    {
+      "file": "tools/blenderctl/telemetry.py",
+      "sha256": "d705892949f28c13dfc91e20072989a7e7537aa77407c9e6fed1abe4554cf452",
+      "bytes": 2578
+    },
+    {
+      "file": "tools/blenderctl/timing.py",
+      "sha256": "5738b873aaa8f0852ba4f0af595e57dd79b6e92752311bbb403736a025e516df",
+      "bytes": 6936
+    },
+    {
+      "file": "tools/blenderctl/tracking.py",
+      "sha256": "43fa730eca67cb7066fc2761bbb37a11e70767ab77c2a28983c9d5be4230d02b",
+      "bytes": 20396
+    },
+    {
+      "file": "tools/blenderctl/tracking_contract.py",
+      "sha256": "0e3c15157b24c79a4fa2077ee97e05c07af03a41c6b6a93629be789ba3f03db2",
+      "bytes": 11156
+    },
+    {
+      "file": "tools/blenderctl/tracking_input.py",
+      "sha256": "6f4f68627c1534248a269b8baec71eaf78edbc27d88b5232b3a3b18ba241f4ed",
+      "bytes": 6782
+    },
+    {
+      "file": "tools/blenderctl/tracking_preview.py",
+      "sha256": "ea58e1db142b842746a4be21111ff62b35945c22c39c9a275b4bc4b09a283e26",
+      "bytes": 4169
+    },
+    {
+      "file": "tools/blenderctl/tracking_quality.py",
+      "sha256": "c6c9c57b33e8e247e8412ab841b31769a2e219e88a32c42bcbda0397ef939c9c",
+      "bytes": 5245
+    },
+    {
+      "file": "tools/blenderctl/transactions.py",
+      "sha256": "c411c2ea8c14853b6dac984bc10b40ea13b6fdf55805815483a0c7125b0274d0",
+      "bytes": 36002
+    },
+    {
+      "file": "tools/blenderctl/typed_dependencies.py",
+      "sha256": "b3147afa940771961ef944211230bb0275207620cf0b799088156a3d4dc80757",
+      "bytes": 17264
+    },
+    {
+      "file": "tools/blenderctl/uv_contract.py",
+      "sha256": "013bbce2b294f59a6db2e9cf36a80cede845330c846c5028bcb62e056b01609e",
+      "bytes": 2504
+    },
+    {
+      "file": "tools/blenderctl/uv_layout.py",
+      "sha256": "eab105932f3141bc93c36dec555caabe04c76e5be7e1bb656421e7b94ef1618a",
+      "bytes": 18482
+    },
+    {
+      "file": "tools/blenderctl/verification.py",
+      "sha256": "6077cddc44356cf8b47946773463fe9401d4a4470d5e7c0f443c6b9088e08f1a",
+      "bytes": 11191
+    },
+    {
+      "file": "tools/blenderctl/verification_contract.py",
+      "sha256": "ec1ce4664afc96c694485386cc41bb365176e86d4273bfd181c0579f0e256acc",
+      "bytes": 5862
+    },
+    {
+      "file": "tools/blenderctl/video_hdr.py",
+      "sha256": "d1342e4512cbb7294759604ff61939cb03866a0b58aea3f51cbb6459ac8841bd",
+      "bytes": 24610
+    },
+    {
+      "file": "tools/blenderctl/video_identity.py",
+      "sha256": "cc0136dc5883c041e8c07b704ade2114906bcadf5c33f129acbf33e548cfddf9",
+      "bytes": 864
+    },
+    {
+      "file": "tools/blenderctl/video_interface.py",
+      "sha256": "415ead882c9cc3d576268bbe8f3d51c4a2bb4cc183a4ee83174154388ed735b3",
+      "bytes": 5327
+    },
+    {
+      "file": "tools/blenderctl/video_media.py",
+      "sha256": "b25b7c3063183766943476f2457bed81fa9fe5946cbe9a34e44b619f1a2d9ec7",
+      "bytes": 5413
+    },
+    {
+      "file": "tools/blenderctl/video_outputs.py",
+      "sha256": "8765bdfeb2791e809e53c7d2705cc85c722f36ca421c3c8fc52b07e5327a84c7",
+      "bytes": 33191
+    },
+    {
+      "file": "tools/blenderctl/video_proxy.py",
+      "sha256": "d24e255d275f7e1e237b4ecbf431e5dbd3ce0ba0fd5aa2f0cd7c8cf68321b9ef",
+      "bytes": 19480
+    },
+    {
+      "file": "tools/blenderctl/video_verifier.py",
+      "sha256": "9a07da4a323f84c12212c1ad3d11c1d37948d025dd65b9f03927234ce3249e5b",
+      "bytes": 4593
+    },
+    {
+      "file": "tools/blenderctl/video_workflow.py",
+      "sha256": "d45efe70949ac650e1008a260cab5988fe25cc0f402ecf16567e961b58a075c9",
+      "bytes": 16100
+    },
+    {
+      "file": "tools/blenderctl/video_workflow_contract.py",
+      "sha256": "493d360e641ce488e87a13559ec1957b17a026117b311e9bb7f4a4b821fcb55a",
+      "bytes": 6177
+    },
+    {
+      "file": "tools/blenderctl/weight_transfer.py",
+      "sha256": "33e441a6dbd6499c65fa70e9c1e49e9bcd5e7c1c31dd76b695f1b5eaeeaa2b3b",
+      "bytes": 15066
+    },
+    {
+      "file": "tools/blenderctl/weight_transfer_contract.py",
+      "sha256": "50f7e12cbab0e90b9f71955b31a853852507985225c94bfd86cefef982290f00",
+      "bytes": 1058
+    },
+    {
+      "file": "tools/blenderctl/win_appcontainer.py",
+      "sha256": "c00d0bc4c029ec53bd30f00ec1396b40e95a67a244dc7334f414a624da7872bb",
+      "bytes": 11677
+    },
+    {
+      "file": "tools/blenderctl/worker.py",
+      "sha256": "4dfff35d302c9f9aea860cde5aa474a36321d7ea2477320363d758ca8f1c22a1",
+      "bytes": 17942
+    },
+    {
+      "file": "tools/blenderctl/workflow_contract.py",
+      "sha256": "2e4c1c0308608be996adcec88b4271612b3a72838f44ed26fd0fe67f7cfc7a84",
+      "bytes": 2452
+    },
+    {
+      "file": "tools/blenderctl/workflow_evidence.py",
+      "sha256": "40e028a3be718336d514e039740c89389701590297feb6dc746257df37c2e21f",
+      "bytes": 6741
+    },
+    {
+      "file": "tools/blenderctl/workflow_identity.py",
+      "sha256": "27d41674b7fdcb417ce04f38aa55b19272ccaef86389398a9164d59ee5b3b193",
+      "bytes": 9223
+    },
+    {
+      "file": "tools/blenderctl/workflow_preflight.py",
+      "sha256": "f057f7d9622e5d57b3159f04d91eae693af2105a214b82e6a7e7152737f582ac",
+      "bytes": 9795
+    },
+    {
+      "file": "tools/blenderctl/workflow_runtime.py",
+      "sha256": "ec827180906d90a32e72d50f1da7af97d038f14c3c14a3de6b03da6fad9742a2",
+      "bytes": 2974
+    },
+    {
+      "file": "tools/blenderctl/zone_cache.py",
+      "sha256": "ae053c1227773aa04ebcc789e57f8bcb33df63a856077d6ade368bad433c19a4",
+      "bytes": 21306
+    },
+    {
+      "file": "tools/blenderctl/zone_cache_contract.py",
+      "sha256": "0e92fda9ef8ae615d2c6dcb44408a2679cfa03688b52531eb04119b31d447cc2",
+      "bytes": 2460
+    },
+    {
+      "file": "tools/blenderctl/zone_contract.py",
+      "sha256": "83b6264814c0bdd800ea337218b8215848a5d5e907a01b854a72bc50f4c43ed3",
+      "bytes": 1044
+    },
+    {
+      "file": "tools/blenderctl/zone_state_oracle.py",
+      "sha256": "09e97cdb80321ef68913e9c5fb0d53b8d84b5f64139c3b883c7670d2b1efb46b",
+      "bytes": 9295
+    },
+    {
+      "file": "tools/compositing_workflow_addon/__init__.py",
+      "sha256": "d9b318495d7edd2cf668b980acf472e34254f191c3b184886daeef364fffc9a2",
+      "bytes": 464
+    },
+    {
+      "file": "tools/compositing_workflow_addon/blender_manifest.toml",
+      "sha256": "14f9ae21085ce6a62e960df3ff5605c55ba0e88719e1b9142bb0f2c67746b66b",
+      "bytes": 286
+    },
+    {
+      "file": "tools/compositing_workflow_addon/contract.py",
+      "sha256": "1b51b7bef6aa4a02a2f05e5d28236d9de30e0e9c0c2fcc3d47c9a1d91899b80b",
+      "bytes": 40488
+    },
+    {
+      "file": "tools/compositing_workflow_addon/core.py",
+      "sha256": "700130e16f8481e96a9b84c4eac5e5321e863c9e7669fe3b83d7a6dc21fcb704",
+      "bytes": 87677
+    },
+    {
+      "file": "tools/compositing_workflow_addon/movie_contract.py",
+      "sha256": "46ea7b1159541c268a79c103a85505d1839fd4c572e867074870269b52e60172",
+      "bytes": 11711
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/__init__.py",
+      "sha256": "dbd2930497290e9e5d294674f7704d46b8c784b9e8e483493515c83e8f05e5f9",
+      "bytes": 545
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/blender_manifest.toml",
+      "sha256": "8756dafda4f7367d15f5338ee7ac62f068b6d9c3bf64777b08e54d445070e2d7",
+      "bytes": 364
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/contract.py",
+      "sha256": "e2c040e5dc26b0b85a97001cfee5d392b0d9a547590143caed02653f2cb4f85a",
+      "bytes": 25122
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/core.py",
+      "sha256": "35e3ccb2fbabb13b7be10baad8738ac77af67a3fa7a18937234253c949f6470f",
+      "bytes": 45306
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/inspection.py",
+      "sha256": "5f3ce81d7a4f40bdf5350559e10e2e49e6f59348b5f354b84f73187eb5c45e7d",
+      "bytes": 30254
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/recipes.py",
+      "sha256": "d66733930ab900c66fb9fca0dd8ad3de8d273814d606eabc8476af71f1982dbb",
+      "bytes": 13716
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/session.py",
+      "sha256": "e176fcf39355fcb3b9c1d0ce24304ce225a6819634552d8a50b4281ea0a20833",
+      "bytes": 29474
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/ui.py",
+      "sha256": "a97ddb23158a2166700462f27089df81f4d467d149b64c4d08e7b5a687ccccfe",
+      "bytes": 3377
+    },
+    {
+      "file": "tools/lighting_workflow_addon/__init__.py",
+      "sha256": "09e725d3e52d09fff202a2a13567fdc0b97f525c99a5f2b9b19faa6e4a5dfa8f",
+      "bytes": 486
+    },
+    {
+      "file": "tools/lighting_workflow_addon/advanced.py",
+      "sha256": "c42222b43fe1edff7757992bd1fa5b7360e498a671f434c1b0b911b2fcc8a57c",
+      "bytes": 13446
+    },
+    {
+      "file": "tools/lighting_workflow_addon/blender_manifest.toml",
+      "sha256": "672c5245e2adb74d3c014ea6d65bf5514cc67120c11c0409b59334b816e08697",
+      "bytes": 306
+    },
+    {
+      "file": "tools/lighting_workflow_addon/contract.py",
+      "sha256": "e5d21ac63e1b3af292a6e0cb2f0c85751317f166a17aabd1b62893c41b680704",
+      "bytes": 14348
+    },
+    {
+      "file": "tools/lighting_workflow_addon/core.py",
+      "sha256": "d764e2a057a67f07d4cb797fc03d8f514c37926ab588463b7c7508ac6bfbb942",
+      "bytes": 57631
+    },
+    {
+      "file": "tools/lighting_workflow_addon/presets.py",
+      "sha256": "cb8d83bfc441c4fc3f41cd5ef45860287447e3d528bbf7d1ad5fa402082b2e14",
+      "bytes": 1652
+    },
+    {
+      "file": "tools/lighting_workflow_addon/templates.py",
+      "sha256": "ece8b4789a84991adcaf96a29af7ac160dcf75b5fa7df9cdab92e19eb8725657",
+      "bytes": 17735
+    },
+    {
+      "file": "tools/lighting_workflow_addon/ui.py",
+      "sha256": "dfbf96b55207d7d260f9669dec6082c3e987784d4b13eb7b142aa59616eede71",
+      "bytes": 12133
+    },
+    {
+      "file": "tools/material_workflow_addon/__init__.py",
+      "sha256": "e93090895be45a71dc79d68a64061d64a28bd6f2647306856c79ba61f52c707a",
+      "bytes": 528
+    },
+    {
+      "file": "tools/material_workflow_addon/batch.py",
+      "sha256": "71545106505c301ab2f8677ac7266e61b651c3a514ff8f816eee1d9efc1fa136",
+      "bytes": 5671
+    },
+    {
+      "file": "tools/material_workflow_addon/batch_contract.py",
+      "sha256": "0fc395cb1b18dc140f624c084f4ce328cc41d994b791f9d0c02e372eba41c1fa",
+      "bytes": 6418
+    },
+    {
+      "file": "tools/material_workflow_addon/batch_preview.py",
+      "sha256": "efdbda38afa145214db5af658dc054facc8256461d728676ff733b3e4e6d0388",
+      "bytes": 7117
+    },
+    {
+      "file": "tools/material_workflow_addon/blender_manifest.toml",
+      "sha256": "20c7d97e6dd842fe819dc4f7411b4ab1e5c1006524152134a647cd41c7d1f942",
+      "bytes": 357
+    },
+    {
+      "file": "tools/material_workflow_addon/contract.py",
+      "sha256": "ba3402e248548299f9c22b49dd9b5b329e301e1d117ce2358afd34f3d7a049bd",
+      "bytes": 13747
+    },
+    {
+      "file": "tools/material_workflow_addon/core.py",
+      "sha256": "f20b41e0a3bed9b3b39bfeb58ac90199870c5b06779606aded8ff46524c9d62d",
+      "bytes": 20570
+    },
+    {
+      "file": "tools/material_workflow_addon/core_v2.py",
+      "sha256": "e334c0348c8eeefe30ff9fdaa59b89bbce30ecee4ae161437e7c5df63c6fab8f",
+      "bytes": 33353
+    },
+    {
+      "file": "tools/material_workflow_addon/engine_compat.py",
+      "sha256": "c0ccdbdf5000c5f5abc96d10e6e54d6ff54f1d8bf1c894dafd3ed3b6214e385c",
+      "bytes": 5112
+    },
+    {
+      "file": "tools/material_workflow_addon/handoff.py",
+      "sha256": "aca1985bb0de38e4dd84752df61c75bb2e4ff2f68b2d87cdd562ae8d76a6f526",
+      "bytes": 15056
+    },
+    {
+      "file": "tools/material_workflow_addon/job_bridge.py",
+      "sha256": "4ca89821d54a78470fbbe91f60f921f6fa67103b42ef8cad2dd3d4e24e1b1b71",
+      "bytes": 12453
+    },
+    {
+      "file": "tools/material_workflow_addon/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "tools/material_workflow_addon/preview.py",
+      "sha256": "8592e7db75c91ffcbb75cef0524211a6b760de540d46e5d722d16b5844d1f74f",
+      "bytes": 16845
+    },
+    {
+      "file": "tools/material_workflow_addon/README.md",
+      "sha256": "de2d4eba18fc77e9701d1cad4fb516e868bf8a846110dc6d6dc70c8d3703cd2e",
+      "bytes": 1272
+    },
+    {
+      "file": "tools/material_workflow_addon/templates.py",
+      "sha256": "ccc679cc69959a0c150e5b9f019b323945235cc74eb011e63adcfa17d8f7409e",
+      "bytes": 7752
+    },
+    {
+      "file": "tools/material_workflow_addon/texture_analysis.py",
+      "sha256": "2662980bbb1800388586cff2a38973c4a37be479d3e3e0341edbedb8631c0184",
+      "bytes": 10137
+    },
+    {
+      "file": "tools/material_workflow_addon/ui.py",
+      "sha256": "9226d7d8a47cf97aa3de2b91b6ed89b0b50316d7089605dfcad62a32340e3e79",
+      "bytes": 19996
+    },
+    {
+      "file": "tools/material_workflow_addon/ui_batch.py",
+      "sha256": "7c80b6de07109a79b7bce32719e915684c9d632cd7ad33cdc4c3ab58ff7d0c94",
+      "bytes": 16741
+    },
+    {
+      "file": "tools/material_workflow_addon/ui_handoff.py",
+      "sha256": "5e6b95881e0b3a0f0d52eee3f2dbcd5cc1f82c718d1bcbcd3241d13055fc43bd",
+      "bytes": 6514
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/__init__.py",
+      "sha256": "b658367c1d536662462a021efaded2cd162194192f38e4472e4557e6bad2c751",
+      "bytes": 487
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/blender_manifest.toml",
+      "sha256": "9f33b597940fdc034c0bde1388e821dcc35599b8a6e880ce44ce8795b92be1c2",
+      "bytes": 294
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/contract.py",
+      "sha256": "00bbfa6b8e0b02f46408c299144481baa74f7c4b0ce0623c5693f58efa2f5997",
+      "bytes": 26994
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/core.py",
+      "sha256": "7be01d8d9b4b18709b573e5984c9ce7a4b164e8802c284673d728874ac21e7d2",
+      "bytes": 31507
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/LICENSE.txt",
+      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
+      "bytes": 35821
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/protection.py",
+      "sha256": "e3bac01875e66f9a6081fa1f49b698bfffee9c5b6c525d473ad2d15c4cbd92d8",
+      "bytes": 23951
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/retiming.py",
+      "sha256": "7b6a3bcffdc814fd4f3cca685e601ef5d9a8f5c080554f983caac5b97fea2e02",
+      "bytes": 11039
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/subtitles.py",
+      "sha256": "94204933dbdd6ca3c5bee97c4ea0aef24f9caf58f3a264a0d84f0317a06122c9",
+      "bytes": 3648
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/ui.py",
+      "sha256": "89372ec259925925997199baa76aacd8f57910f482e373f28fedf5fa97876bf1",
+      "bytes": 2359
+    }
+  ]
+}

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Observations are not limits. No GPU or filesystem configuration is modified."""
 import ctypes,os,shutil,subprocess
 from ctypes import wintypes as w

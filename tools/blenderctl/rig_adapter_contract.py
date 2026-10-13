@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Versioned public evidence envelope for explicit S08 adapters."""
 from scene_contract import obj,array,integer,number
 DETAILS=[]

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit generated USD cache -> FBX 7400 morph clip with native-frame NLA time.
 
 File time stays in seconds (64-bit KTIME). Only the imported Action clock is

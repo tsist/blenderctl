@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Static evaluated asset previews; original scene is reopened before embedding."""
 import copy,hashlib,json,time
 from pathlib import Path

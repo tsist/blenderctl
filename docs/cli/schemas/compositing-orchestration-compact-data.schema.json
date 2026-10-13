@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compositing-orchestration-compact-data.schema.json",
+  "type": "object",
+  "properties": {
+    "status": {
+      "enum": [
+        "pending",
+        "running",
+        "passed",
+        "partial",
+        "failed",
+        "cancelled",
+        "timed_out",
+        "not_observed",
+        "mock_only"
+      ]
+    },
+    "domain_status": {
+      "enum": [
+        "running",
+        "passed",
+        "partial",
+        "failed",
+        "cancelled",
+        "timed_out",
+        "mock_only",
+        "not_observed"
+      ]
+    },
+    "supervisor_state": {
+      "enum": [
+        "queued",
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "timed_out",
+        "not_observed"
+      ]
+    },
+    "transport_ok": {
+      "type": "boolean"
+    },
+    "domain_all_passed": {
+      "type": "boolean"
+    },
+    "evidence_kind": {
+      "enum": [
+        "normal_host",
+        "mock_only"
+      ]
+    },
+    "certified_producer": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "planned": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16
+        },
+        "reused": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16
+        },
+        "not_started": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16
+        }
+      },
+      "required": [
+        "planned",
+        "completed",
+        "passed",
+        "failed",
+        "reused",
+        "not_started"
+      ],
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object"
+      }
+    },
+    "not_started_ids": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string"
+      }
+    },
+    "scope": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "domain_status",
+    "supervisor_state",
+    "transport_ok",
+    "domain_all_passed",
+    "counts",
+    "items",
+    "not_started_ids"
+  ],
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "domain_status": {
+            "enum": [
+              "partial",
+              "mock_only",
+              "failed",
+              "cancelled",
+              "timed_out"
+            ]
+          }
+        },
+        "required": [
+          "domain_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "domain_all_passed": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "pending",
+              "running",
+              "partial",
+              "mock_only",
+              "failed",
+              "cancelled",
+              "timed_out",
+              "not_observed"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "domain_all_passed": {
+            "const": false
+          }
+        }
+      }
+    }
+  ]
+}

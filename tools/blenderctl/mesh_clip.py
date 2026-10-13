@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit full evaluated surface clips, time-rescaled integer export and midpoint gates."""
 import math,time
 from contextlib import ExitStack

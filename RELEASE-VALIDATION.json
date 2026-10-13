@@ -1,0 +1,77 @@
+{
+  "release": "0.63.0",
+  "verified_on": "2026-10-13",
+  "baseline": {
+    "os": "Windows",
+    "blender": "5.2.1 LTS",
+    "build": "9e2066aef7ef",
+    "python": "3.13"
+  },
+  "host_contracts": {
+    "status": "passed",
+    "cli_suite": 33,
+    "template_suite": 35
+  },
+  "independent_dependency_review": {
+    "status": "passed",
+    "runtime_files": 189,
+    "support_source_files": 227,
+    "schemas": 149,
+    "describe_calls": 12
+  },
+  "native_extracted_candidate": {
+    "status": "passed",
+    "source_preserved": true,
+    "main_frames": 8,
+    "decoded_pngs": 16,
+    "pixel_match": "all pixels exact red/blue at the cut",
+    "commands": [
+      {
+        "name": "fixture",
+        "exit_code": 0,
+        "seconds": 0.637
+      },
+      {
+        "name": "input",
+        "exit_code": 0,
+        "seconds": 0.083
+      },
+      {
+        "name": "compile",
+        "exit_code": 0,
+        "seconds": 0.419
+      },
+      {
+        "name": "create",
+        "exit_code": 0,
+        "seconds": 4.302
+      },
+      {
+        "name": "cold-inspect",
+        "exit_code": 0,
+        "seconds": 1.866
+      }
+    ],
+    "scope": "160x90 SDR COLOR strips; no audio/text/HDR/4K or aesthetic qualification"
+  },
+  "tested_candidate_source_archive": {
+    "file": "blenderctl-0.63.0-source.zip",
+    "sha256": "4e7e5cdea51d00bba909541c99a67e8b674b54e28c0ac79d735e3898232da7c2",
+    "bytes": 8549348,
+    "entries": 493
+  },
+  "finalization": "Only publication scripts, skill installation documentation and this result summary changed after native smoke; runtime/compiler/helper/example/smoke code hashes must match tested source.",
+  "extension_metadata": "Blender native extension validate passed for addon ZIP",
+  "standalone_portability": {
+    "template_compile_with_BLENDERCTL_ROOT": "passed",
+    "three_skill_helpers_help": "passed",
+    "powershell_wrapper_version": "0.63.0"
+  },
+  "not_run": [
+    "all-adapter native regression",
+    "4K HDR stress",
+    "HDR display viewing",
+    "complex acting",
+    "real long-form production"
+  ]
+}

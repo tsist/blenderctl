@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """New native curve copies, constrained projection and live evaluated skin bind."""
 import json,math,hashlib
 import bpy,numpy as np

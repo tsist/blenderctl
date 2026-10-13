@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Protected single-worker material batches with immutable recovery checkpoints."""
 import copy
 import hashlib

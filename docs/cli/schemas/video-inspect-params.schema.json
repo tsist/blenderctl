@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:blenderctl:video-inspect-params.schema.json",
+  "title": "video.inspect params (not complete CLI request)",
+  "$comment": "Strict structure; companion normalize functions check absolute paths, unique IDs, kind-specific merged patches, half-open ranges, source sampling, resource SHA closure and complete output budget. HDR10_PQ is not runtime qualified.",
+  "type": "object",
+  "properties": {
+    "file": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32767,
+      "description": "Absolute local path; runtime checks path and resource closure."
+    },
+    "expected_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32767,
+            "description": "Absolute local path; runtime checks path and resource closure."
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "workflow_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+    },
+    "implementation_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "file",
+    "expected_sha256",
+    "resources",
+    "scene"
+  ],
+  "additionalProperties": false
+}

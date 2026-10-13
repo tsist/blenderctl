@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Strict asset-candidate manifests. No arbitrary code or implicit source overwrite."""
 from pathlib import Path
 import uuid

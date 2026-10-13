@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Opt-in material-only edits with deformation invariants and frame checks."""
 import bpy, math, copy
 from inspection import mesh_content, record, value, properties

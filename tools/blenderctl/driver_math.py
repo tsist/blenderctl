@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded AST arithmetic; never eval/exec or Python attribute resolution.
 
 Intervals conservatively reject unprovable domains, including Blender's silent

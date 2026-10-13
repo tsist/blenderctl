@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Per-mesh checked multi-cage B-Bone exchange using the native segment oracle."""
 import time
 import bpy

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Whole-project native rig delivery; never an implicit selection export."""
 from protocol import Failure
 from scene_contract import obj,array,enum,number,NAME,validate

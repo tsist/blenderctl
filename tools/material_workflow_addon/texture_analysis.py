@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded, read-only texture diagnostics. No aesthetic or physical acceptance."""
 import hashlib
 import math

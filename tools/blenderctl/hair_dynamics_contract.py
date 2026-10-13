@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded native ribbon Cloth driven by managed surface guides."""
 from scene_contract import obj,array,number,integer,NAME
 LEGACY=obj({'op':{'const':'hair.dynamics'},'adapter':{'const':'RIBBON_CLOTH_V1'},

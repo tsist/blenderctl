@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit native control channels; preserve the rig graph, never invert arbitrary IK."""
 import math
 import bpy

@@ -1,0 +1,41 @@
+{
+  "context": {
+    "file": "F:\\REPLACE_WITH_PROJECT\\source.blend",
+    "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "resources": []
+  },
+  "parameters": {
+    "workflow_id": "template-example",
+    "scene": "TemplateExample",
+    "fps": [24, 1],
+    "width": 640,
+    "height": 360,
+    "frame_start": 1,
+    "shots": [
+      {
+        "id": "shot-001",
+        "kind": "COLOR",
+        "duration": 36,
+        "color": [0.06, 0.09, 0.13, 1.0],
+        "name": "第一镜头占位"
+      },
+      {
+        "id": "shot-002",
+        "kind": "COLOR",
+        "duration": 36,
+        "color": [0.12, 0.07, 0.04, 1.0],
+        "name": "第二镜头占位"
+      }
+    ],
+    "font": {
+      "file": "F:\\REPLACE_WITH_PROJECT\\chinese-font.ttf",
+      "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "title": "模板参数示例",
+    "title_duration": 24,
+    "subtitles": [
+      {"id": "subtitle-001", "offset": 24, "duration": 24, "text": "先绑定工程和中文字体"},
+      {"id": "subtitle-002", "offset": 48, "duration": 24, "text": "再生成独立剪辑请求"}
+    ]
+  }
+}

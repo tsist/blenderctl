@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host-safe bounded studies; expansions reuse the canonical batch normalizer."""
 from copy import deepcopy
 from material_batch_contract import BATCH_PARAMS_SCHEMA, normalize_params as normalize_batch_params

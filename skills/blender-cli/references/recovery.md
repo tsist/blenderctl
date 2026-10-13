@@ -9,13 +9,13 @@
 resume重新评估DAG，不恢复进程内状态；缓存烘焙不承诺从中间帧续算。输入/输出/实现/闭包不匹配就重跑，不改旧报告求命中。
 
 ```powershell
-& $ctl --jobs-dir $jobs --timeout 600 --async pipeline run --manifest '<manifest.json>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs --timeout 600 --async pipeline run --manifest '<manifest.json>'
 # submit的ok仅表示提交成功；使用返回job_id。
-& $ctl --jobs-dir $jobs job status '<job_id>'
-& $ctl --jobs-dir $jobs job cancel '<job_id>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs job status '<job_id>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs job cancel '<job_id>'
 # cancel只是登记请求，之后有界等待并确认终态/结果。
-& $ctl --jobs-dir $jobs job result '<job_id>'
-& $ctl --jobs-dir $jobs --timeout 600 pipeline resume '<job_id>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs job result '<job_id>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs --timeout 600 pipeline resume '<job_id>'
 ```
 
 不用高速轮询。stale时先读自己job的status.json/supervisor.log/stderr.log/result.json确认归属；不按进程名终止全部Blender或删除锁。取消仅作用于已授权管理的job。隔离任务异常退出按job cleanup-isolation帮助处理自己job残留，不降级无隔离执行。

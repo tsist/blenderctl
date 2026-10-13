@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit asset edits on disposable candidates; sources and other assets stay intact."""
 import json
 import copy

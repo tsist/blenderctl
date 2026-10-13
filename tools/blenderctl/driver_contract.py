@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Opt-in native simple-driver profile; not permission to execute Python."""
 from node_contract import obj,array,integer,NAME,SHA,validate
 

@@ -1,0 +1,1028 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Compositing Encode candidate1.0 dual profiles, Host only",
+  "description": "Named reference fidelity; no device viewing, real mastering or complete normative HDR10 certification. Semantic fps/order/ROI/closure checks use the unchanged core contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "command",
+    "params"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "command": {
+      "const": "compositing.encode"
+    },
+    "params": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "encode_version": {
+              "const": "1.0-candidate"
+            },
+            "producer": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "expected_sha256"
+              ]
+            },
+            "select": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "produced_frames"
+                    },
+                    "frames": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "minItems": 1,
+                      "maxItems": 300,
+                      "uniqueItems": true
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "frames"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "still_repeat"
+                    },
+                    "frames": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "minItems": 1,
+                      "maxItems": 1
+                    },
+                    "repeat_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "frames",
+                    "repeat_count"
+                  ]
+                }
+              ]
+            },
+            "fps": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120000
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "alpha": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "require_opaque"
+                    }
+                  },
+                  "required": [
+                    "mode"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "composite_matte"
+                    },
+                    "association": {
+                      "const": "PREMUL"
+                    },
+                    "matte_rgb_output_linear": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "association",
+                    "matte_rgb_output_linear"
+                  ]
+                }
+              ]
+            },
+            "runtime": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "python": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "ffmpeg": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "ffprobe": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "modules": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "PyOpenColorIO": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    },
+                    "OpenImageIO": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    },
+                    "numpy": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    },
+                    "python_native": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "PyOpenColorIO",
+                    "OpenImageIO",
+                    "numpy",
+                    "python_native"
+                  ]
+                }
+              },
+              "required": [
+                "python",
+                "ffmpeg",
+                "ffprobe",
+                "modules"
+              ]
+            },
+            "quality": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 18
+                },
+                "preset": {
+                  "enum": [
+                    "medium",
+                    "slow"
+                  ]
+                },
+                "gray_rois": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "rect": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "rect"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 128
+                }
+              },
+              "required": [
+                "crf",
+                "preset",
+                "gray_rois"
+              ]
+            },
+            "budget": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "max_pixel_frames": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2147483648
+                },
+                "timeout_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 7200
+                }
+              },
+              "required": [
+                "max_pixel_frames",
+                "timeout_seconds"
+              ]
+            },
+            "resume": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "expected_sha256"
+              ]
+            },
+            "encode_color": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "view": {
+                  "const": "Standard"
+                },
+                "source_display_policy": {
+                  "const": "EXPLICIT_OVERRIDE"
+                },
+                "look": {
+                  "const": "None"
+                },
+                "white_balance": {
+                  "const": false
+                },
+                "curves": {
+                  "const": false
+                },
+                "gamma": {
+                  "type": "number",
+                  "const": 1
+                },
+                "exposure": {
+                  "type": "number",
+                  "minimum": -20,
+                  "maximum": 20
+                },
+                "gamut_policy": {
+                  "const": "RETAIN_REFERENCE"
+                },
+                "reference_white_nits": {
+                  "enum": [
+                    100,
+                    203
+                  ]
+                },
+                "mapping_policy": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "LINEAR_RETAIN_REFERENCE"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              },
+              "required": [
+                "view",
+                "source_display_policy",
+                "look",
+                "white_balance",
+                "curves",
+                "gamma",
+                "exposure",
+                "gamut_policy",
+                "reference_white_nits"
+              ]
+            },
+            "mastering": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "technical_target"
+                },
+                "primaries": {
+                  "const": "BT2020"
+                },
+                "white_point": {
+                  "const": [
+                    0.3127,
+                    0.329
+                  ]
+                },
+                "min_nits": {
+                  "const": 0.0001
+                },
+                "max_nits": {
+                  "const": 10000
+                },
+                "statement_source": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "primaries",
+                "white_point",
+                "min_nits",
+                "max_nits",
+                "statement_source"
+              ]
+            }
+          },
+          "required": [
+            "encode_version",
+            "producer",
+            "select",
+            "fps",
+            "alpha",
+            "runtime",
+            "quality",
+            "budget",
+            "encode_color",
+            "mastering"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "encode_version": {
+              "const": "1.0-candidate"
+            },
+            "producer": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "expected_sha256"
+              ]
+            },
+            "select": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "produced_frames"
+                    },
+                    "frames": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "minItems": 1,
+                      "maxItems": 300,
+                      "uniqueItems": true
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "frames"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "still_repeat"
+                    },
+                    "frames": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "minItems": 1,
+                      "maxItems": 1
+                    },
+                    "repeat_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "frames",
+                    "repeat_count"
+                  ]
+                }
+              ]
+            },
+            "fps": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120000
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "alpha": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "require_opaque"
+                    }
+                  },
+                  "required": [
+                    "mode"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "mode": {
+                      "const": "composite_matte"
+                    },
+                    "association": {
+                      "const": "PREMUL"
+                    },
+                    "matte_rgb_output_linear": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "association",
+                    "matte_rgb_output_linear"
+                  ]
+                }
+              ]
+            },
+            "runtime": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "python": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "ffmpeg": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "ffprobe": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                    },
+                    "expected_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "expected_sha256"
+                  ]
+                },
+                "modules": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "PyOpenColorIO": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    },
+                    "OpenImageIO": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    },
+                    "numpy": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    },
+                    "python_native": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ]
+                      },
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "PyOpenColorIO",
+                    "OpenImageIO",
+                    "numpy",
+                    "python_native"
+                  ]
+                }
+              },
+              "required": [
+                "python",
+                "ffmpeg",
+                "ffprobe",
+                "modules"
+              ]
+            },
+            "quality": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 18
+                },
+                "preset": {
+                  "enum": [
+                    "medium",
+                    "slow"
+                  ]
+                },
+                "gray_rois": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "rect": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "rect"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 128
+                }
+              },
+              "required": [
+                "crf",
+                "preset",
+                "gray_rois"
+              ]
+            },
+            "budget": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "max_pixel_frames": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2147483648
+                },
+                "timeout_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 7200
+                }
+              },
+              "required": [
+                "max_pixel_frames",
+                "timeout_seconds"
+              ]
+            },
+            "resume": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "pattern": "^(?:[A-Za-z]:[\\\\/]|\\\\\\\\)"
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "file",
+                "expected_sha256"
+              ]
+            },
+            "encode_color": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "view": {
+                  "const": "AgX - HDR 1000 nits"
+                },
+                "source_display_policy": {
+                  "const": "EXPLICIT_OVERRIDE"
+                },
+                "look": {
+                  "const": "None"
+                },
+                "white_balance": {
+                  "const": false
+                },
+                "curves": {
+                  "const": false
+                },
+                "gamma": {
+                  "type": "number",
+                  "const": 1
+                },
+                "exposure": {
+                  "type": "number",
+                  "minimum": -20,
+                  "maximum": 20
+                },
+                "gamut_policy": {
+                  "const": "OCIO_VIEW"
+                },
+                "mapping_policy": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "OCIO_DISPLAY_VIEW"
+                    },
+                    "display": {
+                      "const": "Rec.2100-PQ"
+                    },
+                    "view": {
+                      "const": "AgX - HDR 1000 nits"
+                    },
+                    "ocio_config_sha256": {
+                      "const": "df5714c85d5afb5e9762281503a0c48a9f65dadb22d32a3aee50c454a0821f62"
+                    },
+                    "declared_display_reference_white_nits": {
+                      "const": 100
+                    },
+                    "extra_gain": {
+                      "const": "NONE"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "display",
+                    "view",
+                    "ocio_config_sha256",
+                    "declared_display_reference_white_nits",
+                    "extra_gain"
+                  ]
+                }
+              },
+              "required": [
+                "view",
+                "source_display_policy",
+                "look",
+                "white_balance",
+                "curves",
+                "gamma",
+                "exposure",
+                "gamut_policy",
+                "mapping_policy"
+              ]
+            },
+            "mastering": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "technical_target"
+                },
+                "primaries": {
+                  "const": "P3D65"
+                },
+                "white_point": {
+                  "const": [
+                    0.3127,
+                    0.329
+                  ]
+                },
+                "min_nits": {
+                  "const": 0.0001
+                },
+                "max_nits": {
+                  "const": 1000
+                },
+                "statement_source": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "primaries",
+                "white_point",
+                "min_nits",
+                "max_nits",
+                "statement_source"
+              ]
+            }
+          },
+          "required": [
+            "encode_version",
+            "producer",
+            "select",
+            "fps",
+            "alpha",
+            "runtime",
+            "quality",
+            "budget",
+            "encode_color",
+            "mastering"
+          ]
+        }
+      ]
+    }
+  }
+}

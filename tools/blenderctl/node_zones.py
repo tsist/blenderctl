@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit paired zones, stable state sockets and bounded region validation."""
 import bpy
 from protocol import Failure

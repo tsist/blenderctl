@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Owned process-tree lifetime. Never kill a process looked up by name or stale PID."""
 import ctypes
 import os

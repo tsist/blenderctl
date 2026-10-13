@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Auditable native expression evaluation with unchanged default script refusal."""
 import hashlib,json,math
 import bpy

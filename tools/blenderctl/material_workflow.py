@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """One protected material candidate and diagnostic views in one Blender worker."""
 import copy
 import json

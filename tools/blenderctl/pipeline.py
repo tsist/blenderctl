@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """One host supervisor, bounded independent Blender trees, immutable resume attempts."""
 import copy,hashlib,json,os,re,shutil,subprocess,sys,threading,time,traceback
 from concurrent.futures import ThreadPoolExecutor
@@ -12,12 +11,21 @@ CONSTRUCTORS={'scene.prepare','model.prepare','node.prepare','rig.prepare','simu
 NO_REUSE={'extension.run','simulation.bake','dependency.audit','asset.prepare','asset.index','identity.prepare','sculpt.replay'}
 NO_REUSE.update(('tracking.prepare','tracking.inspect','tracking.solve'))
 NO_REUSE.update(('inspect','project.verify','project.prepare_copy','project.link.prepare','project.override.prepare','project.override.resync','exchange.analyze'))
+# Explicit work-unit admission does not grant standalone worker cache reuse.
+NO_REUSE.update(('geometry.run','geometry.inspect','material.run'))
 
 def key(v):return hashlib.sha256(json.dumps(v,sort_keys=True,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 
-def runtime_identity(blender,stack,checkpoint):
+def runtime_identity(blender,stack,checkpoint,workflow_mode=False):
     # Exact implementation/engine bytes plus content SHA of shipped runtime files.
     files=[*sorted(Path(__file__).parent.glob('*.py')),Path(blender),Path(sys.executable)]
+    if workflow_mode:
+        # Both add-on closures contribute to the global identity; no relaxed
+        # producer identity replaces the existing exact CLI/runtime guard.
+        for addon in ('geometry_nodes_workflow_addon','material_workflow_addon'):
+            root=ROOT/'tools'/addon
+            if not root.is_dir():raise Failure('UNSUPPORTED','Workflow add-on closure is missing: '+addon)
+            files.extend(sorted(root.rglob('*.py')))
     hashes={}
     for p in files:
         g=stack.enter_context(FileGuard(p));hashes[str(p)]=g.sha256(checkpoint)
@@ -46,6 +54,12 @@ def protect(params,command,blender,stack,checkpoint):
         from reviews import verify_run
         verify_run(params,blender,stack,checkpoint)
     docs=documents(params)
+    if command in ('geometry.run','geometry.inspect'):
+        from geometry_workflow_contract import input_documents
+        docs+=input_documents(params)
+    if command=='material.run':
+        from material_workflow_contract import input_documents
+        docs+=input_documents(params)
     if command in ('project.link.prepare','project.override.prepare','project.override.resync'):
         if command=='project.override.resync':
             descriptor=params['manifest']['receipt'];guard=stack.enter_context(FileGuard(descriptor['file']))
@@ -230,7 +244,7 @@ def verify_reuse(old,cache_key,stack,checkpoint,runtime=None):
         return False
     except OSError:trial.close();return False
 
-def execute(job,parent_checkpoint=None):
+def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_mode=False,defer_publication=False):
     import runner
     guards=ExitStack()
     try:guards.enter_context(PathLocks([job]))
@@ -238,6 +252,7 @@ def execute(job,parent_checkpoint=None):
         guards.close();return envelope('pipeline.run',job.name,error={'code':ex.code,'message':str(ex)}),CODES[ex.code]
     started=time.monotonic();request=read_json(job/'request.json');launch=read_json(job/'launch.json');status=read_json(job/'status.json');abort=threading.Event();rows={};error=None;manifest=None;runtime=None;futures={};max_active=0;observed_disk=0;last_disk=0;prior_id=None;prior={};pool=None
     status.update(state='running',supervisor_pid=os.getpid(),started_at=time.time());artifacts={'job_directory':str(job),'pipeline_state':str(job/'pipeline-state.json'),'pipeline_report':str(job/'pipeline-report.json')}
+    if workflow_mode:artifacts['workflow_report']=str(job/'pipeline-report.json')
     def child_checkpoint():
         if abort.is_set() or (job/'cancel.request').exists():raise Failure('CANCELLED','Parent pipeline cancelled')
         if time.monotonic()-started>launch['timeout_seconds']:raise Failure('TIMEOUT','Parent pipeline timeout')
@@ -253,6 +268,7 @@ def execute(job,parent_checkpoint=None):
             if shutil.disk_usage(job).free<manifest['policy']['min_free_mb']*1048576:raise Failure('RESOURCE_LIMIT','Free disk space below pipeline floor')
     def record(final=False):
         report={'pipeline_report_version':'1.0','job_id':job.name,'manifest':manifest,'reuse_job':prior_id,'runtime_key':key(runtime) if runtime else None,'steps':list(rows.values()),'max_active_workers':max_active,'observed_disk_bytes':observed_disk,'elapsed_seconds':time.monotonic()-started,'complete':final,'error':error,'execution':'independent workers; no publication/transaction commands; explicit resume creates a new attempt'}
+        if workflow_mode:report['workflow_report_version']='1.0'
         atomic_json(job/('pipeline-report.json' if final else 'pipeline-state.json'),report)
         if final and any(r['command']=='asset.preview.prepare' for r in rows.values()):
             preview_rows=[]
@@ -265,14 +281,17 @@ def execute(job,parent_checkpoint=None):
         row.update(state='failed',error={'code':ex.code if isinstance(ex,Failure) else 'WORKER_FAILED','message':str(ex)},finished_at=time.time())
     try:
         with nullcontext(guards):
-            prior_id=request['params'].get('job_id') if request['command']=='pipeline.resume' else request['params'].get('reuse_job')
+            if workflow_mode != (request['command'] in ('workflow.run','workflow.resume')):
+                raise Failure('INVALID_REQUEST','Workflow/pipeline supervisor domain mismatch')
+            prior_id=request['params'].get('job_id') if request['command'] in ('pipeline.resume','workflow.resume') else request['params'].get('reuse_job')
             previous=runner.job_path(job.parent,prior_id) if prior_id else None
             if previous:guards.enter_context(PathLocks([previous]))
             for p in (job/'request.json',job/'launch.json'):guards.enter_context(FileGuard(p))
             atomic_json(job/'status.json',status)
             if previous:
                 prior_command=read_json(previous/'request.json')['command']
-                if not prior_command.startswith('pipeline.') and prior_command!='asset.preview.batch':raise Failure('INVALID_REQUEST','Reuse source must be a pipeline/batch job in this jobs directory')
+                from workflow_contract import validate_prior
+                validate_prior(prior_command,workflow_mode)
                 for name in ('pipeline-report.json','pipeline-state.json'):
                     if (previous/name).exists():
                         guards.enter_context(FileGuard(previous/name));prior=read_json(previous/name);break
@@ -280,12 +299,19 @@ def execute(job,parent_checkpoint=None):
             if request['command']=='asset.preview.batch':
                 from preview_contract import expand_batch
                 manifest=expand_batch(request['params']['manifest'])
-            else:manifest=normalize(prior['manifest'] if request['command']=='pipeline.resume' else request['params']['manifest'])
+            else:manifest=manifest_normalizer(prior['manifest'] if request['command'] in ('pipeline.resume','workflow.resume') else request['params']['manifest'])
             rows={s['id']:{'id':s['id'],'command':s['command'],'state':'pending','depends_on':s['depends_on'],'child_job':None,'error':None} for s in manifest['steps']};byid={s['id']:s for s in manifest['steps']};oldrows={s['id']:s for s in prior.get('steps',[])};record();checkpoint()
+            if workflow_mode:
+                from workflow_preflight import inspect_manifest
+                preflight=inspect_manifest(manifest,launch['blender'])
+                atomic_json(job/'workflow-preflight.json',preflight)
+                artifacts['workflow_preflight']=str(job/'workflow-preflight.json')
+                if not preflight['admitted']:
+                    raise Failure('VALIDATION_FAILED','Workflow full-scale preflight failed before any worker; read workflow-preflight.json')
             if request['command']=='pipeline.plan':
                 for row in rows.values():row['state']='planned'
             else:
-                runtime=runtime_identity(launch['blender'],guards,checkpoint);atomic_json(job/'pipeline-runtime.json',runtime);pool=ThreadPoolExecutor(max_workers=manifest['policy']['max_workers']);policy=manifest['policy'];halt=False
+                runtime=runtime_identity(launch['blender'],guards,checkpoint,workflow_mode=workflow_mode);atomic_json(job/'pipeline-runtime.json',runtime);pool=ThreadPoolExecutor(max_workers=manifest['policy']['max_workers']);policy=manifest['policy'];halt=False
                 while any(r['state'] in ('pending','running') for r in rows.values()):
                     checkpoint()
                     for future in list(futures):
@@ -326,6 +352,9 @@ def execute(job,parent_checkpoint=None):
                                 put(step['params'],b['target'],path);put(step['params'],b['sha_target'],src['output_hashes'][path])
                             child=validate({'schema_version':'1.0','command':step['command'],'params':step['params']});step['params']=child['params']
                             is_gpu=step['command']=='sculpt.replay' or (step['command'] in ('render.run','asset.preview.prepare') and step['params']['manifest']['device']['backend']!='CPU')
+                            if workflow_mode:
+                                from workflow_contract import requires_gpu
+                                is_gpu=is_gpu or requires_gpu(step['command'],step['params'])
                             if is_gpu and not step['limits']['gpu_mb']:raise Failure('INVALID_REQUEST','GPU worker requires a nonzero declared gpu_mb reservation')
                             hashes=protect(child['params'],step['command'],launch['blender'],step_guards,checkpoint)
                             proof=consumer_proof(step,rows)
@@ -378,5 +407,9 @@ def execute(job,parent_checkpoint=None):
     try:
         report=record(True);code=CODES[error['code']] if error else 0
         status.update(state='cancelled' if code==7 else 'timed_out' if code==6 else 'failed' if code else 'succeeded',exit_code=code,finished_at=time.time(),heartbeat_at=time.time(),elapsed_seconds=round(time.monotonic()-started,3),progress={s:sum(r['state']==s for r in rows.values()) for s in set(r['state'] for r in rows.values())})
-        result=envelope(request['command'],job.name,report if not error else None,error,artifacts);atomic_json(job/'result.json',result);atomic_json(job/'status.json',status);return result,code
+        result=envelope(request['command'],job.name,report if not error else None,error,artifacts)
+        if defer_publication:
+            status.update(state='running',phase='delivery_finalization')
+        else:atomic_json(job/'result.json',result)
+        atomic_json(job/'status.json',status);return result,code
     finally:guards.close()

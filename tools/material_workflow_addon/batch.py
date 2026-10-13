@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Atomic assignment boundary shared by batch CLI and the add-on.
 
 This module does not schedule dependencies, save files or create preview rigs.

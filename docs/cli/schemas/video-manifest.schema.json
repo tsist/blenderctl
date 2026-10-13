@@ -1,0 +1,2804 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:blenderctl:video-manifest.schema.json",
+  "title": "Video workflow manifest",
+  "$comment": "Strict structure; companion normalize functions check absolute paths, unique IDs, kind-specific merged patches, half-open ranges, source sampling, resource SHA closure and complete output budget. HDR10_PQ is not runtime qualified.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "1.0"
+        },
+        "action": {
+          "const": "create"
+        },
+        "workflow_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "timeline": {
+          "type": "object",
+          "properties": {
+            "fps": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000000
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            "frame_start": {
+              "type": "integer",
+              "minimum": -1048574,
+              "maximum": 1048574
+            },
+            "frame_end_exclusive": {
+              "type": "integer",
+              "minimum": -1048573,
+              "maximum": 1048575
+            }
+          },
+          "required": [
+            "fps",
+            "width",
+            "height",
+            "frame_start",
+            "frame_end_exclusive"
+          ],
+          "additionalProperties": false
+        },
+        "clips": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "kind": {
+                    "const": "COLOR"
+                  },
+                  "channel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2097148
+                  },
+                  "shot_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "lock": {
+                    "type": "boolean"
+                  },
+                  "mute": {
+                    "type": "boolean"
+                  },
+                  "candidate_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "fade_in": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "fade_out": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "color": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "transform": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "scale_x": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "scale_y": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "rotation_degrees": {
+                        "type": "number",
+                        "minimum": -360000,
+                        "maximum": 360000
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "crop": {
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "right": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "top": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "bottom": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "grade": {
+                    "type": "object",
+                    "properties": {
+                      "multiply": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      },
+                      "saturation": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "fit": {
+                    "enum": [
+                      "FIT",
+                      "CROP",
+                      "ORIGINAL"
+                    ],
+                    "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "channel",
+                  "start",
+                  "duration",
+                  "color"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "kind": {
+                    "const": "IMAGE"
+                  },
+                  "channel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2097148
+                  },
+                  "shot_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "lock": {
+                    "type": "boolean"
+                  },
+                  "mute": {
+                    "type": "boolean"
+                  },
+                  "candidate_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "fade_in": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "fade_out": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "files": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32767,
+                              "description": "Absolute local path; runtime checks path and resource closure."
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 1
+                      },
+                      "source_in": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2097148
+                      },
+                      "speed": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "freeze": {
+                        "type": "boolean"
+                      },
+                      "stream": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "color_space": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      }
+                    },
+                    "required": [
+                      "files"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "transform": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "scale_x": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "scale_y": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "rotation_degrees": {
+                        "type": "number",
+                        "minimum": -360000,
+                        "maximum": 360000
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "crop": {
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "right": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "top": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "bottom": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "grade": {
+                    "type": "object",
+                    "properties": {
+                      "multiply": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      },
+                      "saturation": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "fit": {
+                    "enum": [
+                      "FIT",
+                      "CROP",
+                      "ORIGINAL"
+                    ],
+                    "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                  },
+                  "alternatives": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "candidate_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "files": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "file": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 32767,
+                                    "description": "Absolute local path; runtime checks path and resource closure."
+                                  },
+                                  "expected_sha256": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                  }
+                                },
+                                "required": [
+                                  "file",
+                                  "expected_sha256"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "minItems": 1
+                            },
+                            "source_in": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2097148
+                            },
+                            "speed": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "freeze": {
+                              "type": "boolean"
+                            },
+                            "stream": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2147483647
+                            },
+                            "color_space": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            }
+                          },
+                          "required": [
+                            "files"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "candidate_id",
+                        "source"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "channel",
+                  "start",
+                  "duration",
+                  "source"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "kind": {
+                    "const": "MOVIE"
+                  },
+                  "channel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2097148
+                  },
+                  "shot_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "lock": {
+                    "type": "boolean"
+                  },
+                  "mute": {
+                    "type": "boolean"
+                  },
+                  "candidate_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "fade_in": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "fade_out": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "files": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32767,
+                              "description": "Absolute local path; runtime checks path and resource closure."
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 1,
+                        "maxItems": 1
+                      },
+                      "source_in": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2097148
+                      },
+                      "speed": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "freeze": {
+                        "type": "boolean"
+                      },
+                      "stream": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "color_space": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      }
+                    },
+                    "required": [
+                      "files"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "transform": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "scale_x": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "scale_y": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "rotation_degrees": {
+                        "type": "number",
+                        "minimum": -360000,
+                        "maximum": 360000
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "crop": {
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "right": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "top": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "bottom": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "grade": {
+                    "type": "object",
+                    "properties": {
+                      "multiply": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      },
+                      "saturation": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "fit": {
+                    "enum": [
+                      "FIT",
+                      "CROP",
+                      "ORIGINAL"
+                    ],
+                    "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                  },
+                  "alternatives": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "candidate_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "files": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "file": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 32767,
+                                    "description": "Absolute local path; runtime checks path and resource closure."
+                                  },
+                                  "expected_sha256": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                  }
+                                },
+                                "required": [
+                                  "file",
+                                  "expected_sha256"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "minItems": 1,
+                              "maxItems": 1
+                            },
+                            "source_in": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2097148
+                            },
+                            "speed": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "freeze": {
+                              "type": "boolean"
+                            },
+                            "stream": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2147483647
+                            },
+                            "color_space": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            }
+                          },
+                          "required": [
+                            "files"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "candidate_id",
+                        "source"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "channel",
+                  "start",
+                  "duration",
+                  "source"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "kind": {
+                    "const": "SOUND"
+                  },
+                  "channel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2097148
+                  },
+                  "shot_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "lock": {
+                    "type": "boolean"
+                  },
+                  "mute": {
+                    "type": "boolean"
+                  },
+                  "candidate_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "fade_in": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "fade_out": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "files": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32767,
+                              "description": "Absolute local path; runtime checks path and resource closure."
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 1,
+                        "maxItems": 1
+                      },
+                      "source_in": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2097148
+                      },
+                      "speed": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "freeze": {
+                        "const": false,
+                        "type": "boolean"
+                      },
+                      "stream": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "color_space": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      }
+                    },
+                    "required": [
+                      "files"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "volume": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "pan": {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  "alternatives": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "candidate_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "files": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "file": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 32767,
+                                    "description": "Absolute local path; runtime checks path and resource closure."
+                                  },
+                                  "expected_sha256": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"
+                                  }
+                                },
+                                "required": [
+                                  "file",
+                                  "expected_sha256"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "minItems": 1,
+                              "maxItems": 1
+                            },
+                            "source_in": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2097148
+                            },
+                            "speed": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "freeze": {
+                              "const": false,
+                              "type": "boolean"
+                            },
+                            "stream": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2147483647
+                            },
+                            "color_space": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            }
+                          },
+                          "required": [
+                            "files"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "candidate_id",
+                        "source"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "channel",
+                  "start",
+                  "duration",
+                  "source"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "kind": {
+                    "const": "TEXT"
+                  },
+                  "channel": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "start": {
+                    "type": "integer",
+                    "minimum": -1048574,
+                    "maximum": 1048574
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2097148
+                  },
+                  "shot_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "lock": {
+                    "type": "boolean"
+                  },
+                  "mute": {
+                    "type": "boolean"
+                  },
+                  "candidate_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "fade_in": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "fade_out": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2097148
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100000
+                  },
+                  "font": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32767,
+                        "description": "Absolute local path; runtime checks path and resource closure."
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "file",
+                      "expected_sha256"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "font_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 4096
+                  },
+                  "color": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  "opacity": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "transform": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": -1000000000.0,
+                        "maximum": 1000000000.0
+                      },
+                      "scale_x": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "scale_y": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "rotation_degrees": {
+                        "type": "number",
+                        "minimum": -360000,
+                        "maximum": 360000
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "crop": {
+                    "type": "object",
+                    "properties": {
+                      "left": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "right": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "top": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      },
+                      "bottom": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2147483647
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "grade": {
+                    "type": "object",
+                    "properties": {
+                      "multiply": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      },
+                      "saturation": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 20
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  },
+                  "fit": {
+                    "enum": [
+                      "FIT",
+                      "CROP",
+                      "ORIGINAL"
+                    ],
+                    "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "channel",
+                  "start",
+                  "duration",
+                  "text"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "version",
+        "action",
+        "workflow_id",
+        "scene",
+        "timeline",
+        "clips"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "1.0"
+        },
+        "action": {
+          "const": "patch"
+        },
+        "workflow_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "timeline": {
+          "type": "object",
+          "properties": {
+            "fps": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000000
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            "frame_start": {
+              "type": "integer",
+              "minimum": -1048574,
+              "maximum": 1048574
+            },
+            "frame_end_exclusive": {
+              "type": "integer",
+              "minimum": -1048573,
+              "maximum": 1048575
+            }
+          },
+          "required": [
+            "fps",
+            "width",
+            "height",
+            "frame_start",
+            "frame_end_exclusive"
+          ],
+          "additionalProperties": false
+        },
+        "edits": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "const": "add"
+                  },
+                  "clip": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "kind": {
+                            "const": "COLOR"
+                          },
+                          "channel": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 128
+                          },
+                          "start": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "duration": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2097148
+                          },
+                          "shot_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "lock": {
+                            "type": "boolean"
+                          },
+                          "mute": {
+                            "type": "boolean"
+                          },
+                          "candidate_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "fade_in": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "fade_out": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "color": {
+                            "type": "array",
+                            "items": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "minItems": 4,
+                            "maxItems": 4
+                          },
+                          "opacity": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "transform": {
+                            "type": "object",
+                            "properties": {
+                              "x": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "y": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "scale_x": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "scale_y": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "rotation_degrees": {
+                                "type": "number",
+                                "minimum": -360000,
+                                "maximum": 360000
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "crop": {
+                            "type": "object",
+                            "properties": {
+                              "left": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "right": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "top": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "bottom": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "grade": {
+                            "type": "object",
+                            "properties": {
+                              "multiply": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              },
+                              "saturation": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "fit": {
+                            "enum": [
+                              "FIT",
+                              "CROP",
+                              "ORIGINAL"
+                            ],
+                            "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "channel",
+                          "start",
+                          "duration",
+                          "color"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "kind": {
+                            "const": "IMAGE"
+                          },
+                          "channel": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 128
+                          },
+                          "start": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "duration": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2097148
+                          },
+                          "shot_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "lock": {
+                            "type": "boolean"
+                          },
+                          "mute": {
+                            "type": "boolean"
+                          },
+                          "candidate_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "fade_in": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "fade_out": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "source": {
+                            "type": "object",
+                            "properties": {
+                              "files": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "file": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 32767,
+                                      "description": "Absolute local path; runtime checks path and resource closure."
+                                    },
+                                    "expected_sha256": {
+                                      "type": "string",
+                                      "pattern": "^[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "required": [
+                                    "file",
+                                    "expected_sha256"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "minItems": 1
+                              },
+                              "source_in": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2097148
+                              },
+                              "speed": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "freeze": {
+                                "type": "boolean"
+                              },
+                              "stream": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "color_space": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              }
+                            },
+                            "required": [
+                              "files"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "opacity": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "transform": {
+                            "type": "object",
+                            "properties": {
+                              "x": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "y": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "scale_x": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "scale_y": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "rotation_degrees": {
+                                "type": "number",
+                                "minimum": -360000,
+                                "maximum": 360000
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "crop": {
+                            "type": "object",
+                            "properties": {
+                              "left": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "right": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "top": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "bottom": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "grade": {
+                            "type": "object",
+                            "properties": {
+                              "multiply": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              },
+                              "saturation": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "fit": {
+                            "enum": [
+                              "FIT",
+                              "CROP",
+                              "ORIGINAL"
+                            ],
+                            "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                          },
+                          "alternatives": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "candidate_id": {
+                                  "type": "string",
+                                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                                },
+                                "source": {
+                                  "type": "object",
+                                  "properties": {
+                                    "files": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "file": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 32767,
+                                            "description": "Absolute local path; runtime checks path and resource closure."
+                                          },
+                                          "expected_sha256": {
+                                            "type": "string",
+                                            "pattern": "^[0-9a-f]{64}$"
+                                          }
+                                        },
+                                        "required": [
+                                          "file",
+                                          "expected_sha256"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "minItems": 1
+                                    },
+                                    "source_in": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2097148
+                                    },
+                                    "speed": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "freeze": {
+                                      "type": "boolean"
+                                    },
+                                    "stream": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2147483647
+                                    },
+                                    "color_space": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 1024
+                                    }
+                                  },
+                                  "required": [
+                                    "files"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "candidate_id",
+                                "source"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "minItems": 0
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "channel",
+                          "start",
+                          "duration",
+                          "source"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "kind": {
+                            "const": "MOVIE"
+                          },
+                          "channel": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 128
+                          },
+                          "start": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "duration": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2097148
+                          },
+                          "shot_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "lock": {
+                            "type": "boolean"
+                          },
+                          "mute": {
+                            "type": "boolean"
+                          },
+                          "candidate_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "fade_in": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "fade_out": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "source": {
+                            "type": "object",
+                            "properties": {
+                              "files": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "file": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 32767,
+                                      "description": "Absolute local path; runtime checks path and resource closure."
+                                    },
+                                    "expected_sha256": {
+                                      "type": "string",
+                                      "pattern": "^[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "required": [
+                                    "file",
+                                    "expected_sha256"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "minItems": 1,
+                                "maxItems": 1
+                              },
+                              "source_in": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2097148
+                              },
+                              "speed": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "freeze": {
+                                "type": "boolean"
+                              },
+                              "stream": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "color_space": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              }
+                            },
+                            "required": [
+                              "files"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "opacity": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "transform": {
+                            "type": "object",
+                            "properties": {
+                              "x": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "y": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "scale_x": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "scale_y": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "rotation_degrees": {
+                                "type": "number",
+                                "minimum": -360000,
+                                "maximum": 360000
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "crop": {
+                            "type": "object",
+                            "properties": {
+                              "left": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "right": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "top": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "bottom": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "grade": {
+                            "type": "object",
+                            "properties": {
+                              "multiply": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              },
+                              "saturation": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "fit": {
+                            "enum": [
+                              "FIT",
+                              "CROP",
+                              "ORIGINAL"
+                            ],
+                            "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                          },
+                          "alternatives": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "candidate_id": {
+                                  "type": "string",
+                                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                                },
+                                "source": {
+                                  "type": "object",
+                                  "properties": {
+                                    "files": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "file": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 32767,
+                                            "description": "Absolute local path; runtime checks path and resource closure."
+                                          },
+                                          "expected_sha256": {
+                                            "type": "string",
+                                            "pattern": "^[0-9a-f]{64}$"
+                                          }
+                                        },
+                                        "required": [
+                                          "file",
+                                          "expected_sha256"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "minItems": 1,
+                                      "maxItems": 1
+                                    },
+                                    "source_in": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2097148
+                                    },
+                                    "speed": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "freeze": {
+                                      "type": "boolean"
+                                    },
+                                    "stream": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2147483647
+                                    },
+                                    "color_space": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 1024
+                                    }
+                                  },
+                                  "required": [
+                                    "files"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "candidate_id",
+                                "source"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "minItems": 0
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "channel",
+                          "start",
+                          "duration",
+                          "source"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "kind": {
+                            "const": "SOUND"
+                          },
+                          "channel": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 128
+                          },
+                          "start": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "duration": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2097148
+                          },
+                          "shot_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "lock": {
+                            "type": "boolean"
+                          },
+                          "mute": {
+                            "type": "boolean"
+                          },
+                          "candidate_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "fade_in": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "fade_out": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "source": {
+                            "type": "object",
+                            "properties": {
+                              "files": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "file": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 32767,
+                                      "description": "Absolute local path; runtime checks path and resource closure."
+                                    },
+                                    "expected_sha256": {
+                                      "type": "string",
+                                      "pattern": "^[0-9a-f]{64}$"
+                                    }
+                                  },
+                                  "required": [
+                                    "file",
+                                    "expected_sha256"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "minItems": 1,
+                                "maxItems": 1
+                              },
+                              "source_in": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2097148
+                              },
+                              "speed": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "freeze": {
+                                "const": false,
+                                "type": "boolean"
+                              },
+                              "stream": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "color_space": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              }
+                            },
+                            "required": [
+                              "files"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "volume": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          },
+                          "pan": {
+                            "type": "number",
+                            "minimum": -1,
+                            "maximum": 1
+                          },
+                          "alternatives": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "candidate_id": {
+                                  "type": "string",
+                                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                                },
+                                "source": {
+                                  "type": "object",
+                                  "properties": {
+                                    "files": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "file": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 32767,
+                                            "description": "Absolute local path; runtime checks path and resource closure."
+                                          },
+                                          "expected_sha256": {
+                                            "type": "string",
+                                            "pattern": "^[0-9a-f]{64}$"
+                                          }
+                                        },
+                                        "required": [
+                                          "file",
+                                          "expected_sha256"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "minItems": 1,
+                                      "maxItems": 1
+                                    },
+                                    "source_in": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2097148
+                                    },
+                                    "speed": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "freeze": {
+                                      "const": false,
+                                      "type": "boolean"
+                                    },
+                                    "stream": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 2147483647
+                                    },
+                                    "color_space": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 1024
+                                    }
+                                  },
+                                  "required": [
+                                    "files"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "candidate_id",
+                                "source"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "minItems": 0
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "channel",
+                          "start",
+                          "duration",
+                          "source"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "kind": {
+                            "const": "TEXT"
+                          },
+                          "channel": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 128
+                          },
+                          "start": {
+                            "type": "integer",
+                            "minimum": -1048574,
+                            "maximum": 1048574
+                          },
+                          "duration": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2097148
+                          },
+                          "shot_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "lock": {
+                            "type": "boolean"
+                          },
+                          "mute": {
+                            "type": "boolean"
+                          },
+                          "candidate_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                          },
+                          "fade_in": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "fade_out": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100000
+                          },
+                          "font": {
+                            "type": "object",
+                            "properties": {
+                              "file": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32767,
+                                "description": "Absolute local path; runtime checks path and resource closure."
+                              },
+                              "expected_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            },
+                            "required": [
+                              "file",
+                              "expected_sha256"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "font_size": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4096
+                          },
+                          "color": {
+                            "type": "array",
+                            "items": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "minItems": 4,
+                            "maxItems": 4
+                          },
+                          "opacity": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "transform": {
+                            "type": "object",
+                            "properties": {
+                              "x": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "y": {
+                                "type": "number",
+                                "minimum": -1000000000.0,
+                                "maximum": 1000000000.0
+                              },
+                              "scale_x": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "scale_y": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "rotation_degrees": {
+                                "type": "number",
+                                "minimum": -360000,
+                                "maximum": 360000
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "crop": {
+                            "type": "object",
+                            "properties": {
+                              "left": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "right": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "top": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              },
+                              "bottom": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "grade": {
+                            "type": "object",
+                            "properties": {
+                              "multiply": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              },
+                              "saturation": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 20
+                              }
+                            },
+                            "required": [],
+                            "additionalProperties": false
+                          },
+                          "fit": {
+                            "enum": [
+                              "FIT",
+                              "CROP",
+                              "ORIGINAL"
+                            ],
+                            "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "channel",
+                          "start",
+                          "duration",
+                          "text"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "clip"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "const": "update"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "changes": {
+                    "type": "object",
+                    "properties": {
+                      "channel": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 128
+                      },
+                      "start": {
+                        "type": "integer",
+                        "minimum": -1048574,
+                        "maximum": 1048574
+                      },
+                      "duration": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2097148
+                      },
+                      "shot_id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "lock": {
+                        "type": "boolean"
+                      },
+                      "mute": {
+                        "type": "boolean"
+                      },
+                      "candidate_id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                      },
+                      "fade_in": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2097148
+                      },
+                      "fade_out": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 2097148
+                      },
+                      "color": {
+                        "type": "array",
+                        "items": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                      },
+                      "opacity": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "transform": {
+                        "type": "object",
+                        "properties": {
+                          "x": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "y": {
+                            "type": "number",
+                            "minimum": -1000000000.0,
+                            "maximum": 1000000000.0
+                          },
+                          "scale_x": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "scale_y": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "rotation_degrees": {
+                            "type": "number",
+                            "minimum": -360000,
+                            "maximum": 360000
+                          }
+                        },
+                        "required": [],
+                        "additionalProperties": false
+                      },
+                      "crop": {
+                        "type": "object",
+                        "properties": {
+                          "left": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2147483647
+                          },
+                          "right": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2147483647
+                          },
+                          "top": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2147483647
+                          },
+                          "bottom": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "required": [],
+                        "additionalProperties": false
+                      },
+                      "grade": {
+                        "type": "object",
+                        "properties": {
+                          "multiply": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 20
+                          },
+                          "saturation": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 20
+                          }
+                        },
+                        "required": [],
+                        "additionalProperties": false
+                      },
+                      "fit": {
+                        "enum": [
+                          "FIT",
+                          "CROP",
+                          "ORIGINAL"
+                        ],
+                        "description": "CROP uses native FILL. Explicit transform scales are native absolute values; media replacement without transform preserves relative fit scale."
+                      },
+                      "source": {
+                        "type": "object",
+                        "properties": {
+                          "files": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "file": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 32767,
+                                  "description": "Absolute local path; runtime checks path and resource closure."
+                                },
+                                "expected_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{64}$"
+                                }
+                              },
+                              "required": [
+                                "file",
+                                "expected_sha256"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "minItems": 1
+                          },
+                          "source_in": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2097148
+                          },
+                          "speed": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "freeze": {
+                            "type": "boolean"
+                          },
+                          "stream": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2147483647
+                          },
+                          "color_space": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          }
+                        },
+                        "required": [
+                          "files"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "alternatives": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "candidate_id": {
+                              "type": "string",
+                              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                            },
+                            "source": {
+                              "type": "object",
+                              "properties": {
+                                "files": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "file": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 32767,
+                                        "description": "Absolute local path; runtime checks path and resource closure."
+                                      },
+                                      "expected_sha256": {
+                                        "type": "string",
+                                        "pattern": "^[0-9a-f]{64}$"
+                                      }
+                                    },
+                                    "required": [
+                                      "file",
+                                      "expected_sha256"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  "minItems": 1
+                                },
+                                "source_in": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 2097148
+                                },
+                                "speed": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "freeze": {
+                                  "type": "boolean"
+                                },
+                                "stream": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 2147483647
+                                },
+                                "color_space": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                }
+                              },
+                              "required": [
+                                "files"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": [
+                            "candidate_id",
+                            "source"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 0
+                      },
+                      "volume": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000
+                      },
+                      "pan": {
+                        "type": "number",
+                        "minimum": -1,
+                        "maximum": 1
+                      },
+                      "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100000
+                      },
+                      "font": {
+                        "type": "object",
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 32767,
+                            "description": "Absolute local path; runtime checks path and resource closure."
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "font_size": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4096
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false,
+                    "minProperties": 1
+                  }
+                },
+                "required": [
+                  "op",
+                  "id",
+                  "changes"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "const": "remove"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  }
+                },
+                "required": [
+                  "op",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "const": "select_candidate"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  },
+                  "candidate_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+                  }
+                },
+                "required": [
+                  "op",
+                  "id",
+                  "candidate_id"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "version",
+        "action",
+        "workflow_id",
+        "scene",
+        "edits"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

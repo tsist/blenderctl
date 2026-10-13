@@ -1,0 +1,562 @@
+{
+  "type": "object",
+  "properties": {
+    "cache_manifest_version": {
+      "const": "1.0"
+    },
+    "root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "implementation_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "blender": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "version_tuple": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "build_hash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "version_tuple",
+        "build_hash"
+      ],
+      "additionalProperties": false
+    },
+    "fps": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "frame_start": {
+      "type": "integer"
+    },
+    "frame_end": {
+      "type": "integer"
+    },
+    "scene_frame_range": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "observe_frames": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]+$",
+            "minLength": 1
+          },
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modifier": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding": {
+            "type": "object",
+            "properties": {
+              "wrapper_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "core_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "parameter_state": {
+                "type": "object"
+              },
+              "parameters": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "wrapper_sha256",
+              "core_sha256",
+              "parameter_state",
+              "parameters"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "object",
+          "modifier",
+          "binding"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "bakes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]+$",
+            "minLength": 1
+          },
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modifier": {
+            "type": "string",
+            "minLength": 1
+          },
+          "node_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]+$",
+            "minLength": 1
+          },
+          "group_path": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "kind": {
+            "enum": [
+              "SIMULATION",
+              "BAKE"
+            ]
+          },
+          "node_type": {
+            "enum": [
+              "GeometryNodeSimulationOutput",
+              "GeometryNodeBake"
+            ]
+          },
+          "bake_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "directory": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "global": {
+                "type": "object",
+                "properties": {
+                  "bake_target": {
+                    "enum": [
+                      "DISK",
+                      "PACKED"
+                    ]
+                  },
+                  "bake_directory": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bake_target",
+                  "bake_directory"
+                ],
+                "additionalProperties": false
+              },
+              "item": {
+                "type": "object",
+                "properties": {
+                  "bake_target": {
+                    "enum": [
+                      "INHERIT",
+                      "DISK",
+                      "PACKED"
+                    ]
+                  },
+                  "bake_mode": {
+                    "enum": [
+                      "ANIMATION",
+                      "STILL"
+                    ]
+                  },
+                  "frame_start": {
+                    "type": "integer"
+                  },
+                  "frame_end": {
+                    "type": "integer"
+                  },
+                  "use_custom_simulation_frame_range": {
+                    "type": "boolean"
+                  },
+                  "use_custom_path": {
+                    "type": "boolean"
+                  },
+                  "directory": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bake_target",
+                  "bake_mode",
+                  "frame_start",
+                  "frame_end",
+                  "use_custom_simulation_frame_range",
+                  "use_custom_path",
+                  "directory"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "global",
+              "item"
+            ],
+            "additionalProperties": false
+          },
+          "operator_result": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "path",
+                "size",
+                "sha256"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "frame_coverage": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "required": [
+          "target",
+          "object",
+          "modifier",
+          "node_id",
+          "group_path",
+          "kind",
+          "node_type",
+          "bake_id",
+          "directory",
+          "metadata",
+          "files",
+          "frame_coverage"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]+$",
+            "minLength": 1
+          },
+          "node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "socket": {
+            "type": "string",
+            "minLength": 1
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attribute": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "enum": [
+              "POINT",
+              "EDGE",
+              "FACE",
+              "CORNER",
+              "CURVE",
+              "INSTANCE"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "geometry_socket": {
+            "type": "string",
+            "minLength": 1
+          },
+          "geometry_node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 64
+          },
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modifier": {
+            "type": "string",
+            "minLength": 1
+          },
+          "group_path": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "repeat_zone": {
+            "type": "string",
+            "minLength": 1
+          },
+          "iteration": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    "samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "frame": {
+            "type": "integer"
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.:/-]+$",
+                  "minLength": 1
+                },
+                "evaluation": {
+                  "type": "object",
+                  "properties": {
+                    "base": {
+                      "anyOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evaluated": {
+                      "type": "object"
+                    },
+                    "instances": {
+                      "type": "object"
+                    },
+                    "observations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                },
+                "status": {
+                  "enum": [
+                    "passed",
+                    "failed"
+                  ]
+                },
+                "mismatch": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "target",
+                "evaluation"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed"
+            ]
+          },
+          "mismatch": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "frame",
+          "targets"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "readback_order": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "scope": {
+      "type": "string"
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "created_unix_seconds": {
+      "type": "number"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "size",
+          "sha256"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "cache_manifest_version",
+    "root",
+    "implementation_sha256",
+    "blender",
+    "fps",
+    "frame_start",
+    "frame_end",
+    "observe_frames",
+    "targets",
+    "bakes",
+    "observations",
+    "samples",
+    "readback_order",
+    "scope",
+    "candidate",
+    "created_unix_seconds",
+    "files"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "geometry-cache-manifest.schema.json"
+}

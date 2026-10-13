@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit asset preview recipes and input-bound reusable receipts."""
 from pathlib import Path
 import copy

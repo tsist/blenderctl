@@ -1,0 +1,192 @@
+{
+  "type": "object",
+  "properties": {
+    "file": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frame": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer",
+        "frame"
+      ],
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modifier": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "object"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]+$",
+            "minLength": 1
+          },
+          "node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "socket": {
+            "type": "string",
+            "minLength": 1
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attribute": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "enum": [
+              "POINT",
+              "EDGE",
+              "FACE",
+              "CORNER",
+              "CURVE",
+              "INSTANCE"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "geometry_socket": {
+            "type": "string",
+            "minLength": 1
+          },
+          "geometry_node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 64
+          },
+          "object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modifier": {
+            "type": "string",
+            "minLength": 1
+          },
+          "group_path": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "repeat_zone": {
+            "type": "string",
+            "minLength": 1
+          },
+          "iteration": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    "discover": {
+      "type": "boolean"
+    },
+    "cache_manifest": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "implementation_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "readOnly": true,
+      "description": "Computed local runtime identity; stale normalized requests are rejected."
+    }
+  },
+  "required": [
+    "file",
+    "expected_sha256",
+    "resources"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "geometry-inspect-request.schema.json"
+}

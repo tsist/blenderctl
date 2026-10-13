@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only cache plans and verified local deployment; never clean automatically."""
 import os,re,time,shutil,subprocess,sys
 from pathlib import Path

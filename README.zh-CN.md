@@ -1,8 +1,10 @@
-# blenderctl 与 Material Workflow
+# blenderctl + Blender workflows
+
+**0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
 
 面向代理与人工的 Blender 自动化工具：用明确 JSON 清单与 SHA-256 保护源文件，通过独立后台作业产出可编辑候选，配套材质插件共用同一执行核心。
 
-**CLI 0.54.1 · 材质插件 0.7.0 · GPL-3.0-or-later**
+**CLI 0.63.0 · 材质插件 0.7.0 · GPL-3.0-or-later**
 
 另提供[四个配套 Blender 技能](skills/README.md)：CLI 操作、制作方法论、材质制作、资产管理。技能包 **0.1.0** 可独立下载安装，见[安装与验证](docs/SKILLS.md)。
 
@@ -23,7 +25,7 @@
 ```powershell
 $env:BLENDER_PATH = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
 python tools/blenderctl/cli.py --version
-python tools/blenderctl/cli.py --jobs-dir ./runtime/jobs doctor
+python tools/blenderctl/cli.py --blender $env:BLENDER_PATH --jobs-dir ./runtime/jobs doctor
 python tools/blenderctl/cli.py material describe --operation run --schema
 ```
 

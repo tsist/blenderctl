@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Finite native file closure. Availability is separate from domain validity."""
 import copy
 import hashlib

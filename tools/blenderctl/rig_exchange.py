@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """B-Bone cage transfer through affine bone factors and sampled native shape keys.
 
 The complete editable rig stays in the source. Output is a deforming cage with

@@ -4,7 +4,6 @@ version = "0.7.0"
 name = "Material Workflow"
 tagline = "Layered materials with Cycles and Eevee previews"
 maintainer = "Blender AI"
-website = "https://github.com/tsist/blenderctl"
 type = "add-on"
 blender_version_min = "5.2.0"
 license = ["SPDX:GPL-3.0-or-later"]

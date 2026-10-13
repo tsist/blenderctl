@@ -1,0 +1,1019 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compositing-template-run-request.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "command": {
+      "const": "compositing.template-run"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "template": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "context": {
+          "type": "object",
+          "properties": {
+            "scene": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "view_layer": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "workflow_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+            },
+            "reference_frame": {
+              "type": "integer",
+              "minimum": -100000,
+              "maximum": 100000
+            }
+          },
+          "required": [
+            "scene",
+            "view_layer",
+            "workflow_id",
+            "reference_frame"
+          ],
+          "additionalProperties": false
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "render_layers",
+                    "existing",
+                    "image"
+                  ]
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "colorspace": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "alpha_mode": {
+                  "enum": [
+                    "STRAIGHT",
+                    "PREMUL",
+                    "CHANNEL_PACKED",
+                    "NONE"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "image_sequence"
+                },
+                "frames": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 300,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_frame": {
+                        "type": "integer",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "expected_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "source_frame",
+                      "file",
+                      "expected_sha256"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "mapping": {
+                  "type": "object",
+                  "properties": {
+                    "scene_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "source_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "frame_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    },
+                    "rate": {
+                      "const": "ONE_TO_ONE"
+                    },
+                    "scene_fps": {
+                      "type": "object",
+                      "properties": {
+                        "numerator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 120000
+                        },
+                        "denominator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "numerator",
+                        "denominator"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "scene_start",
+                    "source_start",
+                    "frame_count",
+                    "rate",
+                    "scene_fps"
+                  ],
+                  "additionalProperties": false
+                },
+                "colorspace": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "alpha_mode": {
+                  "enum": [
+                    "STRAIGHT",
+                    "PREMUL",
+                    "CHANNEL_PACKED",
+                    "NONE"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "frames",
+                "mapping",
+                "colorspace",
+                "alpha_mode"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "movie"
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "mapping": {
+                  "type": "object",
+                  "properties": {
+                    "scene_start": {
+                      "type": "integer",
+                      "minimum": -100000,
+                      "maximum": 100000
+                    },
+                    "source_start": {
+                      "type": "integer",
+                      "const": 1
+                    },
+                    "frame_count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 300
+                    },
+                    "rate": {
+                      "const": "ONE_TO_ONE"
+                    },
+                    "scene_fps": {
+                      "type": "object",
+                      "properties": {
+                        "numerator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 120000
+                        },
+                        "denominator": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "numerator",
+                        "denominator"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "scene_start",
+                    "source_start",
+                    "frame_count",
+                    "rate",
+                    "scene_fps"
+                  ],
+                  "additionalProperties": false
+                },
+                "interpretation": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "const": "BT709_OETF_INVERSE_V1"
+                    },
+                    "coded_orientation": {
+                      "const": "AS_CODED"
+                    },
+                    "audio": {
+                      "const": "IGNORE"
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "coded_orientation",
+                    "audio"
+                  ],
+                  "additionalProperties": false
+                },
+                "decoder_runtime": {
+                  "type": "object",
+                  "properties": {
+                    "ffmpeg": {
+                      "type": "object",
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "ffprobe": {
+                      "type": "object",
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "file",
+                        "expected_sha256"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ffmpeg",
+                    "ffprobe"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "kind",
+                "file",
+                "expected_sha256",
+                "mapping",
+                "interpretation",
+                "decoder_runtime"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "bindings": {
+          "type": "object",
+          "maxProperties": 128,
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "image"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "colorspace": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "alpha_mode": {
+                    "enum": [
+                      "STRAIGHT",
+                      "PREMUL",
+                      "CHANNEL_PACKED",
+                      "NONE"
+                    ]
+                  },
+                  "layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  }
+                },
+                "required": [
+                  "kind",
+                  "file",
+                  "expected_sha256",
+                  "colorspace",
+                  "alpha_mode"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "render_layers"
+                  },
+                  "scene": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "view_layer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  }
+                },
+                "required": [
+                  "kind",
+                  "scene",
+                  "view_layer"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "image_sequence"
+                  },
+                  "frames": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 300,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "source_frame": {
+                          "type": "integer",
+                          "minimum": -100000,
+                          "maximum": 100000
+                        },
+                        "file": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "expected_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "source_frame",
+                        "file",
+                        "expected_sha256"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "mapping": {
+                    "type": "object",
+                    "properties": {
+                      "scene_start": {
+                        "type": "integer",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "source_start": {
+                        "type": "integer",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "frame_count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 300
+                      },
+                      "rate": {
+                        "const": "ONE_TO_ONE"
+                      },
+                      "scene_fps": {
+                        "type": "object",
+                        "properties": {
+                          "numerator": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 120000
+                          },
+                          "denominator": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10000
+                          }
+                        },
+                        "required": [
+                          "numerator",
+                          "denominator"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "scene_start",
+                      "source_start",
+                      "frame_count",
+                      "rate",
+                      "scene_fps"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "colorspace": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "alpha_mode": {
+                    "enum": [
+                      "STRAIGHT",
+                      "PREMUL",
+                      "CHANNEL_PACKED",
+                      "NONE"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind",
+                  "frames",
+                  "mapping",
+                  "colorspace",
+                  "alpha_mode"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "movie"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "expected_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mapping": {
+                    "type": "object",
+                    "properties": {
+                      "scene_start": {
+                        "type": "integer",
+                        "minimum": -100000,
+                        "maximum": 100000
+                      },
+                      "source_start": {
+                        "type": "integer",
+                        "const": 1
+                      },
+                      "frame_count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 300
+                      },
+                      "rate": {
+                        "const": "ONE_TO_ONE"
+                      },
+                      "scene_fps": {
+                        "type": "object",
+                        "properties": {
+                          "numerator": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 120000
+                          },
+                          "denominator": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10000
+                          }
+                        },
+                        "required": [
+                          "numerator",
+                          "denominator"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "scene_start",
+                      "source_start",
+                      "frame_count",
+                      "rate",
+                      "scene_fps"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "interpretation": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "const": "BT709_OETF_INVERSE_V1"
+                      },
+                      "coded_orientation": {
+                        "const": "AS_CODED"
+                      },
+                      "audio": {
+                        "const": "IGNORE"
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "coded_orientation",
+                      "audio"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "decoder_runtime": {
+                    "type": "object",
+                    "properties": {
+                      "ffmpeg": {
+                        "type": "object",
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "ffprobe": {
+                        "type": "object",
+                        "properties": {
+                          "file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1024
+                          },
+                          "expected_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "file",
+                          "expected_sha256"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "ffmpeg",
+                      "ffprobe"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "kind",
+                  "file",
+                  "expected_sha256",
+                  "mapping",
+                  "interpretation",
+                  "decoder_runtime"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+          }
+        },
+        "resources": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file",
+              "expected_sha256"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "preview": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 4096
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 4096
+            },
+            "frames": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 300,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": -100000,
+                "maximum": 100000
+              }
+            },
+            "samples": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256
+            },
+            "engine": {
+              "enum": [
+                "SOURCE",
+                "CYCLES",
+                "BLENDER_EEVEE"
+              ]
+            },
+            "camera": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "device": {
+              "type": "object",
+              "properties": {
+                "backend": {
+                  "enum": [
+                    "CPU",
+                    "CUDA",
+                    "OPTIX",
+                    "GRAPHICS"
+                  ]
+                },
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                }
+              },
+              "required": [
+                "backend"
+              ],
+              "additionalProperties": false
+            },
+            "compositor_device": {
+              "enum": [
+                "GPU",
+                "CPU"
+              ]
+            },
+            "allow_cpu_fallback": {
+              "type": "boolean"
+            },
+            "precision": {
+              "const": "FULL"
+            },
+            "baseline": {
+              "type": "boolean"
+            },
+            "pixel_frame_budget": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483648
+            },
+            "timeline": {
+              "type": "object",
+              "properties": {
+                "scene_start": {
+                  "type": "integer",
+                  "minimum": -100000,
+                  "maximum": 100000
+                },
+                "frame_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 300
+                },
+                "scene_fps": {
+                  "type": "object",
+                  "properties": {
+                    "numerator": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 120000
+                    },
+                    "denominator": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  },
+                  "required": [
+                    "numerator",
+                    "denominator"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "scene_start",
+                "frame_count",
+                "scene_fps"
+              ],
+              "additionalProperties": false
+            },
+            "video": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "kind": {
+                      "const": "SDR_MP4_H264"
+                    },
+                    "alpha_policy": {
+                      "const": "COMPOSITE_BLACK"
+                    },
+                    "runtime": {
+                      "type": "object",
+                      "properties": {
+                        "ffmpeg": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "ffprobe": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            },
+                            "expected_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "expected_sha256"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "ffmpeg",
+                        "ffprobe"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "kind",
+                    "alpha_policy",
+                    "runtime"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "frames",
+                  "timeline"
+                ]
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "video"
+                ],
+                "properties": {
+                  "video": {
+                    "required": [
+                      "enabled"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "timeline"
+                ]
+              }
+            }
+          ]
+        },
+        "resume": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "expected_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "file",
+            "expected_sha256"
+          ],
+          "additionalProperties": false,
+          "description": "Resume descriptor points to the prior outer template-run-report.json. The worker authenticates its owning terminal parent, resolves the exact normal_run_report at that parent/compositing-report.json with its SHA and native signature, then passes that native checkpoint to the unchanged normal compositing Host. Do not provide a native report or draft authority as the outer resume descriptor."
+        },
+        "implementation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256",
+        "template",
+        "context",
+        "source",
+        "bindings",
+        "resources",
+        "preview"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "command",
+    "params"
+  ],
+  "additionalProperties": false
+}

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Isolated physics candidates. Embedded point caches and owned GAS VDB bundles."""
 import math,time
 from pathlib import Path

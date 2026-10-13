@@ -1,0 +1,18 @@
+{
+  "schema_version": "video-template/1.0",
+  "id": "ai-final",
+  "name": "AI 成片基础剪辑",
+  "description": "沿用稳定镜头与候选身份组织 AI 回流素材，以硬切连接镜头。为成片提供简洁标题和中文字幕位置，保留原画面比例与色彩。",
+  "layout": "SEQUENCE",
+  "style": {
+    "background_color": [0.0, 0.0, 0.0, 1.0],
+    "show_shot_labels": false,
+    "label_prefix": "镜头",
+    "fit": "FIT",
+    "transition_frames": 0,
+    "grade": {"multiply": 1.0, "saturation": 1.0},
+    "title": {"font_ratio": 0.09, "y_ratio": 0.35, "color": [1.0, 0.95, 0.85, 1.0]},
+    "label": {"font_ratio": 0.045, "y_ratio": 0.39, "color": [1.0, 0.95, 0.85, 1.0]},
+    "subtitle": {"font_ratio": 0.06, "y_ratio": -0.35, "color": [1.0, 1.0, 1.0, 1.0]}
+  }
+}

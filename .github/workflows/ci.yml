@@ -7,7 +7,6 @@ permissions:
   contents: read
 jobs:
   host:
-    name: Host Python ${{ matrix.python }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,16 +18,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - name: Host contracts
-        run: python -m unittest discover -s tests -p "test_*.py" -v
-      - name: Public source audit
-        run: python scripts/check_release.py
-      - name: Companion skill metadata and links
-        run: python scripts/check_skills.py
-      - name: Build release artifacts
-        run: python scripts/build_release.py --output dist
-      - name: Repeat build and verify identical bytes
-        run: python scripts/build_release.py --output dist --verify
+      - name: Source inventory and identity
+        run: python -B scripts/verify_release.py
+      - name: Template compiler contracts
+        run: python -B templates/video/test_template_library.py
+      - name: Existing CLI host contracts
+        run: python -B -m unittest discover -s tests -p "test_*.py" -v
+      - name: Companion skill metadata and resource graph
+        run: python -B scripts/check_skills.py
+      - name: Build deterministic artifacts twice
+        run: |
+          python -B scripts/build_release.py
+          python -B scripts/build_release.py --verify
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'windows-latest' && matrix.python == '3.13'
         with:

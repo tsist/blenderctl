@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host-controlled staging and output reception for explicit Windows isolation.
 
 The script controls all bytes in scratch, including its return value. Only the

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Open disk snapshots and produce separately verified current-version copies."""
 import bpy,os,sys
 from pathlib import Path

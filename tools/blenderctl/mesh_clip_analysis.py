@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only native surface analysis with durable per-observation evidence."""
 import math,time
 from contextlib import ExitStack

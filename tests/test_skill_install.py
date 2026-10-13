@@ -16,13 +16,13 @@ class SkillInstallTests(unittest.TestCase):
         return subprocess.run([sys.executable, '-B', str(INSTALL), *map(str, args)],
                               cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
 
-    def test_install_preserves_source_and_all_four_siblings(self):
+    def test_install_preserves_source_and_all_manifest_siblings(self):
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / 'skills'
             result = self.call('--destination', destination)
             self.assertEqual(result.returncode, 0, result.stderr)
             installed = json.loads(result.stdout)['installed']
-            self.assertEqual(len(installed), 4)
+            self.assertEqual(len(installed), 5)
             for name in installed:
                 for source in (ROOT / 'skills' / name).rglob('*'):
                     if source.is_file() and '__pycache__' not in source.parts:

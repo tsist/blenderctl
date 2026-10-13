@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Owned native OpenVDB density sequences with exact file and source witnesses."""
 import bpy,numpy as np,json,atexit
 from contextlib import ExitStack

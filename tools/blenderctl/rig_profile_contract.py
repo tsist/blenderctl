@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """JSON Schema for unevaluated profiles; diagnostics intentionally preserve detail."""
 def obj(properties,required=None):
     return {'type':'object','properties':properties,'required':list(properties) if required is None else required,'additionalProperties':False}

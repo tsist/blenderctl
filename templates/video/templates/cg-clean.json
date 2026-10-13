@@ -1,0 +1,18 @@
+{
+  "schema_version": "video-template/1.0",
+  "id": "cg-clean",
+  "name": "CG 动画简洁展示",
+  "description": "顺序组织 Blender 动画或 CG 镜头，使用中性背景、简洁标题和较小字幕。适合保留构图与色彩的 SDR 展示版。",
+  "layout": "SEQUENCE",
+  "style": {
+    "background_color": [0.025, 0.025, 0.025, 1.0],
+    "show_shot_labels": false,
+    "label_prefix": "镜头",
+    "fit": "FIT",
+    "transition_frames": 0,
+    "grade": {"multiply": 1.0, "saturation": 1.0},
+    "title": {"font_ratio": 0.07, "y_ratio": 0.35, "color": [0.88, 0.94, 1.0, 1.0]},
+    "label": {"font_ratio": 0.04, "y_ratio": 0.41, "color": [0.88, 0.94, 1.0, 1.0]},
+    "subtitle": {"font_ratio": 0.055, "y_ratio": -0.36, "color": [0.96, 0.96, 0.96, 1.0]}
+  }
+}

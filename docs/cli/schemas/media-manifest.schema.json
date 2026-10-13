@@ -285,6 +285,12 @@
       },
       "minItems": 1,
       "maxItems": 64
+    },
+    "pixel_frame_budget": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 512000000,
+      "default": 32000000
     }
   },
   "required": [

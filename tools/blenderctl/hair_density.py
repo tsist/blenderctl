@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Deterministic surface children driven live by one nearest parent guide."""
 import bpy,numpy as np,json,random,math
 from mathutils import Vector,Matrix

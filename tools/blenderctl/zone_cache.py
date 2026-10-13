@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Owned disk bakes, complete cache membership and reverse-frame verification."""
 import hashlib,json,math,shutil,time
 from pathlib import Path

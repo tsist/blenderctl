@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """World-space point framing with independent projection checks."""
 import math
 import bpy

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """One supervisor per job; immutable request, atomic status, separate cancellation signal."""
 import os
 from contextlib import ExitStack
@@ -34,12 +33,16 @@ def prepare(request, blender=DEFAULT_BLENDER, root=DEFAULT_JOBS, timeout=120, tr
     else:
         request = validate(request)
     timeout_value(timeout)
+    if request["command"]=="compositing.encode" and limits is not None:
+        raise Failure("UNSUPPORTED","M4 only has explicit pixel/time budgets; Host Job RAM/VRAM integration not qualified")
     if limits is not None:
         from pipeline_contract import LIMITS
         from scene_contract import validate as validate_limits
         validate_limits(limits,LIMITS)
+    if request["command"]=="compositing.encode" and timeout<request["params"]["budget"]["timeout_seconds"]+30:
+        raise Failure("INVALID_REQUEST","M4 launch timeout must cover explicit worker budget plus30s cleanup grace")
     blender = Path(blender).resolve()
-    if not blender.is_file() and request["command"] not in (*OPERATIONS,"transaction.status", "transaction.rollback", "transaction.recover"):
+    if not blender.is_file() and request["command"] not in (*OPERATIONS,"transaction.status", "transaction.rollback", "transaction.recover", "compositing.encode"):
         raise Failure("NOT_FOUND", f"Blender executable not found: {blender}")
     job = Path(root).resolve() / uuid.uuid4().hex
     job.mkdir(parents=True, exist_ok=False)
@@ -47,6 +50,11 @@ def prepare(request, blender=DEFAULT_BLENDER, root=DEFAULT_JOBS, timeout=120, tr
     atomic_json(job / "launch.json", {"blender": str(blender), "timeout_seconds": timeout,
                                      "transactions_root": str(Path(transactions_root).resolve()),**({'limits':limits} if limits else {}),**({'resource_domain':resource_domain} if resource_domain else {})})
     atomic_json(job / "status.json", {"job_id": job.name, "state": "queued", "created_at": time.time(), "heartbeat_at": time.time()})
+    if request["command"]=="compositing.encode":
+        from compositing_encode_public import launch_identity
+        launch=read_json(job/"launch.json")
+        launch.update(encode_identity=launch_identity(),encode_request_signature=__import__("compositing_encode_contract").signature(request["params"]))
+        atomic_json(job/"launch.json",launch)
     return job
 
 
@@ -65,7 +73,14 @@ def status(job):
         value["health"] = "stale_supervisor_review_required"
     else:
         value["health"] = "current"
-    for filename in ('study-progress.json', 'batch-progress.json', 'workflow-progress.json'):
+    video_progress = job / 'video-progress.json'
+    if video_progress.is_file():
+        try:
+            from video_interface import progress_summary
+            value['progress'] = progress_summary(read_json(video_progress))
+        except (Failure, OSError) as error:
+            value['progress_error'] = str(error)[:512]
+    for filename in (() if video_progress.is_file() else ('study-progress.json', 'batch-progress.json', 'workflow-progress.json')):
         path = job / filename
         if path.is_file():
             try:
@@ -104,6 +119,26 @@ def cleanup_isolation(job):
 
 
 def execute_worker(job, parent_checkpoint=None):
+    from timing import Trace
+    trace = Trace(job / 'timing.json', metadata={'scope': 'host worker lifecycle; render stages have a separate trace',
+                                               'job_id': job.name, 'parent_job_id': job.parent.parent.name if job.parent.name == 'children' else None})
+    try:
+        with trace.span('worker_job_total') as span:
+            result, code = _execute_worker(job, parent_checkpoint)
+        error = result.get('error')
+        if error:
+            span['status'] = 'failed'
+            span['error'] = error
+        trace.finish(Failure(error['code'], error['message']) if error else None)
+        result['artifacts']['timing'] = str(job / 'timing.json')
+        atomic_json(job / 'result.json', result)
+        return result, code
+    except BaseException as exc:
+        trace.finish(exc)
+        raise
+
+
+def _execute_worker(job, parent_checkpoint=None):
     started = time.monotonic()
     tree = None
     lease = None
@@ -161,7 +196,7 @@ def execute_worker(job, parent_checkpoint=None):
             for d in (request['params']['manifest']['before'],request['params']['manifest']['after']):
                 protect(d,input_guards,checkpoint)
                 input_hashes[d['file']]=d['expected_sha256']
-        if request["command"] in ("inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
+        if request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
             from filesystem import FileGuard
             for key, expected in (("file", "expected_sha256"), ("other", "other_sha256")):
                 filename = request["params"].get(key)
@@ -213,6 +248,38 @@ def execute_worker(job, parent_checkpoint=None):
                 documents+=addon_documents(launch['blender'])
             if request['command'] in ('node.prepare','material.preview','texture.bake'):
                 from node_contract import input_documents
+                documents+=input_documents(request['params'])
+            if request['command'].startswith('video.'):
+                from video_workflow_contract import anchor_documents, input_documents
+                for anchor in anchor_documents(request['params'],request['command']):
+                    filename=anchor['file']
+                    if filename not in input_hashes:
+                        guard=input_guards.enter_context(FileGuard(filename));input_hashes[filename]=guard.sha256(checkpoint)
+                    if input_hashes[filename]!=anchor['expected_sha256']:raise Failure('CONFLICT','Video descriptor changed')
+                documents+=input_documents(request['params'],request['command'])
+            if request['command'].startswith('compositing.'):
+                from compositing_workflow_contract import anchor_documents, input_documents
+                for anchor in anchor_documents(request['params'],request['command']):
+                    filename=anchor['file']
+                    if filename not in input_hashes:
+                        guard=input_guards.enter_context(FileGuard(filename));input_hashes[filename]=guard.sha256(checkpoint)
+                    if input_hashes[filename]!=anchor['expected_sha256']:raise Failure('CONFLICT','Compositing descriptor changed')
+                documents+=input_documents(request['params'],request['command'])
+            if request['command'].startswith('lighting.'):
+                from lighting_workflow_contract import anchor_documents, input_documents
+                for anchor in anchor_documents(request['params'],request['command']):
+                    filename=anchor['file']
+                    if filename not in input_hashes:
+                        guard=input_guards.enter_context(FileGuard(filename));input_hashes[filename]=guard.sha256(checkpoint)
+                    if input_hashes[filename]!=anchor['expected_sha256']:raise Failure('CONFLICT','Lighting descriptor changed')
+                documents+=input_documents(request['params'],request['command'])
+            if request['command'] in ('geometry.run','geometry.inspect'):
+                if request['params'].get('resume'):
+                    anchor=request['params']['resume'];filename=anchor['file']
+                    if filename not in input_hashes:
+                        guard=input_guards.enter_context(FileGuard(filename));input_hashes[filename]=guard.sha256(checkpoint)
+                    if input_hashes[filename]!=anchor['expected_sha256']:raise Failure('CONFLICT','Geometry resume descriptor changed')
+                from geometry_workflow_contract import input_documents
                 documents+=input_documents(request['params'])
             if request['command'] in ('material.run','material.template-save'):
                 from material_workflow_contract import input_documents
@@ -287,10 +354,21 @@ def execute_worker(job, parent_checkpoint=None):
             command = [launch["blender"], "--background", "--factory-startup", "--disable-autoexec",
                        "--offline-mode", "--threads", str(limits['cpu_threads'] if limits else 2), "--python-exit-code", "23",
                        "--python", str(Path(__file__).with_name("worker.py")), "--", str(job)]
+            if request['command'] in ('video.run', 'video.inspect'):
+                # Blender's global --threads overrides even saved RNA getters
+                # (threads_mode becomes FIXED); it is not persisted in .blend.
+                # Inspect native saved settings, limit only temporary renders.
+                index = command.index('--threads')
+                del command[index:index + 2]
+                env['VWE_RENDER_THREADS'] = str(limits['cpu_threads'] if limits else 2)
             if request['command']=='sculpt.replay':
                 command.remove('--background')
                 command[command.index('--python')+1]=str(Path(__file__).with_name('sculpt_worker.py'))
                 command[1:1]=['--window-geometry','0','0','1024','768']
+        if request['command'] == 'video.run' and request['params'].get('output', {}).get('color_mode') == 'HDR10_PQ':
+            # Bound before Blender initializes color management; resource guards
+            # above already hold this exact configuration and declared LUTs.
+            env['OCIO'] = request['params']['output']['hdr']['ocio']['file']
         atomic_json(job / "command.json", command)
         with (job / "stdout.log").open("wb") as out, (job / "stderr.log").open("wb") as err:
             bootstrap = command if isolation else [sys.executable, str(Path(__file__).with_name("bootstrap.py")), str(job), *command]
@@ -326,7 +404,10 @@ def execute_worker(job, parent_checkpoint=None):
             raise Failure(code if code in CODES else "WORKER_FAILED", f"Worker exit={worker_exit}; {details or 'no result'}")
         result = read_json(result_file)
         if not result.get("ok"):
-            if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study'):
+            if request['command'].startswith('video.'):
+                detail=result.get('error') or {}
+                raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
+            if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
             raise Failure("VALIDATION_FAILED", str(result.get("error")))
@@ -355,6 +436,21 @@ def execute_worker(job, parent_checkpoint=None):
         error = {"code": "WORKER_FAILED", "message": str(exc)}
         (job / "supervisor-error.log").write_text(traceback.format_exc(), encoding="utf-8")
     finally:
+        if request['command'].startswith('video.'):
+            for path in job.rglob('*'):
+                if path.is_file() and (path.name.startswith('video-') or any(part in ('outputs','previews','shots','resources','proxies','cache') for part in path.relative_to(job).parts)):
+                    artifacts[str(path.relative_to(job))]=str(path)
+        if request['command'] in ('compositing.template-save','compositing.template-run','compositing.batch','compositing.study'):
+            # Own-tree paths only; ancestor paths stay in hashed domain anchors.
+            for path in job.rglob('*'):
+                if path.is_file():artifacts[str(path.relative_to(job))]=str(path)
+        if request['command'].startswith('lighting.'):
+            for path in job.rglob('*'):
+                if path.is_file() and (path.name.startswith('lighting-') or 'previews' in path.parts or 'items' in path.parts or 'resources' in path.parts):
+                    artifacts[str(path.relative_to(job))]=str(path)
+        if request['command'] in ('geometry.run','geometry.inspect'):
+            for path in job.glob('geometry-*'):
+                if path.is_file():artifacts[path.name]=str(path)
         if request['command'] in ('material.batch','material.study'):
             for path in job.rglob('*'):
                 if path.is_file():artifacts[str(path.relative_to(job))]=str(path)
@@ -434,6 +530,9 @@ def execute_worker(job, parent_checkpoint=None):
 
 def execute(job, parent_checkpoint=None):
     request = read_json(job / "request.json")
+    if request['command'] in ('workflow.run', 'workflow.resume'):
+        from workflow_runtime import execute as execute_workflow
+        return execute_workflow(job, parent_checkpoint)
     if request['command'].startswith('pipeline.') or request['command']=='asset.preview.batch':
         import pipeline
         return pipeline.execute(job,parent_checkpoint)
@@ -445,13 +544,15 @@ def execute(job, parent_checkpoint=None):
     started = time.monotonic()
     state.update(state="running", supervisor_pid=os.getpid(), started_at=time.time())
     data, error = None, None
+    if request["command"]=="compositing.encode":
+        state["process_tree_root_pid"]=os.getpid()  # Host supervisor roots its actual numeric/codec descendants.
     def checkpoint():
         if parent_checkpoint:
             parent_checkpoint()
         if (job / "cancel.request").exists():
-            raise Failure("CANCELLED", "Transaction job cancelled; inspect journal before recovery")
+            raise Failure("CANCELLED", "Encoder partial retained; only passed final output can resume" if request["command"]=="compositing.encode" else "Transaction job cancelled; inspect journal before recovery")
         if time.monotonic() - started > launch["timeout_seconds"]:
-            raise Failure("TIMEOUT", "Transaction job exceeded timeout; journal retained")
+            raise Failure("TIMEOUT", "Encoder job timeout; partial evidence retained" if request["command"]=="compositing.encode" else "Transaction job exceeded timeout; journal retained")
         if time.time() - state["heartbeat_at"] >= 1:
             state["heartbeat_at"] = time.time()
             atomic_json(job / "status.json", state)
@@ -459,7 +560,16 @@ def execute(job, parent_checkpoint=None):
     try:
         checkpoint()
         from protocol import OPERATIONS,REVIEWS
-        if request['command'] in REVIEWS:
+        if request['command']=='compositing.encode':
+            from compositing_encode_public import run_public
+            data=run_public(request['params'],job,launch,checkpoint)
+        elif request['command'] == 'workflow.preflight':
+            from workflow_preflight import inspect_requests
+            data = inspect_requests(request['params']['requests'], launch['blender'])
+            atomic_json(job / 'workflow-preflight.json', data)
+            if data['failed']:
+                error = {'code': 'VALIDATION_FAILED', 'message': 'Full-scale static preflight failed; read workflow-preflight.json'}
+        elif request['command'] in REVIEWS:
             import reviews
             data=reviews.run(request,launch,job,checkpoint)
         elif request['command'] in OPERATIONS:
@@ -479,6 +589,12 @@ def execute(job, parent_checkpoint=None):
     state.update(state="cancelled" if code == 7 else "timed_out" if code == 6 else "failed" if code else "succeeded",
                  exit_code=code, finished_at=time.time(), heartbeat_at=time.time(), elapsed_seconds=round(time.monotonic() - started, 3))
     artifacts = {"job_directory": str(job)}
+    if request['command'] == 'workflow.preflight' and (job / 'workflow-preflight.json').is_file():
+        artifacts['preflight_report'] = str(job / 'workflow-preflight.json')
+    if request["command"]=="compositing.encode" and (job/"encode-report.json").is_file():
+        artifacts["encode_report"]=str(job/"encode-report.json")
+        if (job/"encode-public-receipt.json").is_file():artifacts["encode_public_receipt"]=str(job/"encode-public-receipt.json")
+        if (job/"encode-lifecycle.json").is_file():artifacts["encode_lifecycle"]=str(job/"encode-lifecycle.json")
     if data and "transaction_directory" in data:
         artifacts["transaction_directory"] = data["transaction_directory"]
     elif request["command"].startswith("transaction."):

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Small, reloadable GUI client for the public blenderctl job protocol."""
 import hashlib
 import json

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Stage-5 validation adapters, evaluated observations and ID working candidates."""
 import math
 import os

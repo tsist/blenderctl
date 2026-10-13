@@ -1,0 +1,598 @@
+{
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "scene": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "view_layer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "frame": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "rig_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+    },
+    "action": {
+      "enum": [
+        "create",
+        "patch",
+        "restore"
+      ]
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 0,
+      "maxItems": 64
+    },
+    "mode": {
+      "enum": [
+        "relight",
+        "adapt"
+      ]
+    },
+    "anchor": {
+      "enum": [
+        "world",
+        "target",
+        "camera"
+      ]
+    },
+    "lights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "type": {
+            "enum": [
+              "AREA",
+              "POINT",
+              "SPOT",
+              "SUN"
+            ]
+          },
+          "energy": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000000.0
+          },
+          "color": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "location": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "size": {
+            "type": "number",
+            "minimum": 1e-05,
+            "maximum": 10000
+          },
+          "size_y": {
+            "type": "number",
+            "minimum": 1e-05,
+            "maximum": 10000
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "use_shadow": {
+            "type": "boolean"
+          },
+          "receivers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "minItems": 0,
+            "maxItems": 256
+          },
+          "blockers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "minItems": 0,
+            "maxItems": 256
+          },
+          "receivers_mode": {
+            "enum": [
+              "INCLUDE",
+              "EXCLUDE"
+            ]
+          },
+          "blockers_mode": {
+            "enum": [
+              "INCLUDE",
+              "EXCLUDE"
+            ]
+          },
+          "normalize": {
+            "type": "boolean"
+          },
+          "spread_deg": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 180
+          },
+          "diffuse_factor": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "specular_factor": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "shape": {
+            "enum": [
+              "SQUARE",
+              "DISK",
+              "RECTANGLE",
+              "ELLIPSE"
+            ]
+          },
+          "aim": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "angle_deg": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 180
+          },
+          "spot_size_deg": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 179.9
+          },
+          "spot_blend": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "type",
+          "location",
+          "energy",
+          "color"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "world": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "constant",
+            "sky",
+            "hdri"
+          ]
+        },
+        "color": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "rotation_deg": {
+          "type": "number",
+          "minimum": -36000,
+          "maximum": 36000
+        },
+        "sky_type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "sun_rotation_deg": {
+          "type": "number",
+          "minimum": -36000,
+          "maximum": 36000
+        },
+        "sun_elevation_deg": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "sun_disc": {
+          "type": "boolean",
+          "description": "Native Sky sun disc is Cycles-only; Eevee does not support this sun-disc control. Use an explicit SUN light for direct light."
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "exposure": {
+      "type": "number",
+      "minimum": -10,
+      "maximum": 10
+    },
+    "eevee": {
+      "type": "object",
+      "properties": {
+        "use_raytracing": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "use_raytracing"
+      ],
+      "additionalProperties": false
+    },
+    "background": {
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "roughness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "size": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "color"
+      ],
+      "additionalProperties": false
+    },
+    "keep_lights": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "minItems": 0,
+      "maxItems": 256
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+          },
+          "values": {
+            "type": "object",
+            "properties": {
+              "energy": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100000000.0
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "location": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000,
+                  "maximum": 1000
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "size": {
+                "type": "number",
+                "minimum": 1e-05,
+                "maximum": 10000
+              },
+              "size_y": {
+                "type": "number",
+                "minimum": 1e-05,
+                "maximum": 10000
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "use_shadow": {
+                "type": "boolean"
+              },
+              "receivers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "minItems": 0,
+                "maxItems": 256
+              },
+              "blockers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "minItems": 0,
+                "maxItems": 256
+              },
+              "receivers_mode": {
+                "enum": [
+                  "INCLUDE",
+                  "EXCLUDE"
+                ]
+              },
+              "blockers_mode": {
+                "enum": [
+                  "INCLUDE",
+                  "EXCLUDE"
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "values"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+          },
+          "kind": {
+            "enum": [
+              "reflector",
+              "flag"
+            ]
+          },
+          "location": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rotation_deg": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -36000,
+              "maximum": 36000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "size": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 1e-05,
+              "maximum": 10000
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "color": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "roughness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "location",
+          "rotation_deg",
+          "size"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "board_patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+          },
+          "values": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000,
+                  "maximum": 1000
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation_deg": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -36000,
+                  "maximum": 36000
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "size": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 1e-05,
+                  "maximum": 10000
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "roughness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "values"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "conflict": {
+      "enum": [
+        "error",
+        "overwrite"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "scene",
+    "view_layer",
+    "rig_id",
+    "action"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lighting-manifest.schema.json"
+}

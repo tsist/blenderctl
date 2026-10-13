@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Self-contained pinhole review copy derived from an already verified solve."""
 import bpy,json,math
 from mathutils import Matrix,Vector

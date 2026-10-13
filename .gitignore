@@ -13,3 +13,9 @@ test-output/
 *.egg-info/
 .DS_Store
 Thumbs.db
+
+__pycache__/
+*.pyc
+dist/
+tests-output/
+example-output/

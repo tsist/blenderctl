@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Shared library planning and pre/post-commit validation on the existing transaction core."""
 import copy,os,re
 from contextlib import ExitStack

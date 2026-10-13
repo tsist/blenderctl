@@ -4,10 +4,10 @@
 
 ```powershell
 $ctl = Join-Path $env:BLENDERCTL_ROOT 'blenderctl.ps1'
-$batch = Join-Path $env:BLENDERCTL_ROOT 'runtime\audit\my-blender-task'
+$batch = Join-Path $env:BLENDERCTL_ROOT '..\my-blender-task'
 $jobs = Join-Path $batch 'jobs'
 New-Item -ItemType Directory -Path $batch -Force | Out-Null
-$raw = & $ctl --jobs-dir $jobs capabilities
+$raw = & $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs capabilities
 $code = $LASTEXITCODE
 $r = $raw | ConvertFrom-Json
 if ($code -ne 0 -or !$r.ok) { throw ($raw -join "`n") }
@@ -21,9 +21,9 @@ $r.data.execution_contract
 技能 `assets/studio-pipeline.json` 为三个步骤：scene.prepare创建2米立方体、相机/灯；render.run做256×256 CPU图像；inspect重开候选。无外部资产。复制模板到新批次再修改，不编辑技能原件。
 
 ```powershell
-& $ctl --jobs-dir $jobs pipeline plan --manifest '<本批模板副本.json>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs pipeline plan --manifest '<本批模板副本.json>'
 # 检查退出码及计划后运行；plan也要求本机Blender存在。
-& $ctl --jobs-dir $jobs --timeout 300 pipeline run --manifest '<本批模板副本.json>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs --timeout 300 pipeline run --manifest '<本批模板副本.json>'
 ```
 
 结果data.steps每步应succeeded或经验证reused；取studio.data.candidate与candidate_sha256，渲染路径从picture.data.outputs读取，不猜output.png。独立重开检查Cube几何、相机/灯；打开实际PNG检查尺寸、可见性和构图。模板不是完整美术场景或发布器。
@@ -37,15 +37,15 @@ $r.data.execution_contract
 project verify/prepare-copy的源为**位置参数**，--resources必填。仅确认无外部资源时用空数组文件。复制manifest为 `{"version_policy":"SAME_MINOR","path_policy":"REMAP_RELATIVE","unused_ids":"REJECT_LOSS","compress":true}`；读当前Schema核对。
 
 ```powershell
-& $ctl --jobs-dir $jobs project verify '<源.blend>' --expected-sha256 '<SHA>' --resources '<resources.json>'
-& $ctl --jobs-dir $jobs project prepare-copy '<源.blend>' --expected-sha256 '<SHA>' --resources '<resources.json>' --manifest '<copy.json>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs project verify '<源.blend>' --expected-sha256 '<SHA>' --resources '<resources.json>'
+& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs project prepare-copy '<源.blend>' --expected-sha256 '<SHA>' --resources '<resources.json>' --manifest '<copy.json>'
 ```
 
 dependency plan-relink、project link/override prepare、project override resync使用**--file**（link可省略，override必需）。资源描述符为 `{"file":"绝对路径","expected_sha256":"小写SHA"}`；清单/回执是内联还是描述符由具体Schema决定。
 
 scene/model/node/rig/simulation的prepare也使用 **--file**，不是位置参数。例如毛发：`simulation prepare --file '<源.blend>' --expected-sha256 '<SHA>' --manifest '<hair.json>'`；`hair.density`放在manifest.operations[].op中。
 
-完整请求例：`{"schema_version":"1.0","command":"inspect","params":{"file":"绝对路径.blend","expected_sha256":"小写SHA"}}`，用 `& $ctl --jobs-dir $jobs request '<request.json>'`。schema_version不是CLI版本号。
+完整请求例：`{"schema_version":"1.0","command":"inspect","params":{"file":"绝对路径.blend","expected_sha256":"小写SHA"}}`，用 `& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs request '<request.json>'`。schema_version不是CLI版本号。
 
 exchange.analyze/export的driver_profile从当前源公共rig inspect取得，按明确驱动策略审核后使用；不能给新副本套旧SHA。分析通过不等于连续时间/导出/渲染通过。GLB/FBX/USD按适配器、单位、帧率与实际求值帧验收。
 

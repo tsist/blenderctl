@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "cli_version",
+    "command",
+    "job_id",
+    "ok",
+    "data",
+    "error",
+    "artifacts",
+    "output_format"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "cli_version": {
+      "type": "string"
+    },
+    "command": {
+      "enum": [
+        "compositing.template-save",
+        "compositing.template-run",
+        "compositing.batch",
+        "compositing.study",
+        "job.submit",
+        "job.status",
+        "job.result",
+        "job.wait",
+        "job.cancel"
+      ]
+    },
+    "job_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "$ref": "compositing-orchestration-compact-data.schema.json"
+    },
+    "error": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "enum": [
+                "INVALID_REQUEST",
+                "NOT_FOUND",
+                "CONFLICT",
+                "WORKER_FAILED",
+                "TIMEOUT",
+                "CANCELLED",
+                "VALIDATION_FAILED",
+                "IO_ERROR",
+                "UNSUPPORTED",
+                "RESOURCE_LIMIT"
+              ]
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "artifacts": {
+      "type": "object"
+    },
+    "output_format": {
+      "const": "compact"
+    }
+  },
+  "$id": "compositing-orchestration-compact-result.schema.json",
+  "$defs": {
+    "ordinary_artifact_descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "sha256"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "anyOf": [
+          {
+            "required": [
+              "command"
+            ],
+            "properties": {
+              "command": {
+                "enum": [
+                  "compositing.template-save",
+                  "compositing.template-run",
+                  "compositing.batch",
+                  "compositing.study"
+                ]
+              }
+            }
+          },
+          {
+            "required": [
+              "data"
+            ],
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "operation"
+                ],
+                "properties": {
+                  "operation": {
+                    "enum": [
+                      "compositing.template-save",
+                      "compositing.template-run",
+                      "compositing.batch",
+                      "compositing.study"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "artifacts": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "job_directory": {
+                "type": "string"
+              },
+              "request.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "result.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "status.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "batch-report.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "study-report.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "template-report.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "template-run-report.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              },
+              "compositing-report.json": {
+                "$ref": "#/$defs/ordinary_artifact_descriptor"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "artifacts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

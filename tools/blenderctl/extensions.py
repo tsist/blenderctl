@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Adapter inventory and explicitly selected local Python execution modes."""
 from pathlib import Path
 import bpy

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded native Draw replay. No script text, implicit backend, or algorithm fallback."""
 import math, os
 from pathlib import Path

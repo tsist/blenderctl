@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only base mesh comparisons and neutral geometry previews, not brush replay."""
 import bpy,math,shutil
 from pathlib import Path

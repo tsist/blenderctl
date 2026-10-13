@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded VSE timeline candidates and in-process Blender media exports."""
 import json,time,wave,math
 from pathlib import Path
@@ -59,13 +58,13 @@ def prepare(params,job):
         expected=state(s);s[KEY]=json.dumps({'manifest':spec,'state':expected,'resources':resources},ensure_ascii=False,sort_keys=True);path=job/'media-candidate.blend';bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(path),relative_remap=False,check_existing=False)
         bpy.ops.wm.open_mainfile(filepath=str(path),load_ui=False,use_scripts=False);observed=state(bpy.context.scene)
         if scenes.compare(expected,observed):raise Failure('VALIDATION_FAILED','Media candidate reopen mismatch')
-        report={'media_report_version':'1.0','state':observed,'resource_hashes':hashes,'reopen':'pass'};atomic_json(job/'media-report.json',report)
+        report={'media_report_version':'1.0','state':observed,'resource_hashes':hashes,'reopen':'pass','pixel_frame_budget':spec['pixel_frame_budget'],'output_pixel_frames':spec['width']*spec['height']*(spec['frame_end']-spec['frame_start']+1)};atomic_json(job/'media-report.json',report)
         return {'candidate':str(path),'candidate_sha256':digest(path),'report':str(job/'media-report.json'),'resources':resources,'reopen':'pass'}
 def export(params,job):
     spec=normalize_export(params['manifest']);started=time.monotonic();bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False);s=scenes.find(bpy.data.scenes,spec['scene'])
     if not s.get(KEY) or not s.sequence_editor:raise Failure('UNSUPPORTED','Export requires a managed media.prepare candidate')
     if tuple(bpy.data.version[:2])!=tuple(bpy.app.version[:2]):raise Failure('UNSUPPORTED','Media requires matching Blender major/minor')
-    stored=json.loads(s[KEY]);normalize_media(stored['manifest'])
+    stored=json.loads(s[KEY]);stored['manifest']=normalize_media(stored['manifest'])
     resources=[f for st in stored['manifest']['strips'] for f in (st.get('files',[]) or ([st['file']] if 'file' in st else []))]
     if resources!=stored['resources']:raise Failure('CONFLICT','Media resource manifest differs')
     if scenes.compare(stored['state'],state(s)):raise Failure('CONFLICT','VSE timeline differs from its authored contract; prepare a new candidate')
@@ -112,4 +111,4 @@ def export(params,job):
             fmt=s.render.image_settings;fmt.media_type='IMAGE';fmt.file_format='PNG';fmt.color_mode='RGBA';fmt.color_depth='8'
             for frame in range(s.frame_start,s.frame_end+1):
                 s.frame_set(frame);path=job/f'media-{frame:06d}.png';s.render.filepath=str(path);modeling.finished(bpy.ops.render.render(write_still=True,scene=s.name));r=rendering.image_report(path);r['frame']=frame;outputs.append(r)
-        report={'media_export_version':'1.0','settings':spec,'outputs':outputs,'resource_hashes':hashes,'seconds':time.monotonic()-started,'source_saved':False,'timeline_authority':'stored manifest rebuilt privately; unmanaged strip edits are not exported'};atomic_json(job/'media-export.json',report);atomic_json(job/'media-progress.json',{'state':'verified'});return report
+        report={'media_export_version':'1.0','settings':spec,'outputs':outputs,'resource_hashes':hashes,'seconds':time.monotonic()-started,'source_saved':False,'pixel_frame_budget':stored['manifest']['pixel_frame_budget'],'output_pixel_frames':s.render.resolution_x*s.render.resolution_y*(s.frame_end-s.frame_start+1),'timeline_authority':'stored manifest rebuilt privately; unmanaged strip edits are not exported'};atomic_json(job/'media-export.json',report);atomic_json(job/'media-progress.json',{'state':'verified'});return report

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read uniform simulation states through temporary native POINT attributes.
 
 The caller must reopen its immutable source after capture and configure the

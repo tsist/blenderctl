@@ -1,23 +1,18 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Versioned, strict request/result protocol. Standard library only."""
 import hashlib
 import json
 import math
 import os
-import shutil
 from pathlib import Path
 import time
 import uuid
 
-VERSION = "0.54.1"
+VERSION = "0.63.0"
 SCHEMA = "1.0"
 ROOT = Path(__file__).resolve().parents[2]
-_PORTABLE_BLENDER = ROOT / "runtime/blender/releases/5.2.1/blender-5.2.1-windows-x64/blender.exe"
-DEFAULT_BLENDER = Path(os.environ.get("BLENDER_PATH") or
-                       (str(_PORTABLE_BLENDER) if _PORTABLE_BLENDER.is_file() else shutil.which("blender")) or
-                       str(_PORTABLE_BLENDER))
-DEFAULT_JOBS = Path(os.environ.get("BLENDERCTL_JOBS_DIR") or ROOT / "runtime/blenderctl/jobs")
-DEFAULT_TRANSACTIONS = Path(os.environ.get("BLENDERCTL_TRANSACTIONS_DIR") or ROOT / "runtime/blenderctl/transactions")
+DEFAULT_BLENDER = ROOT / "runtime/blender/releases/5.2.1/blender-5.2.1-windows-x64/blender.exe"
+DEFAULT_JOBS = ROOT / "runtime/blenderctl/jobs"
+DEFAULT_TRANSACTIONS = ROOT / "runtime/blenderctl/transactions"
 CODES = {"INVALID_REQUEST": 2, "NOT_FOUND": 3, "CONFLICT": 4,
          "WORKER_FAILED": 5, "TIMEOUT": 6, "CANCELLED": 7,
          "VALIDATION_FAILED": 8, "IO_ERROR": 9, "UNSUPPORTED": 10, "RESOURCE_LIMIT":11}
@@ -36,6 +31,20 @@ COMMANDS=(*COMMANDS,*REVIEWS,'sculpt.review','sculpt.replay')
 HOST_COMMANDS=(*HOST_COMMANDS,*OPERATIONS)
 COMMANDS=(*COMMANDS,*OPERATIONS)
 COMMANDS=(*COMMANDS,'material.run','material.template-save','material.batch','material.study')
+HOST_COMMANDS=(*HOST_COMMANDS,'geometry.session')
+COMMANDS=(*COMMANDS,'geometry.run','geometry.inspect','geometry.session')
+COMMANDS=(*COMMANDS,'lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch')
+COMMANDS=(*COMMANDS,'video.run','video.inspect')
+COMMANDS=(*COMMANDS,'compositing.run','compositing.inspect','compositing.encode','compositing.template-save','compositing.template-run','compositing.batch','compositing.study')
+HOST_COMMANDS=(*HOST_COMMANDS,'compositing.encode')
+HOST_COMMANDS=(*HOST_COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
+COMMANDS=(*COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
+
+
+def resource_schema(command):
+    """Single public resource-list shape shared by execution and preflight."""
+    from node_contract import FILE, array
+    return array(FILE, 0, 100000 if command.startswith('video.') else 100)
 
 class Failure(Exception):
     def __init__(self, code, message):
@@ -66,7 +75,9 @@ def read_json(path):
 
 def atomic_json(path, value):
     path = Path(path)
-    temp = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
+    # Same-directory unique O_EXCL file preserves atomic replacement without
+    # inflating a legal Windows destination by its entire basename plus UUID.
+    temp = path.with_name("." + uuid.uuid4().hex + ".tmp")
     with temp.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False)
         stream.write("\n")
@@ -106,6 +117,38 @@ def validate(request):
     if not isinstance(command, str) or command not in COMMANDS:
         raise Failure("INVALID_REQUEST", f"Unknown command: {command}")
     params = request.get("params", {})
+    if command == 'workflow.preflight':
+        if not isinstance(params, dict) or set(params) != {'requests'}:
+            raise Failure('INVALID_REQUEST', 'Preflight requires requests')
+        if not isinstance(params['requests'], list) or not 1 <= len(params['requests']) <= 32:
+            raise Failure('INVALID_REQUEST', 'Preflight requires 1..32 requests')
+        if any(not isinstance(row, dict) or str(row.get('command', '')).startswith('workflow.') for row in params['requests']):
+            raise Failure('INVALID_REQUEST', 'Preflight requests must be non-workflow objects')
+        return {'schema_version': SCHEMA, 'command': command, 'params': params}
+    if command in ('workflow.run', 'workflow.resume'):
+        from workflow_contract import normalize_request
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_request(command, params)}
+    if command=='compositing.encode':
+        from compositing_encode_public import normalize
+        return {'schema_version':SCHEMA,'command':command,'params':normalize(params)}
+    if command.startswith('video.'):
+        from video_workflow_contract import normalize_command
+        return {'schema_version':SCHEMA,'command':command,'params':normalize_command(command,params)}
+    if command.startswith('compositing.'):
+        from compositing_workflow_contract import normalize_command
+        return {'schema_version':SCHEMA,'command':command,'params':normalize_command(command,params)}
+    if command.startswith('lighting.'):
+        from lighting_workflow_contract import normalize_command
+        normalized = normalize_command(command, params)
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in ('geometry.run', 'geometry.inspect'):
+        from geometry_workflow_contract import normalize_params, normalize_inspect_params
+        normalized = normalize_params(params) if command == 'geometry.run' else normalize_inspect_params(params)
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command == 'geometry.session':
+        if not isinstance(params, dict) or set(params) - {'session_dir','action','manifest','resources','baseline','candidate','report','request_id','wait_seconds','session_id'}:
+            raise Failure('INVALID_REQUEST','Invalid geometry session request')
+        return {'schema_version':SCHEMA,'command':command,'params':params}
     if command=='material.run':
         from material_workflow_contract import normalize_params
         return {'schema_version':SCHEMA,'command':command,'params':normalize_params(params)}
@@ -156,7 +199,7 @@ def validate(request):
                "material.preview": {"file","expected_sha256","material","resolution","samples","frame","resources"},
                "texture.bake": {"file","expected_sha256","object","scene","view_layer","uv_layer","type","resolution","samples","margin","frame","resources"},
                "exchange.formats":set(), "exchange.analyze":{"file","expected_sha256","manifest","resources","driver_profile","simulation_receipt"}, "exchange.export":{"file","expected_sha256","manifest","resources","driver_profile","simulation_receipt"}, "exchange.import":{"file","expected_sha256","manifest"}, "exchange.convert":{"manifest"}, "extension.inspect":set(), "extension.prepare":{"manifest"}, "extension.run":{"manifest","resources","review_receipt"},
-               "render.devices": set(), "render.run": {"file","expected_sha256","manifest","resources","simulation_receipt","driver_profile"},
+               "render.devices": set(), "render.run": {"file","expected_sha256","manifest","resources","simulation_receipt","driver_profile","cache_manifest"},
                "media.prepare": {"manifest"}, "media.export": {"file","expected_sha256","manifest","resources"},
                "project.plan_copy": {"file", "output"}, "project.plan_batch": {"items"}, "project.plan_files": {"items"},
                **{c: {'file', 'expected_sha256', 'manifest'} for c in ('project.link.prepare', 'project.override.prepare', 'project.override.resync')},
@@ -220,6 +263,10 @@ def validate(request):
             from node_contract import FILE,validate as validate_nodes
             from render_contract import file_input
             validate_nodes(params['simulation_receipt'],FILE);file_input(params['simulation_receipt'])
+        if command=='render.run' and 'cache_manifest' in params:
+            from node_contract import FILE,validate as validate_nodes
+            from render_contract import file_input
+            validate_nodes(params['cache_manifest'],FILE);file_input(params['cache_manifest'])
     if command in ('scene.inspect','model.inspect','node.inspect','rig.inspect','simulation.inspect') and 'context' in params:
         from scene_contract import CONTEXT,validate as validate_scene
         validate_scene(params['context'],CONTEXT)
@@ -268,7 +315,7 @@ def validate(request):
         params.update(validate({'schema_version':SCHEMA,'command':'query','params':{k:params[k] for k in ('file','expected_sha256')}})['params'])
     if command in ('node.prepare','material.preview','texture.bake','render.run','media.export','exchange.export','exchange.analyze','extension.run','simulation.bake') and 'resources' in params:
         from node_contract import FILE,array,validate as validate_nodes,file_contract
-        validate_nodes(params['resources'],array(FILE,0,100))
+        validate_nodes(params['resources'],resource_schema(command))
         for resource in params['resources']:
             if command in ('render.run','media.export','exchange.export','exchange.analyze','extension.run'):
                 from render_contract import file_input

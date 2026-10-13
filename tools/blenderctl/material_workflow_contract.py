@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host request adapter for the shared add-on contract."""
 from pathlib import Path
 import sys

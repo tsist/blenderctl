@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Asset index/Catalog/blend consistency. No index or Catalog mutation."""
 import json
 import os

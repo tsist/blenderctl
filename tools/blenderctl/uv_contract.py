@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """S06 explicit, density-preserving UDIM layout contract."""
 from scene_contract import obj, array, integer, number, enum, NAME, BOOL
 

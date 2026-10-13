@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit library links and native single-library override hierarchies.
 
 All writes are job candidates. Source libraries remain read-only and their

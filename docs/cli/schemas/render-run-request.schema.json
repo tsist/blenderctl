@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "render.run parameters",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "file": {
+      "type": "string"
+    },
+    "expected_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "view_layer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "camera": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+        },
+        "engine": {
+          "enum": [
+            "CYCLES",
+            "BLENDER_EEVEE",
+            "BLENDER_WORKBENCH"
+          ]
+        },
+        "device": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "backend": {
+              "enum": [
+                "CPU",
+                "CUDA",
+                "OPTIX",
+                "GRAPHICS"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "backend"
+          ]
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "minItems": 1,
+          "maxItems": 120,
+          "uniqueItems": true
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 2048
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 2048
+        },
+        "samples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "format": {
+          "enum": [
+            "PNG",
+            "JPEG",
+            "OPEN_EXR",
+            "OPEN_EXR_MULTILAYER"
+          ]
+        },
+        "depth": {
+          "enum": [
+            "8",
+            "16",
+            "32"
+          ]
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "color": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "view": {
+              "enum": [
+                "Standard",
+                "AgX",
+                "Raw"
+              ]
+            },
+            "exposure": {
+              "type": "number",
+              "minimum": -10,
+              "maximum": 10
+            },
+            "gamma": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 4
+            }
+          },
+          "required": [
+            "view",
+            "exposure",
+            "gamma"
+          ]
+        },
+        "compositor": {
+          "type": "boolean"
+        },
+        "passes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Z",
+              "NORMAL",
+              "DIFFUSE_COLOR",
+              "EMISSION",
+              "OBJECT_INDEX"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "denoise": {
+          "type": "boolean"
+        },
+        "motion_blur": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "pixel_frame_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 512000000,
+          "default": 32000000
+        }
+      },
+      "required": [
+        "scene",
+        "view_layer",
+        "camera",
+        "engine",
+        "device",
+        "frames",
+        "width",
+        "height",
+        "samples",
+        "format",
+        "depth",
+        "transparent",
+        "color",
+        "compositor",
+        "passes",
+        "denoise",
+        "motion_blur"
+      ]
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "file",
+          "expected_sha256"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 100
+    },
+    "simulation_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    },
+    "driver_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "NATIVE_SIMPLE_V1"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inventory_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "driver_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "acknowledged_unresolved": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "minItems": 0,
+          "maxItems": 4096,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "mode",
+        "source_sha256",
+        "inventory_sha256",
+        "driver_count",
+        "acknowledged_unresolved"
+      ]
+    },
+    "cache_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ]
+    }
+  },
+  "required": [
+    "file",
+    "expected_sha256",
+    "manifest"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "driver_profile"
+        ]
+      },
+      "then": {
+        "required": [
+          "expected_sha256"
+        ]
+      }
+    }
+  ]
+}

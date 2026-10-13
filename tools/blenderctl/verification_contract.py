@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Declarative, bounded validation profile; never evaluates Python from a request."""
 import math
 import re

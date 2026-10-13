@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded, generated fixtures. These experiments are NOT production write commands."""
 import math
 from pathlib import Path

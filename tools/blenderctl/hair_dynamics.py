@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Managed native Cloth ribbons and exact sampled centerline Curves."""
 import json,math,hashlib
 import bpy

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit surface guides; root IDs survive deterministic density selection."""
 from scene_contract import obj,array,number,integer,NAME,BOOL
 from model_contract import SHA

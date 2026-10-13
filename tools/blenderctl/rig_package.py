@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Byte-identical native rig package, source-bound receipts and reopen witnesses."""
 import shutil,time
 from pathlib import Path

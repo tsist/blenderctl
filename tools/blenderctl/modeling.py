@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Local static modeling candidates, explicit data ownership and geometry evidence."""
 import hashlib,json,math
 from contextlib import contextmanager

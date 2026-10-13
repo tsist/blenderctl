@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit non-deform SVD helper adapter for finite positive affine bases."""
 import math
 from contextlib import contextmanager

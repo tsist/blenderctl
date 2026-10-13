@@ -1,0 +1,30 @@
+{
+  "schema_version": "video-template-catalog/1.0",
+  "library_version": "0.1.0",
+  "templates": [
+    {
+      "id": "whitebox-board",
+      "name": "白膜分镜审阅",
+      "path": "templates/whitebox-board.json",
+      "sha256": "c4e114844effbf38f149567b941877611de14106a23970e38c7237fb5ce68c73"
+    },
+    {
+      "id": "ai-final",
+      "name": "AI 成片基础剪辑",
+      "path": "templates/ai-final.json",
+      "sha256": "cb0c26eca7e5671d3e7eeadd0eefb5b5c3871f312cc99fb2eee964e158ec62ba"
+    },
+    {
+      "id": "cg-clean",
+      "name": "CG 动画简洁展示",
+      "path": "templates/cg-clean.json",
+      "sha256": "eb08d157a3483c2f914c626001c225e3ec3669f2206d8aed9e4dea40880b8805"
+    },
+    {
+      "id": "subtitle-readable",
+      "name": "中文字幕优先",
+      "path": "templates/subtitle-readable.json",
+      "sha256": "8dee281c4712116f0a640ebdccc8ef6170fa66097a7f8e50c18514b02f422114"
+    }
+  ]
+}

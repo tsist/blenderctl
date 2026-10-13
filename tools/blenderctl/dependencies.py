@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Typed resource observation. Pattern candidates are not a proof of playback completeness."""
 import os
 from pathlib import Path

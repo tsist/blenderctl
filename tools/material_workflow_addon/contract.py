@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Strict, host-compatible contract shared by the Blender add-on and CLI."""
 from copy import deepcopy
 import math

@@ -11,7 +11,7 @@ metadata:
 
 ## 定位工具
 
-仓库根采用用户指定目录或 `BLENDERCTL_ROOT`，不假定个人磁盘布局；须含 `tools/blenderctl/cli.py` 与 `docs/cli/schemas/`。Python 3.12+；Blender 由 `--blender`、`BLENDER_PATH`、兼容 portable 目录或 PATH 选择。缺运行时如实报告，不擅自下载、安装或替换环境。
+仓库根采用用户指定目录或 `BLENDERCTL_ROOT`，不假定个人磁盘布局；须含 `tools/blenderctl/cli.py` 与 `docs/cli/schemas/`。Python 3.12+；Blender 必须通过 `--blender` 显式绑定本机可执行文件；`BLENDER_PATH` 仅可作为传给该参数的 shell 变量，本快照不会自动读取它。缺运行时如实报告，不擅自下载、安装或替换环境。
 
 ```powershell
 $root = $env:BLENDERCTL_ROOT
@@ -50,3 +50,8 @@ study 点名 assignment/layer，最多8候选、每候选6视图、总32视图�
 计时区分总墙钟、顶层作业和内部阶段；嵌套case/view已包含父级时不重复累加。工具秒数不能解释全部会话时间，缺遥测区间标未测，不归因模型、等待或GPU。历史耗时复盘仅提出待匹配验证的优化候选，原证未公开，不代表已实现提速；见[效率章节](../blender-work-methodology/references/efficient-work-units.md)。
 
 交付保留 blend、纹理、frames/VDB/usdc、缓存、回执及上游作业。先检查消费者再清理，缺全局反向消费者索引时注明影响面。资产命名/入库转[资产管理](../blender-asset-manager/SKILL.md)。无隔离不冒称隔离，未验平台/断电一致性/硬配额不得宣称支持，安全拒绝不能换入口绕过。
+
+
+## Video workflow in CLI 0.63.0
+
+Use `video describe` for the current schema and [video editing](../blender-video-editing/SKILL.md) for editorial execution. Its template library is at `templates/video/cli.py` under `BLENDERCTL_ROOT`. Preserve implementation hashes and use the exact source release; independent specialty snapshots may share a version string while differing in code.

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Native-frame GLB morph geometry with an explicit time origin and NLA clock."""
 import json,math,struct,time
 from pathlib import Path

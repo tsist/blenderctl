@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Weight transfer from immutable base-rest triangles with per-vertex evidence.
 
 This adapter never invokes automatic binding, never reads evaluated deformation,

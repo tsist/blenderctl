@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Preservation oracle for explicitly limited local static mesh scenes."""
 import bpy,math
 from protocol import Failure

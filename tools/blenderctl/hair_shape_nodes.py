@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Live triangle-frame binding, expressed entirely as native Geometry Nodes."""
 def definition(surface):
     nodes={'Input':('NodeGroupInput',{},{}),'Output':('NodeGroupOutput',{},{}),

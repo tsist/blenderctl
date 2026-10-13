@@ -105,7 +105,8 @@
                   "render.devices",
                   "exchange.formats",
                   "extension.inspect",
-                  "doctor.verify_install"
+                  "doctor.verify_install",
+                  "workflow.preflight"
                 ]
               },
               "classification": {
@@ -159,7 +160,9 @@
                   "pipeline.plan",
                   "pipeline.run",
                   "pipeline.resume",
-                  "asset.preview.batch"
+                  "asset.preview.batch",
+                  "workflow.run",
+                  "workflow.resume"
                 ]
               },
               "classification": {
@@ -246,11 +249,72 @@
               "classification",
               "reason"
             ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "compositing.encode"
+                ]
+              },
+              "classification": {
+                "const": "host_media_work_unit"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": [
+                  "material.run",
+                  "material.template-save",
+                  "material.batch",
+                  "material.study",
+                  "geometry.run",
+                  "geometry.inspect",
+                  "geometry.session",
+                  "lighting.run",
+                  "lighting.inspect",
+                  "lighting.template-save",
+                  "lighting.template-edit",
+                  "lighting.batch",
+                  "compositing.run",
+                  "compositing.inspect",
+                  "compositing.template-save",
+                  "compositing.template-run",
+                  "compositing.batch",
+                  "compositing.study"
+                ]
+              },
+              "classification": {
+                "const": "standalone_workflow"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "command",
+              "classification",
+              "reason"
+            ]
           }
         ]
       },
-      "minItems": 27,
-      "maxItems": 27,
+      "minItems": 49,
+      "maxItems": 49,
       "allOf": [
         {
           "contains": {
@@ -327,6 +391,20 @@
             "properties": {
               "command": {
                 "const": "doctor.verify_install"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "workflow.preflight"
               }
             },
             "required": [
@@ -508,6 +586,48 @@
           "contains": {
             "properties": {
               "command": {
+                "const": "workflow.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "workflow.resume"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.encode"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
                 "const": "resource.init"
               }
             },
@@ -565,6 +685,258 @@
             "properties": {
               "command": {
                 "const": "project.package"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "material.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "material.template-save"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "material.batch"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "material.study"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "geometry.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "geometry.inspect"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "geometry.session"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "lighting.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "lighting.inspect"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "lighting.template-save"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "lighting.template-edit"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "lighting.batch"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.inspect"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.template-save"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.template-run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.batch"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "compositing.study"
               }
             },
             "required": [

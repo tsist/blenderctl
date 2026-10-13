@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Host adapter; no new branch files read before dependency isolation."""
 from pathlib import Path
 import sys

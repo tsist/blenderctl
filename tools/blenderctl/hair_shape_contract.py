@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit evaluated-surface region, arc resampling and native radius profile."""
 from scene_contract import obj,array,number,integer,NAME,BOOL
 V=array(number(-100,100),3,3)

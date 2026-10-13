@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Managed PNG sequence tracking and native reconstruction with explicit resources."""
 import bpy
 import json

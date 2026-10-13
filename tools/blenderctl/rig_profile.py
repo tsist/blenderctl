@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only, unevaluated rig facts and conservative map suggestions.
 
 No frame changes, depsgraph updates, operators, path evaluation or Python driver

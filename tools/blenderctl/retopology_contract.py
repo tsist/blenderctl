@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Strict finite static remeshing contract shared by runtime and schema export."""
 from scene_contract import obj, enum, number, integer, NAME,BOOL,array
 

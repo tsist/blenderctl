@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Versioned three-way graph reconciliation; no source saves or GUI operations."""
 import copy
 import hashlib

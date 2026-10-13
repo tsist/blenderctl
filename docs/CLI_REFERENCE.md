@@ -15,6 +15,8 @@ The authoritative inputs are [public schemas](cli/schemas/) and the exact subcom
 | `exchange` | Formats, analysis, export/import/conversion and native time/cache adapters |
 | `project`, `asset`, `identity` | Copies, links/overrides, packages, metadata and explicit publication plans |
 | `extension`, `sculpt` | Exact script trust/review, OS isolation and native sculpt replay boundaries |
+| `video`, `geometry`, `lighting`, `compositing` | Bounded specialty workflows; use the matching `describe` and schemas |
+| `workflow` | Explicit recoverable work units |
 | `pipeline` | Bounded DAG planning/execution and verified new resume attempts |
 | `job`, `transaction`, `resource`, `cache` | Owned processes, explicit file transactions, resource domains and cache plans |
 

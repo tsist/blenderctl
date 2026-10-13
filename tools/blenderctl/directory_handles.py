@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Windows local-directory sampling using handle-relative, no-reparse opens.
 
 All mutable child names are single components relative to an already opened

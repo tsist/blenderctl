@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """JSON-only observational progress and disjoint monotonic phase accounting.
 
 Observer return values are ignored. Callbacks receive detached documents and

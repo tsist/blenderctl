@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Bounded format adapters and explicitly trusted local Python contracts."""
 from pathlib import Path
 from protocol import Failure,DEFAULT_BLENDER

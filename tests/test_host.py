@@ -81,7 +81,13 @@ class HostTests(unittest.TestCase):
                 for child in value: walk(child, path)
         for path in paths:
             doc = json.loads(path.read_text(encoding='utf-8-sig'))
-            self.assertEqual(doc['$schema'], 'https://json-schema.org/draft/2020-12/schema')
+            if path.name == 'material-workflow-template.schema.json':
+                # This shared embedded object schema intentionally has no dialect header.
+                self.assertEqual(doc['type'], 'object')
+                self.assertIn('properties', doc)
+                self.assertIn('required', doc)
+            else:
+                self.assertEqual(doc['$schema'], 'https://json-schema.org/draft/2020-12/schema')
             walk(doc, path)
 
     def test_invalid_request_exit_codes(self):

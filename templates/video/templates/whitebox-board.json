@@ -1,0 +1,18 @@
+{
+  "schema_version": "video-template/1.0",
+  "id": "whitebox-board",
+  "name": "白膜分镜审阅",
+  "description": "按镜头顺序组织白膜参考，显示稳定镜头编号，保留原画面比例。适合整体预演和逐镜头交接前的审阅。",
+  "layout": "SEQUENCE",
+  "style": {
+    "background_color": [0.04, 0.045, 0.055, 1.0],
+    "show_shot_labels": true,
+    "label_prefix": "镜头",
+    "fit": "FIT",
+    "transition_frames": 0,
+    "grade": {"multiply": 1.0, "saturation": 1.0},
+    "title": {"font_ratio": 0.08, "y_ratio": 0.26, "color": [1.0, 1.0, 1.0, 1.0]},
+    "label": {"font_ratio": 0.05, "y_ratio": 0.43, "color": [1.0, 0.80, 0.30, 1.0]},
+    "subtitle": {"font_ratio": 0.065, "y_ratio": -0.33, "color": [1.0, 1.0, 1.0, 1.0]}
+  }
+}

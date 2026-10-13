@@ -1,0 +1,583 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compositing-study-report.schema.json",
+  "type": "object",
+  "properties": {
+    "report_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "const": "compositing.study"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "passed",
+        "partial",
+        "failed",
+        "cancelled",
+        "timed_out",
+        "mock_only"
+      ]
+    },
+    "attempt_directory": {
+      "type": "string"
+    },
+    "request": {
+      "type": "object"
+    },
+    "request_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "implementation_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runtime": {
+      "type": "object"
+    },
+    "evidence_kind": {
+      "enum": [
+        "normal_host",
+        "mock_only"
+      ]
+    },
+    "certified_producer": {
+      "type": "boolean"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {}
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "domain_status_observed": {
+      "enum": [
+        "passed",
+        "partial",
+        "failed"
+      ]
+    },
+    "guard_validation": {
+      "type": "object",
+      "properties": {
+        "initial_full_sha": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "final_full_sha": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "file_path_identity_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ancestor_path_identity_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ancestors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "const": "passed"
+        }
+      },
+      "required": [
+        "status",
+        "files",
+        "ancestors",
+        "final_full_sha",
+        "file_path_identity_checks",
+        "ancestor_path_identity_checks"
+      ],
+      "additionalProperties": false
+    },
+    "parent_guard_validation": {
+      "type": "object",
+      "properties": {
+        "initial_full_sha": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "final_full_sha": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "file_path_identity_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ancestor_path_identity_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ancestors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "const": "passed"
+        }
+      },
+      "required": [
+        "status",
+        "files",
+        "ancestors",
+        "final_full_sha",
+        "file_path_identity_checks",
+        "ancestor_path_identity_checks"
+      ],
+      "additionalProperties": false
+    },
+    "closure_guard_validation": {
+      "type": "object",
+      "properties": {
+        "initial_full_sha": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "final_full_sha": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "file_path_identity_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ancestor_path_identity_checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ancestors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "const": "passed"
+        }
+      },
+      "required": [
+        "status",
+        "files",
+        "ancestors",
+        "final_full_sha",
+        "file_path_identity_checks",
+        "ancestor_path_identity_checks"
+      ],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed"
+            ]
+          },
+          "reused": {
+            "type": "boolean"
+          },
+          "params_fingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "new_attempt_directory": {
+            "type": "string"
+          },
+          "report": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file"
+            ],
+            "anyOf": [
+              {
+                "required": [
+                  "sha256"
+                ]
+              },
+              {
+                "required": [
+                  "expected_sha256"
+                ]
+              }
+            ],
+            "additionalProperties": false
+          },
+          "candidate": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "file"
+            ],
+            "anyOf": [
+              {
+                "required": [
+                  "sha256"
+                ]
+              },
+              {
+                "required": [
+                  "expected_sha256"
+                ]
+              }
+            ],
+            "additionalProperties": false
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "baselines": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "guard_validation": {
+            "type": "object",
+            "properties": {
+              "initial_full_sha": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "final_full_sha": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "file_path_identity_checks": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ancestor_path_identity_checks": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "files": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ancestors": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "status",
+              "files",
+              "ancestors",
+              "final_full_sha",
+              "file_path_identity_checks",
+              "ancestor_path_identity_checks"
+            ],
+            "additionalProperties": false
+          },
+          "changes": {
+            "type": "array"
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {}
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "reused",
+          "params_fingerprint",
+          "new_attempt_directory"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "passed"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "required": [
+                "report",
+                "candidate",
+                "outputs",
+                "guard_validation"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "failed"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "required": [
+                "error"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "batch_report": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "sha256"
+          ]
+        },
+        {
+          "required": [
+            "expected_sha256"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "decision": {
+      "type": "object"
+    },
+    "comparison": {
+      "type": "object"
+    },
+    "conditions": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "report_version",
+    "operation",
+    "status",
+    "attempt_directory",
+    "evidence_kind",
+    "certified_producer"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "failed",
+              "cancelled",
+              "timed_out"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "error"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "mock_only"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evidence_kind": {
+            "const": "mock_only"
+          },
+          "certified_producer": {
+            "const": false
+          }
+        },
+        "required": [
+          "evidence_kind",
+          "certified_producer"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "passed",
+              "partial"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "implementation_sha256",
+          "runtime",
+          "request_fingerprint"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "passed",
+              "partial"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evidence_kind": {
+            "const": "normal_host"
+          },
+          "certified_producer": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "passed",
+              "partial"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "cases",
+          "batch_report",
+          "comparison",
+          "conditions",
+          "parent_guard_validation",
+          "closure_guard_validation"
+        ]
+      }
+    }
+  ]
+}

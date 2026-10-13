@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit, idempotent layered shader authoring. Never saves the source file."""
 import copy
 import hashlib

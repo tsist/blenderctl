@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit persistent snapshot, async submission, and manual job refresh panel."""
 import json
 from pathlib import Path

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit same-rest skin rebinding, without touching mesh/weight/key geometry."""
 import copy
 import math

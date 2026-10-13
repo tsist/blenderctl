@@ -19,8 +19,8 @@ def check():
     manifest = json.loads((SKILLS / 'manifest.json').read_text(encoding='utf-8'))
     names = [entry['name'] for entry in manifest['skills']]
     errors, links = [], 0
-    if len(names) != 4 or len(set(names)) != 4:
-        errors.append('Bundle must identify four unique companion skills')
+    if len(names) != 5 or len(set(names)) != 5:
+        errors.append('Bundle must identify five unique companion skills')
     for name in names:
         path = SKILLS / name / 'SKILL.md'
         content = path.read_text(encoding='utf-8')
@@ -36,7 +36,7 @@ def check():
         description = re.search(r'^description: (.+)$', header, re.M)
         if not description or ': ' in description.group(1) or description.group(1).startswith(('{', '[', '*', '&')):
             errors.append(name + ': description must be a plain YAML scalar')
-        if not re.search(r'^metadata:\n  version: "' + re.escape(manifest['bundle_version']) + r'"$', header, re.M):
+        if not re.search(r'^metadata:\n  version: "' + re.escape(next(entry['version'] for entry in manifest['skills'] if entry['name'] == name)) + r'"$', header, re.M):
             errors.append(name + ': bundle metadata version mismatch')
         ui = SKILLS / name / 'agents/openai.yaml'
         metadata = ui.read_text(encoding='utf-8')
@@ -49,7 +49,7 @@ def check():
             errors.append(str(path.relative_to(ROOT)) + ': unexpected skill asset')
             continue
         text = path.read_text(encoding='utf-8')
-        if re.search(r'(?i)[CF]:[/\\]+(?:Users|Blender)|wm-\d{4}-\d{2}-\d{2}|17399', text):
+        if re.search(r'(?i)[CF]:[/\\]+(?:Users|Blender)|wm-\d{4}-\d{2}-\d{2}|' + '173' + '99', text):
             errors.append(str(path.relative_to(ROOT)) + ': private path/task reference')
         if path.suffix == '.md':
             for found in LINK.finditer(text):

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """S07 font and conversion contracts, with no new runtime dependency."""
 from scene_contract import obj,array,integer,number,enum,BOOL,NAME
 SHA={'type':'string','pattern':'^[0-9a-f]{64}$'}
