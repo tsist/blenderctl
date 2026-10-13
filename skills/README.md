@@ -12,7 +12,7 @@ Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**,
 
 ## Install in Codex
 
-Download `blenderctl-skills-0.3.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0), or use the repository. Keep all five skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
+Download `blenderctl-skills-0.3.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0-r1), or use the repository. Keep all five skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
 
 From the repository root:
 

@@ -1,5 +1,5 @@
 {
-  "release": "0.63.0",
+  "release": "0.63.0-r1",
   "verified_on": "2026-10-13",
   "baseline": {
     "os": "Windows",
@@ -60,7 +60,7 @@
     "bytes": 8549348,
     "entries": 493
   },
-  "finalization": "Only publication scripts, skill installation documentation and this result summary changed after native smoke; runtime/compiler/helper/example/smoke code hashes must match tested source.",
+  "finalization": "Runtime/compiler/helper/example/native-smoke code matches the native-tested candidate. Publication scripts/docs and template test fixture path normalization were finalized afterward.",
   "extension_metadata": "Blender native extension validate passed for addon ZIP",
   "standalone_portability": {
     "template_compile_with_BLENDERCTL_ROOT": "passed",
@@ -73,5 +73,6 @@
     "HDR display viewing",
     "complex acting",
     "real long-form production"
-  ]
+  ],
+  "publication_revision": "r1 canonicalizes Windows TEMP 8.3 aliases in the test fixture; production runtime and compiler are unchanged."
 }

@@ -1,6 +1,6 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.0",
+  "release": "0.63.0-r1",
   "cli": "0.63.0",
   "distribution": "0.1.3",
   "addon": "0.1.1",
@@ -47,8 +47,8 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "da613483c760cc66ee075bc49bbe97adb2237146b95881e78f857d10039b4adb",
-      "bytes": 2355
+      "sha256": "524f690baba99dca089db65c944ff8e929a71b80fca7478316f55d6979a71166",
+      "bytes": 2557
     },
     {
       "file": "CONTRIBUTING.md",
@@ -847,8 +847,8 @@
     },
     {
       "file": "docs/VALIDATION.md",
-      "sha256": "b91a562366c473aa9f4d919a2b2422295300dd66944424ae28a333f1d5cb9c9b",
-      "bytes": 2325
+      "sha256": "4e53215190787b2af66d80b279f4151d860dfde5771dce8b5c1767f063884aa4",
+      "bytes": 2549
     },
     {
       "file": "docs/VIDEO-EDITING.md",
@@ -872,18 +872,18 @@
     },
     {
       "file": "README.md",
-      "sha256": "9a63dd39de7f10729d3640fa3c6d2c3522872fa213be05c2fea417664d690c80",
-      "bytes": 5042
+      "sha256": "ac196a3bdb645a832ff70ba5a3423cef95978f2796f0764def75ac9e7920a552",
+      "bytes": 5182
     },
     {
       "file": "README.zh-CN.md",
-      "sha256": "1d2d4ab0fd716922472ebcd4fd59bb069b3d27e9bd8ae081941589271638f760",
-      "bytes": 3880
+      "sha256": "1b8c627e855ff8a1a99416730ffa8865516a4056683eb6a09d78de4321d8eb78",
+      "bytes": 4020
     },
     {
       "file": "RELEASE-VALIDATION.json",
-      "sha256": "d6bf2a03d3826442c5d2061811c111352fd25e359e835588b1113c892b2a381c",
-      "bytes": 2056
+      "sha256": "1281250bf942fcbfa3a7e10fdd66c1ef3e7516f5b4f1218c4eb317fbaf487135",
+      "bytes": 2194
     },
     {
       "file": "scripts/build_release.py",
@@ -1222,8 +1222,8 @@
     },
     {
       "file": "skills/README.md",
-      "sha256": "937ddafeb54a06023fbb438ddcf8afb50e48d97fa08686d65ed53a0c80a0b431",
-      "bytes": 5146
+      "sha256": "55616a3282fa2524a3b65248c798c8c8edb8bdf7fd749ac7b2232b9cd16b30fa",
+      "bytes": 5149
     },
     {
       "file": "skills/requirements-images.txt",
@@ -1277,8 +1277,8 @@
     },
     {
       "file": "templates/video/test_template_library.py",
-      "sha256": "6d3bd38dd7ae2090447d7b4f1b3c820f3fa2ea1fa2b867905624829edfbf6ce1",
-      "bytes": 24253
+      "sha256": "b8b5f4156413eb23ceb8dc8048263e3908e7fced874b66366d0b7e0ef33f572a",
+      "bytes": 24346
     },
     {
       "file": "tests/blender_smoke.py",

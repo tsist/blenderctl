@@ -14,3 +14,5 @@ Host tests exercise actual CLI subprocesses, template compiler constraints and s
 Earlier local validation included 35 compiler tests, seven small public template cases, separate movie/portrait input cases and decoded image/audio checks. Those historical checks are not a new full regression of this archive. This publication does not requalify every material, geometry, lighting, compositing or CLI adapter. Matching version numbers alone do not guarantee matching implementation identities between independently frozen specialty releases.
 
 No 4K/HDR stress test, HDR display review, arbitrary foreign VSE, advanced audio, complex acting or long-form production qualification is claimed. Do not treat registration, static checks or a generated technical clip as artistic acceptance.
+
+Publication revision r1 resolves Windows 8.3 TEMP aliases in the pure test fixture before comparing resource descriptors. The compiler already normalizes these paths; no production behavior or native qualification changed.

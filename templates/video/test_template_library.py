@@ -17,7 +17,8 @@ class CompilerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # The public compiler sits inside the protected runtime tree; fixtures must be external.
-        cls.root = Path(tempfile.mkdtemp(prefix='video-template-pure-'))
+        # Windows TEMP may use an 8.3 alias; match the contract's canonical paths.
+        cls.root = Path(tempfile.mkdtemp(prefix='video-template-pure-')).resolve()
         cls.source = cls.root / 'source.blend'
         cls.source.write_bytes(b'not Blender: pure compiler binding fixture\n')
         cls.font = cls.root / 'font.ttf'

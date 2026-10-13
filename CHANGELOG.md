@@ -1,3 +1,7 @@
+## Publication revision 0.63.0-r1
+
+Canonicalize Windows CI temporary fixture paths before comparing SHA-bound resource descriptors. Preserve production runtime/compiler code and prior native evidence.
+
 # 0.63.0
 
 Publish the qualified video-editing CLI snapshot with its addon, skill and four-template library. Runtime byte identity is preserved; release checks cover relocatable source archives and a bounded native SDR example. Existing material distribution and skills remain available. See docs/VALIDATION.md for scope.
