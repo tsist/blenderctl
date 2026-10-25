@@ -11,8 +11,11 @@ import sys
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 ADDON = 'tools/video_editing_workflow_addon/'
+MATERIAL_ADDON = 'tools/material_workflow_addon/'
+RUNTIME_ROOTS = ('tools/blenderctl', MATERIAL_ADDON.rstrip('/'), ADDON.rstrip('/'))
 BLOCKED = {'.git', '__pycache__', '.venv', 'audit', 'research', 'tests-output', 'dist'}
-IDENTITY = '4a6e44b18e1187baf1569e0f93f3eda4ae2ffa170a3d73b8c7083c0ca8f38bcb'
+IDENTITY = '28d42e55c2df210a6298865c7df90572e3850c54e271900206ae11a6ddfe8bee'
+RUNTIME_FILE_COUNT = 214
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
@@ -35,7 +38,7 @@ def release_files(publication):
 def private_findings(text):
     normalized = text.replace('\\', '/').lower()
     patterns = [r'gh[pousr]_[A-Za-z0-9]{30,}', r'github_pat_[A-Za-z0-9_]{40,}',
-                r'sk-[A-Za-z0-9_-]{32,}', r'AKIA[A-Z0-9]{16}',
+                r'(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{32,}', r'AKIA[A-Z0-9]{16}',
                 r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----']
     return ((('173' + '99') in normalized) or re.search(r'f:/+blender ai|wm-20\d\d-\d\d-\d\d-|runtime/+audit/', normalized)
             or any(re.search(p, text) for p in patterns))
@@ -51,11 +54,15 @@ def verify(root=ROOT):
     runtime_paths = set((root / 'tools/blenderctl').glob('*.py'))
     runtime_paths.update((root / ADDON).glob('*.py'))
     runtime_paths.add(root / ADDON / 'blender_manifest.toml')
+    runtime_paths.update((root / MATERIAL_ADDON).glob('*.py'))
+    runtime_paths.add(root / MATERIAL_ADDON / 'blender_manifest.toml')
     runtime = [{'file': p.relative_to(root).as_posix(), 'expected_sha256': sha(p.read_bytes())}
                for p in sorted(runtime_paths)]
     identity = sha(json.dumps(runtime, sort_keys=True, separators=(',', ':')).encode())
-    if len(runtime) != 189 or identity != IDENTITY or identity != publication['runtime_identity']:
-        raise ValueError('Original 189-file video runtime identity changed')
+    if (len(runtime) != RUNTIME_FILE_COUNT or publication['runtime_files'] != RUNTIME_FILE_COUNT
+            or identity != IDENTITY or identity != publication['runtime_identity']
+            or publication.get('runtime_roots') != list(RUNTIME_ROOTS)):
+        raise ValueError('Versioned CLI/material/video runtime identity or file count changed')
     if not set(row['file'] for row in runtime) <= set(names):
         raise ValueError('Runtime missing from release inventory')
     for name in names:
@@ -81,7 +88,8 @@ def verify(root=ROOT):
         if tracked and tracked != set(names):
             raise ValueError('Git tracked files differ from release inventory: ' + repr(sorted(tracked ^ set(names))))
     return {'status': 'passed', 'runtime_files': len(runtime), 'runtime_identity': identity,
-            'release_files': len(names), 'scope': 'Source hashes, syntax, explicit inventory, skill links and finite privacy checks'}
+            'runtime_roots': list(RUNTIME_ROOTS), 'release_files': len(names),
+            'scope': 'Source hashes, syntax, explicit inventory, skill links and finite privacy checks'}
 
 if __name__ == '__main__':
     try:

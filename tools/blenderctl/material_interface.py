@@ -14,6 +14,8 @@ OPERATIONS = {
     'study': ('material-study-request.schema.json', 'material-batch-manifest.schema.json', 'material-study-report.schema.json', 'one owned worker: texture semantic warnings, bounded parameter candidates, fixed views, phase progress and comparison sheets'),
     'template-save': ('material-template-save-request.schema.json', None, 'material-workflow-template-report.schema.json', 'export managed material template and separate bindings'),
     'preview': (None, None, 'preview-report.schema.json', 'existing isolated material preview; not the layered workflow'),
+    'procedural-run': (None, None, None, 'protected procedural material authoring'),
+    'procedural-export': (None, None, None, 'managed procedural PBR channel export and reconstruction'),
 }
 
 def descriptor(path):
@@ -68,6 +70,10 @@ def describe(operation=None, include_schema=False, section=None):
         raise Failure('INVALID_REQUEST', 'Choose --schema or --section')
     rows = []
     for name in ([operation] if operation else OPERATIONS):
+        if name in ('procedural-run', 'procedural-export'):
+            from material_procedural_contract import describe as describe_procedural
+            rows.append(describe_procedural(name, include_schema, section))
+            continue
         request, manifest, report, purpose = OPERATIONS[name]
         row = {'command': 'material.' + name, 'purpose': purpose, 'execution': 'standalone_job',
                'request_schema': descriptor(SCHEMAS / request) if request else None,
@@ -99,7 +105,7 @@ def describe(operation=None, include_schema=False, section=None):
         'compact_result_schema': descriptor(SCHEMAS / 'material-compact-result.schema.json'),
         'usage': 'Global options precede commands. Use --compact request <json>; read report references only when needed. Full result.json remains authoritative.',
         'constraints': ['Saved disk or persistent GUI snapshot; explicit target and source/resource SHA',
-            'Existing verified UV; generated spatial PBR layers and complex masks',
+            'Existing verified UV; explicit material sources and spatial/data channel semantics',
             'material workflows are standalone jobs, not pipeline DAG entries']})
 
 def compact(result, requested_command=None):
@@ -121,7 +127,7 @@ def compact(result, requested_command=None):
     job_state = {key: deepcopy(data[key]) for key in ('state', 'health', 'cancel_requested') if key in data}
     report_path = None
     if root:
-        for name in ('study-report.json', 'batch-report.json', 'workflow-report.json', 'template-report.json'):
+        for name in ('procedural-report.json', 'study-report.json', 'batch-report.json', 'workflow-report.json', 'template-report.json'):
             path = root / name
             if path.is_file():
                 report_path = path
@@ -173,6 +179,17 @@ def compact(result, requested_command=None):
                                       for case in cases if case.get('status') != 'pass']
         summary['failures']['outputs'] = [{'case': case['id'], **{k: v for k, v in output.items() if k in ('id', 'status', 'code', 'error')}}
                                          for case in cases for output in case.get('outputs', []) if output.get('status') != 'pass']
+    if command in ('material.procedural-run', 'material.procedural-export'):
+        for key in ('author', 'reconstructed', 'reconstructed_material', 'comparison'):
+            if key in data:
+                summary[key] = deepcopy(data[key])
+        if isinstance(data.get('export'), dict):
+            exported = data['export']
+            summary['export'] = {key: deepcopy(exported[key]) for key in
+                                 ('status', 'delivery', 'normal', 'height', 'constants', 'settings', 'error') if key in exported}
+            summary['export']['channels'] = {channel: {key: deepcopy(document[key]) for key in
+                ('file', 'sha256', 'expected_sha256', 'width', 'height', 'bytes', 'bit_depth', 'color_space', 'encoding', 'decoded')
+                if key in document} for channel, document in exported.get('channels', {}).items()}
     # Preview/template artifacts live outside the layered report shape.
     for key in ('template', 'bindings', 'template_sha256', 'bindings_sha256', 'output'):
         if key in data: summary[key] = deepcopy(data[key])

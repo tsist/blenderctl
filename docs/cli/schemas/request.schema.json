@@ -105,7 +105,9 @@
         "compositing.template-save",
         "compositing.template-run",
         "compositing.batch",
-        "compositing.study"
+        "compositing.study",
+        "material.procedural-run",
+        "material.procedural-export"
       ]
     },
     "params": {
@@ -30528,6 +30530,44 @@
       },
       "then": {
         "$ref": "compositing-study-request.schema.json"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "const": "material.procedural-run"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "params"
+        ],
+        "properties": {
+          "params": {
+            "$ref": "material-procedural-run-request.schema.json#/properties/params"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "const": "material.procedural-export"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "params"
+        ],
+        "properties": {
+          "params": {
+            "$ref": "material-procedural-export-request.schema.json#/properties/params"
+          }
+        }
       }
     }
   ]

@@ -174,9 +174,18 @@ def parser():
     material=sub.add_parser('material',help='isolated material output')
     material_actions=material.add_subparsers(dest='action',required=True,parser_class=Parser)
     describe=material_actions.add_parser('describe',help='read-only material capability/schema index; no Blender or job')
-    describe.add_argument('--operation',choices=['run','batch','study','template-save','preview'])
+    describe.add_argument('--operation',choices=['run','batch','study','template-save','preview','procedural-run','procedural-export'])
     describe.add_argument('--schema',action='store_true',help='return the small selected request schema')
-    describe.add_argument('--section',choices=['manifest','preview','layers','target','context','study'],help='read only a selected manifest or study section')
+    describe.add_argument('--section',choices=['manifest','preview','layers','target','context','study','signals','export'],help='read only a selected material contract section')
+    for action in ('procedural-run','procedural-export'):
+        procedural=material_actions.add_parser(action,help='protected procedural material authoring or disk-map reconstruction')
+        procedural.add_argument('file');procedural.add_argument('--expected-sha256',required=True)
+        procedural.add_argument('--resources',type=Path,required=True)
+        if action=='procedural-run':
+            procedural.add_argument('--manifest',type=Path,required=True)
+            procedural.add_argument('--export',type=Path,help='optional PBR export settings JSON')
+        else:
+            for flag in ('context','target','export'):procedural.add_argument('--'+flag,type=Path,required=True)
     workflow=material_actions.add_parser('run',help='run a standalone material workflow in one isolated worker')
     workflow.add_argument('file');workflow.add_argument('--expected-sha256',required=True);workflow.add_argument('--resources',type=Path,required=True)
     workflow_input=workflow.add_mutually_exclusive_group(required=True)
@@ -503,6 +512,14 @@ def main(argv=None):
                 if args.expected_sha256:params['expected_sha256']=args.expected_sha256
                 if args.driver_profile:params['driver_profile']=read_json(args.driver_profile)
                 request={'schema_version':SCHEMA,'command':'animation.sample','params':params}
+            elif args.command=='material' and args.action in ('procedural-run','procedural-export'):
+                params={'file':args.file,'expected_sha256':args.expected_sha256,'resources':read_json(args.resources)}
+                if args.action=='procedural-run':
+                    params['manifest']=read_json(args.manifest)
+                    if args.export is not None:params['export']=read_json(args.export)
+                else:
+                    for key in ('context','target','export'):params[key]=read_json(getattr(args,key))
+                request={'schema_version':SCHEMA,'command':'material.'+args.action,'params':params}
             elif args.command=='material' and args.action in ('batch','study'):
                 params={'file':args.file,'expected_sha256':args.expected_sha256,'manifest':read_json(args.manifest),'resources':read_json(args.resources)}
                 if args.action=='study':params['study']=read_json(args.study)

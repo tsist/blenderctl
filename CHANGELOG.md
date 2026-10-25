@@ -1,3 +1,13 @@
+## CLI 0.64.0 / Material Workflow 0.8.0 — 2026-10-23
+
+- Add standalone `material.procedural-run` and `material.procedural-export` on the public 0.63 baseline, without importing unrelated later CLI/Toon changes.
+- Add strict schema-2.0 registered signal graphs, geometry-aware masks, concentrated editable controls, protected author files, per-channel PBR baking and independent disk-texture reconstruction.
+- Extend this unpublished candidate with optional `surface` SPHERE/SLAB and finite object-space float32 Thickness 0–1000, editable through `Surface/thickness`. Preserve old recipes, AUTO versus explicit 0, report/rebuild semantics and rejection of managed mode/link edits or unknown dynamic thickness.
+- Qualify both public source checkouts with 35 Thickness fixture checks plus eight independent-process reopen checks each, and a separate public CLI 128×128/nine-map cup round trip. See docs/VALIDATION.md for portable commands and limits; these small samples do not certify arbitrary glass visuals or complete the ongoing independent review.
+- Keep source/resource SHA guards, owned output directories, non-target protection, real saved-file reopens, diagnostic previews and report-backed compact output.
+- Retain legacy material v1/v2 behavior and existing video algorithms, presets and packaging. Expand the versioned release runtime identity to cover the CLI, material addon and original video addon.
+- Record native 2K/Cycles and small Eevee glass qualification separately from DeepSeek autonomy and final aesthetic approval, which remain pending. See docs/VALIDATION.md.
+
 ## Publication revision 0.63.0-r1
 
 Canonicalize Windows CI temporary fixture paths before comparing SHA-bound resource descriptors. Preserve production runtime/compiler code and prior native evidence.

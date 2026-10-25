@@ -17,13 +17,15 @@ COMMON = frozenset(('NodeFrame', 'NodeReroute', 'NodeGroupInput', 'NodeGroupOutp
     'ShaderNodeUVMap', 'ShaderNodeMapping', 'ShaderNodeTexImage',
     'ShaderNodeNormalMap', 'ShaderNodeBump'))
 EEVEE_ONLY = frozenset(('ShaderNodeShaderToRGB',))
+PROCEDURAL = frozenset(('ShaderNodeTexNoise', 'ShaderNodeTexWave', 'ShaderNodeTexVoronoi',
+    'ShaderNodeTexCoord', 'ShaderNodeNewGeometry', 'ShaderNodeVectorTransform'))
 
 def _engine(engine):
     if engine not in ENGINES:
         raise WorkflowError('unsupported_engine', 'Supported preview engines: CYCLES, BLENDER_EEVEE; got '+str(engine))
     return engine
 
-def validate_tree(tree, engine, *, effect=False, _stack=(), _budget=None):
+def validate_tree(tree, engine, *, effect=False, _stack=(), _budget=None, _procedural=False):
     """Read-only bounded scan; effect groups must also pass content fingerprinting."""
     _engine(engine)
     if tree is None or tree.bl_idname != 'ShaderNodeTree':
@@ -41,9 +43,10 @@ def validate_tree(tree, engine, *, effect=False, _stack=(), _budget=None):
         kind = node.bl_idname
         if kind in EEVEE_ONLY and engine != 'BLENDER_EEVEE':
             raise WorkflowError('unsupported_node', 'Shader to RGB requires Eevee: '+tree.name+'/'+node.name)
-        if kind not in COMMON | (EEVEE_ONLY if engine == 'BLENDER_EEVEE' else frozenset()):
+        allowed = COMMON | (PROCEDURAL if _procedural else frozenset())
+        if kind not in allowed | (EEVEE_ONLY if engine == 'BLENDER_EEVEE' else frozenset()):
             raise WorkflowError('unsupported_node', 'Node is outside the verified static surface subset: '+tree.name+'/'+node.name+' ('+kind+')')
-        if kind == 'ShaderNodeTexImage' and effect:
+        if kind == 'ShaderNodeTexImage' and effect and not _procedural:
             raise WorkflowError('unsupported_group', 'Effect texture resources must be managed layer channels')
         if kind == 'ShaderNodeOutputMaterial':
             if node.target not in ('ALL', 'EEVEE' if engine == 'BLENDER_EEVEE' else 'CYCLES'):
@@ -54,12 +57,14 @@ def validate_tree(tree, engine, *, effect=False, _stack=(), _budget=None):
         if kind == 'ShaderNodeGroup':
             if node.node_tree is None:
                 raise WorkflowError('unsupported_group', 'Missing nested shader group: '+node.name)
-            from .core_v2 import group_fingerprint
-            group_fingerprint(node.node_tree)
+            if not _procedural:
+                from .core_v2 import group_fingerprint
+                group_fingerprint(node.node_tree)
             found.update(validate_tree(node.node_tree, engine, effect=True,
-                _stack=_stack+(tree,), _budget=budget)['node_types'])
+                _stack=_stack+(tree,), _budget=budget, _procedural=_procedural)['node_types'])
         found.add(kind)
-    return {'engine': engine, 'node_types': sorted(found), 'scope': 'static_surface_subset'}
+    return {'engine': engine, 'node_types': sorted(found),
+            'scope': 'managed_procedural_surface' if _procedural else 'static_surface_subset'}
 
 def validate_group(group, engine):
     from .core_v2 import group_fingerprint
@@ -72,6 +77,12 @@ def validate_material(material, engine):
     if material.library or material.override_library or material.animation_data:
         raise WorkflowError('unsupported_node', 'Preview requires local static material: '+material.name)
     if not material.use_nodes: return {'engine':engine,'node_types':[],'scope':'diffuse_material'}
+    if 'mwp_state' in material or 'mwp_manifest' in material:
+        from .procedural_core import get_stored_manifest
+        # Validate the real graph, images and exposed parameter types. A tag alone
+        # must never enable the additional procedural preview node subset.
+        get_stored_manifest(material)
+        return validate_tree(material.node_tree, engine, _procedural=True)
     return validate_tree(material.node_tree, engine)
 
 def validate_manifest(manifest):

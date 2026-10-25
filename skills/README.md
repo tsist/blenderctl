@@ -1,6 +1,6 @@
 # Blender agent skills / Blender 配套技能
 
-Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.3.0**.
+Five companion skills for **blenderctl 0.64.0 candidate** and **Material Workflow 0.8.0 candidate**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.3.0**.
 
 | Skill | Use |
 | --- | --- |
@@ -12,7 +12,7 @@ Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**,
 
 ## Install in Codex
 
-Download `blenderctl-skills-0.3.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0-r1), or use the repository. Keep all five skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
+Use this repository for the updated 0.3.0 candidate; candidate download assets are not published by this document. Keep all five skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
 
 From the repository root:
 
@@ -49,6 +49,12 @@ Live Blender MCP, native image generation, optional fallback services and memory
 
 五个技能保持同级安装：CLI操作、制作方法论、材质制作、资产管理、视频剪辑。`BLENDERCTL_ROOT` 指向另行解压的公开源码，`BLENDER_PATH` 可保存实际 Blender 路径；调用时仍显式传 `--blender $env:BLENDER_PATH`。辅助脚本不启动 Blender；只有本次实际制作/验收才走已授权 CLI。资产根由用户当次明确，随包资产标准是新项目可采用的基线，已有项目规则优先。
 
-原个人技能和工作区规则保持完整。公开版移除本机盘符/用户名、私人 Wiki、固定任务编号、原资产及用户对话；六个领域方法仍是 candidate，历史教训不冒充公开可复现或跨模型验证。本包保留原生生图优先的材质路线，用户当前明确要求优先。
+原个人技能和工作区规则保持完整。公开版移除本机盘符/用户名、私人 Wiki、固定任务编号、原资产及用户对话；六个领域方法仍是 candidate，历史教训不冒充公开可复现或跨模型验证。材质指导0.7.0按需求选择constant/image/procedural/hybrid；需要AI图像时优先宿主原生生图，程序化路线不以生图受阻为前置。
 
 结构/链接、安装冲突保护、实际辅助脚本和 CI 的验证见 [skills verification](https://github.com/tsist/blenderctl/blob/main/docs/SKILLS.md)。软件已验 Windows/Blender 5.2.1 基线不因发布指导文件而扩大。
+
+Material candidate update: bundle0.3.0 / material source guidance0.7.0 / CLI0.64.0 / extension0.8.0. The fifteen-signal procedure supports explicit axes/scales/weathering and disk-map reconstruction; legacy image-layer v1/v2 remain separate compatible contracts. Public candidate revalidation and independent DeepSeek reuse are in progress. No candidate release asset is promised by this documentation.
+
+## Reference and quality guidance
+
+Material guidance 0.7.0 requires every new material task, including procedural/constant routes, to select and actually inspect applicable references before freezing a versioned quality brief. The [reference quality gate](blender-material-authoring/references/pbr/reference-quality-gate.md) and [brief template](blender-material-authoring/assets/material-quality-brief.template.json) cover all seven visual dimensions, explicit gaps, sampling limits and offline handoff. References guide style, finish and detail quality; individual grain or defect layouts need not match. This guidance update changes no addon/CLI runtime behavior or certification.

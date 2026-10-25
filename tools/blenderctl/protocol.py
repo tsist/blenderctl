@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 import uuid
 
-VERSION = "0.63.0"
+VERSION = "0.64.0"
 SCHEMA = "1.0"
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_BLENDER = ROOT / "runtime/blender/releases/5.2.1/blender-5.2.1-windows-x64/blender.exe"
@@ -31,6 +31,7 @@ COMMANDS=(*COMMANDS,*REVIEWS,'sculpt.review','sculpt.replay')
 HOST_COMMANDS=(*HOST_COMMANDS,*OPERATIONS)
 COMMANDS=(*COMMANDS,*OPERATIONS)
 COMMANDS=(*COMMANDS,'material.run','material.template-save','material.batch','material.study')
+COMMANDS=(*COMMANDS,'material.procedural-run','material.procedural-export')
 HOST_COMMANDS=(*HOST_COMMANDS,'geometry.session')
 COMMANDS=(*COMMANDS,'geometry.run','geometry.inspect','geometry.session')
 COMMANDS=(*COMMANDS,'lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch')
@@ -149,6 +150,10 @@ def validate(request):
         if not isinstance(params, dict) or set(params) - {'session_dir','action','manifest','resources','baseline','candidate','report','request_id','wait_seconds','session_id'}:
             raise Failure('INVALID_REQUEST','Invalid geometry session request')
         return {'schema_version':SCHEMA,'command':command,'params':params}
+    if command in ('material.procedural-run','material.procedural-export'):
+        from material_procedural_contract import normalize_params, normalize_export_params
+        normalized = normalize_params(params) if command=='material.procedural-run' else normalize_export_params(params)
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
     if command=='material.run':
         from material_workflow_contract import normalize_params
         return {'schema_version':SCHEMA,'command':command,'params':normalize_params(params)}

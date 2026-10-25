@@ -1,20 +1,24 @@
 # PBR插件、CLI与MCP执行路由
 
-先遵循[插件+CLI最高指导](../../../blender-work-methodology/references/plugin-cli-work-units.md)。插件封装领域连续操作，CLI组织输入/版本/作业/批量/保存/验证；宿主代理调用原生imagegen。插件不自行假设能访问Codex的原生生图会话。
+先遵循[插件+CLI最高指导](../../../blender-work-methodology/references/plugin-cli-work-units.md)。插件封装领域连续操作，CLI组织输入/版本/作业/批量/保存/验证。来源按[framework](framework.md)选择；仅需要生图时由宿主代理调用原生imagegen，插件不自行假设能访问该会话。没有生图工具不阻断适合程序化/常量的目标。
+
+程序化2.0支持15类信号，包括coordinate/warp/voronoi/remap；木轴、局部三轴采样倍率与显式旧化区域见[基础信号与分层](procedural-signals.md)。旧静态v1/v2合同继续独立兼容，不能混填参数。
 
 ## 可复用工作单元
 
-材质任务把“图层清单校验→加载图像与色彩空间→建立节点/参数→映射/分区→保存候选→预览/回执”组织为有检查点的插件工作单元，由CLI调度。Material Workflow 0.7.0已真实安装并完成本机验收；当前操作顺序见[插件与CLI材质操作章](plugin-cli-authoring.md)。每次先准备完整输入与验收目标，再按范围选择单目标、批量或有限候选对照。
+材质任务组织来源/清单校验、信号/图层、参数、映射、保存和预览，由CLI调度。本版配套公开候选为CLI0.64.0、Material Workflow0.8.0；不能只凭版本/注册宣称可用。实际能力由describe/help/Schema和仓库`docs/MATERIAL_WORKFLOW.md`的逐项范围说明。
 
 有适用插件时核对来源/版本/接口、headless支持、授权和真实小样；缺口先评估现有插件适配或自研扩展。API/RNA可创建节点不证明公共CLI白名单允许；安装/启用仍遵循已有授权和项目规则。
 
 ## 已有操作入口
 
-本机材质工具已验基线：blenderctl 0.54.1、Material Workflow 0.7.0、Blender 5.2.1 LTS/build 9e2066aef7ef。执行时核对当前Schema/版本；本表是导航而非永久能力承诺。
+旧材质工具历史基线：blenderctl0.54.1、Material Workflow0.7.0、Blender5.2.1 LTS/build 9e2066aef7ef。执行时通过`BLENDERCTL_ROOT`定位工程包装器并核对当前Schema/版本；本表是导航，不把源码候选或注册成功当已验能力。
 
 | 目标 | 入口 | 要点 |
 |---|---|---|
 | 发现材质接口 | material.describe | 按需读取section；编写请求前核对真实request schema，不搬入无关全文 |
+| 程序化/混合信号与层 | material.procedural-run | 2.0 manifest；新author、保存重开及预览，可选export；候选验证范围见专章 |
+| 通道烘焙与仅贴图重建 | material.procedural-export | 已受管author→Cycles按通道捕获→磁盘校验→rebuild保存/重开/预览；不替代实际看图 |
 | 单目标材质构建 | material.run | 一个目标的绑定、构建、保存和预览；保留源与依赖SHA |
 | 显式批量分配 | material.batch | 多目标明确assignment；逐项报告与失败隔离，不把partial当全部成功 |
 | 有限参数/视图对照 | material.study | 固定条件、有界case/view，返回基线差异、语义风险与进度；参数范围见操作章 |
@@ -25,18 +29,20 @@
 | 工程与依赖 | project.verify / prepare_copy / dependency.audit | resources实际枚举；open不等于render或所有依赖闭合 |
 | 插件/适配器试验缺口 | extension.run或授权的最小bpy | 绑定脚本/输入SHA，明确trust/隔离，独立候选输出；不绕过已知安全拒绝 |
 | 批处理与恢复 | pipeline.plan / run / resume | 当前ALLOWED命令，复用绑定正确manifest；one batch仍有检查点和真实终态 |
-| 技术交付烘焙/交换 | texture.bake / exchange.*或专用插件 | 只承担已生成图层的技术传递或当次明确要求；记录源/目标/编码，不偷换内容来源 |
+| 其他烘焙/交换 | texture.bake / exchange.*或专用插件 | 按当前合同选择；记录源、通道、目标、编码和损失，不能冒充程序化专用多通道重建入口 |
 
-当前texture.bake为单对象、单tile、PNG/Non-Color，selected_to_active=False；不是独立高低模投射接口。历史投射实验可查询，但不再作为本生图流程的强制阶段。若需通道打包/重投影/格式交换，查当前接口并实际验证目标读取结果。
+旧texture.bake为单对象、单tile、PNG/Non-Color、selected_to_active=False，不是独立高低模投射接口。程序化导出由自己的专用模块处理BaseColor sRGB、数据Non-Color、IOR范围编码和有符号Height EXR；真实Tangent/+Y Normal包含总Height。旧入口的限制不自动等于新入口能力，反之亦然。需要通道打包、AO、重投影或交换时另查实际合同并验目标读取结果。
 
-CLI使用<仓库根>/blenderctl.ps1，全局参数在子命令前；复杂请求UTF-8 JSON、绝对路径、输入/依赖SHA和独立审计目录。材质作业当前为standalone，不加入pipeline DAG；通用pipeline能力不代表material命令已获DAG支持。核对ok/error与终态后，仅消费逐项验证通过的产物；partial保留成功项，失败项不作为交付，不并发写同一工程。extension输出所在job目录未必有相对textures，必须按回执复制到正式布局再重开验证；Packed另在无外图目录验。
+CLI包装器为`$env:BLENDERCTL_ROOT`下的`blenderctl.ps1`，全局参数在子命令前；复杂请求用UTF-8 JSON、绝对路径、输入/依赖SHA和独立jobs目录。材质作业为standalone，不默认加入DAG。核对ok/error与终态后，仅消费逐项验证通过的产物；partial保留成功项，失败项不作为完整交付，不并发写同一工程。按回执整理正式布局后重开验证；Packed另在无外图目录验。
 
 异步提交后用原job的有界wait（0–55秒）读取进度与终态；queued或等待超时不等于失败，也不应重新提交同一制作请求。study恢复绑定前次study报告的file与expected_sha256；不要把batch恢复请求直接套用。缓存/检查点必须核验目录归属、SHA和指纹，变化影响的视图重新渲染；当前case不可变恢复快照和partial隔离按报告读回。
 
+procedural-run/export没有公开resume字段，按报告中的实际持久author与资源新建作业，不能套旧study恢复协议。几何辅助图当前不跨调用缓存；UV/几何/变换、seed或参数改变后重新取证。DeepSeek交接必须包含需求、实际Schema、源/资源身份、当前manifest、最新图与待决点；需实际看图迭代，再烘焙/rebuild。view_image等能力缺失就交回视觉判断，不用数值检查替代“已看图”。
+
 ## 实时与离线
 
-实时GUI场景探索用MCP，执行前核对连接、文件、Scene/View Layer、对象/模式、共享数据和未保存状态。历史localhost:9876断连只描述取证当时，不能替代新检查。
+实时GUI场景探索用MCP，执行前核对连接、文件、Scene/View Layer、对象/模式、共享数据和未保存状态。
 
 MCP的*_for_cli是独立后台入口，不继承blenderctl的SHA/作业/事务契约；临时快照可能清理。入口交接必须持久保存并重新取证。只有UI上下文可用的插件不能声称支持后台CLI；要实现适配或明确MCP交互部分。
 
-当前实际状态由本次输入、Schema和作业结果取得；可用宿主WM须用真实taskId恢复，无工具以本批文件继续，不按旧“下一件”安排重开访谈。历史证据见[实证导航](wiki-and-evidence.md)，不继承历史作品验收。材料视觉、工具安装与可见GUI的验证范围分别判断，仍不互相代替。
+历史案例与安装/批量诊断证据见[实证导航](wiki-and-evidence.md)；实际任务进度从当前批次证据恢复，不按维护者历史顺序重开访谈。各案例、工具安装与可见GUI的验证范围分别判断，仍不互相代替。

@@ -1,78 +1,218 @@
 {
-  "release": "0.63.0-r1",
-  "verified_on": "2026-10-13",
+  "release": "0.64.0",
+  "verified_on": "2026-10-24",
+  "stage": "local_candidate_not_published",
   "baseline": {
     "os": "Windows",
     "blender": "5.2.1 LTS",
     "build": "9e2066aef7ef",
     "python": "3.13"
   },
+  "runtime_identity": "28d42e55c2df210a6298865c7df90572e3850c54e271900206ae11a6ddfe8bee",
+  "runtime_files": 214,
+  "material_addon": "0.8.0",
   "host_contracts": {
     "status": "passed",
     "cli_suite": 33,
-    "template_suite": 35
+    "template_suite": 35,
+    "procedural_routes": 16,
+    "standalone_material_suite": 24,
+    "release_skills_checks": "passed"
   },
-  "independent_dependency_review": {
+  "procedural_native_source_candidate": {
     "status": "passed",
-    "runtime_files": 189,
-    "support_source_files": 227,
-    "schemas": 149,
-    "describe_calls": 12
-  },
-  "native_extracted_candidate": {
-    "status": "passed",
-    "source_preserved": true,
-    "main_frames": 8,
-    "decoded_pngs": 16,
-    "pixel_match": "all pixels exact red/blue at the cut",
-    "commands": [
-      {
-        "name": "fixture",
-        "exit_code": 0,
-        "seconds": 0.637
-      },
-      {
-        "name": "input",
-        "exit_code": 0,
-        "seconds": 0.083
-      },
-      {
-        "name": "compile",
-        "exit_code": 0,
-        "seconds": 0.419
-      },
-      {
-        "name": "create",
-        "exit_code": 0,
-        "seconds": 4.302
-      },
-      {
-        "name": "cold-inspect",
-        "exit_code": 0,
-        "seconds": 1.866
-      }
+    "portable_material_cases": [
+      "contract",
+      "signals",
+      "core",
+      "ui",
+      "mesh_maps",
+      "bake",
+      "examples",
+      "regressions"
     ],
-    "scope": "160x90 SDR COLOR strips; no audio/text/HDR/4K or aesthetic qualification"
+    "cli_public_run_and_independent_export_128": "passed",
+    "cli_wood_desk_export_2048": "9 decoded 16-bit maps; preview 128",
+    "independent_saved_artifact_reopen": "passed",
+    "scope": "Current frozen procedural runtime was tested before archive finalization; this does not repeat the historical video native test."
   },
-  "tested_candidate_source_archive": {
-    "file": "blenderctl-0.63.0-source.zip",
-    "sha256": "4e7e5cdea51d00bba909541c99a67e8b674b54e28c0ac79d735e3898232da7c2",
-    "bytes": 8549348,
-    "entries": 493
+  "standalone_material_archives": {
+    "status": "passed",
+    "two_builds_byte_identical": true,
+    "extracted_source_cases": [
+      "signals",
+      "core",
+      "ui"
+    ],
+    "signals_independent_reopen": "passed",
+    "isolated_extension_install": "passed",
+    "extracted_extension_create_edit_save_independent_reopen": "passed",
+    "backend_tested_version": "0.64.0"
   },
-  "finalization": "Runtime/compiler/helper/example/native-smoke code matches the native-tested candidate. Publication scripts/docs and template test fixture path normalization were finalized afterward.",
-  "extension_metadata": "Blender native extension validate passed for addon ZIP",
-  "standalone_portability": {
-    "template_compile_with_BLENDERCTL_ROOT": "passed",
-    "three_skill_helpers_help": "passed",
-    "powershell_wrapper_version": "0.63.0"
+  "archive_finalization": {
+    "scope": "Final CLI archive checksums and extracted runtime qualification are retained by the local packaging audit; no self-referential archive hash is embedded here."
+  },
+  "bounded_material_closure_2026_10_25": {
+    "material_targets": 14,
+    "required_2k_maps": 126,
+    "independent_full_pixel_disk_checks": "passed",
+    "disk_only_reconstruction": "passed",
+    "maintainer_final_image_review": {
+      "dual_engine_and_relighting_images": 30,
+      "local_supplement_images": 12,
+      "total_actually_viewed": 42,
+      "scope": "Specified wood table, oil drum and glass cases, including the actual oil upper shoulder and lid edge; not arbitrary-prop aesthetic certification."
+    },
+    "deepseek_file_stage_reuse": {
+      "status": "completed_with_assistance",
+      "stages": [
+        "creation and correction",
+        "2K export",
+        "disk reconstruction",
+        "finite final-image review with verified JPEG tool inputs"
+      ],
+      "maintainer_interventions": [
+        "wood mixing",
+        "oil material layers",
+        "glass-thickness diagnosis"
+      ],
+      "unassisted_blind_test": false,
+      "fully_unattended": false,
+      "visual_conditions_retained": [
+        "2K fine pores and lines become softer",
+        "Eevee glass transmission, inner-cavity depth and frosted microdetail remain approximate",
+        "wood end-face reconstruction is conditional despite supported end-grain identity and top/end orientation",
+        "oil upper-shoulder pair is conditional; the actual lid-edge pair passed within the supplied view"
+      ]
+    },
+    "reproducibility": "Private case assets/audits are not bundled; public source tests construct their own fixtures."
+  },
+  "extracted_build_a_qualification_2026_10_25": {
+    "technical_status": "passed",
+    "stages": 15,
+    "host_cases": 73,
+    "optional_pillow_skips": 2,
+    "fresh_standalone_cases": [
+      "contract",
+      "core",
+      "bake",
+      "optics"
+    ],
+    "not_fresh_standalone_cases": [
+      "examples",
+      "mesh_maps",
+      "regressions",
+      "signals",
+      "ui"
+    ],
+    "optics_independent_reopen": "passed",
+    "cli_saved_surface_delivery": {
+      "dimensions": [128, 128],
+      "channels": 9,
+      "full_pixel_max_error": 0.0,
+      "status": "passed"
+    },
+    "installed_material_extension": {
+      "members": 25,
+      "all_members_match_zip_and_source": true,
+      "isolated_install": "passed",
+      "legacy_load_apply": "passed",
+      "surface_save_and_independent_reopen": "passed",
+      "user_preferences_saved": false
+    },
+    "code_test_toml_members": 308,
+    "code_test_toml_identity_sha256": "97f370cd99f9a8e304f420cb967dda5a2085810487f5da1755f24164201eb70f",
+    "visual_status": "not_run_in_package_qualification; separate bounded case review recorded above",
+    "final_document_repack_status": "required; no later archive qualification claimed",
+    "publication_status": "candidate; no public release assets"
   },
   "not_run": [
     "all-adapter native regression",
+    "Linux/macOS",
+    "visible GUI interaction",
     "4K HDR stress",
     "HDR display viewing",
-    "complex acting",
-    "real long-form production"
+    "external-engine material equivalence"
   ],
-  "publication_revision": "r1 canonicalizes Windows TEMP 8.3 aliases in the test fixture; production runtime and compiler are unchanged."
+  "historical_baseline": {
+    "scope": "The following unchanged record applies only to the prior 0.63.0-r1 release.",
+    "record": {
+      "release": "0.63.0-r1",
+      "verified_on": "2026-10-13",
+      "baseline": {
+        "os": "Windows",
+        "blender": "5.2.1 LTS",
+        "build": "9e2066aef7ef",
+        "python": "3.13"
+      },
+      "host_contracts": {
+        "status": "passed",
+        "cli_suite": 33,
+        "template_suite": 35
+      },
+      "independent_dependency_review": {
+        "status": "passed",
+        "runtime_files": 189,
+        "support_source_files": 227,
+        "schemas": 149,
+        "describe_calls": 12
+      },
+      "native_extracted_candidate": {
+        "status": "passed",
+        "source_preserved": true,
+        "main_frames": 8,
+        "decoded_pngs": 16,
+        "pixel_match": "all pixels exact red/blue at the cut",
+        "commands": [
+          {
+            "name": "fixture",
+            "exit_code": 0,
+            "seconds": 0.637
+          },
+          {
+            "name": "input",
+            "exit_code": 0,
+            "seconds": 0.083
+          },
+          {
+            "name": "compile",
+            "exit_code": 0,
+            "seconds": 0.419
+          },
+          {
+            "name": "create",
+            "exit_code": 0,
+            "seconds": 4.302
+          },
+          {
+            "name": "cold-inspect",
+            "exit_code": 0,
+            "seconds": 1.866
+          }
+        ],
+        "scope": "160x90 SDR COLOR strips; no audio/text/HDR/4K or aesthetic qualification"
+      },
+      "tested_candidate_source_archive": {
+        "file": "blenderctl-0.63.0-source.zip",
+        "sha256": "4e7e5cdea51d00bba909541c99a67e8b674b54e28c0ac79d735e3898232da7c2",
+        "bytes": 8549348,
+        "entries": 493
+      },
+      "finalization": "Runtime/compiler/helper/example/native-smoke code matches the native-tested candidate. Publication scripts/docs and template test fixture path normalization were finalized afterward.",
+      "extension_metadata": "Blender native extension validate passed for addon ZIP",
+      "standalone_portability": {
+        "template_compile_with_BLENDERCTL_ROOT": "passed",
+        "three_skill_helpers_help": "passed",
+        "powershell_wrapper_version": "0.63.0"
+      },
+      "not_run": [
+        "all-adapter native regression",
+        "4K HDR stress",
+        "HDR display viewing",
+        "complex acting",
+        "real long-form production"
+      ],
+      "publication_revision": "r1 canonicalizes Windows TEMP 8.3 aliases in the test fixture; production runtime and compiler are unchanged."
+    }
+  }
 }
