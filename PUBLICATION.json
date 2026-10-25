@@ -117,7 +117,7 @@
     },
     {
       "file": "docs/SKILLS.md",
-      "sha256": "d803eb5afd9bcd8b1e2baa7b33274f85bc09d42e8a22294c1cd04aeb1caacfb3",
+      "sha256": "743417887c943fbb5b0fc4768390dffc8fd9cb8d491bab362f8e06eab0c7378d",
       "bytes": 5686
     },
     {
@@ -957,8 +957,8 @@
     },
     {
       "file": "skills/README.md",
-      "sha256": "afa512e9cb0d7364658f8c655e5760e43b076cd209856472a91896c77477b90b",
-      "bytes": 5669
+      "sha256": "05bee4a89f49c7d513fea74d443ed991f6c79b485a995dd9fce0ae2d98df3dca",
+      "bytes": 6358
     },
     {
       "file": "skills/blender-asset-manager/LICENSE",
@@ -1067,8 +1067,8 @@
     },
     {
       "file": "skills/blender-material-authoring/SKILL.md",
-      "sha256": "016616decca55387fc752bcf73a0fc2ba4482dfb1eb14d1c1823156b8479aea5",
-      "bytes": 4655
+      "sha256": "079b4f04a9904294c4463104aefed9c4aa49d09a02fd150c170930e6a40014b2",
+      "bytes": 5502
     },
     {
       "file": "skills/blender-material-authoring/agents/openai.yaml",
@@ -1076,9 +1076,14 @@
       "bytes": 331
     },
     {
+      "file": "skills/blender-material-authoring/assets/material-quality-brief.template.json",
+      "sha256": "07b701e45191401283c0914cf039c7fd466e528bb7dcb413ca3151badef05530",
+      "bytes": 5331
+    },
+    {
       "file": "skills/blender-material-authoring/references/pbr/acceptance-and-promotion.md",
-      "sha256": "de306b52243210ac6ed5b95c58b4e94c3c5e63dfbc2a1871981759a2fe39b7cd",
-      "bytes": 6817
+      "sha256": "a3961bed70ce11b275f6dbd2aa7b70154bdcd9880037e51649b036f55c08b8a6",
+      "bytes": 7230
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/bluewhite-glaze-case.md",
@@ -1092,8 +1097,8 @@
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/framework.md",
-      "sha256": "b8c91d2638963b5afcd437e59a431efc0efeb27f21e5493ee25f971fb93ddfdd",
-      "bytes": 11174
+      "sha256": "f2de26c8a293a1f62a6738dd5094a64f06421716ebe9c6bd34e05cc1d1c4e679",
+      "bytes": 11575
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/plugin-cli-authoring.md",
@@ -1107,13 +1112,18 @@
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/procedural-signals.md",
-      "sha256": "30c1fedf054d41ff1d9e8e0977b8ef910eff858a90d85f654bb0ab52755184e5",
-      "bytes": 10728
+      "sha256": "9e69982e9dd03eb049d02380cae8733ac841de3b748bfe82135a6a643ffb3da5",
+      "bytes": 11045
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/reference-and-images.md",
-      "sha256": "f6e2f18810e3c6191753c0d4c7ad6ac4e02c8d600f01ba8a9496318fd3036ef7",
-      "bytes": 4671
+      "sha256": "b71a288f9014e4cb107d1487c0ba4feb4c8601ef3137f4a1e4b4adf974a1e6cd",
+      "bytes": 4923
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/reference-quality-gate.md",
+      "sha256": "f5c749de7eb2fe245e16610a6430c419efd4855d74899bfd4e510889a38d9742",
+      "bytes": 12950
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/terracotta-case.md",
@@ -1267,7 +1277,7 @@
     },
     {
       "file": "skills/manifest.json",
-      "sha256": "7fabe41cd58b1693c32f7ca90e7d52bda6ed747ec8788b4110b4ab27671b9c49",
+      "sha256": "db5cd026ccd104cdd2c5d871778db4f5f7996b32e3eafe1ff82a2f908905bd88",
       "bytes": 1350
     },
     {

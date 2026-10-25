@@ -6,7 +6,7 @@ The public adaptations preserve the existing plugin/CLI work-unit priority, tech
 
 ## Material candidate update in0.3.0
 
-Material guidance now derives from0.6.0 for CLI0.64.0 / extension0.8.0 candidates. It selects constant/image/procedural/hybrid by need and adds the [full signal method](../skills/blender-material-authoring/references/pbr/procedural-signals.md):15 signals, physical sampling, explicit wood axes/XYZ multipliers, region-based weathering, per-channel baking and disk reconstruction. Legacy image-layer v1/v2 remain separate compatible contracts. Existing sibling skills retain their own metadata versions unless explicitly updated in the manifest. Public candidate revalidation and independent DeepSeek reuse are in progress; bounded maintainer2K/36-image evidence is not public-package certification.
+Material guidance now derives from0.7.0 for CLI0.64.0 / extension0.8.0 candidates. It selects constant/image/procedural/hybrid by need and adds the [full signal method](../skills/blender-material-authoring/references/pbr/procedural-signals.md):15 signals, physical sampling, explicit wood axes/XYZ multipliers, region-based weathering, per-channel baking and disk reconstruction. Legacy image-layer v1/v2 remain separate compatible contracts. Existing sibling skills retain their own metadata versions unless explicitly updated in the manifest. Public candidate revalidation and independent DeepSeek reuse are in progress; bounded maintainer2K/36-image evidence is not public-package certification.
 
 ## Earlier contents of0.3.0
 

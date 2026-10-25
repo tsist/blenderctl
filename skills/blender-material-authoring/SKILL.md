@@ -7,6 +7,12 @@ metadata:
 
 # Blender 材质制作
 
+## 每次开工先找参考并冻结质量标准
+
+所有来源（含程序化、常量和DeepSeek执行）先读[参考与质量门槛](references/pbr/reference-quality-gate.md)：每个新任务主动寻找/筛选并实际看过适用主参考和必要局部，再冻结带版本的质量brief。参考可以来自真实工艺照片、材质/纹理网站、优秀CG或用户图；用于风格、材料层次与完成度，不要求木纹/瑕疵位置逐处一致。
+
+按七个质量维度逐项对照参考与当前新渲染，关键项有差距或未观察就不通过；不以模板名、图数、数值误差或“2K限制”放宽目标。小调参沿用本任务已核参考，目标变化保留旧版并更新依据。无网络时由主代理提供冻结参考包，无看图能力时交接并保持视觉未完成。
+
 先明确用途/引擎、对象/区域、实际尺寸、观察条件、可编辑性与交付。几何法线、坏面、轮廓、厚度或UV引起的问题回建模/映射阶段。来源按需求选择，不把生图作为所有PBR任务的前置。
 
 ## 来源与入口
@@ -24,7 +30,7 @@ metadata:
 
 先按[工作单元指导](../blender-work-methodology/references/plugin-cli-work-units.md)准备完整输入、连续操作和有限候选；插件构建材质，CLI管理身份/作业/保存和证据，宿主在需要时负责生图，插件不假设访问其会话。
 
-配套公开候选为CLI0.64.0、Material Workflow0.8.0；技能包0.3.0源自材质指导0.6.0，版本含义不同。执行前用BLENDERCTL_ROOT定位CLI并通过describe/help发现能力，不能仅凭版本或节点注册宣称可用。旧静态图层的run/batch/study/template-save与2.0的procedural-run/procedural-export是不同合同；见[操作章](references/pbr/plugin-cli-authoring.md)和[路由](references/pbr/tool-routing.md)。
+配套公开候选为CLI0.64.0、Material Workflow0.8.0；技能包0.3.0包含材质指导0.7.0的参考质量增补，版本含义不同。执行前用BLENDERCTL_ROOT定位CLI并通过describe/help发现能力，不能仅凭版本或节点注册宣称可用。旧静态图层的run/batch/study/template-save与2.0的procedural-run/procedural-export是不同合同；见[操作章](references/pbr/plugin-cli-authoring.md)和[路由](references/pbr/tool-routing.md)。
 
 ## 执行与验收
 
