@@ -1,13 +1,13 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.0-r1",
-  "cli": "0.63.0",
+  "release": "0.64.0",
+  "cli": "0.64.0",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.3.0",
-  "runtime_identity": "4a6e44b18e1187baf1569e0f93f3eda4ae2ffa170a3d73b8c7083c0ca8f38bcb",
-  "runtime_files": 189,
+  "runtime_identity": "28d42e55c2df210a6298865c7df90572e3850c54e271900206ae11a6ddfe8bee",
+  "runtime_files": 214,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -41,19 +41,94 @@
       "bytes": 191
     },
     {
-      "file": "blenderctl.ps1",
-      "sha256": "4f8a4f915df164310ae4c89586535db76bdc194d5230c5e848e2a31d8de86d6a",
-      "bytes": 865
-    },
-    {
       "file": "CHANGELOG.md",
-      "sha256": "524f690baba99dca089db65c944ff8e929a71b80fca7478316f55d6979a71166",
-      "bytes": 2557
+      "sha256": "704d4fe6b6a394e78756571359fb75402ad28003a3607a5dbc6a0a172ab63791",
+      "bytes": 4148
     },
     {
       "file": "CONTRIBUTING.md",
       "sha256": "e66af03ff334c28c3ad2ff8d4aaab55076c74f8788acea05ff96133646b9ec2d",
       "bytes": 1638
+    },
+    {
+      "file": "LICENSE",
+      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
+      "bytes": 35821
+    },
+    {
+      "file": "README.md",
+      "sha256": "c0eec779e7600c7670255d46b970312a549cb38983dfbfa174fff85f023b33bc",
+      "bytes": 6859
+    },
+    {
+      "file": "README.zh-CN.md",
+      "sha256": "2d0e63b2f5a8fd91b22a48d2ddfad1122a98ef5961f472f67cbf87054faf9953",
+      "bytes": 5231
+    },
+    {
+      "file": "RELEASE-VALIDATION.json",
+      "sha256": "347c0b52530cacc8b87c8115b470129b4d2288fdbd399d6b15aba3e445a0b984",
+      "bytes": 7364
+    },
+    {
+      "file": "SECURITY.md",
+      "sha256": "8d23e727f2f24ba94ac90d44e25d4117230a3891bb48b89fc87684dbc5cb14af",
+      "bytes": 1264
+    },
+    {
+      "file": "THIRD_PARTY_NOTICES.md",
+      "sha256": "dcf6ebe759d808c63a03927057aa4fd1e26a4ca63a219f908eea03ad6f8e47bd",
+      "bytes": 2399
+    },
+    {
+      "file": "blenderctl.ps1",
+      "sha256": "4f8a4f915df164310ae4c89586535db76bdc194d5230c5e848e2a31d8de86d6a",
+      "bytes": 865
+    },
+    {
+      "file": "docs/CLI_REFERENCE.md",
+      "sha256": "f8317a7c2f896e87a6411f9fcaf2f766f7ffa776adc72ad7a237ea13c836578d",
+      "bytes": 3099
+    },
+    {
+      "file": "docs/COMPATIBILITY.md",
+      "sha256": "68b0e0e3d24d0d9bd8b8a0665c7e63bfbffaaa4037a22497ff9a4a38ee8e8a9a",
+      "bytes": 1710
+    },
+    {
+      "file": "docs/GETTING_STARTED.md",
+      "sha256": "42523388ac0a925825234919e7986fb329160f082727e682f306f274ce7f5cbb",
+      "bytes": 3697
+    },
+    {
+      "file": "docs/MATERIAL_WORKFLOW.md",
+      "sha256": "69a2d715a158fdf68f4710f7be11bc34386b7ce05723e19b479263c97e91ede5",
+      "bytes": 8906
+    },
+    {
+      "file": "docs/PROCEDURAL_MATERIALS.md",
+      "sha256": "7d3429a1a91c373dd21c719e9f4f0c02df262d73ed7ce62d88314144f7af7321",
+      "bytes": 7503
+    },
+    {
+      "file": "docs/RELEASE_VERIFICATION.md",
+      "sha256": "5d45bd1f3465eec47249d3b7969162b673ccf917f686d3b5243e3635c3bbcb94",
+      "bytes": 3546
+    },
+    {
+      "file": "docs/SKILLS.md",
+      "sha256": "d803eb5afd9bcd8b1e2baa7b33274f85bc09d42e8a22294c1cd04aeb1caacfb3",
+      "bytes": 5686
+    },
+    {
+      "file": "docs/VALIDATION.md",
+      "sha256": "73421c35a79e03e9429b48c197ef8ab12e1c45a99b837fe0abeb764f4d65fa78",
+      "bytes": 10569
+    },
+    {
+      "file": "docs/VIDEO-EDITING.md",
+      "sha256": "19942aaaa8ad6cac8b5d5eb324aae760d7577a1d06cf00aa05241d9ab0b59562",
+      "bytes": 5702
     },
     {
       "file": "docs/cli/examples/model-hard-surface.json",
@@ -262,8 +337,8 @@
     },
     {
       "file": "docs/cli/schemas/execution-contract.schema.json",
-      "sha256": "6ab79463896df95d6acabbaa1d790ded61d059afa0c76e95d6ad54a20b366125",
-      "bytes": 24846
+      "sha256": "a047eec214ef53d666c509e59814b9215b874584b54f36ecef2949229a7b985e",
+      "bytes": 26300
     },
     {
       "file": "docs/cli/schemas/extension-approval-receipt.schema.json",
@@ -424,6 +499,31 @@
       "file": "docs/cli/schemas/material-compact-result.schema.json",
       "sha256": "67132fca3f5201345bc3632f35a0832676b208fb20f3e753bcff0d7e77ce9c10",
       "bytes": 1263
+    },
+    {
+      "file": "docs/cli/schemas/material-procedural-export-request.schema.json",
+      "sha256": "e447af8e48139f4c6e6b91418d46538dc7ae28e88cf47934bf1b4816170455c8",
+      "bytes": 4486
+    },
+    {
+      "file": "docs/cli/schemas/material-procedural-export-settings.schema.json",
+      "sha256": "900b06922432c49c8ac4495f4babac5aa9185f10293d33bbe1cb79ad8674aa90",
+      "bytes": 1111
+    },
+    {
+      "file": "docs/cli/schemas/material-procedural-manifest.schema.json",
+      "sha256": "93e78d777faf19be34c44941231d301ce1510bed3fe7ca2b5bf520121a04e2c6",
+      "bytes": 53167
+    },
+    {
+      "file": "docs/cli/schemas/material-procedural-report.schema.json",
+      "sha256": "17cb5ca2a52cc785b5f5d2ae1dfde254db0b2c24b225d4dd277bdb83c7b621a0",
+      "bytes": 1921
+    },
+    {
+      "file": "docs/cli/schemas/material-procedural-run-request.schema.json",
+      "sha256": "5dc80632c60637d332f02e047f58cd12338c2e58142d7c912f4d689404a7808c",
+      "bytes": 70884
     },
     {
       "file": "docs/cli/schemas/material-run-request.schema.json",
@@ -602,8 +702,8 @@
     },
     {
       "file": "docs/cli/schemas/request.schema.json",
-      "sha256": "c2e7dd63235ab1b4fbb912812ebebae90c08aa705c11a9407f4a81b0ff634b3b",
-      "bytes": 1231264
+      "sha256": "10f0c3d117a0d177c2960af022e2f265c1ab544ff965acc26f9491b532443a42",
+      "bytes": 1232145
     },
     {
       "file": "docs/cli/schemas/resource-budget.schema.json",
@@ -816,46 +916,6 @@
       "bytes": 3039
     },
     {
-      "file": "docs/CLI_REFERENCE.md",
-      "sha256": "f8317a7c2f896e87a6411f9fcaf2f766f7ffa776adc72ad7a237ea13c836578d",
-      "bytes": 3099
-    },
-    {
-      "file": "docs/COMPATIBILITY.md",
-      "sha256": "68b0e0e3d24d0d9bd8b8a0665c7e63bfbffaaa4037a22497ff9a4a38ee8e8a9a",
-      "bytes": 1710
-    },
-    {
-      "file": "docs/GETTING_STARTED.md",
-      "sha256": "42523388ac0a925825234919e7986fb329160f082727e682f306f274ce7f5cbb",
-      "bytes": 3697
-    },
-    {
-      "file": "docs/MATERIAL_WORKFLOW.md",
-      "sha256": "69af8711020be426cdd0d5184b83f9962cd35bb70449b5f0dafeaec8a6b0ab60",
-      "bytes": 5032
-    },
-    {
-      "file": "docs/RELEASE_VERIFICATION.md",
-      "sha256": "5d45bd1f3465eec47249d3b7969162b673ccf917f686d3b5243e3635c3bbcb94",
-      "bytes": 3546
-    },
-    {
-      "file": "docs/SKILLS.md",
-      "sha256": "dc5a420d31bce37b0eabc03a8b34dfd917de5ed3ae636a1fce91674fd975d80b",
-      "bytes": 4899
-    },
-    {
-      "file": "docs/VALIDATION.md",
-      "sha256": "4e53215190787b2af66d80b279f4151d860dfde5771dce8b5c1767f063884aa4",
-      "bytes": 2549
-    },
-    {
-      "file": "docs/VIDEO-EDITING.md",
-      "sha256": "19942aaaa8ad6cac8b5d5eb324aae760d7577a1d06cf00aa05241d9ab0b59562",
-      "bytes": 5702
-    },
-    {
       "file": "examples/create_fixture.py",
       "sha256": "178ca315c362059e990936d3488b95a879d8d29ad7fe5b4cef5d9e9b8d61565e",
       "bytes": 658
@@ -864,26 +924,6 @@
       "file": "examples/make_input.py",
       "sha256": "f97e9708ab328fe65ab6d9eb96f7dc75270d981e438e636f6e7a5ee45bd0b92d",
       "bytes": 1376
-    },
-    {
-      "file": "LICENSE",
-      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
-      "bytes": 35821
-    },
-    {
-      "file": "README.md",
-      "sha256": "ac196a3bdb645a832ff70ba5a3423cef95978f2796f0764def75ac9e7920a552",
-      "bytes": 5182
-    },
-    {
-      "file": "README.zh-CN.md",
-      "sha256": "1b8c627e855ff8a1a99416730ffa8865516a4056683eb6a09d78de4321d8eb78",
-      "bytes": 4020
-    },
-    {
-      "file": "RELEASE-VALIDATION.json",
-      "sha256": "1281250bf942fcbfa3a7e10fdd66c1ef3e7516f5b4f1218c4eb317fbaf487135",
-      "bytes": 2194
     },
     {
       "file": "scripts/build_release.py",
@@ -907,13 +947,28 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "36dca465e34dce74d7a8f1e3a6c6149e17235fb632d28b9d59fda2683a344c80",
-      "bytes": 4706
+      "sha256": "6243ae257430bdcf70ea48dc47400c7a52b86703dbf660a3e9045bbd2e3d49c3",
+      "bytes": 5238
     },
     {
-      "file": "SECURITY.md",
-      "sha256": "8d23e727f2f24ba94ac90d44e25d4117230a3891bb48b89fc87684dbc5cb14af",
-      "bytes": 1264
+      "file": "skills/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/README.md",
+      "sha256": "afa512e9cb0d7364658f8c655e5760e43b076cd209856472a91896c77477b90b",
+      "bytes": 5669
+    },
+    {
+      "file": "skills/blender-asset-manager/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-asset-manager/SKILL.md",
+      "sha256": "f554b9ff0278cf227de4658a4d914ad69859769099376aff1b57025a89dd5531",
+      "bytes": 3188
     },
     {
       "file": "skills/blender-asset-manager/agents/openai.yaml",
@@ -941,11 +996,6 @@
       "bytes": 179
     },
     {
-      "file": "skills/blender-asset-manager/LICENSE",
-      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "bytes": 35149
-    },
-    {
       "file": "skills/blender-asset-manager/references/asset-standard.md",
       "sha256": "c8c6c6f1d8924b2c759058a17b90dfff5ec174b7248b82a0c9a8f0d6e765378a",
       "bytes": 11126
@@ -971,9 +1021,14 @@
       "bytes": 5330
     },
     {
-      "file": "skills/blender-asset-manager/SKILL.md",
-      "sha256": "f554b9ff0278cf227de4658a4d914ad69859769099376aff1b57025a89dd5531",
-      "bytes": 3188
+      "file": "skills/blender-cli/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-cli/SKILL.md",
+      "sha256": "c7ca2df8ecf7c6b1ffeaaa6399a5964e674b82a43d59637954d7ab374c719556",
+      "bytes": 5711
     },
     {
       "file": "skills/blender-cli/agents/openai.yaml",
@@ -984,11 +1039,6 @@
       "file": "skills/blender-cli/assets/studio-pipeline.json",
       "sha256": "e4eec009300f47d05470e55bceaec78d4f861fed6dec3090ca5c1f18857a963d",
       "bytes": 4124
-    },
-    {
-      "file": "skills/blender-cli/LICENSE",
-      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "bytes": 35149
     },
     {
       "file": "skills/blender-cli/references/domains.md",
@@ -1011,9 +1061,14 @@
       "bytes": 4465
     },
     {
-      "file": "skills/blender-cli/SKILL.md",
-      "sha256": "c7ca2df8ecf7c6b1ffeaaa6399a5964e674b82a43d59637954d7ab374c719556",
-      "bytes": 5711
+      "file": "skills/blender-material-authoring/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-material-authoring/SKILL.md",
+      "sha256": "016616decca55387fc752bcf73a0fc2ba4482dfb1eb14d1c1823156b8479aea5",
+      "bytes": 4655
     },
     {
       "file": "skills/blender-material-authoring/agents/openai.yaml",
@@ -1021,14 +1076,9 @@
       "bytes": 331
     },
     {
-      "file": "skills/blender-material-authoring/LICENSE",
-      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "bytes": 35149
-    },
-    {
       "file": "skills/blender-material-authoring/references/pbr/acceptance-and-promotion.md",
-      "sha256": "fa6e8469d957425c420bfccf156c715ee6f9b05d427123c5469ae6313d5b74ad",
-      "bytes": 4540
+      "sha256": "de306b52243210ac6ed5b95c58b4e94c3c5e63dfbc2a1871981759a2fe39b7cd",
+      "bytes": 6817
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/bluewhite-glaze-case.md",
@@ -1037,23 +1087,33 @@
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/channel-contract.md",
-      "sha256": "a1c00995dd67cad3989dfbf3e5a5c40a047bedcc817f3f3d87ee4a87d6cbfa6e",
-      "bytes": 4895
+      "sha256": "1d1831959d724c7ee54fd406894e2e35e8fe9d7cb3605f896b6b2c4a1c5a8dd7",
+      "bytes": 5046
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/framework.md",
-      "sha256": "d5ef88b26c24416c17b43bd06c01cb418647cc473efb6045e71545273c1ad483",
-      "bytes": 9965
+      "sha256": "b8c91d2638963b5afcd437e59a431efc0efeb27f21e5493ee25f971fb93ddfdd",
+      "bytes": 11174
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/plugin-cli-authoring.md",
-      "sha256": "2d1015a3354307b5125e24ad13da3223dda1547fecede9daefd7d83c4ac961bd",
-      "bytes": 14757
+      "sha256": "6dba7825a02016e46557bdd42b4fa90d8205a376e07297a97d4c1d94572b27ed",
+      "bytes": 16744
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/procedural-pbr.md",
+      "sha256": "5b064b1a66fcbeb76079094c05242f414b686b9e45f8d21a15cb77f16512b2c4",
+      "bytes": 19287
+    },
+    {
+      "file": "skills/blender-material-authoring/references/pbr/procedural-signals.md",
+      "sha256": "30c1fedf054d41ff1d9e8e0977b8ef910eff858a90d85f654bb0ab52755184e5",
+      "bytes": 10728
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/reference-and-images.md",
-      "sha256": "588b9f26781b162c8dca4ca511f56fe1842d8434ab5fc870a571f7c67da20834",
-      "bytes": 4374
+      "sha256": "f6e2f18810e3c6191753c0d4c7ad6ac4e02c8d600f01ba8a9496318fd3036ef7",
+      "bytes": 4671
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/terracotta-case.md",
@@ -1062,13 +1122,13 @@
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/tool-routing.md",
-      "sha256": "04fac7b37ffbc6a154a14714793e58c5e9e7934e86d910de0c16853d13fe0dd2",
-      "bytes": 5145
+      "sha256": "a8e32908753023e435b64c03d925450bf1c1b4848710c5f0f211fb9a81be38d0",
+      "bytes": 6153
     },
     {
       "file": "skills/blender-material-authoring/references/pbr/wiki-and-evidence.md",
-      "sha256": "0e7a16615217b728163c0d3c94491e69fcd765d3f1501e53b20c189f0e66999a",
-      "bytes": 1015
+      "sha256": "936a40a107e697ccb446ecb5fa4ce786206c98141e68623c7a6954014e201e92",
+      "bytes": 1637
     },
     {
       "file": "skills/blender-material-authoring/scripts/image_gate.py",
@@ -1076,9 +1136,9 @@
       "bytes": 2616
     },
     {
-      "file": "skills/blender-material-authoring/SKILL.md",
-      "sha256": "872c27940810dbaee09bde4d65ec4738867a57719c5cdb7f569899c2f507883e",
-      "bytes": 3902
+      "file": "skills/blender-video-editing/SKILL.md",
+      "sha256": "90029d75f4d31f867c6c75952f8a34edd9439c188c8222d71bae4a6c5045be41",
+      "bytes": 6707
     },
     {
       "file": "skills/blender-video-editing/agents/openai.yaml",
@@ -1131,19 +1191,19 @@
       "bytes": 1791
     },
     {
-      "file": "skills/blender-video-editing/SKILL.md",
-      "sha256": "90029d75f4d31f867c6c75952f8a34edd9439c188c8222d71bae4a6c5045be41",
-      "bytes": 6707
+      "file": "skills/blender-work-methodology/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "skills/blender-work-methodology/SKILL.md",
+      "sha256": "bd65433b33b8e94daf50912e9a9bf73f17cdcec5cefc8a2d1e8687fb145fd643",
+      "bytes": 16580
     },
     {
       "file": "skills/blender-work-methodology/agents/openai.yaml",
       "sha256": "efed45cf1ebc84ef81289dacef1bab7111b7fb4cb4e5f7b0734c324bf616f5fc",
       "bytes": 308
-    },
-    {
-      "file": "skills/blender-work-methodology/LICENSE",
-      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "bytes": 35149
     },
     {
       "file": "skills/blender-work-methodology/references/architecture-basics.md",
@@ -1206,29 +1266,19 @@
       "bytes": 6237
     },
     {
-      "file": "skills/blender-work-methodology/SKILL.md",
-      "sha256": "33fc1f86a15a073a2787ebd92764b5fa084ae38fe669cb438ba79662249eaa57",
-      "bytes": 16598
-    },
-    {
-      "file": "skills/LICENSE",
-      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "bytes": 35149
-    },
-    {
       "file": "skills/manifest.json",
-      "sha256": "70ca39cba230e98102c652278a1a25a5c01754ae84a4a2083925ccbaa5b5cc01",
-      "bytes": 1310
-    },
-    {
-      "file": "skills/README.md",
-      "sha256": "55616a3282fa2524a3b65248c798c8c8edb8bdf7fd749ac7b2232b9cd16b30fa",
-      "bytes": 5149
+      "sha256": "7fabe41cd58b1693c32f7ca90e7d52bda6ed747ec8788b4110b4ab27671b9c49",
+      "bytes": 1350
     },
     {
       "file": "skills/requirements-images.txt",
       "sha256": "3c7e3add6a37541634b47e7c39ab033f8ae36f2edc9c69c5bd9bfabebc9cb98f",
       "bytes": 97
+    },
+    {
+      "file": "templates/video/README.md",
+      "sha256": "206dc9420b44995b5950cca990b570180034e4d14c6d4358fcbaf984fe05c87f",
+      "bytes": 8064
     },
     {
       "file": "templates/video/catalog.json",
@@ -1246,13 +1296,8 @@
       "bytes": 1183
     },
     {
-      "file": "templates/video/README.md",
-      "sha256": "206dc9420b44995b5950cca990b570180034e4d14c6d4358fcbaf984fe05c87f",
-      "bytes": 8064
-    },
-    {
       "file": "templates/video/template_library.py",
-      "sha256": "db6027a1b6f8629ae6a7a38e3bac08f8d2dd04000913b8c44c31efdcb70fd94a",
+      "sha256": "c57b2a21173808fcc9e9f48010c9526c2ff2ced8e2a96dc104c011f0faf4ead5",
       "bytes": 32601
     },
     {
@@ -1321,11 +1366,6 @@
       "bytes": 4950
     },
     {
-      "file": "THIRD_PARTY_NOTICES.md",
-      "sha256": "dcf6ebe759d808c63a03927057aa4fd1e26a4ca63a219f908eea03ad6f8e47bd",
-      "bytes": 2399
-    },
-    {
       "file": "tools/blenderctl/adaptive_sampling.py",
       "sha256": "f148577f5f771db1a6ccd2102382ecae2d4370882379285dfdfedf3fbd17b220",
       "bytes": 2710
@@ -1357,8 +1397,8 @@
     },
     {
       "file": "tools/blenderctl/cli.py",
-      "sha256": "8c4edee85db65fa95fe5ecca7445c7a374cb4da5d487157bab1342ae94516afa",
-      "bytes": 52177
+      "sha256": "3bb2217fd056d14ed25acd1a077f2022c0fd4d93d0a11703324b316e1c7f938e",
+      "bytes": 53589
     },
     {
       "file": "tools/blenderctl/compositing_batch.py",
@@ -1512,8 +1552,8 @@
     },
     {
       "file": "tools/blenderctl/execution_contract.py",
-      "sha256": "c28e3040bed29bc2d72dfac124c2642b90bd71c3149a6f4a64c6ef49e6d1e50f",
-      "bytes": 3806
+      "sha256": "67cee632ce7c2d0e7162145c860f5ac43c9608e3314ad8e98f21a6042fdbd6b3",
+      "bytes": 3901
     },
     {
       "file": "tools/blenderctl/extensions.py",
@@ -1747,8 +1787,8 @@
     },
     {
       "file": "tools/blenderctl/material_interface.py",
-      "sha256": "a21412a713e95b8ea840d0b5d33e9f3326a7bc3e5782b93394791bb8f58179d4",
-      "bytes": 12310
+      "sha256": "1198cbc2a2f6f8f19a696f3f10f874638ce94f5f99a3330e3b2f684bd18b013c",
+      "bytes": 13643
     },
     {
       "file": "tools/blenderctl/material_interface_contract.py",
@@ -1759,6 +1799,16 @@
       "file": "tools/blenderctl/material_outputs.py",
       "sha256": "e38d623c2def39457205e3154ef1a57d20575e142223eebdc580662347bcee27",
       "bytes": 8951
+    },
+    {
+      "file": "tools/blenderctl/material_procedural.py",
+      "sha256": "3bfef8e5b0f3ac6a91879aaa9cc09e8abb4084af5506f85599121110c8311d28",
+      "bytes": 24007
+    },
+    {
+      "file": "tools/blenderctl/material_procedural_contract.py",
+      "sha256": "7488f34902834382fb8db1b8dac907bbf76b99c0f764672753f14929aa013556",
+      "bytes": 8596
     },
     {
       "file": "tools/blenderctl/material_progress.py",
@@ -1882,8 +1932,8 @@
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "8bf8fbf5d5582a24c32caded004b4d85299f00db2e0dcb250d4c9acf07d84786",
-      "bytes": 31087
+      "sha256": "6e1456715f8774482327dafc196a7997b5145ca339215f8119e960a3477a6c6e",
+      "bytes": 31535
     },
     {
       "file": "tools/blenderctl/render_contract.py",
@@ -1992,8 +2042,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "630856e059016f6aa7cabad8d7b8f0840d84f6a97bd8e26e93624d3b1d703f7e",
-      "bytes": 42233
+      "sha256": "9ef2f1d294a23bf326a938e90ebb97a89c67f0de5004410af90c3e6b5b97ac18",
+      "bytes": 42919
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2059,6 +2109,21 @@
       "file": "tools/blenderctl/telemetry.py",
       "sha256": "d705892949f28c13dfc91e20072989a7e7537aa77407c9e6fed1abe4554cf452",
       "bytes": 2578
+    },
+    {
+      "file": "tools/blenderctl/tests/material_procedural_optics.py",
+      "sha256": "db7740efed7d63f4922a61beb04b2fe752ec80cd1fb8b1f41b3df600fbfbbfb3",
+      "bytes": 11245
+    },
+    {
+      "file": "tools/blenderctl/tests/material_procedural_routes.py",
+      "sha256": "dfa0db478e559b883afcc21b085cd239d9258c6f0ac6741a4f132a87dfc63eba",
+      "bytes": 16674
+    },
+    {
+      "file": "tools/blenderctl/tests/material_procedural_signals.py",
+      "sha256": "54adaf8292b8f6aab91f428e5576efcac4415be2f5a39677f6715566f9f24fce",
+      "bytes": 29144
     },
     {
       "file": "tools/blenderctl/timing.py",
@@ -2182,8 +2247,8 @@
     },
     {
       "file": "tools/blenderctl/worker.py",
-      "sha256": "4dfff35d302c9f9aea860cde5aa474a36321d7ea2477320363d758ca8f1c22a1",
-      "bytes": 17942
+      "sha256": "40416a54b10f0c85e8523764750ad7a8e86158a43e2070f2155ffbb8982772c9",
+      "bytes": 18231
     },
     {
       "file": "tools/blenderctl/workflow_contract.py",
@@ -2336,9 +2401,19 @@
       "bytes": 12133
     },
     {
+      "file": "tools/material_workflow_addon/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "tools/material_workflow_addon/README.md",
+      "sha256": "de2d4eba18fc77e9701d1cad4fb516e868bf8a846110dc6d6dc70c8d3703cd2e",
+      "bytes": 1272
+    },
+    {
       "file": "tools/material_workflow_addon/__init__.py",
-      "sha256": "e93090895be45a71dc79d68a64061d64a28bd6f2647306856c79ba61f52c707a",
-      "bytes": 528
+      "sha256": "967edbf610dd5a831e459f845789694748c47489471b1042933a51804a9312a6",
+      "bytes": 618
     },
     {
       "file": "tools/material_workflow_addon/batch.py",
@@ -2357,7 +2432,7 @@
     },
     {
       "file": "tools/material_workflow_addon/blender_manifest.toml",
-      "sha256": "20c7d97e6dd842fe819dc4f7411b4ab1e5c1006524152134a647cd41c7d1f942",
+      "sha256": "beab7822d6850007c4c424051494392b01940084d1a9346f7bbbd75c3abd5458",
       "bytes": 357
     },
     {
@@ -2377,8 +2452,8 @@
     },
     {
       "file": "tools/material_workflow_addon/engine_compat.py",
-      "sha256": "c0ccdbdf5000c5f5abc96d10e6e54d6ff54f1d8bf1c894dafd3ed3b6214e385c",
-      "bytes": 5112
+      "sha256": "ac90fb111f3bd3680847c05d40f320d172c4b10d5972ba54ddd8e9ace0028a0d",
+      "bytes": 5923
     },
     {
       "file": "tools/material_workflow_addon/handoff.py",
@@ -2391,19 +2466,39 @@
       "bytes": 12453
     },
     {
-      "file": "tools/material_workflow_addon/LICENSE",
-      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
-      "bytes": 35149
-    },
-    {
       "file": "tools/material_workflow_addon/preview.py",
-      "sha256": "8592e7db75c91ffcbb75cef0524211a6b760de540d46e5d722d16b5844d1f74f",
-      "bytes": 16845
+      "sha256": "f6420ad4d67f63601dd610e3a4ca9ac966ce781d08b9ffc392e96a648185d69f",
+      "bytes": 17125
     },
     {
-      "file": "tools/material_workflow_addon/README.md",
-      "sha256": "de2d4eba18fc77e9701d1cad4fb516e868bf8a846110dc6d6dc70c8d3703cd2e",
-      "bytes": 1272
+      "file": "tools/material_workflow_addon/procedural_bake.py",
+      "sha256": "34bd638e0a58d9005361b87b5cd7cac679e9d94576d6fcda9f18f72c86a08624",
+      "bytes": 41726
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_contract.py",
+      "sha256": "2f3bb8e25154b11dc3a6982414b4241a495699cfec8f2f73db71a70ac467b47e",
+      "bytes": 32240
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_core.py",
+      "sha256": "85080e0cdb1ea2d6d3dc6a93be71a298e7f5234ed4f930af9e41b3ac28f5e333",
+      "bytes": 34486
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_examples.py",
+      "sha256": "34011a2c48d5b1f3dd590fd623fa8b88734a0ef7116dd7a29221a173c227fdd5",
+      "bytes": 15194
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_mesh_maps.py",
+      "sha256": "c0e84fe6deb8446663e754329c33b85b1b3d55d0a93f6692906a482745079c3e",
+      "bytes": 18422
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_ui.py",
+      "sha256": "c569e0ee90cfea17757ea08ff3c494fd3a352c87871fe58b294b3bcdf0f42252",
+      "bytes": 19330
     },
     {
       "file": "tools/material_workflow_addon/templates.py",
@@ -2431,6 +2526,11 @@
       "bytes": 6514
     },
     {
+      "file": "tools/video_editing_workflow_addon/LICENSE.txt",
+      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
+      "bytes": 35821
+    },
+    {
       "file": "tools/video_editing_workflow_addon/__init__.py",
       "sha256": "b658367c1d536662462a021efaded2cd162194192f38e4472e4557e6bad2c751",
       "bytes": 487
@@ -2449,11 +2549,6 @@
       "file": "tools/video_editing_workflow_addon/core.py",
       "sha256": "7be01d8d9b4b18709b573e5984c9ce7a4b164e8802c284673d728874ac21e7d2",
       "bytes": 31507
-    },
-    {
-      "file": "tools/video_editing_workflow_addon/LICENSE.txt",
-      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
-      "bytes": 35821
     },
     {
       "file": "tools/video_editing_workflow_addon/protection.py",
@@ -2475,5 +2570,11 @@
       "sha256": "89372ec259925925997199baa76aacd8f57910f482e373f28fedf5fa97876bf1",
       "bytes": 2359
     }
+  ],
+  "material_addon": "0.8.0",
+  "runtime_roots": [
+    "tools/blenderctl",
+    "tools/material_workflow_addon",
+    "tools/video_editing_workflow_addon"
   ]
 }

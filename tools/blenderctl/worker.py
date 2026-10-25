@@ -269,6 +269,10 @@ def main():
         elif command in ('geometry.run','geometry.inspect'):
             import geometry_workflow
             data=getattr(geometry_workflow,command.split('.')[1])(request['params'],job)
+        elif command in ('material.procedural-run','material.procedural-export'):
+            import material_procedural
+            operation = material_procedural.run if command=='material.procedural-run' else material_procedural.export
+            data=operation(request['params'],job)
         elif command=='material.run':
             import material_workflow
             data=material_workflow.run(request['params'],job)

@@ -1,14 +1,18 @@
 # blenderctl + Blender workflows
 
-Publication revision **0.63.0-r1** fixes Windows CI temporary-path normalization in test fixtures. Product/runtime versions are unchanged.
+**0.64.0 在公开0.63基线上新增程序化PBR制作与导出**：受管信号图、可编辑作者工程、实际预览、通道烘焙、磁盘贴图重建和独立重开。参见[程序化材质](docs/PROCEDURAL_MATERIALS.md)与[验证范围](docs/VALIDATION.md)。
 
-**0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
+保留既有Video Editing Workflow 0.1.1、视频算法以及源码/插件/技能/模板打包行为，参见[视频设置与限制](docs/VIDEO-EDITING.md)。本版没有带入后续本地CLI或Toon的无关改动。
 
 面向代理与人工的 Blender 自动化工具：用明确 JSON 清单与 SHA-256 保护源文件，通过独立后台作业产出可编辑候选，配套材质插件共用同一执行核心。
 
-**CLI 0.63.0 · 材质插件 0.7.0 · GPL-3.0-or-later**
+**CLI 0.64.0 · 材质插件 0.8.0 · GPL-3.0-or-later**
 
-另提供[四个配套 Blender 技能](skills/README.md)：CLI 操作、制作方法论、材质制作、资产管理。技能包 **0.1.0** 可独立下载安装，见[安装与验证](docs/SKILLS.md)。
+当前仍是候选，尚未发布本版公开release资产。限定案例的文件阶段制作与观察已完成：14个材质目标、126张必要2K通道通过独立完整像素/磁盘重建检查；主线程实际看过30张双引擎/换光最终图及12张局部补图，共42张。DeepSeek真实完成制作、修正、导出、重建及有限看图；主线程介入过木纹mix、油桶图层和玻璃厚度诊断，因此不是无协助盲测或完整无人值守。2K微细节变软、Eevee玻璃近似和逐对conditional结论仍保留。
+
+解压后的build-a通过15个技术阶段：73项host用例（2项可选Pillow用例跳过）、部分程序化用例及独立重开、公共CLI128×128九图surface往返及全像素最大误差0、25成员材质扩展的隔离安装/旧接口/surface保存与独立重开。最终文档更新后仍须重封包和最终核验，不预填后续包通过。私人案例不随包分发，仓内测试自造夹具可复现；见[验证范围与命令](docs/VALIDATION.md)。
+
+另提供[四个配套 Blender 技能](skills/README.md)：CLI操作、制作方法论、材质制作、资产管理。技能包版本以`skills/manifest.json`为准，见[安装与验证](docs/SKILLS.md)。
 
 ## 能力
 
@@ -16,6 +20,7 @@ Publication revision **0.63.0-r1** fixes Windows CI temporary-path normalization
 - 独立作业、源与资源 SHA、取消、检查点、流水线恢复、显式文件事务。
 - 材质图层、静态 PBR 通道、遮罩、模板、增量冲突检测、多对象分配、Cycles/Eevee 多视角与拼图。
 - `material.study` 在一个有界作业内比较有限参数候选，报告图像语义警示、参数差异与阶段进度。
+- `material.procedural-run`与`material.procedural-export`提供独立的2.0程序化合同、可编辑作者工程、PBR贴图及目标材质重建；不承诺任意旧BSDF叠层都能无损转成单一PBR。
 - Blender 面板编辑草稿、批量分配、保存持久快照并交给 CLI 后台；当前场景不会自动载入后台候选。
 
 ## 安装与第一步
@@ -33,7 +38,7 @@ python tools/blenderctl/cli.py material describe --operation run --schema
 
 将示例路径换为实际 Blender。Windows 可使用 `./blenderctl.ps1`；设置 `BLENDERCTL_PYTHON` 可指定 Python。没有 Blender 时仍可读取版本、帮助和材质 Schema。
 
-在 Blender 的 **Preferences → Extensions → Install from Disk** 安装 `material-workflow-0.7.0.zip` 并启用。材质面板在 View3D 侧栏；后台项目目录填写本源码目录，运行时使用实际 Blender 路径。
+从[材质插件独立仓库](https://github.com/tsist/blender-material-workflow)取得匹配的插件包，通过Blender **Preferences → Extensions → Install from Disk**安装并启用。材质面板在View3D侧栏；后台项目目录填写本源码目录，运行时使用实际Blender路径。新程序化入口见[专章](docs/PROCEDURAL_MATERIALS.md)。
 
 完整操作参见 [快速开始](docs/GETTING_STARTED.md)、[材质工作流](docs/MATERIAL_WORKFLOW.md)、[命令索引](docs/CLI_REFERENCE.md) 与 [兼容范围](docs/COMPATIBILITY.md)。详细 JSON 合同位于 `docs/cli/schemas/`；全局参数必须放在子命令之前。
 

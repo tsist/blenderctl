@@ -4,7 +4,11 @@
 
 The public adaptations preserve the existing plugin/CLI work-unit priority, technical/visual acceptance separation, six candidate methods, PBR channel/source rules and asset identity/UUID/dependency protection. They remove private machine locations, fixed task IDs, Wiki roots, current project progress, asset provenance judgments and user conversations. Historical examples are explicitly limited guidance; original case artifacts are not published.
 
-## Changes in 0.3.0
+## Material candidate update in0.3.0
+
+Material guidance now derives from0.6.0 for CLI0.64.0 / extension0.8.0 candidates. It selects constant/image/procedural/hybrid by need and adds the [full signal method](../skills/blender-material-authoring/references/pbr/procedural-signals.md):15 signals, physical sampling, explicit wood axes/XYZ multipliers, region-based weathering, per-channel baking and disk reconstruction. Legacy image-layer v1/v2 remain separate compatible contracts. Existing sibling skills retain their own metadata versions unless explicitly updated in the manifest. Public candidate revalidation and independent DeepSeek reuse are in progress; bounded maintainer2K/36-image evidence is not public-package certification.
+
+## Earlier contents of0.3.0
 
 Added the portable video-editing skill (0.1.3) and template workflow. CLI is now 0.63.0. The four previous skills retain version 0.2.0 with a small CLI routing update; each manifest entry owns its metadata version. The bundle is 0.3.0. Installer and checks cover all five folders.
 

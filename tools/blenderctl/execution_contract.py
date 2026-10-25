@@ -16,6 +16,7 @@ EXCLUSIONS={
     'development_fixture':('probe',),
 }
 EXCLUSIONS['standalone_workflow'] += ('video.run','video.inspect')
+EXCLUSIONS['standalone_workflow'] += ('material.procedural-run','material.procedural-export')
 REASONS={
     'diagnostic_preflight':'Run standalone to discover the host before scheduling work; not an artifact producer.',
     'explicit_transaction':'Publication and rollback remain explicit host transactions, outside a replayable DAG.',

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PBR texture export settings",
+  "type": "object",
+  "properties": {
+    "channels": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "base_color",
+          "roughness",
+          "metallic",
+          "normal",
+          "height",
+          "alpha",
+          "transmission",
+          "ior",
+          "coat_weight",
+          "coat_roughness"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": [
+        "base_color",
+        "roughness",
+        "metallic",
+        "normal"
+      ]
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 64,
+      "maximum": 2048,
+      "default": 2048
+    },
+    "margin": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 128,
+      "default": 16
+    },
+    "samples": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 256,
+      "default": 16
+    },
+    "bit_depth": {
+      "enum": [
+        "8",
+        "16"
+      ],
+      "default": "16"
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

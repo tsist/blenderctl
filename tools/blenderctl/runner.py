@@ -80,7 +80,7 @@ def status(job):
             value['progress'] = progress_summary(read_json(video_progress))
         except (Failure, OSError) as error:
             value['progress_error'] = str(error)[:512]
-    for filename in (() if video_progress.is_file() else ('study-progress.json', 'batch-progress.json', 'workflow-progress.json')):
+    for filename in (() if video_progress.is_file() else ('procedural-progress.json', 'study-progress.json', 'batch-progress.json', 'workflow-progress.json')):
         path = job / filename
         if path.is_file():
             try:
@@ -196,7 +196,7 @@ def _execute_worker(job, parent_checkpoint=None):
             for d in (request['params']['manifest']['before'],request['params']['manifest']['after']):
                 protect(d,input_guards,checkpoint)
                 input_hashes[d['file']]=d['expected_sha256']
-        if request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
+        if request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "material.procedural-run", "material.procedural-export", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
             from filesystem import FileGuard
             for key, expected in (("file", "expected_sha256"), ("other", "other_sha256")):
                 filename = request["params"].get(key)
@@ -280,6 +280,9 @@ def _execute_worker(job, parent_checkpoint=None):
                         guard=input_guards.enter_context(FileGuard(filename));input_hashes[filename]=guard.sha256(checkpoint)
                     if input_hashes[filename]!=anchor['expected_sha256']:raise Failure('CONFLICT','Geometry resume descriptor changed')
                 from geometry_workflow_contract import input_documents
+                documents+=input_documents(request['params'])
+            if request['command'] in ('material.procedural-run','material.procedural-export'):
+                from material_procedural_contract import input_documents
                 documents+=input_documents(request['params'])
             if request['command'] in ('material.run','material.template-save'):
                 from material_workflow_contract import input_documents
@@ -407,7 +410,7 @@ def _execute_worker(job, parent_checkpoint=None):
             if request['command'].startswith('video.'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
-            if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
+            if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','material.procedural-run','material.procedural-export','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
             raise Failure("VALIDATION_FAILED", str(result.get("error")))
@@ -454,6 +457,10 @@ def _execute_worker(job, parent_checkpoint=None):
         if request['command'] in ('material.batch','material.study'):
             for path in job.rglob('*'):
                 if path.is_file():artifacts[str(path.relative_to(job))]=str(path)
+        if request['command'] in ('material.procedural-run','material.procedural-export'):
+            for path in job.rglob('*'):
+                if path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(job.resolve()):
+                    artifacts[str(path.relative_to(job))]=str(path)
         if request['command'] in ('material.run','material.template-save'):
             for name in ('workflow-report.json','workflow-progress.json','candidate.blend','contact-sheet.png','contact-sheet.index.json','resources.json','manifest.json','source-snapshot.json','candidate-expected.json','template.json','bindings.json'):
                 if (job/name).is_file():artifacts[name]=str(job/name)

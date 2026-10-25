@@ -1,38 +1,43 @@
 ---
 name: blender-material-authoring
-description: 制作、修改并验证 Blender 材质、着色节点和贴图，组织参考、表面分层、映射、色彩与交付；PBR 是本技能章节，不替代建模、灯光构图或资产编目。
+description: 制作、修改并验证 Blender 材质、着色节点和贴图，按需求组织常量、图像、程序信号与分层PBR；不替代建模、灯光构图或资产编目。
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Blender 材质制作
 
-先明确用途/引擎、对象/区域、实际尺寸、观察条件、编辑性与交付。几何法线、坏面、轮廓、厚度或 UV 引起的问题回建模/映射阶段。
+先明确用途/引擎、对象/区域、实际尺寸、观察条件、可编辑性与交付。几何法线、坏面、轮廓、厚度或UV引起的问题回建模/映射阶段。来源按需求选择，不把生图作为所有PBR任务的前置。
 
-## 制作来源
+## 来源与入口
 
-沿用原工作规范的原生生图优先路线：所需空间通道/复杂遮罩首先用当前宿主的原生生图工具。只有实际缺失、429 或确认服务故障等受阻时，才在当前授权及配置内用可用替代服务；质量不足、批量或速度不是切换理由。本规范不继承维护者的第三方服务授权。
+| 来源 | 适用情形 | 关键检查 |
+|---|---|---|
+| constant | 无空间变化的物性、纯色、开关 | 明确值/单位；需要图片时确定性导出 |
+| image | 指定图案、文字、语义浮雕、照片或合格贴图 | 来源/权利、配准、色彩与数据语义；需要生图时优先宿主原生工具 |
+| procedural | 可由坐标、参数和几何依据表达的基材/旧化 | 固定尺度、方向、seed；实际看渲染，噪声不自动等于合理风化 |
+| hybrid | 特殊图案与程序基材/遮罩组合 | 明确通道来源、区域、覆盖和烘焙边界 |
 
-Blender 制作遮罩的例外限简单渐变或明确几何/数学输入的计算域；复杂裂纹/风化即使能用 Noise/Voronoi 拼成也沿用生图。无空间变化物性可明确常量；合同要求图像时按约定制作。完整定义见[PBR 规范](references/pbr/framework.md)。用户本次指定其他来源时记录并遵从。
+先读[PBR规范](references/pbr/framework.md)。程序化/混合2.0先读[基础信号与分层实做](references/pbr/procedural-signals.md)，再读[程序化PBR](references/pbr/procedural-pbr.md)，图像分支按需读[参考/图像](references/pbr/reference-and-images.md)，通道读取见[通道合同](references/pbr/channel-contract.md)。特殊图案无法可靠完成时交接图案输入，先完成其他已授权部分，不用普通噪声替代目标。没有生图工具不阻断适合程序化或常量的目标。
 
-## 插件与 CLI
+## 插件与CLI
 
-0.2.0正式修订把区域/UV与首轮目标区域观察前移，按依赖准备生图及有界诊断，显式判断分层宏观Normal共享意图。复制前检查live/orphan，最终质量反馈前备齐可审查封包；详见[操作章](references/pbr/plugin-cli-authoring.md)。复用已验证构建器，不把拟开发功能当现有入口；本修订尚未测得总体提速。
+先按[工作单元指导](../blender-work-methodology/references/plugin-cli-work-units.md)准备完整输入、连续操作和有限候选；插件构建材质，CLI管理身份/作业/保存和证据，宿主在需要时负责生图，插件不假设访问其会话。
 
-先按[最高指导](../blender-work-methodology/references/plugin-cli-work-units.md)评估连续工作单元，再准备完整输入与有限候选。宿主负责生图，插件消费图层/映射/节点，CLI 管身份/作业/证据；插件不假设访问原生生图会话。
+配套公开候选为CLI0.64.0、Material Workflow0.8.0；技能包0.3.0源自材质指导0.6.0，版本含义不同。执行前用BLENDERCTL_ROOT定位CLI并通过describe/help发现能力，不能仅凭版本或节点注册宣称可用。旧静态图层的run/batch/study/template-save与2.0的procedural-run/procedural-export是不同合同；见[操作章](references/pbr/plugin-cli-authoring.md)和[路由](references/pbr/tool-routing.md)。
 
-读[操作章](references/pbr/plugin-cli-authoring.md)选 run/batch/study/template-save，检查旋钮是否生效；看诊断/差异/阶段/图像后人工决定，局部筛选不代正式验收。范围见[工具路由](references/pbr/tool-routing.md)。
+## 执行与验收
 
-PBR先读[规范](references/pbr/framework.md)，按需转[参考/图像](references/pbr/reference-and-images.md)、[通道合同](references/pbr/channel-contract.md)。小调参复用合格图层，不重新制作整套；风格化按目标，PBR数值不是非PBR配方。
+需求/参考 → 区域/UV/共享检查 → 来源与通道清单 → 信号/图层/参数 → 读新渲染并迭代 → 所需通道烘焙 → 仅磁盘图和声明参数重建 → 保存重开、换光/局部对照 → 封包和反馈。可编辑author与reconstructed分别保存；内腔任务检查深处、口沿、内外法线和玻璃壁厚。
 
-参考冻结 → 区域/UV与首轮观察 → 按依赖准备图层/常量 → 插件组装 → 缩略图大特征及目标接缝/遮蔽区域检查 → 有限局部对照与人工选定 → 按约定和变化影响完成换光/视角/必要通道隔离 → 正式目录回接、独立重开重渲与可审查封包 → 反馈侧记/交付。内腔仅在涉及内壁时检查；复用合格输入，失败回对应来源阶段。
+可靠切线Normal采用真实Tangent/+Y烘焙，不能因紫蓝外观就宣称校准。已含Height的Normal重建时不再重复Bump。玻璃分别保留Alpha/Transmission/IOR与粗糙度，不降低Alpha冒充透射。首期写实PBR，NPR、液体、复杂焦散、体积与自动UV另行研究验证。
 
-[图像门卫](scripts/image_gate.py)只读解码/尺寸/字节/SHA：生成最长边≤2048，会话预览≤2MiB，原件/数据图/有损预览分开。需要可选 Pillow，缺失报告依赖，不自动安装。漂亮图不证明校准、配准或权利。
+DeepSeek或其他无生图执行者必须实际读新图→迭代→烘焙→rebuild检查。view_image或等价观察不可用时交接路径、SHA和待判断点，视觉项保持未完成，不把数值/工具completed当成已看图。
 
-## 验收与证据
+[图像门卫](scripts/image_gate.py)检查解码/尺寸/字节/SHA：生成最长边≤2048，会话预览≤2MiB，原件/数据图/有损预览分开。Pillow为可选依赖，缺失报告，不自动安装。
 
-技术、视觉、性能、时序、依赖复现、权利与用户反馈分别记录。没有反馈不写成用户认可。许可绑定素材/用途，入库转[资产管理](../blender-asset-manager/SKILL.md)。
+## 证据与维护
 
-[赤陶经验](references/pbr/terracotta-case.md)、[釉瓷经验](references/pbr/bluewhite-glaze-case.md)为去标识历史指导，原件/私人对话未公开，参数非新材料默认。证据见[公开导航](references/pbr/wiki-and-evidence.md)。宿主记忆/Wiki 是可选能力，缺失时正常完成，不声称已读写。
+技术、视觉、性能、时序、依赖复现、权利和用户反馈分列。没有反馈不写用户认可；来源许可绑定素材与用途，入库转[资产管理](../blender-asset-manager/SKILL.md)。历史案例中的统一生图前置已由按需路由更新，既有合格图层仍可复用，案例参数不是新材质默认值。
 
-案例验收不替代跨材料迁移判断，历史阶段顺序不作为新任务默认。宿主WM可用时用真实taskId核对本任务身份，不依赖共享车道默认活动记录；否则以本批文件继续。
+本包不含维护者私有工程、对话、任务态或审计。有限验证及未验范围见仓库`docs/MATERIAL_WORKFLOW.md`；[赤陶](references/pbr/terracotta-case.md)与[釉瓷](references/pbr/bluewhite-glaze-case.md)是去标识历史指导，不是公开可复现实验。维护者工作区14部件/126张2K通道与36张双引擎换光图仅为限定证据；私有工件不随包发布。公开候选代码已完成解压、隔离安装与运行回归；DeepSeek已按文件阶段完成14部件/126张2K与重建，主线程检查42张最终图并保留差异。过程包含主线程诊断纠偏，不称无协助盲测，也不等于已发布Release或任意模型通过。以当前报告和实际新图为准。

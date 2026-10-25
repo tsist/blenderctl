@@ -295,7 +295,11 @@
                   "compositing.template-save",
                   "compositing.template-run",
                   "compositing.batch",
-                  "compositing.study"
+                  "compositing.study",
+                  "material.procedural-run",
+                  "material.procedural-export",
+                  "video.run",
+                  "video.inspect"
                 ]
               },
               "classification": {
@@ -313,8 +317,8 @@
           }
         ]
       },
-      "minItems": 49,
-      "maxItems": 49,
+      "minItems": 53,
+      "maxItems": 53,
       "allOf": [
         {
           "contains": {
@@ -993,6 +997,62 @@
             "properties": {
               "command": {
                 "const": "probe"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "material.procedural-run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "material.procedural-export"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "video.run"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "command": {
+                "const": "video.inspect"
               }
             },
             "required": [

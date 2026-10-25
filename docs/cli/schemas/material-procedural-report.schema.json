@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Procedural material report 1.0",
+  "type": "object",
+  "properties": {
+    "report_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "enum": [
+        "material.procedural-run",
+        "material.procedural-export"
+      ]
+    },
+    "status": {
+      "enum": [
+        "running",
+        "pass",
+        "partial",
+        "failed"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "source_saved": {
+      "const": false
+    },
+    "checks": {
+      "type": "object"
+    },
+    "outputs": {
+      "type": "array"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "reconstructed": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "expected_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object"
+    },
+    "error": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "report_version",
+    "operation",
+    "status",
+    "source_saved",
+    "checks",
+    "outputs"
+  ]
+}
