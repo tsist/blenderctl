@@ -1,6 +1,6 @@
 # blenderctl + Blender workflows
 
-Publication revision **0.63.0-r1** fixes Windows CI temporary-path normalization in test fixtures. Product/runtime versions are unchanged.
+Publication revision **0.63.0-r2** adds the open-source [rigging development baseline](https://github.com/tsist/blender-rigging-workflow), its companion skill and setup guidance. The stable public CLI runtime remains **0.63.0**; this update does not import unrelated local experimental modules. See [rigging setup and limits](docs/RIGGING.md).
 
 **0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
 
@@ -10,7 +10,7 @@ Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.3.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.4.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
 
 ## What you get
 

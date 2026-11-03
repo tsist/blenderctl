@@ -1,3 +1,9 @@
+# 0.63.0-r2 — 2026-11-03
+
+- Add the portable blender-rigging companion skill and independent rigging repository setup guide.
+- Keep the existing public CLI and video runtime unchanged; detailed rigging quality and future third-party integration are not certified by this publication.
+- Extend skill-bundle validation and installation coverage to the manifest-listed skill set.
+
 ## Publication revision 0.63.0-r1
 
 Canonicalize Windows CI temporary fixture paths before comparing SHA-bound resource descriptors. Preserve production runtime/compiler code and prior native evidence.

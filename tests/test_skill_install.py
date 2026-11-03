@@ -22,7 +22,7 @@ class SkillInstallTests(unittest.TestCase):
             result = self.call('--destination', destination)
             self.assertEqual(result.returncode, 0, result.stderr)
             installed = json.loads(result.stdout)['installed']
-            self.assertEqual(len(installed), 5)
+            self.assertEqual(set(installed), {row['name'] for row in json.loads((ROOT / 'skills/manifest.json').read_text(encoding='utf-8'))['skills']})
             for name in installed:
                 for source in (ROOT / 'skills' / name).rglob('*'):
                     if source.is_file() and '__pycache__' not in source.parts:

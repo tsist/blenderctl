@@ -1,10 +1,11 @@
 # Blender agent skills / Blender 配套技能
 
-Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.3.0**.
+Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.4.0**.
 
 | Skill | Use |
 | --- | --- |
 | `blender-video-editing` | Whitebox/AI/CG editing, shot candidates, audio/subtitles, manual continuation and SDR templates |
+| `blender-rigging` | Bones, binding weights, expression Shape Keys and hair-bone physics; separate development baseline |
 | `blender-cli` | Saved-file CLI operations, discovery, rendering, job/transaction protection and recovery |
 | `blender-work-methodology` | Plugin/CLI work units, reference/assembly decisions, progress, preview and acceptance |
 | `blender-material-authoring` | References, PBR layers/channels, image budgets, managed material operations and validation |
@@ -12,20 +13,20 @@ Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**,
 
 ## Install in Codex
 
-Download `blenderctl-skills-0.3.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0-r1), or use the repository. Keep all five skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
+Download `blenderctl-skills-0.4.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0-r2), or use the repository. Keep all six skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
 
 From the repository root:
 
 ```powershell
-# List the five skills without changing anything.
+# List the six skills without changing anything.
 python scripts/install_skills.py --list
 # Use an explicit installation destination; existing skills are never replaced.
 python scripts/install_skills.py --destination '<CODEX_HOME>\skills'
 ```
 
-When `CODEX_HOME` is unset, Codex's personal skill location is `~/.codex/skills`. Replace the example with the actual absolute destination. The same installer is at the root of the skill ZIP. You can also copy the five folders manually, preserving their sibling layout. If a same-named skill already exists, compare versions and choose your migration explicitly; the installer refuses before copying any skill. Restart the agent session if needed for its host's discovery mechanism.
+When `CODEX_HOME` is unset, Codex's personal skill location is `~/.codex/skills`. Replace the example with the actual absolute destination. The same installer is at the root of the skill ZIP. You can also copy the six folders manually, preserving their sibling layout. If a same-named skill already exists, compare versions and choose your migration explicitly; the installer refuses before copying any skill. Restart the agent session if needed for its host's discovery mechanism.
 
-From an extracted skill ZIP root, use `python install_skills.py --destination '<actual-skill-directory>'`. Installation copies the five sibling directories only; it never replaces existing skills or automatically configures the CLI/runtime.
+From an extracted skill ZIP root, use `python install_skills.py --destination '<actual-skill-directory>'`. Installation copies the six sibling directories only; it never replaces existing skills or automatically configures the CLI/runtime.
 
 Configure the separate software checkout and runtime:
 

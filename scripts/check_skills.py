@@ -19,8 +19,8 @@ def check():
     manifest = json.loads((SKILLS / 'manifest.json').read_text(encoding='utf-8'))
     names = [entry['name'] for entry in manifest['skills']]
     errors, links = [], 0
-    if len(names) != 5 or len(set(names)) != 5:
-        errors.append('Bundle must identify five unique companion skills')
+    if not names or len(set(names)) != len(names):
+        errors.append('Bundle must identify unique companion skills')
     for name in names:
         path = SKILLS / name / 'SKILL.md'
         content = path.read_text(encoding='utf-8')

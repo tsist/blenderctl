@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender Rigging"
+  short_description: "Bones, binding weights, expression keys and hair physics"
+  default_prompt: "Use $blender-rigging to inspect and operate the rigging development components."

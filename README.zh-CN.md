@@ -1,6 +1,10 @@
+# 骨骼插件配套更新
+
+本次发布修订 **0.63.0-r2** 同步[骨骼/绑定插件开发基线](https://github.com/tsist/blender-rigging-workflow)、唯一配套技能和使用入口。基础功能面已就绪，具体质量尚未验收，后期组件仍在整合。CLI 运行时保持 0.63.0，不把本机其他实验模块混入本次发布；新版组件所需接口按实际合同核对。详见[骨骼插件说明](docs/RIGGING.md)。
+
 # blenderctl + Blender workflows
 
-Publication revision **0.63.0-r1** fixes Windows CI temporary-path normalization in test fixtures. Product/runtime versions are unchanged.
+Earlier revision **0.63.0-r1** fixed Windows CI temporary-path normalization in test fixtures. Current companion publication is **0.63.0-r2**, with the runtime unchanged.
 
 **0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
 
