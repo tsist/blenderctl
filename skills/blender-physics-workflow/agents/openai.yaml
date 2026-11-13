@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender Physics Workflow"
+  short_description: "Modular Geometry Nodes physics simulations, disk bake, and isolated CLI"
+  default_prompt: "Use $blender-physics-workflow to build, update, bake, and verify physics simulations."

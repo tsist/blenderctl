@@ -1,9 +1,10 @@
 # Blender agent skills / Blender 配套技能
 
-Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.4.0**.
+Public companion skills for **blenderctl** and companion workflows, distributed under **GPL-3.0-or-later**. Public bundle version: **0.5.0**.
 
 | Skill | Use |
 | --- | --- |
+| `blender-physics-workflow` | Modular Geometry Nodes physics simulations (`rigid_scatter`, `cloth_rope`, `fluid_emission`), disk bake, and isolated CLI |
 | `blender-video-editing` | Whitebox/AI/CG editing, shot candidates, audio/subtitles, manual continuation and SDR templates |
 | `blender-rigging` | Bones, binding weights, expression Shape Keys and hair-bone physics; separate development baseline |
 | `blender-cli` | Saved-file CLI operations, discovery, rendering, job/transaction protection and recovery |

@@ -1,0 +1,16 @@
+schema_version = "1.0.0"
+
+id = "physics_nodes_workflow_addon"
+version = "0.1.0"
+name = "Physics Nodes Workbench"
+tagline = "Modular Geometry Nodes physics workbench, disk bake & CLI"
+maintainer = "Blender AI Pipeline"
+type = "add-on"
+
+blender_version_min = "5.2.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+tags = ["Physics", "Geometry Nodes", "Bake"]
