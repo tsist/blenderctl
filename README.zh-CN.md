@@ -1,3 +1,7 @@
+# 物理节点工作流与配套 CLI
+
+本次修订 **0.63.0-r3** 集成独立仓库 [tsist/blender-physics-workflow](https://github.com/tsist/blender-physics-workflow) 的模块化 Geometry Nodes 物理插件（`tools/physics_nodes_workflow_addon/`）、隔离配套 CLI（`tools/physics_workflow_cli_v1/`）与 `blender-physics-workflow` 技能，同时完整保留 `tools/blenderctl/` 原有 189 文件运行身份。详见[物理节点工作流说明](docs/PHYSICS_NODES_WORKFLOW.md)。
+
 # 骨骼插件配套更新
 
 本次发布修订 **0.63.0-r2** 同步[骨骼/绑定插件开发基线](https://github.com/tsist/blender-rigging-workflow)、唯一配套技能和使用入口。基础功能面已就绪，具体质量尚未验收，后期组件仍在整合。CLI 运行时保持 0.63.0，不把本机其他实验模块混入本次发布；新版组件所需接口按实际合同核对。详见[骨骼插件说明](docs/RIGGING.md)。

@@ -1,3 +1,8 @@
+# 0.63.0-r3 — 2026-11-13
+
+- Add the standalone Geometry Nodes Physics Nodes Workflow add-on (`tools/physics_nodes_workflow_addon/` 0.1.0), isolated companion CLI (`tools/physics_workflow_cli_v1/` 0.1.0), contract unit tests (`tests/test_physics_workflow_contract.py`), documentation (`docs/PHYSICS_NODES_WORKFLOW.md`), and companion skill (`blender-physics-workflow` 0.1.0).
+- Preserve the existing 189-file `tools/blenderctl` + `tools/video_editing_workflow_addon` runtime identity (`4a6e44b18e1187baf1569e0f93f3eda4ae2ffa170a3d73b8c7083c0ca8f38bcb`).
+
 # 0.63.0-r2 — 2026-11-03
 
 - Add the portable blender-rigging companion skill and independent rigging repository setup guide.

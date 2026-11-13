@@ -1,5 +1,7 @@
 # blenderctl + Blender workflows
 
+Publication revision **0.63.0-r3** adds the standalone [physics nodes workflow](https://github.com/tsist/blender-physics-workflow) (`tools/physics_nodes_workflow_addon/`, companion CLI `tools/physics_workflow_cli_v1/`, and skill `blender-physics-workflow`). The stable core `tools/blenderctl` runtime remains **0.63.0** with its 189-file runtime identity preserved. See [physics workflow setup and limits](docs/PHYSICS_NODES_WORKFLOW.md).
+
 Publication revision **0.63.0-r2** adds the open-source [rigging development baseline](https://github.com/tsist/blender-rigging-workflow), its companion skill and setup guidance. The stable public CLI runtime remains **0.63.0**; this update does not import unrelated local experimental modules. See [rigging setup and limits](docs/RIGGING.md).
 
 **0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
