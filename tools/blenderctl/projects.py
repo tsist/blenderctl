@@ -1,4 +1,5 @@
 """Open disk snapshots and produce separately verified current-version copies."""
+from collections import Counter
 import bpy,os,sys
 from pathlib import Path
 from protocol import Failure,atomic_json,digest
@@ -44,17 +45,31 @@ def opened(params):
     return snap
 
 def file_paths():
-    native={canonical(p) for p in bpy.utils.blend_paths(absolute=True,packed=False,local=False) if p}
-    weak={canonical(bpy.path.abspath(x.library_weak_reference.filepath)) for x in inspection.all_ids() if getattr(x,'library_weak_reference',None)}
-    # Append provenance is not a live linked library. A real resource with the
-    # same filename must still be guarded, so restore all typed input targets.
+    raw = bpy.utils.blend_paths(absolute=False, packed=False, local=False)
+    absolute = bpy.utils.blend_paths(absolute=True, packed=False, local=False)
+    if len(raw) != len(absolute):
+        raise Failure('VALIDATION_FAILED', 'Native dependency traversal changed during path classification')
+    # The two traversals use the same native occurrence order. Pair them to
+    # avoid resolving historical POSIX append provenance on the wrong drive.
+    weak = Counter()
+    for item in bpy.data.user_map():
+        reference = getattr(item, 'library_weak_reference', None)
+        if reference and reference.filepath:
+            weak[os.path.normcase(reference.filepath)] += 1
+    occurrences = Counter(os.path.normcase(path) for path in raw if path)
+    native = set()
+    for original, path in zip(raw, absolute):
+        name = os.path.normcase(original)
+        if path and (not name or occurrences[name] != weak[name]):
+            native.add(canonical(path))
+    # Keep explicit runtime resources even if they share a provenance path.
     strong=set()
     for name in ('images','libraries','sounds','fonts','movieclips','cache_files','volumes'):
         for x in getattr(bpy.data,name,()):
             raw=getattr(x,'filepath','')
             if raw and raw!='<builtin>' and not getattr(x,'packed_file',None) and not getattr(x,'packed_files',[]):
                 strong.add(canonical(bpy.path.abspath(raw,library=None if name=='libraries' else x.library)))
-    return sorted((native-weak)|strong)
+    return sorted(native | strong)
 
 def verify(params,job):
     snap=opened(params);paths=file_paths();declared={canonical(d['file']) for d in params['resources']}
@@ -66,13 +81,24 @@ def verify(params,job):
     atomic_json(job/'project-snapshot.json',snap);atomic_json(job/'project-report.json',report)
     return report
 
+def fully_packed_tiles(image):
+    """Require a stored image payload for every tile; the structural diff hashes it."""
+    if image.use_multiview:
+        return False
+    tiles = Counter(tile.number for tile in image.tiles)
+    packed = Counter(member.tile_number for member in image.packed_files
+                     if member.packed_file and member.packed_file.size > 0)
+    return bool(tiles) and len(image.packed_files) == sum(tiles.values()) and packed == tiles
+
 def prepare_copy(params,job):
     before=opened(params);version=tuple(bpy.data.version);reader=tuple(bpy.app.version);spec=params['manifest'];versions=version_info()
     if version[:2]>reader[:2] or spec['version_policy']=='SAME_MINOR' and version[:2]!=reader[:2]:
         raise Failure('UNSUPPORTED','Version policy rejects source major/minor; no implicit downgrade or migration')
     # Save/reopen validation is structural. Do not run physics or media to claim usability.
-    for collection in (bpy.data.images,bpy.data.movieclips):
-        if any(x.source in ('SEQUENCE','TILED') for x in collection):raise Failure('UNSUPPORTED','Project copy sequence/tile expansion requires its domain adapter')
+    if (any(image.source == 'SEQUENCE' or (image.source == 'TILED' and not fully_packed_tiles(image))
+            for image in bpy.data.images) or
+            any(clip.source in ('SEQUENCE', 'TILED') for clip in bpy.data.movieclips)):
+        raise Failure('UNSUPPORTED', 'Project copy sequence or external tile expansion requires its domain adapter')
     if bpy.data.cache_files or bpy.data.volumes or any(s.rigidbody_world for s in bpy.data.scenes) or any(o.modifiers for o in bpy.data.objects if any(m.type in ('FLUID','CLOTH','SOFT_BODY') for m in o.modifiers)):
         raise Failure('UNSUPPORTED','Cache-bearing project requires its domain copy adapter')
     paths=file_paths();declared={canonical(d['file']):d for d in params['resources']}

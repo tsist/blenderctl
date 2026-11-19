@@ -2,18 +2,21 @@
 import hashlib
 import json
 import math
+from array import array
 from contextlib import contextmanager
 from pathlib import Path
 from copy import deepcopy
 import bpy
 from .contract import (WorkflowError, normalize_manifest, NODE_TYPES, COMPONENT_DEFINITIONS, BINDING_SCHEMA,
     validate, media_sources, ANIMATION_TRACK_SCHEMA, TRACKING_DOCUMENT_SCHEMA, _check_track, _target_key)
+from .runtime import supported
 
 OWNER='_cwf_owner'
 ROLE='_cwf_role'
 NODE_ID='_cwf_node_id'
 SCENE_TAG='_cwf_scene'
 STATE='_cwf_state_v1'
+RETAINED_ROOT='_cwf_retained_root_v1'
 BINDING='_cwf_binding_v1_1'
 BOUND_IMAGE='_cwf_binding_image_id'
 MEDIA='_cwf_media_v1_2'
@@ -69,7 +72,10 @@ def _plain(value,depth=0):
     except TypeError: _fail('UNSUPPORTED','Unserializable value '+type(value).__name__)
 
 def _custom(item):
-    return {str(k):_plain(item[k]) for k in sorted(item.keys()) if k not in {STATE,ARCHIVE}}
+    private = {STATE, ARCHIVE}
+    if isinstance(item, bpy.types.Scene) and STATE in item:
+        private.add(RETAINED_ROOT)
+    return {str(k):_plain(item[k]) for k in sorted(item.keys()) if k not in private}
 def _id_name(item):
     return item.name+('|'+item.library.filepath if item.library else '')
 def _owned(item,scene,wid):
@@ -474,9 +480,93 @@ def _bridge(root,scene,wid):
     if len(rows)!=1:_fail('CONFLICT','Tagged managed bridge is missing or duplicated',{'count':len(rows)})
     return rows[0]
 
+
+def scene_roots(scene):
+    """Read ordered compositor attachments without changing the active effect."""
+    effects = getattr(scene, 'compositor_effects', None)
+    if effects is None:
+        root = scene.compositing_node_group
+        return (root,) if root else ()
+    return tuple(effect.node_group for effect in effects if effect.node_group)
+
+
+def _bound_effect(scene, state):
+    effects = scene.compositor_effects
+    if 'effect_name' in state:
+        return effects.get(state['effect_name'])
+    # Files already managed in 5.2 are converted by Blender into one scene
+    # effect. Find the old root by identity even if the user selected another.
+    matches = [effect for effect in effects if effect.node_group and
+               effect.node_group.name == state['root_group']]
+    return matches[0] if len(matches) == 1 else None
+
+
+def scene_root(scene, state=None):
+    effects = getattr(scene, 'compositor_effects', None)
+    if effects is None:
+        return scene.compositing_node_group
+    effect = _bound_effect(scene, state) if state else effects.active
+    return effect.node_group if effect else None
+
+
+def _effect_state(scene, *, managed_state=None):
+    managed = _bound_effect(scene, managed_state) if managed_state else None
+    active = scene.compositor_effects.active
+    rows = []
+    removed_active = False
+    for effect in scene.compositor_effects:
+        group = _plain(effect.node_group)
+        if effect == managed:
+            if managed_state.get('effect_created', managed_state['new_root']):
+                removed_active = effect == active
+                continue
+            original = managed_state['original']
+            group = ({'id_type': 'CompositorNodeTree', 'name': original['root'],
+                      'library': original.get('root_library')} if original['root'] else None)
+        values = effect.properties
+        rows.append({'name': effect.name, 'group': group, 'render': effect.enable_for_render,
+                     'preview': effect.enable_for_preview,
+                     'properties': {prop.identifier: _plain(getattr(values, prop.identifier))
+                                    for prop in values.bl_rna.properties if prop.identifier != 'rna_type'}
+                     if values is not None else {}})
+    active_name = active.name if active else None
+    if removed_active:
+        active_name = rows[0]['name'] if rows else None
+    return {'active': active_name, 'effects': rows}
+
+
+def _restore_root(scene, state, restored):
+    effects = getattr(scene, 'compositor_effects', None)
+    if effects is None:
+        scene.compositing_node_group = restored
+        return
+    effect = _bound_effect(scene, state)
+    if effect is None:
+        _fail('CONFLICT', 'Managed compositor effect disappeared')
+    if state.get('effect_created', state['new_root']):
+        effects.remove(effect)
+    else:
+        effect.node_group = restored
+
+
+def _original_root(scene, state):
+    original = state['original']
+    if original['root'] is None:
+        return None
+    candidates = (scene.get(RETAINED_ROOT),) if state.get('retained_original_root') else bpy.data.node_groups
+    found = [tree for tree in candidates if isinstance(tree, bpy.types.CompositorNodeTree)
+             and tree.name == original['root']
+             and (tree.library.filepath if tree.library else None) == original.get('root_library')]
+    if len(found) != 1:
+        _fail('CONFLICT', 'Original root identity disappeared or is ambiguous')
+    return found[0]
+
+
 def _groups(scene,state):
-    root=scene.compositing_node_group
+    root=scene_root(scene,state)
     if not root or root.name!=state['root_group']:_fail('CONFLICT','Scene root binding changed',{'expected':state['root_group'],'observed':root.name if root else None})
+    if state.get('retained_original_root'):
+        _original_root(scene,state)
     bridge=_bridge(root,scene,state['workflow_id'])
     group=bridge.node_tree
     if not group or group.name!=state['managed_group'] or not _owned(group,scene,state['workflow_id']):
@@ -506,8 +596,9 @@ def _groups(scene,state):
         for node in tree.nodes:
             if getattr(node,'node_tree',None)==group and node!=bridge:consumers.append({'tree':tree.name,'node':node.name})
     for other in bpy.data.scenes:
-        if other.compositing_node_group==group:consumers.append({'scene':other.name})
-        if other!=scene and other.compositing_node_group==root:consumers.append({'shared_root_scene':other.name})
+        roots = scene_roots(other)
+        if group in roots:consumers.append({'scene':other.name})
+        if roots.count(root) > (1 if other == scene else 0):consumers.append({'shared_root_scene':other.name})
     if consumers:_fail('CONFLICT','Managed graph acquired outside consumers; isolate before editing',{'consumers':consumers})
     return root,bridge,group
 
@@ -534,7 +625,7 @@ def _diff(before,after,path='$',rows=None):
 
 def _baseline(scene,state):
     if state.get('workflow_version') in {'1.2','1.3'} and 'bound_definitions' not in state:
-        root=scene.compositing_node_group;group=bpy.data.node_groups[state['managed_group']]
+        root=scene_root(scene,state);group=bpy.data.node_groups[state['managed_group']]
         _refresh_declarations(root,group,state)
     observed=_observed(scene,state)
     state['baseline']={'fingerprint':_hash(observed),'state':observed}
@@ -542,15 +633,70 @@ def _baseline(scene,state):
     return observed
 
 def _boundaries(scene,state=None):
-    names={_id_name(scene.compositing_node_group)} if scene.compositing_node_group else set()
+    root=scene_root(scene,state)
+    names={_id_name(root)} if root else set()
     if state and state['original']['root']:
         names.add(state['original']['root']+('|'+state['original']['root_library'] if state['original'].get('root_library') else ''))
     return names
 
+def _mesh_read_bulk(collection,field,code,width=1):
+    """Read current RNA on every call; retain no mesh or protection values."""
+    count=len(collection)
+    if not count:return []
+    values=array(code,[0])*(count*width)
+    collection.foreach_get(field,values)
+    return list(values)
+
+
+def _mesh_attribute_rows(attribute):
+    """Mirror _rna for homogeneous numeric values; other RNA keeps its old path."""
+    data=attribute.data
+    if not len(data):return []
+    sample=data[0]
+    actual=sample.bl_rna.identifier
+    fields=[]
+    if attribute.bl_rna.properties['data'].fixed_type.identifier!=actual:
+        return [_rna(value) for value in data]
+    for prop in sample.bl_rna.properties:
+        key=prop.identifier
+        if key=='rna_type':continue
+        if prop.is_readonly and prop.type not in ('POINTER','COLLECTION'):continue
+        if prop.is_readonly or prop.type not in ('BOOLEAN','INT','FLOAT'):
+            return [_rna(value) for value in data]
+        is_array=bool(getattr(prop,'is_array',False))
+        dimensions=tuple(getattr(prop,'array_dimensions',()))
+        length=int(getattr(prop,'array_length',0))
+        if is_array and (length<1 or len([n for n in dimensions if n])!=1):
+            return [_rna(value) for value in data]
+        # Double buffers avoid narrowing Python floats, including converted colors.
+        code={'BOOLEAN':'b','INT':'i','FLOAT':'d'}[prop.type]
+        fields.append((key,prop.type,code,length if is_array else 1,is_array))
+    try:
+        rows=[{'rna':actual} for _ in range(len(data))]
+        for key,kind,code,width,is_array in fields:
+            values=_mesh_read_bulk(data,key,code,width)
+            cast=bool if kind=='BOOLEAN' else int if kind=='INT' else float
+            for index,row in enumerate(rows):
+                value=[cast(v) for v in values[index*width:(index+1)*width]] if is_array else cast(values[index])
+                row[key]=_plain(value)
+        return rows
+    except (AttributeError,TypeError,ValueError,RuntimeError,OverflowError):
+        return [_rna(value) for value in data]
+
+
 def _mesh(mesh):
-    return {'vertices':[list(v.co) for v in mesh.vertices],'edges':[list(e.vertices) for e in mesh.edges],
-      'polygons':[{'vertices':list(p.vertices),'material':p.material_index,'smooth':p.use_smooth} for p in mesh.polygons],
-      'attributes':{a.name:{'domain':a.domain,'type':a.data_type,'data':[_rna(v) for v in a.data]} for a in mesh.attributes},
+    coords=_mesh_read_bulk(mesh.vertices,'co','f',3)
+    edge_verts=_mesh_read_bulk(mesh.edges,'vertices','i',2)
+    loop_vertices=_mesh_read_bulk(mesh.loops,'vertex_index','i')
+    starts=_mesh_read_bulk(mesh.polygons,'loop_start','i')
+    totals=_mesh_read_bulk(mesh.polygons,'loop_total','i')
+    materials=_mesh_read_bulk(mesh.polygons,'material_index','i')
+    smooth=_mesh_read_bulk(mesh.polygons,'use_smooth','b')
+    return {'vertices':[coords[i:i+3] for i in range(0,len(coords),3)],
+      'edges':[edge_verts[i:i+2] for i in range(0,len(edge_verts),2)],
+      'polygons':[{'vertices':loop_vertices[starts[i]:starts[i]+totals[i]],
+        'material':int(materials[i]),'smooth':bool(smooth[i])} for i in range(len(mesh.polygons))],
+      'attributes':{a.name:{'domain':a.domain,'type':a.data_type,'data':_mesh_attribute_rows(a)} for a in mesh.attributes},
       'vertex_weights':[[{'group':g.group,'weight':g.weight} for g in v.groups] for v in mesh.vertices],
       'materials':[_plain(m) for m in mesh.materials],
       'shape_keys':({'id':_plain(mesh.shape_keys),'use_relative':mesh.shape_keys.use_relative,
@@ -611,15 +757,18 @@ def _protection(scene,wid,boundaries,workflow_version='1.0'):
         else:value=_tree_state(tree,enforce_safety=tree.bl_idname=='CompositorNodeTree')
         add('NodeTree:'+_id_name(tree),value)
     for sc in bpy.data.scenes:
-        add('Scene:'+_id_name(sc),{'camera':_plain(sc.camera),'world':_plain(sc.world),
+        scene_data={'camera':_plain(sc.camera),'world':_plain(sc.world),
           'objects':sorted(o.name for o in sc.objects),'view_layers':[{'name':v.name,'use':v.use,
             **({'passes':_pass_settings(v)} if workflow_version in {'1.1','1.2','1.3'} else {})} for v in sc.view_layers],
           'frame_start':sc.frame_start,'frame_end':sc.frame_end,
-          'root':None if sc==scene else _plain(sc.compositing_node_group),
+          'root':None if sc==scene else _plain(scene_root(sc)),
           'compositing':None if sc==scene else sc.render.use_compositing,
           'frame_current':None if sc==scene else sc.frame_current,
           'render':{'engine':sc.render.engine,'resolution':[sc.render.resolution_x,sc.render.resolution_y,sc.render.resolution_percentage],'fps':sc.render.fps,'fps_base':sc.render.fps_base},
-          'custom':_custom(sc)})
+          'custom':_custom(sc)}
+        if hasattr(sc, 'compositor_effects'):
+            scene_data['compositor_stack'] = _effect_state(sc, managed_state=_state(scene) if sc == scene else None)
+        add('Scene:'+_id_name(sc),scene_data)
     if workflow_version in {'1.2','1.3'}:
         for item in _id_owners():
             if isinstance(item,bpy.types.NodeTree) and _owned(item,scene,wid):continue
@@ -656,9 +805,11 @@ def _input_bindings(root,group):
 
 def inspect(scene_name,workflow_id):
     scene=_scene(scene_name);state=_state(scene)
+    effects = {'compositor_stack': _effect_state(scene)} if hasattr(scene, 'compositor_effects') else {}
     if state is None:
-        return {'status':'detached','scene':scene.name,'workflow_id':workflow_id,'root_group':scene.compositing_node_group.name if scene.compositing_node_group else None,
-          'managed_group':None,'bridge_node':None,'bridge':None,'source':None,'fingerprint':None,'semantic_fingerprint':None,'baseline':None,'conflicts':[]}
+        root=scene_root(scene)
+        return {'status':'detached','scene':scene.name,'workflow_id':workflow_id,'root_group':root.name if root else None,
+          'managed_group':None,'bridge_node':None,'bridge':None,'source':None,'fingerprint':None,'semantic_fingerprint':None,'baseline':None,'conflicts':[],**effects}
     if state['workflow_id']!=workflow_id:_fail('CONFLICT','This scene is owned by another workflow')
     root,bridge,group=_groups(scene,state);observed=_observed(scene,state);fp=_hash(observed)
     conflicts=_diff(state['baseline']['state'],observed)
@@ -670,7 +821,7 @@ def inspect(scene_name,workflow_id):
       'bridge':{'node':bridge.name,'id':'$bridge','type':bridge.bl_idname,'input':input_socket.identifier,
                 'output':next(s.identifier for s in bridge.outputs if s.type=='RGBA')},
       'source':source,'original':state['original'],'fingerprint':fp,'semantic_fingerprint':fp,
-      'baseline':state['baseline'],'observed':{'state':observed},'conflicts':conflicts}
+      'baseline':state['baseline'],'observed':{'state':observed},'conflicts':conflicts,**effects}
     if state.get('workflow_version','1.0') in {'1.1','1.2','1.3'}:
         result['workflow_version']=state['workflow_version'];result['input_bindings']=_input_bindings(root,group)
         result['baseline_definition']=state['baseline_definition']
@@ -713,7 +864,7 @@ def _source(root,scene,manifest,original,resolved_media=None):
     return _exact(node.outputs,'Image'),{'kind':'image','node':node.name,'output':'Image','image':{'name':image.name,'file':str(path),'colorspace':image.colorspace_settings.name,'alpha_mode':image.alpha_mode}}
 
 def apply(manifest,resolved_media=None):
-    if bpy.app.version!=(5,2,1):_fail('UNSUPPORTED','M1 apply is verified only for Blender 5.2.1')
+    if not supported(bpy.app):_fail('UNSUPPORTED','This Blender build is outside the compositor runtime contract')
     manifest=normalize_manifest(manifest);scene=_scene(manifest['scene']);wid=manifest['workflow_id'];op=manifest['operation']
     if scene.view_layers.get(manifest['view_layer']) is None:_fail('NOT_FOUND','View Layer missing')
     state=_state(scene)
@@ -722,6 +873,7 @@ def apply(manifest,resolved_media=None):
     if state and state.get('workflow_version','1.0')!=manifest['workflow_version']:
         _fail('CONFLICT','Workflow version differs; snapshots are not automatically migrated')
     if op=='create' and state:_fail('CONFLICT','Scene already has one managed workflow')
+    if op=='create' and RETAINED_ROOT in scene:_fail('CONFLICT','Scene has a retained compositor root without a managed workflow')
     if op!='create' and not state:_fail('NOT_FOUND','No managed workflow in this scene')
     if manifest['workflow_version'] in {'1.2','1.3'}:
         if state:
@@ -736,7 +888,10 @@ def apply(manifest,resolved_media=None):
     if 'frame' in manifest:scene.frame_set(manifest['frame'])
     boundaries=_boundaries(scene,state);before=_protection(scene,wid,boundaries,manifest['workflow_version'])
     if op=='create':
-        original_root=scene.compositing_node_group
+        effects=getattr(scene,'compositor_effects',None)
+        effect=effects.active if effects is not None else None
+        created_effect=False
+        original_root=scene_root(scene)
         if original_root:_tree_state(original_root)
         if original_root and manifest['workflow_version'] in {'1.2','1.3'} and manifest['source']['kind']=='existing':
             _reject_unbound_temporal(original_root)
@@ -768,9 +923,25 @@ def apply(manifest,resolved_media=None):
             root.links.new(source_socket,si)
             for link in list(port.links):root.links.remove(link)
             root.links.new(so,port)
-            scene.compositing_node_group=root;scene.render.use_compositing=True
+            if cow:
+                # Keep a real ID reference so Blender retains a linked source
+                # root across save/reopen while the effect uses its local copy.
+                scene[RETAINED_ROOT] = original_root
+            if effects is None:
+                scene.compositing_node_group=root
+            else:
+                if effect is None:
+                    effect=effects.new('CWF '+wid)
+                    created_effect=True
+                if effect.node_group != root:
+                    effect.node_group=root
+            scene.render.use_compositing=True
             state={'version':'1.0','workflow_id':wid,'scene':scene.name,'view_layer':manifest['view_layer'],
               'root_group':root.name,'managed_group':group.name,'original':original,'source':source,'cow':cow,'new_root':new_root}
+            if cow:
+                state['retained_original_root'] = True
+            if effect is not None:
+                state.update(effect_name=effect.name,effect_created=created_effect)
             if manifest['workflow_version'] in {'1.1','1.2','1.3'}:
                 state['workflow_version']=manifest['workflow_version']
                 state['baseline_definition']='main bridge input only; extra managed inputs are not part of bypass baseline'
@@ -785,7 +956,14 @@ def apply(manifest,resolved_media=None):
                 if original['source']:
                     root.links.new(_exact(root.nodes[original['source']['node']].outputs,original['source']['socket']),
                       _exact(root.nodes[original['output']['node']].inputs,original['output']['socket']))
-            scene.compositing_node_group=original_root;scene.render.use_compositing=original['enabled']
+            if effects is None:
+                scene.compositing_node_group=original_root
+            elif created_effect:
+                effects.remove(effect)
+            elif effect is not None and effect.node_group != original_root:
+                effect.node_group=original_root
+            scene.render.use_compositing=original['enabled']
+            if RETAINED_ROOT in scene:del scene[RETAINED_ROOT]
             if STATE in scene:del scene[STATE]
             raise
     else:
@@ -825,11 +1003,9 @@ def apply(manifest,resolved_media=None):
             if manifest['workflow_version'] in {'1.2','1.3'}:_remember_action(group,state)
             original=state['original']
             if state['cow'] or state['new_root']:
-                found=[g for g in bpy.data.node_groups if g.name==original['root'] and
-                       (g.library.filepath if g.library else None)==original.get('root_library')] if original['root'] else []
-                restored=found[0] if len(found)==1 else None
-                if original['root'] and restored is None:_fail('CONFLICT','Original root identity disappeared or is ambiguous')
-                scene.compositing_node_group=restored
+                _restore_root(scene,state,_original_root(scene,state))
+                if state.get('retained_original_root'):
+                    del scene[RETAINED_ROOT]
             else:
                 output=root.nodes.get(original['output']['node']) if original['output'] else None
                 if not output:_fail('CONFLICT','Original output endpoint disappeared')
@@ -851,7 +1027,8 @@ def apply(manifest,resolved_media=None):
                 scene[ARCHIVE]=_dump(retained)
             del scene[STATE]
     if manifest['workflow_version'] in {'1.2','1.3'}:scene.frame_set(manifest['reference_frame'])
-    after=_protection(scene,wid,boundaries|_boundaries(scene,_state(scene)),manifest['workflow_version'])
+    after_boundaries = boundaries if op == 'detach' else boundaries | _boundaries(scene,_state(scene))
+    after=_protection(scene,wid,after_boundaries,manifest['workflow_version'])
     differences=_diff(before,after)
     protection={'status':'pass' if not differences else 'fail','before':before,'after':after,'differences':differences}
     if differences:_fail('VALIDATION_FAILED','Non-target semantic protection changed',protection)

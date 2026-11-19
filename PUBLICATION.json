@@ -1,12 +1,12 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.0-r2",
-  "cli": "0.63.0",
+  "release": "0.63.1",
+  "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "4a6e44b18e1187baf1569e0f93f3eda4ae2ffa170a3d73b8c7083c0ca8f38bcb",
+  "runtime_identity": "69e4b0502e1fb6f3459a4bde931a30a338e3ac639295ef5b3e7024a63e42dee2",
   "runtime_files": 189,
   "license": "GPL-3.0-or-later",
   "files": [
@@ -42,8 +42,8 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "bcafebb94b0f4102fcba6b077a999f68156d762dfd20a1cca9e8a14dfbaa31c4",
-      "bytes": 2937
+      "sha256": "c6ff57eb9ed06dac98b2a058f86cda18f4294962650c6ee228181741e2accb11",
+      "bytes": 3282
     },
     {
       "file": "CONTRIBUTING.md",
@@ -57,18 +57,18 @@
     },
     {
       "file": "README.md",
-      "sha256": "8f9887e8ed787c9053541a9414fb6ca9de4ee000fd97f7fe3d347d0398158030",
-      "bytes": 5387
+      "sha256": "bb44d3ba219bc4e200556b2971182168b7136dcd4966e5dc54990ac014f3e705",
+      "bytes": 5267
     },
     {
       "file": "README.zh-CN.md",
-      "sha256": "88430b10275bcfaa08565af10043bb0f87db71ca5cf3287b914caa1e7006d846",
-      "bytes": 4499
+      "sha256": "d8ef9740e4f5ce7029b2062c7ab230aa94b01e1a1825f82954ce85356dcefac8",
+      "bytes": 4163
     },
     {
       "file": "RELEASE-VALIDATION.json",
-      "sha256": "1281250bf942fcbfa3a7e10fdd66c1ef3e7516f5b4f1218c4eb317fbaf487135",
-      "bytes": 2194
+      "sha256": "666eea2827000fafbcaf5da7906a5b5ce014bd01d16a53ea85e5ea89589e2d83",
+      "bytes": 651
     },
     {
       "file": "SECURITY.md",
@@ -92,8 +92,8 @@
     },
     {
       "file": "docs/COMPATIBILITY.md",
-      "sha256": "68b0e0e3d24d0d9bd8b8a0665c7e63bfbffaaa4037a22497ff9a4a38ee8e8a9a",
-      "bytes": 1710
+      "sha256": "16d30fb5c482eae0f0c6dc4e54bbcb854d14fd66ec5dc685f5de5431947f4bff",
+      "bytes": 2457
     },
     {
       "file": "docs/GETTING_STARTED.md",
@@ -927,8 +927,8 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "36dca465e34dce74d7a8f1e3a6c6149e17235fb632d28b9d59fda2683a344c80",
-      "bytes": 4706
+      "sha256": "92fe48e98e89140c812c9d6ce74198966b0307cf7e53285dd6e3419ad038c5e8",
+      "bytes": 4692
     },
     {
       "file": "skills/LICENSE",
@@ -1377,8 +1377,8 @@
     },
     {
       "file": "tools/blenderctl/cli.py",
-      "sha256": "8c4edee85db65fa95fe5ecca7445c7a374cb4da5d487157bab1342ae94516afa",
-      "bytes": 52177
+      "sha256": "9868cfba4193e87fb7c812da3c3829eb3f1b99ce881ff2549f67604d24ffc3db",
+      "bytes": 52980
     },
     {
       "file": "tools/blenderctl/compositing_batch.py",
@@ -1467,13 +1467,13 @@
     },
     {
       "file": "tools/blenderctl/compositing_verifier.py",
-      "sha256": "c33df6a8eb6e23559969af196f9654b088ce1bd1d09faac75d3afaa9ccb95a7e",
-      "bytes": 39461
+      "sha256": "bccec7329b21038c0f11d1c3dd46a90d2cdbbf7e9033e9965d67041cdeccd2f2",
+      "bytes": 39481
     },
     {
       "file": "tools/blenderctl/compositing_workflow.py",
-      "sha256": "24adec7903471d2fc0f24d64f5b67465247aec99ba4ad2e1962a489b678492be",
-      "bytes": 71244
+      "sha256": "4cae17f53341515ec0776a1deb3ebe9f9260d1980fc49428b616b9d415bfafb7",
+      "bytes": 71334
     },
     {
       "file": "tools/blenderctl/compositing_workflow_contract.py",
@@ -1897,13 +1897,13 @@
     },
     {
       "file": "tools/blenderctl/projects.py",
-      "sha256": "2b09cd41e5170677a624b514e3aec39099b90421548de649ef62bb866867b130",
-      "bytes": 8084
+      "sha256": "fa43c7b5a683121b71d57562915ce7f644efe1538086f1d8b7a145dfebb79666",
+      "bytes": 9341
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "8bf8fbf5d5582a24c32caded004b4d85299f00db2e0dcb250d4c9acf07d84786",
-      "bytes": 31087
+      "sha256": "c282e51a7cef29116f1a0df31ad052b8492db56d67e99db9997bddb5b51a8501",
+      "bytes": 30673
     },
     {
       "file": "tools/blenderctl/render_contract.py",
@@ -1912,8 +1912,8 @@
     },
     {
       "file": "tools/blenderctl/rendering.py",
-      "sha256": "0f8ab588ae4ee9134afa6b9452d000c95caa1227fe43a1a47f271dc1afe7970f",
-      "bytes": 26647
+      "sha256": "d5a6ce63f30f1016ab06a16d50f126a6d1bae883ef9623ee01a80cd42107fbb5",
+      "bytes": 26713
     },
     {
       "file": "tools/blenderctl/resource_leases.py",
@@ -2267,13 +2267,18 @@
     },
     {
       "file": "tools/compositing_workflow_addon/core.py",
-      "sha256": "700130e16f8481e96a9b84c4eac5e5321e863c9e7669fe3b83d7a6dc21fcb704",
-      "bytes": 87677
+      "sha256": "b554cc1c33f976c7686d3be4fd00a1bd7b49ed898884ef911bbaa579dc06f53f",
+      "bytes": 94158
     },
     {
       "file": "tools/compositing_workflow_addon/movie_contract.py",
       "sha256": "46ea7b1159541c268a79c103a85505d1839fd4c572e867074870269b52e60172",
       "bytes": 11711
+    },
+    {
+      "file": "tools/compositing_workflow_addon/runtime.py",
+      "sha256": "7adc8f71c4b65df99f9310a78c6df2e762b93a676f2e3217f0ee378fe7328791",
+      "bytes": 265
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/__init__.py",

@@ -1,3 +1,9 @@
+# 0.63.1 — 2026-11-19
+
+- Select Blender 5.2.1 or 5.3.0 by version from the Windows portable runtime directory.
+- Preserve fully packed single-view UDIM tiles through guarded project copies and verify tile data on reopen.
+- Inspect every compositor effect in the render guard, and preserve the full effect stack in managed static compositing.
+
 # 0.63.0-r2 — 2026-11-03
 
 - Add the portable blender-rigging companion skill and independent rigging repository setup guide.

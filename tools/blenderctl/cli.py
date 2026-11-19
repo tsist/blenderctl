@@ -1,7 +1,9 @@
 """Project entry point: python tools/blenderctl/cli.py --help."""
 import argparse
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
 
 from protocol import (CODES, COMMANDS, DEFAULT_BLENDER, DEFAULT_JOBS, DEFAULT_TRANSACTIONS, SCHEMA,
@@ -17,7 +19,10 @@ class Parser(argparse.ArgumentParser):
 def parser():
     p = Parser(description="blenderctl: isolated Blender CLI and recoverable file transactions")
     p.add_argument("--version", action="version", version=VERSION)
-    p.add_argument("--blender", type=Path, default=DEFAULT_BLENDER)
+    runtime = p.add_mutually_exclusive_group()
+    runtime.add_argument("--blender", type=Path)
+    runtime.add_argument("--blender-version", choices=("5.2.1", "5.3.0"),
+                         help="select a Windows portable Blender from BLENDERCTL_BLENDER_ROOT")
     p.add_argument("--jobs-dir", type=Path, default=DEFAULT_JOBS)
     p.add_argument("--transactions-dir", type=Path, default=DEFAULT_TRANSACTIONS)
     p.add_argument("--timeout", type=float, default=120)
@@ -282,12 +287,34 @@ def parser():
     return p
 
 
+def portable_blender(version):
+    root = Path(os.environ.get("BLENDERCTL_BLENDER_ROOT") or DEFAULT_BLENDER.parents[2])
+    if not root.is_absolute():
+        raise Failure("INVALID_REQUEST", "BLENDERCTL_BLENDER_ROOT must be absolute")
+    binary = root / version / f"blender-{version}-windows-x64" / "blender.exe"
+    if not binary.is_file():
+        raise Failure("NOT_FOUND", f"Portable Blender executable not found: {binary}")
+    try:
+        probe = subprocess.run([str(binary), "--version"], capture_output=True, check=True,
+                               encoding="utf-8", errors="replace", timeout=15)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise Failure("VALIDATION_FAILED", f"Failed to query Blender version: {binary}") from exc
+    banner = probe.stdout.partition("\n")[0].strip()
+    if banner not in (f"Blender {version}", f"Blender {version} LTS"):
+        raise Failure("VALIDATION_FAILED", f"Portable Blender does not report {version}: {binary}")
+    return binary
+
+
 def main(argv=None):
     args = None
     compact_command = None
     code = 0
     try:
         args = parser().parse_args(argv)
+        if args.blender_version:
+            args.blender = portable_blender(args.blender_version)
+        elif args.blender is None:
+            args.blender = DEFAULT_BLENDER
         if args.compact and args.full:
             raise Failure('INVALID_REQUEST', 'Choose --compact or --full')
         if args.command == 'video' and args.action == 'describe':

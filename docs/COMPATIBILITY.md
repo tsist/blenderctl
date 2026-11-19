@@ -1,6 +1,15 @@
 # Compatibility and support boundaries
 
-The verified native baseline is **Windows / Blender 5.2.1 LTS / build 9e2066aef7ef**. This release uses host Python 3.12+; local integration runs use Blender's Python 3.13.13. Source distribution does not install or upgrade the user's runtime.
+The tested Windows x64 builds are **Blender 5.2.1 LTS (9e2066aef7ef)** and **Blender 5.3.0 (02f0899d78e3)**. Use host Python 3.12+. The source distribution requires a separately installed Blender.
+
+Set the optional `BLENDERCTL_BLENDER_ROOT` absolute path to the directory containing the versioned Windows portable distributions. It defaults to `runtime/blender/releases` beside the source checkout. Layout example: `5.3.0/blender-5.3.0-windows-x64/blender.exe`.
+
+```powershell
+.\blenderctl.ps1 --blender-version 5.3.0 doctor
+.\blenderctl.ps1 --blender-version 5.2.1 doctor
+```
+
+Both builds were exercised for background startup and the CPU material smoke test. The 5.3 qualification covers reopening project copies from 5.2 and managed static compositor stacks. The generic render guard checks every effect and rejects unmanaged output nodes. Separate video, simulation and rigging adapter qualifications are maintained with their workflows. Use `--blender` for an explicit executable path.
 
 Several native drivers, links/overrides, retopology and format-time adapters explicitly restrict Blender versions. The extension minimum of Blender 5.2.0 is an installation declaration, not a statement that every Blender 5.2 build was exercised. Check the actual adapter and runtime result.
 

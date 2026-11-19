@@ -47,9 +47,10 @@ def near(left, right, path='root'):
 
 def runtime_identity():
     import bpy
+    from compositing_workflow_addon.runtime import supported
     build = bpy.app.build_hash.decode()
-    if tuple(bpy.app.version) != (5, 2, 1) or build != '9e2066aef7ef':
-        raise Failure('UNSUPPORTED', 'Static compositing workflows require Blender 5.2.1 build 9e2066aef7ef')
+    if not supported(bpy.app):
+        raise Failure('UNSUPPORTED', 'This Blender build is outside the static compositor runtime contract')
     return {'version': bpy.app.version_string, 'version_tuple': list(bpy.app.version),
             'build': build, 'binary_sha256': digest(bpy.app.binary_path)}
 

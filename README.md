@@ -1,12 +1,12 @@
 # blenderctl + Blender workflows
 
-Publication revision **0.63.0-r2** adds the open-source [rigging development baseline](https://github.com/tsist/blender-rigging-workflow), its companion skill and setup guidance. The stable public CLI runtime remains **0.63.0**; this update does not import unrelated local experimental modules. See [rigging setup and limits](docs/RIGGING.md).
+**0.63.1** adds Windows Blender 5.3.0 selection, 5.2-to-5.3 project copies and multi-effect compositor checks. See the [compatibility matrix](docs/COMPATIBILITY.md) and [independent rigging setup](docs/RIGGING.md).
 
 **0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
 
 Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-256 protected source files, isolated background jobs, editable candidates, and a matching layered-material Blender extension.
 
-**CLI 0.63.0 · Material Workflow 0.7.0 · GPL-3.0-or-later**
+**CLI 0.63.1 · Material Workflow 0.7.0 snapshot · GPL-3.0-or-later**
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 

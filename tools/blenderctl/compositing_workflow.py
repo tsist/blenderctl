@@ -137,7 +137,7 @@ def _inspection_file_preflight(scene, closure):
 def _trees():
     rows = list(bpy.data.node_groups)
     rows += [item.node_tree for item in [*bpy.data.materials, *bpy.data.worlds] if item.node_tree]
-    rows += [scene.compositing_node_group for scene in bpy.data.scenes if scene.compositing_node_group]
+    rows += [group for scene in bpy.data.scenes for group in core.scene_roots(scene)]
     seen = set()
     for tree in rows:
         if tree.as_pointer() not in seen:
@@ -206,8 +206,9 @@ def _activate(manifest):
 
 
 def _graph_render_gate(scene, layer, workflow_version='1.0'):
-    root = scene.compositing_node_group
-    if root is None:
+    # An effect disabled at the reference frame can be animated on later.
+    roots = core.scene_roots(scene)
+    if not roots:
         raise Failure('UNSUPPORTED', 'Preview has no defined compositing output after management operation')
     visited, active, render_layers, denoise_nodes = set(), set(), [], []
     node_total = 0
@@ -247,7 +248,8 @@ def _graph_render_gate(scene, layer, workflow_version='1.0'):
             if child:
                 visit(child)
         active.remove(pointer)
-    visit(root)
+    for root in roots:
+        visit(root)
     editor = scene.sequence_editor
     if scene.render.use_sequencer and editor:
         strips = getattr(editor, 'strips', getattr(editor, 'sequences', ()))
@@ -548,7 +550,7 @@ def _previews_batch(params, inspection, scene, layer, job, progress, report):
     bridge = None
     if inspection.get('status') == 'managed':
         root = bpy.data.node_groups.get(inspection['root_group'])
-        if root is None or root != scene.compositing_node_group:
+        if root is None or root != core.scene_root(scene, core._state(scene)):
             raise Failure('CONFLICT', 'Managed root differs before preview')
         matches = [node for node in root.nodes if node.get(core.OWNER) == params['manifest']['workflow_id']
                    and node.get(core.ROLE) == 'bridge' and node.get(core.NODE_ID) == '$bridge']

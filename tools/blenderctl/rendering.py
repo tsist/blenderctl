@@ -226,8 +226,18 @@ def compositor_safe(scene,layer):
             if n.bl_idname not in NODE_TYPES['CompositorNodeTree']:raise Failure('UNSUPPORTED','Compositor output/external node is outside the render allowlist: '+n.bl_idname)
             if n.bl_idname=='CompositorNodeRLayers' and ((n.scene and n.scene!=scene) or n.layer!=layer.name):raise Failure('UNSUPPORTED','Render Layers must target this scene and view layer')
             if getattr(n,'node_tree',None):walk(n.node_tree)
-    if not scene.compositing_node_group:raise Failure('NOT_FOUND','No compositor group bound to scene')
-    walk(scene.compositing_node_group)
+    effects = getattr(scene, 'compositor_effects', None)
+    if effects is None:
+        tree = scene.compositing_node_group
+        roots = [tree] if tree else []
+    else:
+        # The compatibility pointer is only the active effect in 5.3. Check
+        # every tree before stepping frames, irrespective of current switches.
+        roots = [effect.node_group for effect in effects if effect.node_group]
+    if not roots:
+        raise Failure('NOT_FOUND', 'No compositor group bound to scene')
+    for tree in roots:
+        walk(tree)
 def _run_timed(params,job,trace,*,prepared_hashes=None,preserve_color_settings=False):
     # Internal prepared scenes have already passed source/resource/physics
     # preflight. Public request params cannot select this keyword-only path.
