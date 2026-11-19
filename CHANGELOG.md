@@ -1,3 +1,7 @@
+# 0.63.1-r1 — 2026-11-19
+
+- Bind the bundled video template compiler to the 0.63.1 runtime identity. The prior bundle retained the 0.63.0 pin and refused to compile templates.
+
 # 0.63.1 — 2026-11-19
 
 - Select Blender 5.2.1 or 5.3.0 by version from the Windows portable runtime directory.

@@ -1,6 +1,6 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1",
+  "release": "0.63.1-r1",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
@@ -42,8 +42,8 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "c6ff57eb9ed06dac98b2a058f86cda18f4294962650c6ee228181741e2accb11",
-      "bytes": 3282
+      "sha256": "de4d972a52293d86cdb73a677e6d13f4b0fc67fa5d7cfd0fb23db37d531409bc",
+      "bytes": 3461
     },
     {
       "file": "CONTRIBUTING.md",
@@ -67,8 +67,8 @@
     },
     {
       "file": "RELEASE-VALIDATION.json",
-      "sha256": "666eea2827000fafbcaf5da7906a5b5ce014bd01d16a53ea85e5ea89589e2d83",
-      "bytes": 651
+      "sha256": "637324c2ef394ef1534af5ffc78cebd69375a9bc172401a64c2a18c3fda63432",
+      "bytes": 654
     },
     {
       "file": "SECURITY.md",
@@ -1277,7 +1277,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "db6027a1b6f8629ae6a7a38e3bac08f8d2dd04000913b8c44c31efdcb70fd94a",
+      "sha256": "00a3b6e7fd6e50cad0f0813daac93674b6d511036569699545f8e41f6e2f2172",
       "bytes": 32601
     },
     {
