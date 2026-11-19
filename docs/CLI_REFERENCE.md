@@ -7,6 +7,7 @@ The authoritative inputs are [public schemas](cli/schemas/) and the exact subcom
 | `doctor`, `capabilities` | Runtime, registered operations and orchestration dispositions |
 | `inspect`, `query`, `diff`, `validate`, `dependency` | Disk structure, comparisons, dependency identities and typed relinking |
 | `scene`, `model`, `node` | Explicit scene/geometry/UV/node candidates and diagnostics |
+| [`uv`](UV_WORKFLOW.md) | Saved-file UV candidates, inspection, micro-island merge and protected integer-grid normal transfer |
 | `material`, `texture` | Layered material workflows, isolated previews and texture baking |
 | `rig`, `animation` | Local skeletons, weights, retargeting, sampled actions and packaging |
 | `simulation` | Bounded physics, hair, volume and cache adapters |

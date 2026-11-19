@@ -8,6 +8,7 @@ import sys
 import time
 import traceback
 import uuid
+from protocol import UV_COMMANDS
 
 from protocol import (CODES, DEFAULT_BLENDER, DEFAULT_JOBS, DEFAULT_TRANSACTIONS, HOST_COMMANDS, OPERATIONS, Failure, atomic_json,
                       digest, envelope, read_json, timeout_value, validate)
@@ -196,7 +197,7 @@ def _execute_worker(job, parent_checkpoint=None):
             for d in (request['params']['manifest']['before'],request['params']['manifest']['after']):
                 protect(d,input_guards,checkpoint)
                 input_hashes[d['file']]=d['expected_sha256']
-        if request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
+        if request['command'] in UV_COMMANDS or request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
             from filesystem import FileGuard
             for key, expected in (("file", "expected_sha256"), ("other", "other_sha256")):
                 filename = request["params"].get(key)
@@ -281,6 +282,9 @@ def _execute_worker(job, parent_checkpoint=None):
                     if input_hashes[filename]!=anchor['expected_sha256']:raise Failure('CONFLICT','Geometry resume descriptor changed')
                 from geometry_workflow_contract import input_documents
                 documents+=input_documents(request['params'])
+            if request['command'] in UV_COMMANDS:
+                from uv_workflow_contract import input_documents
+                documents+=input_documents(request['params'],request['command'])
             if request['command'] in ('material.run','material.template-save'):
                 from material_workflow_contract import input_documents
                 documents+=input_documents(request['params'])
@@ -404,7 +408,7 @@ def _execute_worker(job, parent_checkpoint=None):
             raise Failure(code if code in CODES else "WORKER_FAILED", f"Worker exit={worker_exit}; {details or 'no result'}")
         result = read_json(result_file)
         if not result.get("ok"):
-            if request['command'].startswith('video.'):
+            if request['command'].startswith('video.') or request['command'] in UV_COMMANDS:
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
             if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
@@ -451,6 +455,15 @@ def _execute_worker(job, parent_checkpoint=None):
         if request['command'] in ('geometry.run','geometry.inspect'):
             for path in job.glob('geometry-*'):
                 if path.is_file():artifacts[path.name]=str(path)
+        if request['command'] in UV_COMMANDS:
+            for path in job.glob('uv-*'):
+                if path.is_file():
+                    artifacts[path.name]=str(path)
+        if request['command']=='uv.grid-transfer':
+            for name in ('normal.png','receipt.json'):
+                output=job/'grid-transfer'/name
+                if output.is_file():
+                    artifacts['grid-transfer/'+name]=str(output)
         if request['command'] in ('material.batch','material.study'):
             for path in job.rglob('*'):
                 if path.is_file():artifacts[str(path.relative_to(job))]=str(path)

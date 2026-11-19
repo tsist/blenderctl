@@ -266,6 +266,12 @@ def main():
         elif command=='lighting.batch':
             import lighting_batch
             data=lighting_batch.run(request['params'],job)
+        elif command=='uv.grid-transfer':
+            from uv_grid_transfer import run
+            data=run(request['params'],job)
+        elif command in ('uv.run','uv.inspect'):
+            import uv_workflow
+            data=getattr(uv_workflow,command.split('.')[1])(request['params'],job)
         elif command in ('geometry.run','geometry.inspect'):
             import geometry_workflow
             data=getattr(geometry_workflow,command.split('.')[1])(request['params'],job)

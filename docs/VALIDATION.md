@@ -1,6 +1,6 @@
 # Validation scope
 
-The distribution preserves the 189-file video runtime identity:
+The original video distribution recorded this 189-file runtime identity:
 `4a6e44b18e1187baf1569e0f93f3eda4ae2ffa170a3d73b8c7083c0ca8f38bcb`.
 
 `PUBLICATION.json` records the full explicit release inventory including supporting addons, schemas, helper adaptations and documents. The video runtime identity covers a smaller set; it is not a hash of the complete distribution. All source ZIP members must match the staged Git tree and inventory.
@@ -16,3 +16,7 @@ Earlier local validation included 35 compiler tests, seven small public template
 No 4K/HDR stress test, HDR display review, arbitrary foreign VSE, advanced audio, complex acting or long-form production qualification is claimed. Do not treat registration, static checks or a generated technical clip as artistic acceptance.
 
 Publication revision r1 resolves Windows 8.3 TEMP aliases in the pure test fixture before comparing resource descriptors. The compiler already normalizes these paths; no production behavior or native qualification changed.
+
+## UV preview
+
+The preview includes the UV 0.8.9 runtime and reports its checkout-specific identity with `uv describe`. On Windows, the edit and independent reopen were exercised with files saved in Blender 5.2.1 and 5.3.0, each using its matching runtime. The 5.2.1 run also exercised read-only UV inspection, exact normal PNG transfer and refusal of a fractional texel translation. See the [UV command guide](UV_WORKFLOW.md) for the input and sampling boundaries.

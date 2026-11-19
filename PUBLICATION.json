@@ -1,13 +1,13 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r1",
+  "release": "0.63.1-uv-preview",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "69e4b0502e1fb6f3459a4bde931a30a338e3ac639295ef5b3e7024a63e42dee2",
-  "runtime_files": 189,
+  "runtime_identity": "c2613d15a580deb5a48d824a90b755af0e1cfdbbee1d01b2122e8dc898c539de",
+  "runtime_files": 228,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -87,8 +87,8 @@
     },
     {
       "file": "docs/CLI_REFERENCE.md",
-      "sha256": "f8317a7c2f896e87a6411f9fcaf2f766f7ffa776adc72ad7a237ea13c836578d",
-      "bytes": 3099
+      "sha256": "60474f9fdd234288af160d7c9653bdfdf76322eef1e99fd650f5a959ad3d6977",
+      "bytes": 3228
     },
     {
       "file": "docs/COMPATIBILITY.md",
@@ -126,9 +126,14 @@
       "bytes": 4899
     },
     {
+      "file": "docs/UV_WORKFLOW.md",
+      "sha256": "fb507e3b1b2aa9a0e60e2ab8c9699eefe2ab79dbaab682cf8b3a7861f2b0cca7",
+      "bytes": 2595
+    },
+    {
       "file": "docs/VALIDATION.md",
-      "sha256": "4e53215190787b2af66d80b279f4151d860dfde5771dce8b5c1767f063884aa4",
-      "bytes": 2549
+      "sha256": "73f4c502aaf9e2aea8be6b30c87abf77cf9668f04951854e0af17aee15faddd0",
+      "bytes": 3025
     },
     {
       "file": "docs/VIDEO-EDITING.md",
@@ -927,8 +932,8 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "92fe48e98e89140c812c9d6ce74198966b0307cf7e53285dd6e3419ad038c5e8",
-      "bytes": 4692
+      "sha256": "4b027465cbfb92eb5c37aaf95e2e3dd716327568101d57c0c210602083a98278",
+      "bytes": 4877
     },
     {
       "file": "skills/LICENSE",
@@ -1377,8 +1382,8 @@
     },
     {
       "file": "tools/blenderctl/cli.py",
-      "sha256": "9868cfba4193e87fb7c812da3c3829eb3f1b99ce881ff2549f67604d24ffc3db",
-      "bytes": 52980
+      "sha256": "2186bc2c01e076a3d4b58953bd3c255784ce9de49427485858c97049aadafaca",
+      "bytes": 54052
     },
     {
       "file": "tools/blenderctl/compositing_batch.py",
@@ -1532,8 +1537,8 @@
     },
     {
       "file": "tools/blenderctl/execution_contract.py",
-      "sha256": "c28e3040bed29bc2d72dfac124c2642b90bd71c3149a6f4a64c6ef49e6d1e50f",
-      "bytes": 3806
+      "sha256": "c4d0adbb3a1fb656f781fbee5e1a98c0945febf350f05b7ecd90331aa45689e1",
+      "bytes": 3887
     },
     {
       "file": "tools/blenderctl/extensions.py",
@@ -1902,8 +1907,8 @@
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "c282e51a7cef29116f1a0df31ad052b8492db56d67e99db9997bddb5b51a8501",
-      "bytes": 30673
+      "sha256": "38b48f2945d09de88a7a88817bf854072b44c8425bcafce3592b2c7756f8bc62",
+      "bytes": 30958
     },
     {
       "file": "tools/blenderctl/render_contract.py",
@@ -2012,8 +2017,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "630856e059016f6aa7cabad8d7b8f0840d84f6a97bd8e26e93624d3b1d703f7e",
-      "bytes": 42233
+      "sha256": "d8f27deee922c50c17582b24ed06e082107c44d4cfc67f3fbe9aae7a06fcfd60",
+      "bytes": 42979
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2126,9 +2131,44 @@
       "bytes": 2504
     },
     {
+      "file": "tools/blenderctl/uv_grid_transfer.py",
+      "sha256": "21be0ca36dcf512e3ee69931e057b0b0e1dc4237a8839f196e37c9effdf44613",
+      "bytes": 14597
+    },
+    {
+      "file": "tools/blenderctl/uv_grid_transfer_contract.py",
+      "sha256": "25a9109b3600bef55b597a70886050e54e6253c39e45f7bc83f07392aa6a954d",
+      "bytes": 6140
+    },
+    {
       "file": "tools/blenderctl/uv_layout.py",
       "sha256": "eab105932f3141bc93c36dec555caabe04c76e5be7e1bb656421e7b94ef1618a",
       "bytes": 18482
+    },
+    {
+      "file": "tools/blenderctl/uv_resources.py",
+      "sha256": "85180c5e0f4b721bbef8a940f361808b307dcaa1fc27d02ca9add62087cbb993",
+      "bytes": 5095
+    },
+    {
+      "file": "tools/blenderctl/uv_saved_protection.py",
+      "sha256": "7ce821931b93dd8bdfcefcee194c490ccdebbdc05f7ecb877d807bb7db1dd0fe",
+      "bytes": 2571
+    },
+    {
+      "file": "tools/blenderctl/uv_verifier.py",
+      "sha256": "35ef11f229092935ac0fba8895b1582592464091d21b51c2f41590d8564226bd",
+      "bytes": 3241
+    },
+    {
+      "file": "tools/blenderctl/uv_workflow.py",
+      "sha256": "ae072f9ad29ed0018a801e0c35e20a9e2e9a12c44ad1711a6ca719b331d4fe15",
+      "bytes": 23197
+    },
+    {
+      "file": "tools/blenderctl/uv_workflow_contract.py",
+      "sha256": "8c7c7fdf730a1c94ca1e50c122183344cc60c8a0d7e2f98d2bdddd4d23ea6416",
+      "bytes": 20117
     },
     {
       "file": "tools/blenderctl/verification.py",
@@ -2202,8 +2242,8 @@
     },
     {
       "file": "tools/blenderctl/worker.py",
-      "sha256": "4dfff35d302c9f9aea860cde5aa474a36321d7ea2477320363d758ca8f1c22a1",
-      "bytes": 17942
+      "sha256": "d9482aab1b384a537ebf9c176a5808f403bee308acba0f3ae1d479b3242bd8a8",
+      "bytes": 18236
     },
     {
       "file": "tools/blenderctl/workflow_contract.py",
@@ -2454,6 +2494,176 @@
       "file": "tools/material_workflow_addon/ui_handoff.py",
       "sha256": "5e6b95881e0b3a0f0d52eee3f2dbcd5cc1f82c718d1bcbcd3241d13055fc43bd",
       "bytes": 6514
+    },
+    {
+      "file": "tools/uv_workflow_addon/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "file": "tools/uv_workflow_addon/NOTICE.md",
+      "sha256": "ab0bc8701c879af2fb39430ab0bf1ce4ef564707e47f15700f71a083ce661e63",
+      "bytes": 2304
+    },
+    {
+      "file": "tools/uv_workflow_addon/__init__.py",
+      "sha256": "7c6d7566e90356b213d3ed119d710ca891269d5b6cd87b7e702f548c446ddd32",
+      "bytes": 462
+    },
+    {
+      "file": "tools/uv_workflow_addon/auto_repair.py",
+      "sha256": "902aa224d026fc548deb2ff839dfdd12e35b88a46b78d2416e62ff572c094234",
+      "bytes": 18420
+    },
+    {
+      "file": "tools/uv_workflow_addon/blender_manifest.toml",
+      "sha256": "43ef71f98f49ac22c00e0c22ee7c4ce66ed15cc2d1f2dee4d9e41b995fdcc086",
+      "bytes": 254
+    },
+    {
+      "file": "tools/uv_workflow_addon/consumers.py",
+      "sha256": "e919dbc049c4cf3e776e619dd127b9c279ed8cde22bc85a10fbc7f1943683ac7",
+      "bytes": 40959
+    },
+    {
+      "file": "tools/uv_workflow_addon/contract.py",
+      "sha256": "4c6db432e4bf4c4065148e573ce4d369beb79f553194d97d3ca2112eb67df037",
+      "bytes": 30863
+    },
+    {
+      "file": "tools/uv_workflow_addon/core.py",
+      "sha256": "03318a05dd0d84a65cc8f9ecddece2d6108afdb2451e60fd444a8b0b13285170",
+      "bytes": 34436
+    },
+    {
+      "file": "tools/uv_workflow_addon/diagnostics.py",
+      "sha256": "016e378e10503490f2d0ff251acdaa97a909c5399249a90ca52004894ebc17aa",
+      "bytes": 6116
+    },
+    {
+      "file": "tools/uv_workflow_addon/editing.py",
+      "sha256": "57e5f3d52a4c7b666bb19dbbb5665379d8f49395d8b0ee81cbe97743e128e0e7",
+      "bytes": 20525
+    },
+    {
+      "file": "tools/uv_workflow_addon/editing_math.py",
+      "sha256": "cf8f692a88677a947b3c795525446a225f65c8066961b7e1920eed99ca29e0c9",
+      "bytes": 16265
+    },
+    {
+      "file": "tools/uv_workflow_addon/geometry_diagnostics.py",
+      "sha256": "e3e33435ab3534ff2f2f1c82467ba73a899c5396fc6c867c57f06a703171e557",
+      "bytes": 5614
+    },
+    {
+      "file": "tools/uv_workflow_addon/grid_transfer.py",
+      "sha256": "694890412b2cb306692d526bc605d9f5338b336c67fd601c7571cb60444478d0",
+      "bytes": 18609
+    },
+    {
+      "file": "tools/uv_workflow_addon/integrity.py",
+      "sha256": "7a5ad4671e8b05ad47431f5b0d065aadd086b1e28e245c56d3f09e62dab8e0d2",
+      "bytes": 63189
+    },
+    {
+      "file": "tools/uv_workflow_addon/island_tools.py",
+      "sha256": "a98ebf9507af6db5fa398ebee2f35c8b11b4e88fb1c3d47b7451bc008a7eff6f",
+      "bytes": 10248
+    },
+    {
+      "file": "tools/uv_workflow_addon/job_ui.py",
+      "sha256": "b82fbf5f78e065a9a33e7544799a9e064e94e46ad3f3cc48628802618e1bc0da",
+      "bytes": 5535
+    },
+    {
+      "file": "tools/uv_workflow_addon/lightmap.py",
+      "sha256": "62ff489be74e6b25cb15432922148aea21fe612a436847288c32d2b47750ceb7",
+      "bytes": 8528
+    },
+    {
+      "file": "tools/uv_workflow_addon/local_solver.py",
+      "sha256": "001289d6fb4355645fd2c64fd746278a15f99ec2cacd03a0010edd8b829cad11",
+      "bytes": 7793
+    },
+    {
+      "file": "tools/uv_workflow_addon/management.py",
+      "sha256": "8b8a09e4276892ad7edf309b3a8bbbb80ed0b6633cfdad941655e451c5cd9020",
+      "bytes": 7730
+    },
+    {
+      "file": "tools/uv_workflow_addon/metrics.py",
+      "sha256": "335826ef0428492df78cf94699051197503d055bccfd79c9ccecf8c093501f26",
+      "bytes": 55592
+    },
+    {
+      "file": "tools/uv_workflow_addon/micro_island_merge.py",
+      "sha256": "0c5d4c835248007866b0cba29aacb5b010745174e7675841f5a1676539f611df",
+      "bytes": 14877
+    },
+    {
+      "file": "tools/uv_workflow_addon/packing.py",
+      "sha256": "868a6be19decde94dc770c566e3e10b6ddc9f1cb4e5c704be61345dd687125b8",
+      "bytes": 10164
+    },
+    {
+      "file": "tools/uv_workflow_addon/policies.py",
+      "sha256": "ad68fa36afcf6f6ae100dff484c71c7ed9e2157de7e7db7e64a3885e944870ce",
+      "bytes": 10522
+    },
+    {
+      "file": "tools/uv_workflow_addon/recipes.py",
+      "sha256": "6b1890326ac191a7cb4173b13b61e6d5b18f77721ba534f9a59415225185f545",
+      "bytes": 6743
+    },
+    {
+      "file": "tools/uv_workflow_addon/seams_helper.py",
+      "sha256": "e1f27bff87414c9c55c21a1e12e574b77f72372b058b8215b1d8e60d132eaa50",
+      "bytes": 6950
+    },
+    {
+      "file": "tools/uv_workflow_addon/splitting.py",
+      "sha256": "490ab233b7c9d71e1ae0ec4afa5ff460775371bfb9d59f1d9aa6cd88c3888482",
+      "bytes": 3462
+    },
+    {
+      "file": "tools/uv_workflow_addon/stitching.py",
+      "sha256": "c69dfbf7834b86223142e31810a61b33a89cd71558334fe4ae042691adfa784b",
+      "bytes": 2590
+    },
+    {
+      "file": "tools/uv_workflow_addon/surface.py",
+      "sha256": "c75e461b4ada9f2961b4060ad6b6f3f296cc6436b22426fe6b7d43a37e7dbacd",
+      "bytes": 20605
+    },
+    {
+      "file": "tools/uv_workflow_addon/surface_contract.py",
+      "sha256": "fd02c4542eae483a13dc7d9777ac24765ae899cf1a0ad308b2a95623c9e76749",
+      "bytes": 2133
+    },
+    {
+      "file": "tools/uv_workflow_addon/surface_ui.py",
+      "sha256": "d292d10777db1733f273ec67fd8991d05118e6b20c6b2b4719e83fd602386469",
+      "bytes": 7329
+    },
+    {
+      "file": "tools/uv_workflow_addon/transfer.py",
+      "sha256": "2fc169fbe2c153660a23014ed14d05cdba4d49ec81c7116c84035064184c6627",
+      "bytes": 11132
+    },
+    {
+      "file": "tools/uv_workflow_addon/transfer_contract.py",
+      "sha256": "57c59e56ec68a565f1f3de916364b9edd9e9e5b8cfc50fbef6224ec16a004e59",
+      "bytes": 4431
+    },
+    {
+      "file": "tools/uv_workflow_addon/transfer_math.py",
+      "sha256": "5adc3eb167d6f2db589584979d2aaf925cadb13a9055e9fc69e2c2bfc57dbe5f",
+      "bytes": 76800
+    },
+    {
+      "file": "tools/uv_workflow_addon/ui.py",
+      "sha256": "c28d64d7d1f08ba866f8857cc40074147ce04da0d1f6bac5783b3385703d2488",
+      "bytes": 79524
     },
     {
       "file": "tools/video_editing_workflow_addon/LICENSE.txt",

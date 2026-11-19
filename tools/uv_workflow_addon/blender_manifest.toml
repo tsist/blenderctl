@@ -1,0 +1,9 @@
+schema_version = "1.0.0"
+id = "uv_workflow"
+version = "0.8.9"
+name = "UV Workflow"
+tagline = "Editable UV candidates with independent validation"
+maintainer = "Blender AI"
+type = "add-on"
+blender_version_min = "5.2.0"
+license = ["SPDX:GPL-3.0-or-later"]

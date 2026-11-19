@@ -35,6 +35,8 @@ HOST_COMMANDS=(*HOST_COMMANDS,'geometry.session')
 COMMANDS=(*COMMANDS,'geometry.run','geometry.inspect','geometry.session')
 COMMANDS=(*COMMANDS,'lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch')
 COMMANDS=(*COMMANDS,'video.run','video.inspect')
+UV_COMMANDS=('uv.run','uv.inspect','uv.grid-transfer')
+COMMANDS=(*COMMANDS,*UV_COMMANDS)
 COMMANDS=(*COMMANDS,'compositing.run','compositing.inspect','compositing.encode','compositing.template-save','compositing.template-run','compositing.batch','compositing.study')
 HOST_COMMANDS=(*HOST_COMMANDS,'compositing.encode')
 HOST_COMMANDS=(*HOST_COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
@@ -141,6 +143,9 @@ def validate(request):
         from lighting_workflow_contract import normalize_command
         normalized = normalize_command(command, params)
         return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in UV_COMMANDS:
+        from uv_workflow_contract import normalize_params
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_params(params, command)}
     if command in ('geometry.run', 'geometry.inspect'):
         from geometry_workflow_contract import normalize_params, normalize_inspect_params
         normalized = normalize_params(params) if command == 'geometry.run' else normalize_inspect_params(params)

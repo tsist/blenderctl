@@ -162,6 +162,11 @@ def parser():
     le.add_argument('--revision',type=int,required=True);le.add_argument('--edits',type=Path,required=True)
     lb=la.add_parser('batch',help='bounded sequential independent candidates and partial recovery')
     lb.add_argument('--manifest',type=Path,required=True);lb.add_argument('--resume',type=Path);lb.add_argument('--resume-sha256')
+    uv=sub.add_parser('uv',help='protected UV candidates, inspection and integer-grid normal transfer')
+    uv_actions=uv.add_subparsers(dest='action',required=True,parser_class=Parser)
+    uv_actions.add_parser('describe',help='UV contract and implementation identity without Blender')
+    for operation in ('run','inspect','grid-transfer'):
+        uv_actions.add_parser(operation).add_argument('--params',type=Path,required=True)
     geometry=sub.add_parser('geometry',help='managed native geometry graphs, observed output and live-session handoff')
     geometry_actions=geometry.add_subparsers(dest='action',required=True,parser_class=Parser)
     gd=geometry_actions.add_parser('describe',help='read-only geometry contract index; no Blender or job')
@@ -338,6 +343,12 @@ def main(argv=None):
             from geometry_interface import describe
             print(json.dumps(describe(args.operation,args.schema,args.section),ensure_ascii=False,allow_nan=False))
             return 0
+        if args.command == 'uv' and args.action == 'describe':
+            if args.background or args.compact:
+                raise Failure('INVALID_REQUEST', '--async/--compact does not apply to UV describe')
+            from uv_workflow_contract import describe
+            print(json.dumps(describe(),ensure_ascii=False,allow_nan=False))
+            return 0
         if args.command == 'geometry' and args.action == 'session':
             if args.background or args.compact:raise Failure('INVALID_REQUEST','Session requests use their own bounded wait')
             from geometry_session import dispatch
@@ -512,6 +523,8 @@ def main(argv=None):
                     if args.rig_id:params['rig_id']=args.rig_id
                     if args.action=='template-save':params.update(template_id=args.template_id,revision=args.revision)
                 request={'schema_version':SCHEMA,'command':'lighting.'+args.action,'params':params}
+            elif args.command=='uv':
+                request={'schema_version':SCHEMA,'command':'uv.'+args.action,'params':read_json(args.params)}
             elif args.command=='geometry':
                 params={'resources':read_json(args.resources)}
                 if args.action=='run':params['manifest']=read_json(args.manifest)
@@ -613,6 +626,8 @@ def main(argv=None):
                 from compositing_interface import compact
             elif compact_command and compact_command.startswith('lighting.'):
                 from lighting_interface import compact
+            elif compact_command and compact_command.startswith('uv.'):
+                from uv_workflow_contract import compact
             elif compact_command and compact_command.startswith('geometry.'):
                 from geometry_interface import compact
             elif compact_command and compact_command.startswith('material.'):
