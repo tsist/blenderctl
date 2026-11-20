@@ -5,3 +5,7 @@ Download **[blenderctl-linux-x64-5.3.0-standalone-reconstruction-r3.zip](./blend
 Requires Linux x86-64, `/usr/bin/python3.13`, tar/xz, and the [official Blender 5.3.0 Linux x64 archive](https://download.blender.org/release/Blender5.3/blender-5.3.0-linux-x64.tar.xz). Blender is intentionally separate. The included README covers checksums, a fresh install prefix, and smoke examples for Blender build `02f0899d78e3`.
 
 Supported here: probe, scene/model prepare, local background jobs, and new-file-only publish. Camera and other domain add-ons, rendering, and external providers are not part of this package. This artifact branch leaves the existing source PR and release inventory untouched.
+
+## Optional Linux scene inspection
+
+See [the isolated, testable R3 source overlay](linux-scene-inspect/README.md). The original R3 ZIP is unchanged.

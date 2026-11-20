@@ -1,0 +1,89 @@
+--- a/FILES.json
++++ b/FILES.json
+@@ -1,10 +1,10 @@
+ {
+   "LICENSE": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
+   "README.md": "c28a49ef856073dcf48a443c21e572283bbbe173c641527764e1f1d53ea8075b",
+-  "base/blenderctl_linux.py": "6269265a1d2a775e232b8bca30c39947b8d43005589cbb7c2b87438c7793d3a0",
+-  "base/blenderctl_linux_worker.py": "218eecacdf753d5f1f4f9cee34face4f018c40c66e95beefc7e05745f3c74da0",
++  "base/blenderctl_linux.py": "7703b1a1c38388b7586baed816bd61d44a8993d41e07c83c5603db63f3860388",
++  "base/blenderctl_linux_worker.py": "2dd166658398257374821829f2cd5f5673c84b295d4e349b21c65f89086e4305",
+   "base/linux_scene_guards.py": "aa61b8a2c2461f8bec4f40cf1b1c5919104511478870449ce0c04bdde8d09cab",
+-  "blenderctl": "9e9463b8b3345cae43e7ab34a559c0eba27c76e1cdeea46f0c045687660646eb",
++  "blenderctl": "02092b95b6a161003bf31630585627465483e44f80899c170f7915b8528e0760",
+   "core/curve_contract.py": "bf4289b0cbd21861d08679eab56b9f6a7d51330eed355e5c54a69bfa05a1e0c1",
+   "core/dependencies.py": "7bd212cf44e715edc8c693413dfce4ccc32fc2a83808fed3dd46475b137c8df5",
+   "core/font_binary.py": "4083f7ca7e6ac5bc0fcb78851fdadcdce25cc52f596926b3fc1fb6355c47c596",
+--- a/base/blenderctl_linux.py
++++ b/base/blenderctl_linux.py
+@@ -7,15 +7,17 @@
+ sys.path.insert(0,str(here.parent/'tools/blenderctl'))
+ def main():
+     os.umask(0o077);ap=argparse.ArgumentParser();ap.add_argument('--blender',required=True,type=Path);ap.add_argument('--jobs-dir',required=True,type=Path)
+-    ap.add_argument('domain',choices=('probe','scene','model'));ap.add_argument('verb',nargs='?',choices=('prepare',));ap.add_argument('--manifest',type=Path);ap.add_argument('--file',type=Path);ap.add_argument('--expected-sha256')
++    ap.add_argument('domain',choices=('probe','scene','model'));ap.add_argument('verb',nargs='?',choices=('prepare','inspect'));ap.add_argument('--manifest',type=Path);ap.add_argument('--file',type=Path);ap.add_argument('--expected-sha256')
+     a=ap.parse_args();base=here.parents[3];rt=base/'af-exterior-blender53/blender-5.3.0-linux-x64/blender';common=base/'af-exterior-linux-suite/jobs/common'
+     require(a.blender==rt and regular(rt)==PIN and a.jobs_dir==common and common.resolve()==common,'untrusted runtime or job root')
+     t=common.stat();require(t.st_uid==os.getuid() and stat.S_IMODE(t.st_mode)==0o700,'private root required')
+     require(bool(a.file)==bool(a.expected_sha256),'source SHA required')
+     if a.domain=='probe':require(not any((a.verb,a.manifest,a.file)),'probe accepts no options')
++    elif a.verb=='inspect':
++        require(a.domain=='scene' and a.file is not None and a.manifest is None,'scene inspect needs --file and --expected-sha256 only')
+     else:require(a.verb=='prepare' and a.manifest is not None,'prepare needs manifest')
+     job=common/uuid.uuid4().hex;job.mkdir(mode=0o700);work=job/'worker';work.mkdir(mode=0o700)
+-    cmd=a.domain+('.prepare' if a.verb else '');params={}
++    cmd=a.domain+('.'+a.verb if a.verb else '');params={}
+     try:
+         if a.manifest:
+             import io
+@@ -31,10 +33,10 @@
+         if a.file:
+             with (work/'input.blend').open('xb') as f:require(regular(a.file,destination=f)==a.expected_sha256,'source hash mismatch')
+             w['file']=str(work/'input.blend')
+-        put(work/'task.json',{'domain':a.domain,'params':w})
++        put(work/'task.json',{'domain':a.domain,'verb':a.verb,'params':w})
+         run([str(rt),'--background','--factory-startup','--disable-autoexec','--offline-mode','--threads','2','--python-exit-code','23','--python',str(here/'blenderctl_linux_worker.py'),'--',str(work)],work)
+         data=json.loads((work/'worker-result.json').read_bytes())
+-        if a.verb:
++        if a.verb=='prepare':
+             c=work/(a.domain+'-candidate.blend');require(data['candidate']==str(c) and data['reopen']=='pass' and regular(c)==data['candidate_sha256'],'candidate mismatch')
+         if a.file:
+             require(regular(a.file)==a.expected_sha256==regular(work/'input.blend'),'source changed');data.update(source_file=str(a.file),source_sha256=a.expected_sha256,source_unchanged=True)
+--- a/base/blenderctl_linux_worker.py
++++ b/base/blenderctl_linux_worker.py
+@@ -8,7 +8,7 @@
+ r=json.loads((work/'task.json').read_text());domain=r['domain'];params=r['params']
+ require(bpy.app.version[:3]==(5,3,0),'Blender 5.3.0 only')
+ if domain=='probe':
+-    result={'version':bpy.app.version_string,'build_hash':bpy.app.build_hash.decode(),'background':bool(bpy.app.background),'qualified_routes':['scene.prepare','model.prepare']}
++    result={'version':bpy.app.version_string,'build_hash':bpy.app.build_hash.decode(),'background':bool(bpy.app.background),'qualified_routes':['scene.prepare','model.prepare','scene.inspect']}
+ else:
+     require(domain in {'scene','model'},'unsupported')
+     if 'file' in params:
+@@ -19,5 +19,10 @@
+             require(not q or (q not in refs and q.endswith('/datafiles/assets/brushes/essentials_brushes-gp_draw.blend')),'external file unsupported')
+         require(not any(v.animation_data and v.animation_data.drivers for coll in (bpy.data.objects,bpy.data.scenes,bpy.data.materials,bpy.data.worlds) for v in coll),'drivers unsupported')
+     import scenes,modeling
+-    result=(scenes if domain=='scene' else modeling).prepare(params,work)
++    if r.get('verb')=='inspect':
++        require(domain=='scene' and set(params)=={'file','expected_sha256'},'invalid inspect task')
++        result=scenes.state()  # current guarded copy; never reopen the unverified original
++    else:
++        require(r.get('verb')=='prepare','invalid prepare task')
++        result=(scenes if domain=='scene' else modeling).prepare(params,work)
+ put(work/'worker-result.json',result)
+--- a/blenderctl
++++ b/blenderctl
+@@ -3,9 +3,10 @@
+ suite=$(CDPATH= cd -- "$(dirname -- "$0")/../af-exterior-linux-suite" && pwd)
+ prefix=$(CDPATH= cd -- "$suite/.." && pwd)
+ case "${1:-}" in
+- -h|--help|'') printf '%s\n' 'Linux 5.3 standalone (reconstructed, non-rendering): probe; scene/model prepare; job submit/status/result/cancel/wait/submit-and-wait; transaction publish/status';;
++ -h|--help|'') printf '%s\n' 'Linux 5.3 standalone (reconstructed, non-rendering): probe; scene inspect; scene/model prepare; job submit/status/result/cancel/wait/submit-and-wait; transaction publish/status';;
+  probe) shift; exec /usr/bin/python3.13 -I -B "$prefix/af-exterior-linux-dev/source/blenderctl/scripts/blenderctl_linux.py" --blender "$prefix/af-exterior-blender53/blender-5.3.0-linux-x64/blender" --jobs-dir "$suite/jobs/common" probe "$@";;
+- scene|model) test "${2:-}" = prepare || exit 2; exec "$suite/bin/blenderctl-prepare-v1" "$@";;
++ scene) if [ "${2:-}" = inspect ]; then exec /usr/bin/python3.13 -I -B "$prefix/af-exterior-linux-dev/source/blenderctl/scripts/blenderctl_linux.py" --blender "$prefix/af-exterior-blender53/blender-5.3.0-linux-x64/blender" --jobs-dir "$suite/jobs/common" "$@"; fi; test "${2:-}" = prepare || exit 2; exec "$suite/bin/blenderctl-prepare-v1" "$@";;
++ model) test "${2:-}" = prepare || exit 2; exec "$suite/bin/blenderctl-prepare-v1" "$@";;
+  job|transaction) exec "$suite/bin/linux-flow" "$@";;
+  *) echo 'Unsupported standalone command; use --help.' >&2; exit 2;;
+ esac
