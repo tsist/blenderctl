@@ -172,8 +172,81 @@ def check_all_guards():
         guard.check()
 
 
+class LinuxGuardMonitor:
+    """One bounded inotify queue for a batch of independently leased files.
+
+    Watches stay installed until the batch closes; removing them could recycle
+    a watch descriptor with unread events. Guard membership is weak and old
+    queue events can only fail a new guard conservatively.
+    """
+    def __init__(self):
+        self.lib = _libc()
+        self.lock = threading.RLock()
+        self.members = {}
+        self.failure = None
+        self.pid = os.getpid()
+        self.fd = self.lib.inotify_init1(os.O_CLOEXEC | os.O_NONBLOCK)
+        if self.fd < 0:
+            number = ctypes.get_errno()
+            raise Failure('IO_ERROR', 'Cannot initialize shared Linux namespace monitor: ' + os.strerror(number))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        if self.fd >= 0:
+            os.close(self.fd)
+            self.fd = -1
+
+    def watch(self, guard, fd, name, mask):
+        with self.lock:
+            wd = self.lib.inotify_add_watch(self.fd, os.fsencode(f'/proc/self/fd/{fd}'), mask)
+            if wd < 0:
+                number = ctypes.get_errno()
+                raise OSError(number, os.strerror(number))
+            self.members.setdefault(wd, weakref.WeakKeyDictionary()).setdefault(guard, set()).add(name)
+
+    def check(self, guard):
+        with self.lock:
+            if self.pid != os.getpid() or self.fd < 0:
+                guard._conflict('Shared Linux namespace monitor is unavailable')
+            for _ in range(64):
+                if self.failure:
+                    guard._conflict(self.failure)
+                try:
+                    data = os.read(self.fd, 65536)
+                except BlockingIOError:
+                    if guard._failure:
+                        raise guard._failure
+                    return
+                if not data:
+                    self.failure = 'Shared Linux namespace monitor ended'
+                    continue
+                offset = 0
+                while offset < len(data):
+                    if len(data) - offset < _EVENT.size:
+                        self.failure = 'Truncated shared Linux namespace event'
+                        break
+                    wd, mask, cookie, length = _EVENT.unpack_from(data, offset)
+                    offset += _EVENT.size
+                    if offset + length > len(data):
+                        self.failure = 'Truncated shared Linux namespace event name'
+                        break
+                    name = data[offset:offset + length].split(b'\0', 1)[0]
+                    offset += length
+                    if mask & _IN_Q_OVERFLOW or wd not in self.members:
+                        self.failure = 'Shared Linux namespace monitoring lost events'
+                        break
+                    for member, names in list(self.members[wd].items()):
+                        if (None in names or (not name and mask & _SELF_EVENTS) or name in names) and member._failure is None:
+                            member._failure = Failure('CONFLICT', f'Guarded file or ancestor namespace changed: {member.path}')
+            self.failure = self.failure or 'Shared Linux namespace event backlog exceeded validation bound'
+            guard._conflict(self.failure)
+
+
 class LinuxFileGuard:
-    def __init__(self, path, *, renameable=False, directory=False):
+    def __init__(self, path, *, renameable=False, directory=False, monitor=None):
+        self._monitor = monitor
         self.handle = None
         self._notify_fd = None
         self._directories = []
@@ -196,11 +269,12 @@ class LinuxFileGuard:
             raise Failure('UNSUPPORTED', 'Linux guards require 64-bit x86_64/aarch64 Linux with pthread_sigmask')
         self._lib = _libc()
         try:
-            self._notify_fd = self._lib.inotify_init1(os.O_CLOEXEC | os.O_NONBLOCK)
-            if self._notify_fd < 0:
-                self._notify_fd = None
-                number = ctypes.get_errno()
-                raise OSError(number, os.strerror(number))
+            if self._monitor is None:
+                self._notify_fd = self._lib.inotify_init1(os.O_CLOEXEC | os.O_NONBLOCK)
+                if self._notify_fd < 0:
+                    self._notify_fd = None
+                    number = ctypes.get_errno()
+                    raise OSError(number, os.strerror(number))
             components = self.path.parts[1:]
             if not components:
                 raise Failure('CONFLICT', 'Linux read guards require a regular file')
@@ -258,6 +332,9 @@ class LinuxFileGuard:
         # /proc/self/fd pins the exact already-open inode, unlike re-resolving
         # its pathname during watch installation. User symlinks are forbidden.
         mask = _WATCH_EVENTS | (_IN_ONLYDIR if child is not None else 0)
+        if self._monitor is not None:
+            self._monitor.watch(self, fd, os.fsencode(child) if child is not None else None, mask)
+            return
         wd = self._lib.inotify_add_watch(self._notify_fd, os.fsencode(f'/proc/self/fd/{fd}'), mask)
         if wd < 0:
             number = ctypes.get_errno()
@@ -271,6 +348,8 @@ class LinuxFileGuard:
         raise self._failure
 
     def _events(self):
+        if self._monitor is not None:
+            return self._monitor.check(self)
         # Bound work under continuous unrelated directory traffic. An overflow
         # or an unbounded backlog invalidates the guard, never a silent reset.
         for _ in range(64):
@@ -433,6 +512,10 @@ def _after_fork():
     for guard in guards:
         guard._lock = threading.RLock()
         guard._signal_sink = None
+        monitor = guard._monitor
+        if monitor is not None and monitor.fd >= 0:
+            os.close(monitor.fd)
+            monitor.fd = -1
         guard._ready = False
         try:
             guard._close_fds(unlock=False)

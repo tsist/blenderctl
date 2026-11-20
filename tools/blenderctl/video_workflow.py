@@ -2,6 +2,7 @@
 import copy
 import json
 import subprocess
+import sys
 import time
 from contextlib import ExitStack
 from pathlib import Path
@@ -262,6 +263,8 @@ def inspect(params, job):
     _check_inputs(params)
     bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)
     paths = _resource_closure(params)
+    if sys.platform == 'linux' and paths:
+        raise Failure('UNSUPPORTED', 'Linux video inspection requires a self-contained project')
     inspection = _json(_call(core.inspect, params['scene'], params.get('workflow_id')))
     report = {'video_report_version': '1.0', 'addon_version': '0.1-dev', 'status': 'passed',
               'source': {'file': params['file'], 'sha256': params['expected_sha256']},
