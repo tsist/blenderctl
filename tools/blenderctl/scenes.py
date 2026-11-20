@@ -287,7 +287,12 @@ def compare(a,b,path='$'):
     return None
 
 def inspect(params,job):
-    bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
+    import sys
+    if sys.platform == 'linux':
+        from linux_rig_reads import open_scene_fixture
+        open_scene_fixture(params['file'])
+    else:
+        bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
     if 'context' in params:activate(params['context'])
     result=state();atomic_json(job/'scene-report.json',result);return result
 

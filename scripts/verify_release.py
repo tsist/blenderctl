@@ -12,7 +12,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 ADDON = 'tools/video_editing_workflow_addon/'
 BLOCKED = {'.git', '__pycache__', '.venv', 'audit', 'research', 'tests-output', 'dist'}
-IDENTITY = '66d894b94dbdcc7a0ad696fae1813f0cf1111d40bf1d0dad2d4746993c2b8eda'
+IDENTITY = '141c6f62d6bf66a94299035dd51d5151172b0bd1c6eefa96eda930d8482d7d2b'
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
