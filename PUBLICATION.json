@@ -2361,6 +2361,106 @@
       "bytes": 12133
     },
     {
+      "file": "tools/linux_suite_overlay/CAMERA.zh.md",
+      "sha256": "f0568ec81b3a42dedd39938ff23c89f2d1a07a3c836d81b2d31b4291a8608379",
+      "bytes": 2915
+    },
+    {
+      "file": "tools/linux_suite_overlay/CLI-LINUX.zh.md",
+      "sha256": "1d83c6ebdac3322619a10c7a4beeeb2945e3e58dbe84dd77a17cb76537ce1c1a",
+      "bytes": 1394
+    },
+    {
+      "file": "tools/linux_suite_overlay/README.md",
+      "sha256": "320429812758719da6d2f71b73ea636dc0cf9e57cd70937f30aae1aa73d4d492",
+      "bytes": 2611
+    },
+    {
+      "file": "tools/linux_suite_overlay/bin/blenderctl",
+      "sha256": "b711c29ea6d5387c1cf6680dd0510a22a6cf318ed8cdc910900456eba7a960af",
+      "bytes": 2460
+    },
+    {
+      "file": "tools/linux_suite_overlay/bin/blenderctl-prepare-v1",
+      "sha256": "c796f6888a24e93caa2a6a72c2e9c7da727af6cf64cb89173f54e59334c8c5ac",
+      "bytes": 2244
+    },
+    {
+      "file": "tools/linux_suite_overlay/bin/camera-advanced",
+      "sha256": "907e63e640194f352747db157be018dfe367f55d1e0fb7949099d9de50184f0d",
+      "bytes": 365
+    },
+    {
+      "file": "tools/linux_suite_overlay/bin/camera-shots",
+      "sha256": "f3ab8c7d12c03f1b8cc3db2075e346bb6f536372458cb4ac2020992bbc28e1c9",
+      "bytes": 371
+    },
+    {
+      "file": "tools/linux_suite_overlay/bin/linux-flow",
+      "sha256": "c511bd89a1c52dc2adf2a7fda1e79cd268c5c680d11ff9c2bb28f2b847f0e9e4",
+      "bytes": 1160
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/camera_cli/camera_advanced_cli.py",
+      "sha256": "471a42e68797f5feab493c2a7e15d4eaeebfb6062663cdc50c98a11c310f871f",
+      "bytes": 7353
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/camera_cli/shot_inspect/pinned_schema.py",
+      "sha256": "5b5692c4d5afc12e606a456bef4ba0479025f37d455754ab74ba953d5ab472c9",
+      "bytes": 1826
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/camera_cli/shot_inspect/shot_inspect.py",
+      "sha256": "edb7ca0e8fa5e867b5ac2c2e575f6bcacd14973e90c5f8f3684c41962cc31e62",
+      "bytes": 4457
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/camera_cli/shot_inspect/shot_table.py",
+      "sha256": "b02e2ed9b515b8c32be566072718d477f4facc8fd5a529b55d2117b5bff83773",
+      "bytes": 2839
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/camera_cli/shot_inspect/shot_worker.py",
+      "sha256": "060fcebd82b4a4f023bca99bf6797b0c3b0fba1c4250afcce1df6da389c02d41",
+      "bytes": 923
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/legacy_cli/dispatch.py",
+      "sha256": "eeace304821daf87f122c5bbffc87a9c7a16d9d38557341137250a37a172ca79",
+      "bytes": 3016
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/legacy_cli/legacy-blenderctl.linux",
+      "sha256": "771e1a10df951f8f6b4edeb3d16869cbdd6de2df18ff895ff4653dd32b1b405b",
+      "bytes": 219
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/linux-flow/jobs/README.md",
+      "sha256": "5347beba661bfd27cefc2a5f6e02561bf1d409e3b52c58bd69b4b7b038d4bbd1",
+      "bytes": 2768
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/linux-flow/jobs/jobs.py",
+      "sha256": "42eb79be5070de1b03079c7684e86672a9e52a0199aae424276007e513426d5a",
+      "bytes": 15737
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/linux-flow/keeper.py",
+      "sha256": "cfcbbff036107df4fba84439d5d817c0aeecae9ea6a4d041dbe66d4803abfb7c",
+      "bytes": 2501
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/linux-flow/publish/README.md",
+      "sha256": "d85c022c10b3f072a6ac8ae0908e1c1ec27866e2d7a5ab02b71fb45b5b8ba35d",
+      "bytes": 2114
+    },
+    {
+      "file": "tools/linux_suite_overlay/source/linux-flow/publish/transaction.py",
+      "sha256": "cbc7de9bf308afc17ba344ab9e84246fa0b6a7618016e6d847927f71452bb6f8",
+      "bytes": 10420
+    },
+    {
       "file": "tools/material_workflow_addon/LICENSE",
       "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
       "bytes": 35149
