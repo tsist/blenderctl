@@ -161,8 +161,12 @@ def _execute_worker(job, parent_checkpoint=None):
     artifacts = {"job_directory": str(job), "request": str(job / "request.json"),
                  "stdout_log": str(job / "stdout.log"), "stderr_log": str(job / "stderr.log")}
     limits=launch.get('limits');usage={};last_resource_check=0;memory_observations=[]
+    linux_uv = sys.platform == 'linux' and request['command'] == 'uv.inspect'
     def checkpoint():
         nonlocal last_resource_check
+        if linux_uv:
+            from linux_file_guard import check_all_guards
+            check_all_guards()
         if parent_checkpoint:
             parent_checkpoint()
         if (job / "cancel.request").exists():
@@ -198,7 +202,15 @@ def _execute_worker(job, parent_checkpoint=None):
                 protect(d,input_guards,checkpoint)
                 input_hashes[d['file']]=d['expected_sha256']
         if request['command'] in UV_COMMANDS or request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
-            from filesystem import FileGuard
+            if linux_uv:
+                if limits or request['params']['resources']:
+                    raise Failure('UNSUPPORTED', 'Linux UV inspection requires self-contained inputs and no resource budgets')
+                from functools import partial
+                from linux_file_guard import LinuxFileGuard, LinuxGuardMonitor
+                monitor = input_guards.enter_context(LinuxGuardMonitor())
+                FileGuard = partial(LinuxFileGuard, monitor=monitor)
+            else:
+                from filesystem import FileGuard
             for key, expected in (("file", "expected_sha256"), ("other", "other_sha256")):
                 filename = request["params"].get(key)
                 if not filename:
@@ -530,7 +542,13 @@ def _execute_worker(job, parent_checkpoint=None):
             atomic_json(job/'telemetry.json',{'memory_samples':memory_observations,'gpu':gpu_sample(),'hard_memory':'Windows Job committed bytes','hard_disk':False,'hard_vram':False,'disk':'sampling and cancellation; no per-job filesystem quota'})
             atomic_json(job/'resources.json',{'limits':limits,'usage':usage,'memory_semantics':'Windows Job Object committed memory for bootstrap and all descendants','disk_semantics':'sampled budget; may overshoot, partial files retained','gpu_semantics':'scheduler reservation only, not a VRAM allocator limit'})
             artifacts['resources']=str(job/'resources.json')
-        input_guards.close()
+        if linux_uv:
+            try:
+                input_guards.close()
+            except Failure as exc:
+                error = error or {'code': exc.code, 'message': str(exc)}
+        else:
+            input_guards.close()
     code = CODES[error["code"]] if error else 0
     state.update(state=("cancelled" if code == 7 else "timed_out" if code == 6 else "failed" if code else "succeeded"),
                  exit_code=code, worker_exit_code=worker_exit, finished_at=time.time(), heartbeat_at=time.time(),

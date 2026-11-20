@@ -21,6 +21,7 @@ import copy
 import json
 import os
 import subprocess
+import sys
 import time
 from contextlib import ExitStack
 from pathlib import Path
@@ -66,7 +67,10 @@ def _check_identity(params):
 
 def _guard_inputs(params, stack):
     """Hold deny-write handles on the source and every declared resource."""
-    from filesystem import FileGuard
+    if sys.platform == 'linux' and params['manifest']['operation']=='inspect':
+        from linux_file_guard import LinuxFileGuard as FileGuard
+    else:
+        from filesystem import FileGuard
     source = Path(params['file'])
     if not source.is_file():
         raise Failure('NOT_FOUND', 'UV source not found: ' + str(source))
@@ -86,6 +90,8 @@ def _guard_inputs(params, stack):
 def _open_source(params):
     import bpy
     bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)
+    if sys.platform == 'linux' and params['manifest']['operation']=='inspect' and tuple(bpy.app.version) != (5,3,0):
+        raise Failure('UNSUPPORTED', 'Linux UV inventory is qualified only for Blender 5.3.0')
     if tuple(bpy.data.version[:2]) != tuple(bpy.app.version[:2]):
         raise Failure('UNSUPPORTED', 'UV requires matching Blender major/minor')
 
