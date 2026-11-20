@@ -1,7 +1,0 @@
-#!/bin/sh
-set -eu
-base=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-workspace=$(CDPATH= cd -- "$base/.." && pwd)
-runtime="$workspace/af-exterior-blender53/blender-5.3.0-linux-x64"
-addon="$base/profile/scripts/addons/camera_windows_static"
-exec /usr/bin/python3.13 -I -B "$base/source/camera_cli/camera_advanced_cli.py" --runtime "$runtime" --addon "$addon" "$@"
