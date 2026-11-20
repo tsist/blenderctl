@@ -161,11 +161,11 @@ def _execute_worker(job, parent_checkpoint=None):
                  "stdout_log": str(job / "stdout.log"), "stderr_log": str(job / "stderr.log")}
     limits=launch.get('limits');usage={};last_resource_check=0;memory_observations=[]
     linux_template = sys.platform == "linux" and request["command"] == "material.template-save"
-    linux_rig_read = sys.platform == "linux" and request["command"] in ("rig.inspect", "animation.sample")
+    linux_guarded_fixture_read = sys.platform == "linux" and request["command"] in ("rig.inspect", "animation.sample", "scene.inspect")
     linux_workflow = sys.platform == 'linux' and request['command'] in ('compositing.inspect', 'video.inspect', 'geometry.run', 'lighting.run')
     def checkpoint():
         nonlocal last_resource_check
-        if linux_template or linux_rig_read or linux_workflow:
+        if linux_template or linux_guarded_fixture_read or linux_workflow:
             from linux_file_guard import check_all_guards
             check_all_guards()
         if parent_checkpoint:
@@ -213,7 +213,7 @@ def _execute_worker(job, parent_checkpoint=None):
                     raise Failure('UNSUPPORTED', 'Linux static workflows require no external resources, OCIO override, rendering, resume, or budgets')
                 monitor=input_guards.enter_context(LinuxGuardMonitor())
                 FileGuard=partial(LinuxFileGuard,monitor=monitor)
-            elif linux_template or linux_rig_read:
+            elif linux_template or linux_guarded_fixture_read:
                 from linux_file_guard import LinuxFileGuard as FileGuard
                 if (linux_template and request["params"]["resources"]) or limits:
                     raise Failure("UNSUPPORTED", "Linux guarded reads require self-contained inputs and no resource budgets")
@@ -428,7 +428,7 @@ def _execute_worker(job, parent_checkpoint=None):
             if request['command'].startswith('video.'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
-            if linux_rig_read or request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
+            if linux_guarded_fixture_read or request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
             raise Failure("VALIDATION_FAILED", str(result.get("error")))
@@ -538,7 +538,7 @@ def _execute_worker(job, parent_checkpoint=None):
             atomic_json(job/'telemetry.json',{'memory_samples':memory_observations,'gpu':gpu_sample(),'hard_memory':'Windows Job committed bytes','hard_disk':False,'hard_vram':False,'disk':'sampling and cancellation; no per-job filesystem quota'})
             atomic_json(job/'resources.json',{'limits':limits,'usage':usage,'memory_semantics':'Windows Job Object committed memory for bootstrap and all descendants','disk_semantics':'sampled budget; may overshoot, partial files retained','gpu_semantics':'scheduler reservation only, not a VRAM allocator limit'})
             artifacts['resources']=str(job/'resources.json')
-        if linux_template or linux_rig_read or linux_workflow:
+        if linux_template or linux_guarded_fixture_read or linux_workflow:
             try:
                 input_guards.close()
             except Failure as exc:

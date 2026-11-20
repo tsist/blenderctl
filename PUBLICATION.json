@@ -1,12 +1,12 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r1-linux-static-preview",
+  "release": "0.63.1-r1-linux-scene-inspect-preview",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "66d894b94dbdcc7a0ad696fae1813f0cf1111d40bf1d0dad2d4746993c2b8eda",
+  "runtime_identity": "141c6f62d6bf66a94299035dd51d5151172b0bd1c6eefa96eda930d8482d7d2b",
   "runtime_files": 191,
   "license": "GPL-3.0-or-later",
   "files": [
@@ -927,7 +927,7 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "6d72dc59a35f4fd3c8e22ceec63465e2a2b5ed80dfdcec2aabbf6697734e597b",
+      "sha256": "12ea212f3e552d9591576acaa683aec8dd2eb70a4905e10bb1c50c662ce80476",
       "bytes": 4692
     },
     {
@@ -1277,7 +1277,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "4ec65aacf7a0219f0ae89e6a2244b7122f409d1132522f9c4a4bc4eacdf7b60a",
+      "sha256": "3eceaa6acb5e346daee808dfb48aa8e18335f6c8a1fce2956ab6d9b9a1c79574",
       "bytes": 32601
     },
     {
@@ -1329,6 +1329,21 @@
       "file": "tests/linux_rig_reads/smoke.py",
       "sha256": "58891efe922fa23685d8f103dd6d4beb2b4bc56b33c3cfd1d49f21d7f5e5a75e",
       "bytes": 2493
+    },
+    {
+      "file": "tests/linux_scene_reads/README.md",
+      "sha256": "0e7fabee6e40fcbc80cb02ee426d632f286c04a50b5af300a9e3066689094ae1",
+      "bytes": 1191
+    },
+    {
+      "file": "tests/linux_scene_reads/fixture.py",
+      "sha256": "f1340932481b8d373c3bec05227a05c58a6dbe0e726f227ad0cd3f69d26eb8f2",
+      "bytes": 1890
+    },
+    {
+      "file": "tests/linux_scene_reads/smoke.py",
+      "sha256": "aa93024ce5d0e75fcf5d7e8aab68719af9f5c3ee196af4204201248430605c18",
+      "bytes": 3107
     },
     {
       "file": "tests/linux_template_save/README.md",
@@ -1797,8 +1812,8 @@
     },
     {
       "file": "tools/blenderctl/linux_rig_reads.py",
-      "sha256": "59a67afc13c36e37821d780e87d33ff63b7619d4501933f7aa72ebc7170f78db",
-      "bytes": 2619
+      "sha256": "cba53b448196ff2375d59c5da08567f8b5c595e76d7701380faf3aa6128fb6c6",
+      "bytes": 3751
     },
     {
       "file": "tools/blenderctl/liquid.py",
@@ -1957,8 +1972,8 @@
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "b7281448a1f1a1e2f0d1237d1bbec982c08b2e36683140ddd207d5733975227f",
-      "bytes": 31232
+      "sha256": "e25bfe235be2bca8a158722a7b2b06fd242094a00a996b56c92ec681ec3a817a",
+      "bytes": 31273
     },
     {
       "file": "tools/blenderctl/render_contract.py",
@@ -2067,8 +2082,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "bcf1d7b654c37e75f8e571b8531d87ea520b6ebfd8355191d3a13667de13a2c0",
-      "bytes": 44182
+      "sha256": "287c4ba71337fdf61ef93f914c97bb0b149782e8e15023e45da5b462376ddb3c",
+      "bytes": 44259
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2077,8 +2092,8 @@
     },
     {
       "file": "tools/blenderctl/scenes.py",
-      "sha256": "bfafcc63b5bfb38bf2d956b05de300aa16d5a210c26a0a770e386d36fde7b833",
-      "bytes": 23453
+      "sha256": "e5a9e2619947f477bf75b4cb34fa867c1acb5a016cebf07efb9ceb7af7b03ffc",
+      "bytes": 23612
     },
     {
       "file": "tools/blenderctl/script_isolation.py",
