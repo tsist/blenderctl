@@ -131,7 +131,11 @@ def run(params,job,*,cancel_parent=None):
             # Relative inputs were explicitly resolved above; preserve their absolute bindings.
             bpy.ops.wm.save_as_mainfile(filepath=str(candidate_path),check_existing=False,relative_remap=False)
             candidate=descriptor(candidate_path);report['candidate']=candidate
-        from filesystem import FileGuard
+        import sys
+        if sys.platform == "linux":
+            from linux_file_guard import LinuxFileGuard as FileGuard
+        else:
+            from filesystem import FileGuard
         candidate_guard=FileGuard(candidate['file']);candidate_guard.__enter__()
         if candidate_guard.sha256()!=candidate['sha256']:raise Failure('CONFLICT','Candidate changed before guarded verification')
         report['effective_frame']=params['_effective_frame']

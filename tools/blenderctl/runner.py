@@ -162,9 +162,10 @@ def _execute_worker(job, parent_checkpoint=None):
     limits=launch.get('limits');usage={};last_resource_check=0;memory_observations=[]
     linux_template = sys.platform == "linux" and request["command"] == "material.template-save"
     linux_rig_read = sys.platform == "linux" and request["command"] in ("rig.inspect", "animation.sample")
+    linux_workflow = sys.platform == 'linux' and request['command'] in ('compositing.inspect', 'video.inspect', 'geometry.run', 'lighting.run')
     def checkpoint():
         nonlocal last_resource_check
-        if linux_template or linux_rig_read:
+        if linux_template or linux_rig_read or linux_workflow:
             from linux_file_guard import check_all_guards
             check_all_guards()
         if parent_checkpoint:
@@ -202,7 +203,17 @@ def _execute_worker(job, parent_checkpoint=None):
                 protect(d,input_guards,checkpoint)
                 input_hashes[d['file']]=d['expected_sha256']
         if request['command'].startswith('video.') or request["command"] in ("compositing.run", "compositing.inspect", "compositing.template-save", "compositing.template-run", "compositing.batch", "compositing.study", "lighting.run", "lighting.inspect", "lighting.template-save", "lighting.template-edit", "lighting.batch", "geometry.run", "geometry.inspect", "inspect", "project.verify", "project.prepare_copy", "tracking.prepare", "tracking.inspect", "tracking.solve", "asset.preview.prepare", "query", "diff", "dependency.audit", "dependency.plan-relink", "dependency.prepare", "project.link.prepare", "project.override.prepare", "project.override.resync", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "material.run", "material.template-save", "material.batch", "material.study", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.run", "media.prepare", "media.export", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.run", "extension.prepare"):
-            if linux_template or linux_rig_read:
+            if linux_workflow:
+                from functools import partial
+                from linux_file_guard import LinuxFileGuard, LinuxGuardMonitor
+                p=request['params']; m=p.get('manifest') or {}
+                if (p['resources'] or limits or any(p.get(k) for k in ('template','preview','resume','cache_manifest'))
+                    or m.get('temporal') or (m.get('preview') or {}).get('enabled')
+                    or (request['command']=='compositing.inspect' and os.environ.get('OCIO'))):
+                    raise Failure('UNSUPPORTED', 'Linux static workflows require no external resources, OCIO override, rendering, resume, or budgets')
+                monitor=input_guards.enter_context(LinuxGuardMonitor())
+                FileGuard=partial(LinuxFileGuard,monitor=monitor)
+            elif linux_template or linux_rig_read:
                 from linux_file_guard import LinuxFileGuard as FileGuard
                 if (linux_template and request["params"]["resources"]) or limits:
                     raise Failure("UNSUPPORTED", "Linux guarded reads require self-contained inputs and no resource budgets")
@@ -527,7 +538,7 @@ def _execute_worker(job, parent_checkpoint=None):
             atomic_json(job/'telemetry.json',{'memory_samples':memory_observations,'gpu':gpu_sample(),'hard_memory':'Windows Job committed bytes','hard_disk':False,'hard_vram':False,'disk':'sampling and cancellation; no per-job filesystem quota'})
             atomic_json(job/'resources.json',{'limits':limits,'usage':usage,'memory_semantics':'Windows Job Object committed memory for bootstrap and all descendants','disk_semantics':'sampled budget; may overshoot, partial files retained','gpu_semantics':'scheduler reservation only, not a VRAM allocator limit'})
             artifacts['resources']=str(job/'resources.json')
-        if linux_template or linux_rig_read:
+        if linux_template or linux_rig_read or linux_workflow:
             try:
                 input_guards.close()
             except Failure as exc:

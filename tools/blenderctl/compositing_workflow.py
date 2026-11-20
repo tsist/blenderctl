@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import time
 from contextlib import ExitStack, contextmanager
 
@@ -40,8 +41,11 @@ def _signature(params):
     return hashlib.sha256(json.dumps(original, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False).encode('utf-8')).hexdigest()
 
 
-def _inputs(params, stack):
-    from filesystem import FileGuard
+def _inputs(params, stack, *, linux_inspect=False):
+    if linux_inspect:
+        from linux_file_guard import LinuxFileGuard as FileGuard
+    else:
+        from filesystem import FileGuard
     rows = [{'file': params['file'], 'expected_sha256': params['expected_sha256']}, *params['resources']]
     source = params.get('manifest', {}).get('source', {})
     if source.get('kind') == 'image':
@@ -79,9 +83,12 @@ def _recheck(checked, params):
         raise Failure('CONFLICT', 'Compositor implementation changed during execution')
 
 
-def _guard_color_inputs(color, stack, checked):
+def _guard_color_inputs(color, stack, checked, *, linux_inspect=False):
     """Lock precisely the discovered files used by this color-identity proof."""
-    from filesystem import FileGuard
+    if linux_inspect:
+        from linux_file_guard import LinuxFileGuard as FileGuard
+    else:
+        from filesystem import FileGuard
     rows = color_file_descriptors(color)
     for row in rows:
         key = os.path.normcase(row['file'])
@@ -1061,8 +1068,17 @@ def inspect(params, job):
     job = Path(job).resolve()
     with ExitStack() as stack:
         runtime = runtime_identity()
-        checked = _inputs(params, stack)
+        linux_inspect = sys.platform == 'linux'
+        if linux_inspect and params['resources']:
+            raise Failure('UNSUPPORTED', 'Linux compositor inspection requires a self-contained project')
+        checked = _inputs(params, stack, linux_inspect=linux_inspect)
         bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)
+        if linux_inspect and (
+                any(json.loads(scene.get(core.STATE, '{}')).get('workflow_version') in ('1.2', '1.3')
+                    or core.ARCHIVE in scene for scene in bpy.data.scenes)
+                or any(core.ANIM in group or any(core.MEDIA in node for node in group.nodes)
+                       for group in bpy.data.node_groups)):
+            raise Failure('UNSUPPORTED', 'Linux compositor inspection does not qualify temporal media guards')
         media.guard_rows(media.persisted_documents(stack=stack, checked=checked), stack, checked)
         provider = None
         if any(json.loads(scene.get(core.STATE, '{}')).get('workflow_version') in ('1.2', '1.3') for scene in bpy.data.scenes):
@@ -1077,7 +1093,7 @@ def inspect(params, job):
             raise Failure('NOT_FOUND', 'Target compositor Scene missing')
         preflight = _inspection_file_preflight(scene, closure)
         color = color_identity(scene)
-        color_inputs = _guard_color_inputs(color, stack, checked)
+        color_inputs = _guard_color_inputs(color, stack, checked, linux_inspect=linux_inspect)
         inspection = _call(core.inspect, params['scene'], params.get('workflow_id'))
         report = {'compositing_report_version': '1.0', 'status': 'passed',
                   'source': {'file': params['file'], 'sha256': params['expected_sha256']}, 'runtime': runtime,

@@ -1,12 +1,12 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r1-linux-rig-preview",
+  "release": "0.63.1-r1-linux-static-preview",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "196d18f7448379c265b8406b55378115dc3e4c01278c88b11799a947a0fc50b4",
+  "runtime_identity": "66d894b94dbdcc7a0ad696fae1813f0cf1111d40bf1d0dad2d4746993c2b8eda",
   "runtime_files": 191,
   "license": "GPL-3.0-or-later",
   "files": [
@@ -927,7 +927,7 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "6a7c458e9d0fb1d7dcd635618520101952f09c0d692389e088da30ca66318c7a",
+      "sha256": "6d72dc59a35f4fd3c8e22ceec63465e2a2b5ed80dfdcec2aabbf6697734e597b",
       "bytes": 4692
     },
     {
@@ -1277,7 +1277,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "129f7a1789b66f2d565ce4023099c3113223149e7ef8833768f137d27ca3da87",
+      "sha256": "4ec65aacf7a0219f0ae89e6a2244b7122f409d1132522f9c4a4bc4eacdf7b60a",
       "bytes": 32601
     },
     {
@@ -1351,6 +1351,16 @@
       "bytes": 3870
     },
     {
+      "file": "tests/run_linux_static_scene_smoke.py",
+      "sha256": "20d8f4946b3c675e0a24e4f2d2b4f329310d074f12b5bb14f696785f5a9e0cf0",
+      "bytes": 4471
+    },
+    {
+      "file": "tests/run_linux_workflow_inspect_smoke.py",
+      "sha256": "328bc6561c0f1a96027d3a5d3092679a15b681bad5b289e2b8c8f836cd2dbd9c",
+      "bytes": 4249
+    },
+    {
       "file": "tests/test_host.py",
       "sha256": "548c413175e8bb6100716f13c9351165192d3696726dae4564a29e439ee15d8f",
       "bytes": 5118
@@ -1359,6 +1369,11 @@
       "file": "tests/test_job_bridge.py",
       "sha256": "41bdd6e7df2174aca56d7075ffc494a348b49a17d2faea908cd429e36f82407c",
       "bytes": 8838
+    },
+    {
+      "file": "tests/test_linux_guard_monitor.py",
+      "sha256": "e0430ab6c3a7a7a5d4c8ddbc62a207919c8d0de257d16c7e4e228aaef58b3d3e",
+      "bytes": 3660
     },
     {
       "file": "tests/test_skill_install.py",
@@ -1502,8 +1517,8 @@
     },
     {
       "file": "tools/blenderctl/compositing_workflow.py",
-      "sha256": "4cae17f53341515ec0776a1deb3ebe9f9260d1980fc49428b616b9d415bfafb7",
-      "bytes": 71334
+      "sha256": "f2b3e26b72d9d51b44776ef9873fe3bc1f1c0b455b7dca0b87b459ddd9314ed2",
+      "bytes": 72329
     },
     {
       "file": "tools/blenderctl/compositing_workflow_contract.py",
@@ -1757,8 +1772,8 @@
     },
     {
       "file": "tools/blenderctl/lighting_workflow.py",
-      "sha256": "fad8f064cc6ab9667ebee0c6ef558c0d4e5c0948d989e736c6a036251bc03844",
-      "bytes": 17041
+      "sha256": "362d007e40c77c72e0a1abab1bee6a8fc83b4b23d05eea0d4b9178c246ed9423",
+      "bytes": 17183
     },
     {
       "file": "tools/blenderctl/lighting_workflow_contract.py",
@@ -1777,8 +1792,8 @@
     },
     {
       "file": "tools/blenderctl/linux_file_guard.py",
-      "sha256": "58895356187c08a3d288af0e19586e0eb8e53fddeef6fbb3409916130125d785",
-      "bytes": 18464
+      "sha256": "aa4e5dc02841b07233e131da64492119ce049a93d4600b4f035833a8651615b6",
+      "bytes": 22236
     },
     {
       "file": "tools/blenderctl/linux_rig_reads.py",
@@ -2052,8 +2067,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "1b43f0158ae41a9dcc8b7f381d5bd12595f4c3c1e314042f807ea3f36d4a63d1",
-      "bytes": 43181
+      "sha256": "bcf1d7b654c37e75f8e571b8531d87ea520b6ebfd8355191d3a13667de13a2c0",
+      "bytes": 44182
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2217,8 +2232,8 @@
     },
     {
       "file": "tools/blenderctl/video_workflow.py",
-      "sha256": "d45efe70949ac650e1008a260cab5988fe25cc0f402ecf16567e961b58a075c9",
-      "bytes": 16100
+      "sha256": "0a3e8d8e6ec8e0ae1353848084a4e54a59624a066ab39ae84589a3b3146c635a",
+      "bytes": 16250
     },
     {
       "file": "tools/blenderctl/video_workflow_contract.py",
