@@ -3,6 +3,7 @@ import hashlib
 import json
 import math
 import os
+import sys
 from pathlib import Path
 import time
 import uuid
@@ -342,7 +343,15 @@ def validate(request):
         value = params.get("file")
         if not isinstance(value, str) or not value.strip() or "\0" in value:
             raise Failure("INVALID_REQUEST", "inspect requires a file path")
-        path = Path(value).resolve()
+        if sys.platform == "linux" and command in ("rig.inspect", "animation.sample"):
+            if not params.get("expected_sha256") or "driver_profile" in params:
+                raise Failure("UNSUPPORTED", "Linux rig reads require expected_sha256 and no driver profile")
+            # Do not resolve symlinks away before LinuxFileGuard walks the path.
+            path = Path(value).absolute()
+            if ".." in path.parts:
+                raise Failure("INVALID_REQUEST", "Linux rig input disallows parent traversal")
+        else:
+            path = Path(value).resolve()
         if not path.is_file():
             raise Failure("NOT_FOUND", f"Input file not found: {path}")
         if path.suffix.lower() != ".blend":

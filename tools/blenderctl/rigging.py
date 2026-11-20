@@ -393,8 +393,16 @@ def state():
         'rigs':[{'object':o.name,'data':identity(o.data),'rest_sha256':rest_signature(o,[b.name for b in o.data.bones]),'bones':[{'name':b.name,'parent':b.parent.name if b.parent else None,'head':value(b.head_local),'tail':value(b.tail_local),'matrix_local':value(b.matrix_local),'connected':b.use_connect,'deform':b.use_deform,'inherit_scale':b.inherit_scale,'inherit_rotation':b.use_inherit_rotation,'pose_matrix':value(o.pose.bones[b.name].matrix),'basis':value(o.pose.bones[b.name].matrix_basis)} for b in o.data.bones]} for o in sorted(bpy.data.objects,key=lambda o:o.name) if o.type=='ARMATURE'],
         'skins':[{'object':o.name,'topology_sha256':modeling.topology(o.data),'groups':[{'name':g.name,'index':g.index,'locked':g.lock_weight} for g in o.vertex_groups],'weights_sha256':modeling.sha([[(g.group,g.weight) for g in v.groups] for v in o.data.vertices]),'bindings':[{'modifier':m.name,'rig':m.object.name,'weights':weights_report(o,m.object)} for m in o.modifiers if m.type=='ARMATURE' and m.object]} for o in sorted(bpy.data.objects,key=lambda o:o.name) if o.type=='MESH'],
         'coverage':'local_rest_pose_weights_layered_actions_slots_NLA_and_non_scripted_drivers; sampled_deformation_separate'}
+def open_read_target(path):
+    import sys
+    if sys.platform == 'linux':
+        from linux_rig_reads import open_fixture
+        open_fixture(path)
+    else:
+        bpy.ops.wm.open_mainfile(filepath=path,load_ui=False,use_scripts=False)
+
 def inspect(params,job):
-    bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
+    open_read_target(params['file'])
     if 'context' in params:scenes.activate(params['context'])
     update();report=state()
     import drivers
@@ -408,7 +416,7 @@ def inspect(params,job):
         atomic_json(job/'rig-mapping-suggestions.json',report['mapping_suggestions'])
     atomic_json(job/'rig-report.json',report);return report
 def sample(params,job):
-    spec=params['manifest'];validate(spec,SAMPLE);bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False);animation_safe(params.get('driver_profile'),params['file'],job)
+    spec=params['manifest'];validate(spec,SAMPLE);open_read_target(params['file']);animation_safe(params.get('driver_profile'),params['file'],job)
     context={'scene':spec['scene'],'view_layer':spec['view_layer'],'frame':math.floor(spec['frames'][0]),'mode':'OBJECT','active_object':None,'selected_objects':[]};scenes.activate(context);rows=[]
     for frame in spec['frames']:
         frame_set(frame);graph=bpy.context.evaluated_depsgraph_get();objects=[]
