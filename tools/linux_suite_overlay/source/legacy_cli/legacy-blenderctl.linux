@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+workspace=$(CDPATH= cd -- "$root/.." && pwd)
+exec /usr/bin/python3.13 -I -B "$workspace/af-exterior-linux-suite/source/legacy_cli/dispatch.py" "$@"
