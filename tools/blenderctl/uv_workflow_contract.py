@@ -26,7 +26,7 @@ ADDON_DIR = TOOLS_DIR / 'uv_workflow_addon'
 # Python surface of the UV add-on. Never hash the whole (very large) tools tree.
 CLI_RUNTIME_FILES = ('cli.py', 'protocol.py', 'runner.py', 'worker.py',
                      'uv_workflow.py', 'uv_workflow_contract.py', 'uv_verifier.py', 'uv_resources.py', 'uv_saved_protection.py',
-                     'filesystem.py', 'geometry_workflow.py',
+                     'filesystem.py', 'linux_file_guard.py', 'geometry_workflow.py',
                      'execution_contract.py', 'uv_grid_transfer.py', 'uv_grid_transfer_contract.py')
 RUN_OPERATIONS = ('generate', 'validate', 'adopt', 'restore', 'edit', 'recipe', 'settings', 'seams', 'lightmap', 'copy_uv', 'transfer')
 ALL_OPERATIONS = ('generate', 'inspect', 'validate', 'adopt', 'restore', 'edit', 'recipe', 'settings', 'seams', 'lightmap', 'copy_uv', 'transfer')
@@ -129,6 +129,8 @@ def normalize_params(value, command):
     Unknown top-level or descriptor fields are rejected. The manifest is
     normalized by the add-on's host-safe contract before operation routing.
     """
+    if sys.platform == 'linux' and command != 'uv.inspect':
+        _fail('Linux UV support is limited to static read-only inspection', 'UNSUPPORTED')
     if command == 'uv.grid-transfer':
         from uv_grid_transfer_contract import normalize
         return normalize(value)
@@ -142,6 +144,12 @@ def normalize_params(value, command):
     if missing:
         _fail('UV params require file, expected_sha256, resources and manifest; missing: '
               + ', '.join(sorted(missing)))
+    if sys.platform == 'linux':
+        raw = result['file']
+        if not isinstance(raw, str) or not Path(raw).is_absolute() or '..' in Path(raw).parts:
+            _fail('Linux UV source must be an absolute path without parent traversal')
+        if result['resources']:
+            _fail('Linux UV inventory requires self-contained inputs', 'UNSUPPORTED')
     source = _descriptor({'file': result['file'],
                           'expected_sha256': result['expected_sha256']},
                          'source', blend=True)
@@ -157,7 +165,15 @@ def normalize_params(value, command):
             _fail('Duplicate UV resource path: ' + item['file'])
         seen.add(key)
         normalized_resources.append(item)
+    if sys.platform == 'linux' and isinstance(result['manifest'], dict) and any(
+            k in result['manifest'] for k in ('diagnostics','surface','seam_suggestions')):
+        _fail('Linux UV inventory excludes optional inspections', 'UNSUPPORTED')
     manifest = _call(addon_contract.normalize, result['manifest'])
+    if sys.platform == 'linux':
+        source['file'] = str(Path(raw))  # The guard must see symlinks, not their resolved targets.
+        minimal = {k: manifest[k] for k in ('version','operation','scene','view_layer','objects')}
+        if manifest['operation']=='inspect' and manifest != _call(addon_contract.normalize, minimal):
+            _fail('Linux UV inventory accepts only basic scene, view layer and mesh targets', 'UNSUPPORTED')
     operation = manifest['operation']
     if command == 'uv.inspect' and operation != 'inspect':
         _fail('uv.inspect requires manifest.operation=inspect')

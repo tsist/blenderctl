@@ -6,8 +6,8 @@
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "c2613d15a580deb5a48d824a90b755af0e1cfdbbee1d01b2122e8dc898c539de",
-  "runtime_files": 228,
+  "runtime_identity": "25bbe84959075de65e8acf8975a385cca2ee688820cdce4fecdf3fbb022044a5",
+  "runtime_files": 229,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -932,7 +932,7 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "4b027465cbfb92eb5c37aaf95e2e3dd716327568101d57c0c210602083a98278",
+      "sha256": "8332f588fff67a2685fcbda061fd5650b77391d07f9834c52667e9c2341f3568",
       "bytes": 4877
     },
     {
@@ -1282,7 +1282,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "1626899a316f6402926274c7b173625bb1db2b2deb826cb642c122f08d5a5280",
+      "sha256": "9472ed7e232994a30c3023fa302983c022479d1f782c65352a21a600453a83f2",
       "bytes": 32601
     },
     {
@@ -1326,6 +1326,11 @@
       "bytes": 3870
     },
     {
+      "file": "tests/run_linux_uv_inspect_smoke.py",
+      "sha256": "8ebf9c2d4b53a973df4eeae8f4e65795359f206d14f35c493c55c2c7c3d64edc",
+      "bytes": 2384
+    },
+    {
       "file": "tests/test_host.py",
       "sha256": "548c413175e8bb6100716f13c9351165192d3696726dae4564a29e439ee15d8f",
       "bytes": 5118
@@ -1334,6 +1339,11 @@
       "file": "tests/test_job_bridge.py",
       "sha256": "41bdd6e7df2174aca56d7075ffc494a348b49a17d2faea908cd429e36f82407c",
       "bytes": 8838
+    },
+    {
+      "file": "tests/test_linux_guard_monitor.py",
+      "sha256": "e0430ab6c3a7a7a5d4c8ddbc62a207919c8d0de257d16c7e4e228aaef58b3d3e",
+      "bytes": 3660
     },
     {
       "file": "tests/test_skill_install.py",
@@ -1751,6 +1761,11 @@
       "bytes": 23249
     },
     {
+      "file": "tools/blenderctl/linux_file_guard.py",
+      "sha256": "aa4e5dc02841b07233e131da64492119ce049a93d4600b4f035833a8651615b6",
+      "bytes": 22236
+    },
+    {
       "file": "tools/blenderctl/liquid.py",
       "sha256": "533c76b50e82317aa78576efb455398a54e2d0e5be7a0d384a81ca09a6bc17d3",
       "bytes": 4407
@@ -2017,8 +2032,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "d8f27deee922c50c17582b24ed06e082107c44d4cfc67f3fbe9aae7a06fcfd60",
-      "bytes": 42979
+      "sha256": "9d578108823b82ec079767477254602c52ca451b388f27ba6162add583f2c5c6",
+      "bytes": 43889
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2162,13 +2177,13 @@
     },
     {
       "file": "tools/blenderctl/uv_workflow.py",
-      "sha256": "ae072f9ad29ed0018a801e0c35e20a9e2e9a12c44ad1711a6ca719b331d4fe15",
-      "bytes": 23197
+      "sha256": "f2136fff5352b39aab98a2ef5875df638943daea6920ed5fc3e234e4399a913b",
+      "bytes": 23578
     },
     {
       "file": "tools/blenderctl/uv_workflow_contract.py",
-      "sha256": "8c7c7fdf730a1c94ca1e50c122183344cc60c8a0d7e2f98d2bdddd4d23ea6416",
-      "bytes": 20117
+      "sha256": "c42812c9b066f25030c1ecf2fb6eaf81c37096b64c6fc6b180d28669c6bf09ac",
+      "bytes": 21348
     },
     {
       "file": "tools/blenderctl/verification.py",

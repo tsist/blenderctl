@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ADDON = 'tools/video_editing_workflow_addon/'
 UV_ADDON = 'tools/uv_workflow_addon/'
 BLOCKED = {'.git', '__pycache__', '.venv', 'audit', 'research', 'tests-output', 'dist'}
-IDENTITY = 'c2613d15a580deb5a48d824a90b755af0e1cfdbbee1d01b2122e8dc898c539de'
+IDENTITY = '25bbe84959075de65e8acf8975a385cca2ee688820cdce4fecdf3fbb022044a5'
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
