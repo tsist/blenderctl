@@ -25,3 +25,19 @@
 ```
 
 非渲染版的结果从实际 Blender 属性、时间线和求值坐标核对，不输出图像。Linux 的旧表可移动已存在的相邻切点，保留相机、其余镜头行和原件。Camera Live 的 SOLID 视口现在能对同场景两个本地相机做同帧 A/B 和还原；不支持跨文件候选实时切换。对旧版表使用 `blenderctl camera-shots --source <绝对路径工作副本> --frame <帧号>`，可比对旧表与 Blender 原生标记选中的相机。带旧表行的工程只按明确的 `legacy_cut` 路线另存；其他操作会拒绝带有旧表的文件。复杂绑定/合成场景按各自工具交接。
+
+### 不安装也能跑的独立入口
+
+`bin/camera-checked` 可从本仓库直接调用，独立于通用 scene/model base workers。需要官方 Linux x64 Blender 5.3.0（构建 02f0899d78e3）、系统 Python 3.13、bubblewrap、libseccomp，以及 Camera Workflow 提交 `89bb84cd9d422d0a8e3b3c04c4eb2294b63324a7` 的 `addons/camera_windows_static` 源码目录。无需在 Blender 启用插件。使用自己信任且调用期间不变的检出目录；入口核对 CLI 与插件清单 SHA，原事务再检查所有 Python 文件、可执行文件、源工作副本和候选，不会跳过沙箱。
+
+以下变量均为无符号链接的绝对路径；D 是自己所有的 0700 工作目录，source.blend 是已保存的无压缩静态工作副本。以默认 Scene/Camera 为例：
+
+```sh
+printf '%s\n' '{"scene":"Scene","camera":"Camera","lens":63}' > "$D/request.json"
+"$CLI" "$RUNTIME" "$ADDON" check --source "$D/source.blend" --request "$D/request.json" \
+  --out "$D/candidate" --plan "$D/plan.json" --authorize-owned-work-copy
+# 阅读 CHECK 输出和计划。确认后将输出的 plan_sha256 传给 APPLY：
+"$CLI" "$RUNTIME" "$ADDON" apply --plan "$D/plan.json" --plan-sha256 "$REVIEWED_PLAN_SHA256"
+```
+
+本轮运行验证：静态镜头 50→63 mm，候选冷启动回读、输入未变、错误计划 SHA 被拒绝。不据此声称走通所有高级动画、镜头表、GUI 或通用 base worker。
