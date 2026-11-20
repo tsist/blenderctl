@@ -1,13 +1,13 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r1",
+  "release": "0.63.1-r1-linux-material-preview",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "69e4b0502e1fb6f3459a4bde931a30a338e3ac639295ef5b3e7024a63e42dee2",
-  "runtime_files": 189,
+  "runtime_identity": "4f7fdba2a36c3a4435ef1ccf2034239a9f333c87c24fe06a7c92e097f32ea6ea",
+  "runtime_files": 190,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -927,7 +927,7 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "92fe48e98e89140c812c9d6ce74198966b0307cf7e53285dd6e3419ad038c5e8",
+      "sha256": "e30a7eb9c3da52200b5a962fb24a4c44c3254d1558f2e3ea5bd9d4d40451fc7f",
       "bytes": 4692
     },
     {
@@ -1277,7 +1277,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "00a3b6e7fd6e50cad0f0813daac93674b6d511036569699545f8e41f6e2f2172",
+      "sha256": "614ade115f10eb667ddc6b681128fa7b2717a67ec8d025b115716bcc9e4bcaab",
       "bytes": 32601
     },
     {
@@ -1314,6 +1314,21 @@
       "file": "tests/extension_install_smoke.py",
       "sha256": "a9086f04a3391c304489241b07b818a491036a2feb54de6acd3edaafd99b1ee9",
       "bytes": 2317
+    },
+    {
+      "file": "tests/linux_template_save/README.md",
+      "sha256": "7352082cfab763f91d7bddb2420bb44077c243c7648cf8e842d1a43fddbee006",
+      "bytes": 712
+    },
+    {
+      "file": "tests/linux_template_save/fixture.py",
+      "sha256": "555d8692614f3d98ce34351cb7edf7ff4ca41ce6f16ba52fa97fc80eec156e8f",
+      "bytes": 1315
+    },
+    {
+      "file": "tests/linux_template_save/run.sh",
+      "sha256": "cab570126eef8d83cd7a2e2449a64c2c2726fd025eabad6cb307e2ee2ddadbf7",
+      "bytes": 1360
     },
     {
       "file": "tests/run_blender_smoke.py",
@@ -1746,6 +1761,11 @@
       "bytes": 23249
     },
     {
+      "file": "tools/blenderctl/linux_file_guard.py",
+      "sha256": "58895356187c08a3d288af0e19586e0eb8e53fddeef6fbb3409916130125d785",
+      "bytes": 18464
+    },
+    {
       "file": "tools/blenderctl/liquid.py",
       "sha256": "533c76b50e82317aa78576efb455398a54e2d0e5be7a0d384a81ca09a6bc17d3",
       "bytes": 4407
@@ -1797,8 +1817,8 @@
     },
     {
       "file": "tools/blenderctl/material_workflow.py",
-      "sha256": "1095a47635b8927156c24739ccbc5fe7201360ce61e369fa81f0691fb890cd13",
-      "bytes": 22189
+      "sha256": "0667d9fd962e99831d3b33f4667297c8ff5a5152bdc12251c27bfa6e5efbc1cd",
+      "bytes": 22876
     },
     {
       "file": "tools/blenderctl/material_workflow_contract.py",
@@ -2012,8 +2032,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "630856e059016f6aa7cabad8d7b8f0840d84f6a97bd8e26e93624d3b1d703f7e",
-      "bytes": 42233
+      "sha256": "c9ec853cabdcbde373698527ab0cb95fc8f41af176b97216dcd03eee03fd3452",
+      "bytes": 42990
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
