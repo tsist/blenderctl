@@ -157,7 +157,11 @@ def save_template(params, job):
     from material_workflow_contract import normalize_template_save_params
     from material_workflow_addon import templates
     from material_workflow_addon.contract import image_documents, normalize_manifest
-    from filesystem import FileGuard
+    import sys
+    if sys.platform == "linux":
+        from linux_file_guard import LinuxFileGuard as FileGuard
+    else:
+        from filesystem import FileGuard
     job = Path(job).resolve()
     started = time.monotonic()
     report = {'report_version': '1.0', 'operation': 'template-save', 'status': 'failed', 'source_saved': False,
@@ -171,6 +175,9 @@ def save_template(params, job):
             bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)
             if tuple(bpy.data.version[:2]) != tuple(bpy.app.version[:2]):
                 raise Failure('UNSUPPORTED', 'Template export requires matching Blender major/minor')
+            if sys.platform == "linux":
+                if params["resources"] or bpy.data.libraries or bpy.data.sounds or bpy.data.movieclips or bpy.data.cache_files or bpy.data.volumes or any(i.source != "GENERATED" and i.type not in ("RENDER_RESULT", "COMPOSITING") for i in bpy.data.images) or any(f.filepath and f.filepath != "<builtin>" for f in bpy.data.fonts) or bpy.utils.blend_paths(absolute=True, packed=True):
+                    raise Failure("UNSUPPORTED", "Linux template-save requires a self-contained material fixture without file references")
             declared = {}
             for resource in params['resources']:
                 guard = guards.enter_context(FileGuard(resource['file']))
