@@ -1,0 +1,20 @@
+#!/bin/sh
+# Independent entry into the existing guarded camera transaction; no installation.
+set -eu
+usage() {
+ printf '%s\n' 'Usage: camera-checked RUNTIME_DIR ADDON_DIR {check|apply} [camera CLI options]' \
+   'Use absolute, symlink-free directories. Run "check --help" or "apply --help" for details.'
+}
+case ${1:-} in -h|--help) usage; exit 0;; esac
+if [ "$#" -lt 3 ]; then usage >&2; exit 2; fi
+runtime=$1; addon=$2; shift 2
+case "$1" in check|apply) ;; *) usage >&2; exit 2;; esac
+base=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
+cli="$base/source/camera_cli/camera_advanced_cli.py"
+check_pin() {
+ actual=$(/usr/bin/sha256sum < "$1") || exit 2
+ [ "${actual%% *}" = "$2" ] || { echo "Camera checkout pin differs: $1" >&2; exit 2; }
+}
+check_pin "$cli" 471a42e68797f5feab493c2a7e15d4eaeebfb6062663cdc50c98a11c310f871f
+check_pin "$addon/CODE-MANIFEST.json" db6fd1a088c7c6b76fab5ae0fb8b0b62738ec78306961aa2beeb9b7b2115e8c9
+exec /usr/bin/python3.13 -I -B "$cli" --runtime "$runtime" --addon "$addon" "$@"

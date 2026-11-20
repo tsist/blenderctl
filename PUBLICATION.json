@@ -2362,8 +2362,8 @@
     },
     {
       "file": "tools/linux_suite_overlay/CAMERA.zh.md",
-      "sha256": "f0568ec81b3a42dedd39938ff23c89f2d1a07a3c836d81b2d31b4291a8608379",
-      "bytes": 2915
+      "sha256": "ff2610a2e5f382c53ce9b52bae720d30f69bd869d378a0bbf9ad1a10844dce23",
+      "bytes": 4335
     },
     {
       "file": "tools/linux_suite_overlay/CLI-LINUX.zh.md",
@@ -2389,6 +2389,11 @@
       "file": "tools/linux_suite_overlay/bin/camera-advanced",
       "sha256": "907e63e640194f352747db157be018dfe367f55d1e0fb7949099d9de50184f0d",
       "bytes": 365
+    },
+    {
+      "file": "tools/linux_suite_overlay/bin/camera-checked",
+      "sha256": "b5101bd639c9b77fe34d9861a2c555ea436d822a7aff668c29e1d0ebcf09a27b",
+      "bytes": 1011
     },
     {
       "file": "tools/linux_suite_overlay/bin/camera-shots",
@@ -2459,6 +2464,11 @@
       "file": "tools/linux_suite_overlay/source/linux-flow/publish/transaction.py",
       "sha256": "cbc7de9bf308afc17ba344ab9e84246fa0b6a7618016e6d847927f71452bb6f8",
       "bytes": 10420
+    },
+    {
+      "file": "tools/linux_suite_overlay/tests/camera-checked-smoke.py",
+      "sha256": "a1c36c4136f015f6b0c618b8555eeb7fc6d17abe3ee31814902b20e2509958a3",
+      "bytes": 2458
     },
     {
       "file": "tools/material_workflow_addon/LICENSE",
