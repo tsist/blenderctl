@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from protocol import atomic_json, digest
+from protocol import Failure
 from video_identity import implementation_sha256
 
 
@@ -44,6 +45,17 @@ def runtime_identity(bpy):
             'binary_sha256': digest(bpy.app.binary_path)}
 
 
+def require_linux_self_contained(bpy):
+    # This supplements the VSE closure with Blender's native path walk.
+    # It is post-open admission for trusted inputs, not an OS sandbox.
+    # Factory startup persists this Blender-supplied brush asset reference,
+    # including in otherwise empty files. Do not exempt arbitrary runtime paths.
+    factory_brush = Path(bpy.utils.system_resource('DATAFILES')) / 'assets/brushes/essentials_brushes-gp_draw.blend'
+    paths = bpy.utils.blend_paths(absolute=True, packed=False, local=False)
+    if bpy.data.libraries or any(Path(value) != factory_brush for value in paths):
+        raise Failure('UNSUPPORTED', 'Linux video.run requires a trusted self-contained project')
+
+
 def verify(path):
     import bpy
     from video_editing_workflow_addon import core
@@ -58,6 +70,8 @@ def verify(path):
         if digest(config['candidate']['file']) != config['candidate']['sha256']:
             raise ValueError('Candidate bytes changed')
         bpy.ops.wm.open_mainfile(filepath=config['candidate']['file'], load_ui=False, use_scripts=False)
+        if sys.platform == 'linux':
+            require_linux_self_contained(bpy)
         scene = bpy.data.scenes[config['scene']]
         bpy.context.window.scene = scene
         actual = json.loads(json.dumps(core.inspect(config['scene'], config['workflow_id']), allow_nan=False))

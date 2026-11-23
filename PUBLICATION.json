@@ -1,12 +1,12 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r1-linux-scene-inspect-preview",
+  "release": "0.63.1-r1-linux-native-video-save-preview",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
   "skill_bundle": "0.4.0",
-  "runtime_identity": "141c6f62d6bf66a94299035dd51d5151172b0bd1c6eefa96eda930d8482d7d2b",
+  "runtime_identity": "56c29997475664e6517c0bd2319db82bf9b427216816580c3773ab46529a5353",
   "runtime_files": 191,
   "license": "GPL-3.0-or-later",
   "files": [
@@ -132,8 +132,8 @@
     },
     {
       "file": "docs/VIDEO-EDITING.md",
-      "sha256": "19942aaaa8ad6cac8b5d5eb324aae760d7577a1d06cf00aa05241d9ab0b59562",
-      "bytes": 5702
+      "sha256": "a4515c758c746631e6ae14f2a68b5410a8d70698ad6558cae88b160972259ea6",
+      "bytes": 6816
     },
     {
       "file": "docs/cli/examples/model-hard-surface.json",
@@ -927,7 +927,7 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "12ea212f3e552d9591576acaa683aec8dd2eb70a4905e10bb1c50c662ce80476",
+      "sha256": "cdcb6d0182ce28bbf9b4b7be4fe5933a6836c6a532d9e5b5d71f326aadd450d0",
       "bytes": 4692
     },
     {
@@ -1277,7 +1277,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "3eceaa6acb5e346daee808dfb48aa8e18335f6c8a1fce2956ab6d9b9a1c79574",
+      "sha256": "03f973ffdf2214127e402dca13906ce7b7fb793122faf949b1a37e88bdcbd333",
       "bytes": 32601
     },
     {
@@ -1369,6 +1369,11 @@
       "file": "tests/run_linux_static_scene_smoke.py",
       "sha256": "20d8f4946b3c675e0a24e4f2d2b4f329310d074f12b5bb14f696785f5a9e0cf0",
       "bytes": 4471
+    },
+    {
+      "file": "tests/run_linux_video_save_smoke.py",
+      "sha256": "8d840e6ab1a48445a70139726b14ef6550ad701f08b3befa48a975a5ee63843a",
+      "bytes": 6450
     },
     {
       "file": "tests/run_linux_workflow_inspect_smoke.py",
@@ -2082,8 +2087,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "287c4ba71337fdf61ef93f914c97bb0b149782e8e15023e45da5b462376ddb3c",
-      "bytes": 44259
+      "sha256": "e807ef403cb0fc22e8d3e05041bc8a91e88aae53333bfbe4a5e71f4c8032a772",
+      "bytes": 45488
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2242,13 +2247,13 @@
     },
     {
       "file": "tools/blenderctl/video_verifier.py",
-      "sha256": "9a07da4a323f84c12212c1ad3d11c1d37948d025dd65b9f03927234ce3249e5b",
-      "bytes": 4593
+      "sha256": "57b5e99f0f09f7d186c5aa1c79346d190d47221816637e82afa6bf4a4175f3f2",
+      "bytes": 5419
     },
     {
       "file": "tools/blenderctl/video_workflow.py",
-      "sha256": "0a3e8d8e6ec8e0ae1353848084a4e54a59624a066ab39ae84589a3b3146c635a",
-      "bytes": 16250
+      "sha256": "259a7fb5fb94781d85213ca4193db55ec4db01f6d584fdfa88817692773f10e7",
+      "bytes": 19093
     },
     {
       "file": "tools/blenderctl/video_workflow_contract.py",
