@@ -45,7 +45,8 @@ def prepare(request, blender=DEFAULT_BLENDER, root=DEFAULT_JOBS, timeout=120, tr
     if not blender.is_file() and request["command"] not in (*OPERATIONS,"transaction.status", "transaction.rollback", "transaction.recover", "compositing.encode"):
         raise Failure("NOT_FOUND", f"Blender executable not found: {blender}")
     job = Path(root).resolve() / uuid.uuid4().hex
-    job.mkdir(parents=True, exist_ok=False)
+    linux_video_write = sys.platform == "linux" and request["command"] == "video.run"
+    job.mkdir(mode=0o700 if linux_video_write else 0o777, parents=True, exist_ok=False)
     atomic_json(job / "request.json", request)
     atomic_json(job / "launch.json", {"blender": str(blender), "timeout_seconds": timeout,
                                      "transactions_root": str(Path(transactions_root).resolve()),**({'limits':limits} if limits else {}),**({'resource_domain':resource_domain} if resource_domain else {})})
@@ -162,7 +163,7 @@ def _execute_worker(job, parent_checkpoint=None):
     limits=launch.get('limits');usage={};last_resource_check=0;memory_observations=[]
     linux_template = sys.platform == "linux" and request["command"] == "material.template-save"
     linux_guarded_fixture_read = sys.platform == "linux" and request["command"] in ("rig.inspect", "animation.sample", "scene.inspect")
-    linux_workflow = sys.platform == 'linux' and request['command'] in ('compositing.inspect', 'video.inspect', 'geometry.run', 'lighting.run')
+    linux_workflow = sys.platform == 'linux' and request['command'] in ('compositing.inspect', 'video.inspect', 'video.run', 'geometry.run', 'lighting.run')
     def checkpoint():
         nonlocal last_resource_check
         if linux_template or linux_guarded_fixture_read or linux_workflow:
@@ -207,6 +208,10 @@ def _execute_worker(job, parent_checkpoint=None):
                 from functools import partial
                 from linux_file_guard import LinuxFileGuard, LinuxGuardMonitor
                 p=request['params']; m=p.get('manifest') or {}
+                if request['command'] == 'video.run' and (
+                    any(k in p for k in ('output', 'media_probe', 'resume')) or os.environ.get('OCIO')
+                ):
+                    raise Failure('UNSUPPORTED', 'Linux video.run is limited to self-contained native saves, without output, resume, media probe, or an OCIO override')
                 if (p['resources'] or limits or any(p.get(k) for k in ('template','preview','resume','cache_manifest'))
                     or m.get('temporal') or (m.get('preview') or {}).get('enabled')
                     or (request['command']=='compositing.inspect' and os.environ.get('OCIO'))):
@@ -433,6 +438,15 @@ def _execute_worker(job, parent_checkpoint=None):
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
             raise Failure("VALIDATION_FAILED", str(result.get("error")))
         data = result["data"]
+        if sys.platform == 'linux' and request['command'] == 'video.run':
+            candidate = data.get('candidate', {})
+            expected_path = job / 'video-candidate.blend'
+            if (candidate.get('file') != str(expected_path) or data.get('status') != 'passed'
+                or data.get('verification', {}).get('status') != 'passed'):
+                raise Failure('VALIDATION_FAILED', 'Linux video candidate did not pass independent verification')
+            accepted_guard = input_guards.enter_context(FileGuard(expected_path))
+            if accepted_guard.sha256(checkpoint) != candidate.get('sha256'):
+                raise Failure('CONFLICT', 'Linux video candidate changed before host acceptance')
         if request['command']=='sculpt.replay':
             from sculpt_host import accept
             data=accept(job,request,data,input_guards,checkpoint,sculpt_runtime_hashes)

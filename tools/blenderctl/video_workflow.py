@@ -1,6 +1,8 @@
 """Saved-file native VSE work unit, guarded candidate and fresh-reader evidence."""
 import copy
 import json
+import os
+import uuid
 import subprocess
 import sys
 import time
@@ -12,7 +14,7 @@ from protocol import Failure, atomic_json, digest, read_json
 from video_identity import implementation_sha256
 from video_workflow_contract import (_call, input_documents, normalize_params,
                                      normalize_inspect_params, signature)
-from video_verifier import mismatch, runtime_identity
+from video_verifier import mismatch, require_linux_self_contained, runtime_identity
 from video_editing_workflow_addon import core, contract
 
 
@@ -127,9 +129,33 @@ def _output_files(value):
     return result
 
 
+def _linux_stage_new(destination, staging):
+    if os.path.lexists(destination):
+        raise Failure('CONFLICT', 'Owned candidate already exists')
+    staged = staging
+    result = bpy.ops.wm.save_as_mainfile(filepath=str(staged), check_existing=False,
+                                        relative_remap=True, copy=True)
+    if result != {'FINISHED'} or not staged.is_file():
+        raise Failure('IO_ERROR', 'Blender did not save the staged Linux candidate')
+    return _descriptor(staged)
+
+
+def _linux_publish_new(staged, destination):
+    # Same filesystem, private job, no-clobber kernel link. Do not use the
+    # Blender overwrite save or the Windows transaction backend.
+    try:
+        os.link(staged['file'], destination, follow_symlinks=False)
+    except FileExistsError as exc:
+        raise Failure('CONFLICT', 'Owned candidate already exists') from exc
+    return {'file': str(destination), 'sha256': staged['sha256']}
+
+
 def run(params, job, *, cancel_parent=None):
     params = normalize_params(params)
     job = Path(job)
+    linux = sys.platform == 'linux'
+    if linux and (params['resources'] or any(k in params for k in ('output', 'media_probe', 'resume'))):
+        raise Failure('UNSUPPORTED', 'Linux video.run requires a self-contained native save')
     started = time.monotonic()
     report = {'video_report_version': '1.0', 'addon_version': '0.1-dev', 'status': 'running',
               'source': {'file': params['file'], 'sha256': params['expected_sha256']},
@@ -139,6 +165,7 @@ def run(params, job, *, cancel_parent=None):
               'support': {'stage': 'technical_A_development', 'HDR10_PQ': 'not_requested_in_this_job',
                           'real_AI_film': 'not_run', 'five_minute_real_film': 'not_run'}}
     last_progress = [None, 0.0]
+    staging = None
 
     def progress(stage, **extra):
         if (job / 'cancel.request').exists() or (cancel_parent and (Path(cancel_parent) / 'cancel.request').exists()):
@@ -159,7 +186,11 @@ def run(params, job, *, cancel_parent=None):
         bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)
         if tuple(bpy.data.version[:2]) != tuple(bpy.app.version[:2]):
             raise Failure('UNSUPPORTED', 'Video requires matching Blender major/minor')
+        if linux:
+            require_linux_self_contained(bpy)
         report['source_resource_paths'] = _resource_closure(params)
+        if linux and report['source_resource_paths']:
+            raise Failure('UNSUPPORTED', 'Linux video.run requires a self-contained project')
         manifest = params['manifest']
         if params.get('resume'):
             old = read_json(params['resume']['file'])
@@ -196,23 +227,39 @@ def run(params, job, *, cancel_parent=None):
                 _call(contract.validate_output_budget, params['output'], inspected['timeline'], inspected.get('clips', []))
             progress('save_checkpoint')
             destination = job / 'video-candidate.blend'
-            if destination.exists():
-                raise Failure('CONFLICT', 'Owned candidate already exists')
-            bpy.ops.wm.save_as_mainfile(filepath=str(destination), check_existing=False, relative_remap=True)
-            candidate = _descriptor(destination)
-        report['candidate'] = candidate
+            if linux:
+                if report['saved_expectation']['resource_paths']:
+                    raise Failure('UNSUPPORTED', 'Linux video.run cannot save external dependencies')
+                require_linux_self_contained(bpy)
+                # Stage at the final path's depth, so Blender remaps saved
+                # relative paths against the same directory used on publish.
+                staging = job / ('.vse-stage-' + uuid.uuid4().hex + '.blend')
+                candidate = _linux_stage_new(destination, staging)
+            else:
+                if destination.exists():
+                    raise Failure('CONFLICT', 'Owned candidate already exists')
+                bpy.ops.wm.save_as_mainfile(filepath=str(destination), check_existing=False, relative_remap=True)
+                candidate = _descriptor(destination)
+        if not linux:
+            report['candidate'] = candidate
         report['inspection'] = copy.deepcopy(report['saved_expectation']['inspection'])
         atomic_json(job / 'video-manifest.json', manifest)
         atomic_json(job / 'video-shots.json', _shots(report['inspection']))
-        from filesystem import FileGuard
+        if linux:
+            from linux_file_guard import LinuxFileGuard as FileGuard
+        else:
+            from filesystem import FileGuard
         with ExitStack() as guards:
             candidate_guard = guards.enter_context(FileGuard(candidate['file']))
             if candidate_guard.sha256() != candidate['sha256']:
                 raise Failure('CONFLICT', 'Candidate changed before independent verification')
             progress('independent_reopen')
             report['verification'] = _reopen(candidate, params, report, job, progress)
-            report['recovery'] = {'available': True, 'checkpoint': candidate, 'resume_report': str(job / 'video-report.json'),
-                                  'binding': 'Original request, source/resources/implementation/runtime SHA and original saved expectation; new job only'}
+            if linux:
+                report['recovery'] = {'available': False, 'reason': 'Linux video.run does not support resume'}
+            else:
+                report['recovery'] = {'available': True, 'checkpoint': candidate, 'resume_report': str(job / 'video-report.json'),
+                                      'binding': 'Original request, source/resources/implementation/runtime SHA and original saved expectation; new job only'}
             if 'output' in params:
                 inspected = report['inspection']
                 _call(contract.validate_output_budget, params['output'], inspected['timeline'], inspected.get('clips', []))
@@ -242,6 +289,15 @@ def run(params, job, *, cancel_parent=None):
             if candidate_guard.sha256() != candidate['sha256']:
                 raise Failure('CONFLICT', 'Candidate bytes changed during output')
             _check_inputs(params)
+        if linux:
+            progress('publish_candidate')
+            candidate = _linux_publish_new(candidate, destination)
+            staging.unlink(missing_ok=True)
+            staging = None
+            with FileGuard(destination) as guard:
+                if guard.sha256() != candidate['sha256']:
+                    raise Failure('CONFLICT', 'Published Linux candidate changed')
+            report['candidate'] = candidate
         report['checks'].update(source_resources_implementation_sha='passed', candidate_bytes_unchanged='passed', independent_reopen='passed')
         report['status'] = 'passed'
         report['metrics'] = {'wall_seconds': time.monotonic() - started, 'clip_count': len(report['inspection'].get('clips', []))}
@@ -256,6 +312,9 @@ def run(params, job, *, cancel_parent=None):
         if isinstance(exc, contract.WorkflowError):
             raise Failure(exc.code, str(exc)) from exc
         raise
+    finally:
+        if staging is not None:
+            staging.unlink(missing_ok=True)
 
 
 def inspect(params, job):

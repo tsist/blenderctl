@@ -49,3 +49,23 @@ Inputs are saved disk snapshots. Work on new candidates, preserve manual/locked/
 Base video workflow supports bounded retiming/freeze/replacement, candidates, original-speed dialogue/music/SFX, volume/fades, subtitle/title editing, basic transforms/color and explicit outputs. Complex effects belong to the compositing workflow. HLG, arbitrary imported VSE continuation, audio time-stretch, nonzero pan and HDR display viewing are not supported. Technical PQ/10-bit paths have limited prior evidence; 4K HDR and long combined loads are not qualified. This template library deliberately rejects HDR. Complex performance and real long-form production remain future validation goals.
 
 The compiler refuses output/custom-library locations inside the protected source root. Place project outputs in a sibling or other explicitly selected external directory. FFmpeg/ffprobe for MP4 or preparation helpers must be explicitly bound by their real executable paths and SHA-256; PNG-only examples do not need them. Some legacy native report fields still show `addon_version: 0.1-dev`; the authoritative addon version is the shipped `blender_manifest.toml` (0.1.1).
+
+## Linux native-save compatibility
+
+On 64-bit Linux with matching Blender major/minor, public `video.run` supports
+trusted self-contained projects with `resources: []` and no `output`, resume,
+external media probe, OCIO override, or job resource limits. Technical smoke
+covers Blender 5.3.0 build `02f0899d78e3`, COLOR create/patch and cold inspection.
+The source and implementation stay guarded with local Linux leases and
+namespace monitoring. The candidate is staged privately, independently
+reopened, then linked into its job without overwriting any existing entry.
+Treat the public result and terminal job state as authoritative; a file by
+itself is not a successful job. This uses the existing local filesystem
+qualification; it is not OS isolation, a generic Linux transaction back end,
+or a power-loss guarantee. Do not use it to open untrusted blend files.
+Media inputs, output rendering/encoding and recovery are outside this scope.
+
+Run the bounded test on a qualified filesystem:
+```sh
+python -B tests/run_linux_video_save_smoke.py --blender /path/to/blender --output /new/absolute/test-directory
+```
