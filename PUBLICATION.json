@@ -1322,8 +1322,8 @@
     },
     {
       "file": "tests/test_host.py",
-      "sha256": "3b44a0c4639794c1c14c93543f8ec249c9d99a88153c19f9c8b043542c9e641f",
-      "bytes": 8245
+      "sha256": "0db38240865b3e162a488bd2c72fcf2ae133396803af784489872ed2fac79ae9",
+      "bytes": 8275
     },
     {
       "file": "tests/test_job_bridge.py",

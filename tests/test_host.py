@@ -101,7 +101,8 @@ class HostTests(unittest.TestCase):
                 result = self.rig_call('--blender', str(blender), *group, route, mode, '--request', str(request), '--run-dir', str(run))
                 self.assertEqual(result.returncode, 17, result.stderr)
                 self.assertEqual(json.loads(result.stdout), [
-                    filename, mode, '--run-dir', str(run), '--request', str(request), '--blender', str(blender),
+                    filename, mode, '--run-dir', str(run), '--request', str(request),
+                    '--blender', str(blender.resolve()),
                 ])
         cancelled = self.rig_call(*group, 'candidate-repair', 'cancel', '--run-dir', str(run))
         self.assertEqual(cancelled.returncode, 17, cancelled.stderr)
