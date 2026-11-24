@@ -1,6 +1,5 @@
 interface:
-  display_name: "Blender 材质制作"
-  short_description: "组织 Blender 材质参考、PBR 图层与插件 CLI 制作，并验证真实输出与依赖"
-  default_prompt: "使用 $blender-material-authoring 依据当前目标与参考制作材质，并实际验证结果。"
-policy:
-  allow_implicit_invocation: true
+  display_name: "Blender 材质与贴图"
+  short_description: "在定稿白模与 UV 上定参考、分层做材质、烘焙投射贴图并完成三方对照交付"
+  default_prompt: "按 UV 与材质部门流程，先定参考与来源，再用 blenderctl 完成材质组装、烘焙与冷重开对照验收。"
+  default_prompt: "Use $blender-material-authoring for this Blender workflow task."

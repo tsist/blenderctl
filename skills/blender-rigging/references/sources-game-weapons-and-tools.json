@@ -1,0 +1,366 @@
+{
+  "sources": [
+    {
+      "id": "BL01",
+      "title": "Child Of Constraint — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/constraints/relationship/child_of.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2025-09-09",
+      "read_scope": "full constraint section (official manual raw source)",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Animatable Influence can switch parents over time; Set Inverse fixes offset after enabling; not suitable for connected bone chains"
+      ],
+      "limits": [
+        "Blender authoring constraint only; not exported as an engine constraint; no engine test"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL02",
+      "title": "Parenting Objects — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/editing/parent.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2026-07-04",
+      "read_scope": "sections on Object Parent, Bone Parent, Parent Inverse, Keep Transform, non-uniform scale",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Object parent vs bone parent; Parent Inverse; Keep Transform; non-uniform scale can cause shear"
+      ],
+      "limits": [
+        "Blender behavior only; engine import behavior not covered"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL03",
+      "title": "Armature Deform Parent — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/parenting.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2021-07-12",
+      "read_scope": "full section on Empty Groups, Automatic Weights, Envelope Weights",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Armature Deform Parent creates an Armature modifier and sets the armature as parent; automatic weights can be wrong on complex/overlapping parts"
+      ],
+      "limits": [
+        "Blender-specific; does not define a universal weight count or bone budget"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL04",
+      "title": "Armature Modifier — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/armature.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2026-03-06",
+      "read_scope": "full modifier options and Bind to sections",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Vertex groups of the same name drive weights; weights control per-bone influence; envelopes are an alternative; Preserve Volume behavior"
+      ],
+      "limits": [
+        "Blender-specific; no claim about engine import or LOD"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL05",
+      "title": "Object Origin — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/origin.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2025-09-09",
+      "read_scope": "full origin section including Set Origin types",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Object origin determines location/rotation/scale; Origin to 3D Cursor can place pivot at grip/hinge; Geometry to Origin is a different action"
+      ],
+      "limits": [
+        "Does not prescribe where a weapon grip or door hinge should be"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL06",
+      "title": "Copy Transforms Constraint — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/constraints/transform/copy_transforms.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2025-10-13",
+      "read_scope": "full constraint section including Mix and Target/Owner spaces",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Copy Transforms matches target location/rotation/scale; Mix Before/After Original changes parent-like behavior; Target/Owner spaces must be explicit"
+      ],
+      "limits": [
+        "Authoring constraint; export requires baking; no engine test"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL07",
+      "title": "Limit Rotation Constraint — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/constraints/transform/limit_rotation.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2025-10-13",
+      "read_scope": "full constraint section",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Limits Euler rotation per axis; does not work on bones affected by IK, where IK panel limits should be used"
+      ],
+      "limits": [
+        "Blender authoring only; not an engine joint; no test"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "BL08",
+      "title": "Bone Relations — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/bones/properties/relations.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2026-03-26",
+      "read_scope": "full Relations section including Local Location and Inherit Rotation/Scale",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Per-bone Local Location, Inherit Rotation and Inherit Scale change how child bones consume parent transforms; connected bones cannot be translated independently"
+      ],
+      "limits": [
+        "Blender behavior only; engine retarget/import may differ"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/blender.md"
+    },
+    {
+      "id": "UE01",
+      "title": "Skeletal Mesh Sockets in Unreal Engine",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/skeletal-mesh-sockets-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.9 Documentation; read 2026-11-13",
+      "read_scope": "full article",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Sockets are relative to a bone; mesh sockets for shared skeletons; Force Always Animated; dynamic Attach with Keep Relative/Keep World/Snap; Weld Simulated Bodies"
+      ],
+      "limits": [
+        "UE-specific; no project test; no Blender export/Unity/Godot coverage"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/epic-sockets.md"
+    },
+    {
+      "id": "UN01",
+      "title": "Unity-Technologies/FPSSample",
+      "url": "https://github.com/Unity-Technologies/FPSSample",
+      "author": "Unity Technologies",
+      "version_date": "Unity 2018.3.8f1; archived; repository last push 2025-10-23 (GitHub metadata)",
+      "read_scope": "README and repository metadata",
+      "evidence_type": "official open-source project documentation",
+      "supports": [
+        "Full first-person multiplayer sample; archived learning resource; first/third person presentation split; separate character/weapon hierarchies"
+      ],
+      "limits": [
+        "Archived 2018.3 project; 18GB with LFS; not run; not a current-engine template"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/fps-sample.md"
+    },
+    {
+      "id": "UN02",
+      "title": "FPSSample Documentation/Animation.md",
+      "url": "https://github.com/Unity-Technologies/FPSSample/blob/master/Documentation/Animation.md",
+      "author": "Unity Technologies",
+      "version_date": "Unity 2018.3-era; archived project",
+      "read_scope": "sections on Humanoid/Generic, animation jobs, first-person animation",
+      "evidence_type": "official open-source project documentation",
+      "supports": [
+        "Third person Humanoid; first person Generic; separate character and weapon hierarchies; override controller; Offhand IK; first-person weapon drag/lead; first person is client-local"
+      ],
+      "limits": [
+        "Documentation only; no code execution; archived"
+      ],
+      "capture_status": "search_extract",
+      "local_evidence": "evidence/weapons/fps-sample.md"
+    },
+    {
+      "id": "UN03",
+      "title": "FPSSample Documentation/Characters.md",
+      "url": "https://github.com/Unity-Technologies/FPSSample/blob/master/Documentation/Characters.md",
+      "author": "Unity Technologies",
+      "version_date": "Unity 2018.3-era; archived project",
+      "read_scope": "sections on authoring, prefabs, Skeleton Component, procedural bones, Humanoid configuration",
+      "evidence_type": "official open-source project documentation",
+      "supports": [
+        "Multiple prefabs per character (first person, client, server, hit collision, ragdoll); simplified skeletons; Skeleton Component stores hierarchy/names/default pose; procedural bones"
+      ],
+      "limits": [
+        "Documentation only; no code execution; archived"
+      ],
+      "capture_status": "search_extract",
+      "local_evidence": "evidence/weapons/fps-sample.md"
+    },
+    {
+      "id": "UN04",
+      "title": "Rendering of first person weapon model — Unity Discussions",
+      "url": "https://discussions.unity.com/t/rendering-of-first-person-weapon-model/719196/1",
+      "author": "Unity Discussions participants incl. Mogens_H (FPS Sample team reply)",
+      "version_date": "2018-10-24/25",
+      "read_scope": "thread posts shown in search extract",
+      "evidence_type": "developer forum statement",
+      "supports": [
+        "First-person material reprojects models to a fixed FOV; first-person models are made very small to avoid clipping; world-interaction arms need a different FOV"
+      ],
+      "limits": [
+        "Forum, not official manual; 2018 era; no run"
+      ],
+      "capture_status": "search_extract",
+      "local_evidence": "evidence/weapons/unity-fp-viewmodel.md"
+    },
+    {
+      "id": "CA01",
+      "title": "How to Make a Bow Attack Animation in Blender and Godot",
+      "url": "https://codernunk.com/tutorials/bow-and-arrow-attack-animation/",
+      "author": "CoderNunk",
+      "version_date": "2024-10-29",
+      "read_scope": "full article text (images noted as not yet available by author)",
+      "evidence_type": "author public project tutorial",
+      "supports": [
+        "Bow needs a flex representation; this case uses base/limb/string bones; IK plus Limit Distance; automatic weights then fix; constraints are not exportable; idle/drawn/fire actions and BlendTree; BoneAttachment3D; weapon bone; fixed draw-length limitation"
+      ],
+      "limits": [
+        "Single-author tutorial; not a shipped game; no collision/network/LOD; fixed draw length; Godot 4 specifics; not run"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/codernunk-bow.md"
+    },
+    {
+      "id": "IN01",
+      "title": "Unity FPSSample — Garry Newman",
+      "url": "https://garry.net/posts/2018/10/24/unity-fpssample/",
+      "author": "Garry Newman",
+      "version_date": "2018-10-24",
+      "read_scope": "full blog post extract",
+      "evidence_type": "third-party public project inspection",
+      "supports": [
+        "Arms and weapon are separate meshes/animators sharing a controller; first-person shader reprojects FOV; no self-shadowing; can still clip; author calls it a hack"
+      ],
+      "limits": [
+        "Third-party observation, 2018; may misread implementation; not official; not run"
+      ],
+      "capture_status": "search_extract",
+      "local_evidence": "evidence/weapons/unity-fp-viewmodel.md"
+    },
+    {
+      "id": "IN02",
+      "title": "Firearm Attachments — NeoFPS Scripting Reference",
+      "url": "https://docs.neofps.com/manual/weapons-firearms-attachments.html",
+      "author": "NeoFPS documentation",
+      "version_date": "undated; read via search extract 2026-11-13",
+      "read_scope": "full attachment section as returned by search extract",
+      "evidence_type": "commercial asset technical documentation",
+      "supports": [
+        "Sockets parented to a gun bone; nested sockets; attachments transfer to same-named socket; aim offset relative to weapon transform; socket scale should be 1,1,1"
+      ],
+      "limits": [
+        "Commercial Unity asset docs; product-specific; no source/run"
+      ],
+      "capture_status": "search_extract",
+      "local_evidence": "evidence/weapons/attachments.md"
+    },
+    {
+      "id": "IN03",
+      "title": "Weapon System — FPS Animation Pack Unity",
+      "url": "https://kinemation.gitbook.io/fps-animation-pack-unity/gameplay/weapon-system",
+      "author": "Kinemation",
+      "version_date": "undated; read via search extract 2026-11-13",
+      "read_scope": "weapon system overview and weapon mesh components",
+      "evidence_type": "commercial asset technical documentation",
+      "supports": [
+        "Weapon model has its own Animator for bolt/mag parts; bone visibility and sound events are separate components"
+      ],
+      "limits": [
+        "Commercial asset docs; not open source; not run"
+      ],
+      "capture_status": "search_extract",
+      "local_evidence": "evidence/weapons/attachments.md"
+    },
+    {
+      "id": "CM01",
+      "title": "How can I keep the \"Nock Point\" on my bowstring from flattening?",
+      "url": "https://blender.stackexchange.com/questions/318563/how-can-i-keep-the-nock-point-on-my-bowstring-from-flattening",
+      "author": "Eric Eaklor",
+      "version_date": "2024-05-17; CC BY-SA 4.0",
+      "read_scope": "question and comments",
+      "evidence_type": "community Q&A (unanswered)",
+      "supports": [
+        "Single string bone plus automatic weights/weight edits can leave a flat/curved nock point; no accepted fix in the thread"
+      ],
+      "limits": [
+        "Question with no accepted answer; not evidence of a fix"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/weapons/bow-failure.md"
+    },
+    {
+      "id": "CM02",
+      "title": "bow string animating (with physics?) — Blender Artists",
+      "url": "https://blenderartists.org/t/bow-string-animating-with-physics/603143",
+      "author": "Blender Artists thread participants",
+      "version_date": "2014-03-04 onwards",
+      "read_scope": "thread snippet",
+      "evidence_type": "community forum experience",
+      "supports": [
+        "Split string at middle, weight ends to limbs, middle to its own bone; use simple control bones; no stretch needed"
+      ],
+      "limits": [
+        "Old forum thread; no project/export test; not a standard"
+      ],
+      "capture_status": "snippet_only",
+      "local_evidence": "evidence/weapons/bow-failure.md"
+    },
+    {
+      "id": "CM03",
+      "title": "Need help figuring how to keep a bowstring straight — Blender Artists",
+      "url": "https://blenderartists.org/t/need-help-figuring-how-to-keep-a-bowstring-straight/1127153",
+      "author": "Blender Artists thread participants",
+      "version_date": "2018-09-21 onwards",
+      "read_scope": "thread snippet",
+      "evidence_type": "community forum experience",
+      "supports": [
+        "User reports bowstring deformation differs at character scale vs >2m; cause not confirmed"
+      ],
+      "limits": [
+        "Anecdotal; no reproduction; cause unconfirmed"
+      ],
+      "capture_status": "snippet_only",
+      "local_evidence": "evidence/weapons/bow-failure.md"
+    }
+  ],
+  "blocked": [
+    {
+      "id": "B-W01",
+      "title": "Animation Notifies in Unreal Engine",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/animation-notifies-in-unreal-engine",
+      "status": "403 Access not allowed",
+      "note": "Stopped this route; not used as evidence."
+    },
+    {
+      "id": "B-W02",
+      "title": "Godot 4.7 BoneAttachment3D class reference",
+      "url": "https://docs.godotengine.org/en/4.7/classes/class_boneattachment3d.html",
+      "status": "429 rate limited",
+      "note": "Full-page read not obtained; no retry or backend switch. Only the author tutorial mention is used, not an official API claim."
+    }
+  ],
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

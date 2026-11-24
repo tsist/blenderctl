@@ -1,0 +1,295 @@
+{
+  "sources": [
+    {
+      "id": "BL02",
+      "title": "Parenting Objects — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/editing/parent.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2026-07-04",
+      "read_scope": "sections on Object Parent, Bone Parent, Parent Inverse, Keep Transform, non-uniform scale",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Bone parent vs object parent; Parent Inverse; Keep Transform; non-uniform scale can cause shear"
+      ],
+      "limits": [
+        "Blender behavior only; engine import behavior not covered"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/blender.md"
+    },
+    {
+      "id": "BL03",
+      "title": "Armature Deform Parent — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/parenting.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2021-07-12",
+      "read_scope": "full section on Empty Groups, Automatic Weights, Envelope Weights",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Armature Deform Parent creates an Armature modifier and sets the armature as parent; automatic weights can be wrong on complex parts"
+      ],
+      "limits": [
+        "Blender-specific; does not define a universal weight/bone budget"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/blender.md"
+    },
+    {
+      "id": "BL04",
+      "title": "Armature Modifier — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/armature.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2026-03-06",
+      "read_scope": "full modifier options and Bind to sections",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Vertex groups of the same name drive weights; weights control per-bone influence; rigid 1.0 weight is valid"
+      ],
+      "limits": [
+        "Blender-specific; no engine/LOD claim"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/blender.md"
+    },
+    {
+      "id": "BL05",
+      "title": "Object Origin — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/origin.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2025-09-09",
+      "read_scope": "full origin section including Set Origin types",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Object origin determines location/rotation/scale; Origin to 3D Cursor can place pivot at hinge/slide origin"
+      ],
+      "limits": [
+        "Does not prescribe where a prop pivot should be"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/blender.md"
+    },
+    {
+      "id": "BL08",
+      "title": "Bone Relations — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/bones/properties/relations.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS; manual source revision 2026-03-26",
+      "read_scope": "full Relations section including Local Location and Inherit Rotation/Scale",
+      "evidence_type": "official documentation",
+      "supports": [
+        "Per-bone Local Location, Inherit Rotation and Inherit Scale change how child bones consume parent transforms; connected bones cannot be translated independently"
+      ],
+      "limits": [
+        "Blender behavior only; engine retarget/import may differ"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/blender.md"
+    },
+    {
+      "id": "UN01",
+      "title": "Hinge Joint component reference — Unity 6000.0",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/class-HingeJoint.html",
+      "author": "Unity Technologies",
+      "version_date": "Unity 6000.0 Manual; read 2026-11-13",
+      "read_scope": "full component reference",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Anchor/Axis local; Connected Body and hinge chains; nested cat flap example; Spring/Motor mutually exclusive; limits/contact distance/break force/mass scale"
+      ],
+      "limits": [
+        "Component reference, not a project test; Unity-specific; no run"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/unity-hinge.md"
+    },
+    {
+      "id": "UN02",
+      "title": "Rigidbody component reference — Unity 6000.0",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/class-Rigidbody.html",
+      "author": "Unity Technologies",
+      "version_date": "Unity 6000.0 Manual; read 2026-11-13",
+      "read_scope": "full component reference",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Is Kinematic means the physics system cannot move/rotate the body; only Transform moves it; angular damping and constraints exist"
+      ],
+      "limits": [
+        "Unity-specific; no project test"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/unity-rigidbody.md"
+    },
+    {
+      "id": "UE01",
+      "title": "Constraints User Guide — Unreal Engine",
+      "url": "https://dev.epicgames.com/documentation/unreal-engine/constraints-user-guide-in-unreal-engine?lang=en-US",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.7 Documentation; read 2026-11-13",
+      "read_scope": "full guide",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Physics Constraint connects two actors/components; angular swing limits; skeletal mesh constraint bone is a Physics Asset body; component name targeting"
+      ],
+      "limits": [
+        "UE-specific; no UE run; project setup not covered"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/ue-constraints.md"
+    },
+    {
+      "id": "UE02",
+      "title": "Physics Constraint Reference — Unreal Engine 4.27",
+      "url": "https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/Physics/Constraints/ConstraintsReference/",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 4.27 Documentation; read 2026-11-13",
+      "read_scope": "full reference",
+      "evidence_type": "official engine documentation (older version)",
+      "supports": [
+        "Linear Free/Limited/Locked; limit distance; soft constraint; linear/angular break; projection; parent dominates"
+      ],
+      "limits": [
+        "UE 4.27 reference; property names/behavior may differ in target version; mechanism vocabulary only"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/ue-constraints.md"
+    },
+    {
+      "id": "UE03",
+      "title": "Physics Damping in Unreal Engine",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/physics-damping-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.7 Documentation; read 2026-11-13",
+      "read_scope": "full article",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Angular damping; constraint limit stiffness/damping; values require scene-specific experimentation"
+      ],
+      "limits": [
+        "UE-specific; no universal values; no run"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/ue-constraints.md"
+    },
+    {
+      "id": "GD01",
+      "title": "AnimatableBody3D — Godot 4.7",
+      "url": "https://docs.godotengine.org/en/4.7/classes/class_animatablebody3d.html",
+      "author": "Godot Engine documentation contributors",
+      "version_date": "Godot 4.7 documentation; read 2026-11-13",
+      "read_scope": "full class reference",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Kinematic body manually moved; estimates velocity and affects other bodies; useful for moving platforms/doors; sync_to_physics for AnimationPlayer; do not mix with move_and_collide"
+      ],
+      "limits": [
+        "Class reference, not a complete elevator/passenger tutorial; no run"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/godot-moving-body.md"
+    },
+    {
+      "id": "GD02",
+      "title": "HingeJoint3D — Godot 4.7",
+      "url": "https://docs.godotengine.org/en/4.7/classes/class_hingejoint3d.html",
+      "author": "Godot Engine documentation contributors",
+      "version_date": "Godot 4.7 documentation; read 2026-11-13",
+      "read_scope": "full class reference",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Hinge around an axis; StaticBody door hinge + RigidBody example; angular limits lower/upper; motor enable/target velocity/max impulse"
+      ],
+      "limits": [
+        "Class reference; no project test"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/godot-moving-body.md"
+    },
+    {
+      "id": "CA01",
+      "title": "Rigging and animating a door, from Blender to Unreal Engine",
+      "url": "https://itandfeel.com/rigging-and-animating-a-door-from-blender-to-unreal-engine/",
+      "author": "itandfeel (maebara)",
+      "version_date": "2024-08-09; Blender 4.1 -> Unreal Engine 5.4",
+      "read_scope": "full article",
+      "evidence_type": "author public project tutorial",
+      "supports": [
+        "Door pivot at origin; Root/Controller bones; Roll 0; bone parent; Copy Rotation local; Limit Rotation 0-90 local; keyframes; FBX bake and no leaf bones; UE import"
+      ],
+      "limits": [
+        "Single door; no collision/state/network; dimensions/settings not universal; not run"
+      ],
+      "capture_status": "read_full",
+      "local_evidence": "evidence/interactive-props/itandfeel-door.md"
+    },
+    {
+      "id": "CA02",
+      "title": "Rigging up elevator or sliding doors with an armature (bones)",
+      "url": "https://helloserve.com/blogs/rigging_up_elevator_or_sliding_doors_with_an_armature_bones",
+      "author": "helloserve",
+      "version_date": "undated; search snippet read 2026-11-13",
+      "read_scope": "search snippet only; full page rate-limited",
+      "evidence_type": "author public technical post (snippet)",
+      "supports": [
+        "Two bones for double sliding doors; decouple second bone; bone-parent each door; do not use automatic weights; keyframe 0/100"
+      ],
+      "limits": [
+        "Snippet only; undated; no collision/state/elevator passenger/export; not run"
+      ],
+      "capture_status": "snippet_only",
+      "local_evidence": "evidence/interactive-props/sliding-door-snippet.md"
+    },
+    {
+      "id": "CA03",
+      "title": "Make Interactive Doors and Switches in Blender for Godot",
+      "url": "https://foldedpaperengine.com/guides/make-doors-switches-in-blender.html",
+      "author": "Folded Paper Engine",
+      "version_date": "undated; search snippet read 2026-11-13",
+      "read_scope": "search snippet only; full page rate-limited",
+      "evidence_type": "author/vendor guide (snippet)",
+      "supports": [
+        "Animate prop first; correct hinge/slide origin; autoplay off; semantic event; no stacked openings; separate open/close; trigger away from moving geometry; test with second participant"
+      ],
+      "limits": [
+        "Snippet only; vendor guide; not official; not run"
+      ],
+      "capture_status": "snippet_only",
+      "local_evidence": "evidence/interactive-props/state-events-snippet.md"
+    }
+  ],
+  "blocked": [
+    {
+      "id": "B-P01",
+      "title": "helloserve sliding doors full page",
+      "url": "https://helloserve.com/blogs/rigging_up_elevator_or_sliding_doors_with_an_armature_bones",
+      "status": "429 rate limited",
+      "note": "No retry or backend switch. Only search snippet retained; source card marked snippet_only."
+    },
+    {
+      "id": "B-P02",
+      "title": "Folded Paper Engine doors/switches full page",
+      "url": "https://foldedpaperengine.com/guides/make-doors-switches-in-blender.html",
+      "status": "429 rate limited",
+      "note": "No retry or backend switch. Only search snippet retained; source card marked snippet_only."
+    },
+    {
+      "id": "B-P03",
+      "title": "Godot 4.7 SliderJoint3D class reference",
+      "url": "https://docs.godotengine.org/en/4.7/classes/class_sliderjoint3d.html",
+      "status": "429 rate limited",
+      "note": "Not used as evidence; no official linear-joint claim made. Drawer linear limits are supported by UE02 instead."
+    },
+    {
+      "id": "B-P04",
+      "title": "KatsBits gate/door rig full page",
+      "url": "https://www.katsbits.com/codex/rig-animate-game-asset/",
+      "status": "429 rate limited",
+      "note": "Not used as evidence; no full read. Blender origin/parent claims use official manual pages instead."
+    }
+  ],
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

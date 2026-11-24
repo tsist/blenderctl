@@ -1,38 +1,38 @@
 {
-  "bundle_version": "0.5.0",
+  "bundle_version": "0.6.0",
   "license": "GPL-3.0-or-later",
   "cli_version": "0.63.1",
   "extension_version": "0.7.0",
   "skills": [
     {
       "name": "blender-cli",
-      "source_guidance": "Windows Blender 5.3.0 and public rigging candidate routes",
-      "version": "0.3.0"
+      "source_guidance": "Windows Blender 5.3.0 unified CLI operations, discovery, and recovery",
+      "version": "1.0.0"
     },
     {
       "name": "blender-work-methodology",
-      "source_guidance": "Production handoffs for editable assets, rigging and shots",
-      "version": "0.3.0"
+      "source_guidance": "10 department cards, 4 commission chains, and 5-gradient commercial QA",
+      "version": "1.0.0"
     },
     {
       "name": "blender-material-authoring",
-      "source_guidance": "0.4.0",
-      "version": "0.2.0"
+      "source_guidance": "Layered PBR materials, projection baking, and clean rebuild verification",
+      "version": "1.0.0"
     },
     {
       "name": "blender-asset-manager",
-      "source_guidance": "Asset Browser consumption and saved-project handoff",
-      "version": "0.2.1"
+      "source_guidance": "Asset naming, Catalog mapping, transactional publish, and drag-in checks",
+      "version": "1.0.0"
     },
     {
       "name": "blender-video-editing",
-      "source_guidance": "Video workflow distribution 0.1.3 / template library 0.1.0",
-      "version": "0.1.3"
+      "source_guidance": "VSE rough cut, in-place shot swap, audio/subtitles, and OTIO roundtrip",
+      "version": "1.0.0"
     },
     {
       "name": "blender-rigging",
-      "source_guidance": "Independent rigging workflow v003 source preview and 0.40.1 workbench",
-      "version": "0.42.3-agent-v003"
+      "source_guidance": "Rigging workflow v003 CLI source preview, skeleton, weights, and retargeting",
+      "version": "1.0.0"
     }
   ],
   "optional_dependencies": {

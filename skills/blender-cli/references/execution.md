@@ -1,52 +1,53 @@
-# 执行与独立验收
+# 命令写法、请求 JSON 与建模 UV 扩展
 
-使用PowerShell 7。全局参数放子命令之前，含空格路径整体传参，复杂JSON写文件。
+使用 PowerShell 7 调用 `./blenderctl.ps1`。含空格的路径用引号包住，全局开关放在子命令前面。
+
+## 标准起手模板
 
 ```powershell
-$ctl = Join-Path $env:BLENDERCTL_ROOT 'blenderctl.ps1'
-$batch = Join-Path $env:BLENDERCTL_ROOT '..\my-blender-task'
-$jobs = Join-Path $batch 'jobs'
-New-Item -ItemType Directory -Path $batch -Force | Out-Null
-$raw = & $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs capabilities
+$ctl   = './blenderctl.ps1'
+$batch = 'work/audit/<batch>/'
+$jobs  = Join-Path $batch 'jobs'
+New-Item -ItemType Directory -Path $jobs -Force | Out-Null
+
+$raw  = & $ctl --jobs-dir $jobs capabilities
 $code = $LASTEXITCODE
-$r = $raw | ConvertFrom-Json
-if ($code -ne 0 -or !$r.ok) { throw ($raw -join "`n") }
-$r.data.execution_contract
+$res  = $raw | ConvertFrom-Json
+if ($code -ne 0 -or !$res.ok) { throw ($raw -join "`n") }
 ```
 
-新批次用独有目录，不覆盖旧请求。JSON用 `ConvertTo-Json -Depth 100 | Set-Content -LiteralPath <文件> -Encoding utf8`。SHA用 `(Get-FileHash -LiteralPath <源> -Algorithm SHA256).Hash.ToLowerInvariant()`。先 `inspect <源> --expected-sha256 <SHA>`，结构详情按需query/scene inspect/rig inspect，不凭文件名猜对象名。
+- **写 UTF-8 JSON 文件**：`$obj | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $jsonPath -Encoding utf8`。
+- **算小写 SHA256**：`(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()`。
+- **按名称精确查询数据块**：`query` 的选择器写齐三个键 `{"type": "Object", "name": "Cube", "library": null}`（本地对象的 `library` 填 `null`）。
 
-## 空场景到渲染
+## 位置参数与 `--file` 速查
 
-技能 `assets/studio-pipeline.json` 为三个步骤：scene.prepare创建2米立方体、相机/灯；render.run做256×256 CPU图像；inspect重开候选。无外部资产。复制模板到新批次再修改，不编辑技能原件。
+| 命令族 | 源 `.blend` 怎么传 | 必填配套参数 |
+|---|---|---|
+| `inspect`、`query`、`model inspect`、`scene inspect` | 位置参数 `file` | `--expected-sha256` |
+| `project verify`、`project prepare-copy` | 位置参数 `file` | `--expected-sha256`、`--resources <json>`（`prepare-copy` 另加 `--manifest <json>`） |
+| `scene` / `model` / `node` / `rig` / `simulation` 的 `prepare` | 命名参数 `--file` | `--expected-sha256`、`--manifest <json>` |
+| `dependency plan-relink`、`project override prepare` / `resync` | 命名参数 `--file` | 按各自 `--help` 传入资源描述符 `{"file": "绝对路径", "expected_sha256": "小写SHA"}` |
+| `request` | 位置参数 `request.json` | JSON 顶层含 `"schema_version": "1.0"`、`"command"`、`"params"` |
+
+工程确实没有任何外部贴图或缓存时，`--resources` 传一个内容为 `[]` 的 JSON 文件；有外部依赖时逐项列齐，保持打包与相对路径重映射完整。
+
+## 建模减面、脏网格重拓扑与 UV 常用操作
+
+这些能力已经集成在 `model prepare` 与 `uv` 子命令里，写 `manifest.json` 前用 `uv describe` 或对应 Schema 核对字段：
+
+- **共面融并减面**：在 `model.prepare` 的 `modifier.add`（`DECIMATE`）里设 `mode="DISSOLVE"` 与 `angle_limit_deg`（可选 `delimit` 按法线、材质、接缝、锐边、UV 保护边界），或用直接网格操作 `mesh.dissolve_limited` 清理布尔后的碎共面。
+- **脏网格自动重拓扑回投影**：在 `model.prepare` 的 `mesh.retopology` 里选 `adapter="QUADRIFLOW_SHRINKWRAP_V1"`，适合带修改器、开口边界或锐边的外部生成网格，支持设定目标面数、体素预处理与缩裹回贴，并在报告里列出属性变化与表面贴合误差。闭合干净网格也可继续用 `QUADRIFLOW_CLOSED_V1`。
+- **低拉伸展开、显式打缝与光照图 UV2**：`model.prepare` 的 `uv.unwrap` 与 `uv run` 都支持 `method="MINIMUM_STRETCH"`（SLIM）。展开动作保持现有接缝不变；需要先加缝时，用 `uv inspect` 看推荐接缝，再跑 `uv run` 的 `operation="seams"`（按角度或锐边打缝）。做第二套光照图 UV 用 `uv run` 的 `operation="lightmap"`（默认写进 `UVMap_Lightmap` 层，保留主渲染 UV 不动）。
+
+## 空场景流水线试跑
+
+技能自带 `assets/studio-pipeline.json` 三步样例（建 2 米立方体与相机灯光 → 渲 256×256 小图 → 重开检查）。用之前先复制到当前批次目录再改参数：
 
 ```powershell
-& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs pipeline plan --manifest '<本批模板副本.json>'
-# 检查退出码及计划后运行；plan也要求本机Blender存在。
-& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs --timeout 300 pipeline run --manifest '<本批模板副本.json>'
+Copy-Item '<本技能目录>\assets\studio-pipeline.json' $batch
+& $ctl --jobs-dir $jobs pipeline plan --manifest "$batch\studio-pipeline.json"
+& $ctl --jobs-dir $jobs --timeout 300 pipeline run --manifest "$batch\studio-pipeline.json"
 ```
 
-结果data.steps每步应succeeded或经验证reused；取studio.data.candidate与candidate_sha256，渲染路径从picture.data.outputs读取，不猜output.png。独立重开检查Cube几何、相机/灯；打开实际PNG检查尺寸、可见性和构图。模板不是完整美术场景或发布器。
-
-实际读取 `result.json` 的完整JSON；不要把终端截断、选列摘要或 `--human`输出当完整返回。必要时按step.child_directory读取子job的result.json。
-
-几何可用 `model inspect <候选> --expected-sha256 <SHA>`查看bounds/顶点/面，再用 `scene inspect`核对变换、单位和对象集合。模板CUBE的size是局部完整边长，不是半径，世界尺寸还受对象变换和scene单位设置影响。按名称query的selector必须包含 `{"type":"Object","name":"Cube","library":null}`三个键；本地对象library不能省略。
-
-## 有源工程
-
-project verify/prepare-copy的源为**位置参数**，--resources必填。仅确认无外部资源时用空数组文件。复制manifest为 `{"version_policy":"SAME_MINOR","path_policy":"REMAP_RELATIVE","unused_ids":"REJECT_LOSS","compress":true}`；读当前Schema核对。
-
-```powershell
-& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs project verify '<源.blend>' --expected-sha256 '<SHA>' --resources '<resources.json>'
-& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs project prepare-copy '<源.blend>' --expected-sha256 '<SHA>' --resources '<resources.json>' --manifest '<copy.json>'
-```
-
-dependency plan-relink、project link/override prepare、project override resync使用**--file**（link可省略，override必需）。资源描述符为 `{"file":"绝对路径","expected_sha256":"小写SHA"}`；清单/回执是内联还是描述符由具体Schema决定。
-
-scene/model/node/rig/simulation的prepare也使用 **--file**，不是位置参数。例如毛发：`simulation prepare --file '<源.blend>' --expected-sha256 '<SHA>' --manifest '<hair.json>'`；`hair.density`放在manifest.operations[].op中。
-
-完整请求例：`{"schema_version":"1.0","command":"inspect","params":{"file":"绝对路径.blend","expected_sha256":"小写SHA"}}`，用 `& $ctl --blender $env:BLENDER_PATH --jobs-dir $jobs request '<request.json>'`。schema_version不是CLI版本号。
-
-exchange.analyze/export的driver_profile从当前源公共rig inspect取得，按明确驱动策略审核后使用；不能给新副本套旧SHA。分析通过不等于连续时间/导出/渲染通过。GLB/FBX/USD按适配器、单位、帧率与实际求值帧验收。
-
-保留请求、返回JSON、job路径、成功产物/SHA、实际检验结果和限制。图像交付附图；动画记录帧域/误差/容差；缓存列保留目录。旧报告或测试脚本存在不代表本轮已执行，不把旧job路径充当新结果。
+跑完读作业目录下的完整 `result.json`（子步骤读 `child_directory` 里的 `result.json`），从返回字段取出候选 `.blend` 和输出图片路径核验。导出 `GLB / FBX / USD` 前先从当前副本跑 `rig inspect` 拿到匹配的 `driver_profile` 审核后再传给 `exchange analyze` 与 `export`。

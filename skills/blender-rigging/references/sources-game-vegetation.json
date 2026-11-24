@@ -1,0 +1,369 @@
+{
+  "domain": "vegetation",
+  "research_date": "2026-11-13",
+  "target_note": "Asset-side baseline: Blender 5.2.1; documentation baseline: Blender 5.2 LTS Manual. Engine examples are version-stated documentation reads, not a production engine target and not runtime verification.",
+  "sources": [
+    {
+      "id": "BL-ARM",
+      "title": "Armature Modifier",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/armature.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Armature modifier purpose, vertex groups, bone envelopes, multi-modifier behavior, parenting tip",
+      "evidence_type": "official manual",
+      "supports": [
+        "Armature modifier deforms vertices using vertex groups or envelopes",
+        "Skinning is distinct from object/bone parenting",
+        "Multiple armature modifiers can be mixed rather than chained"
+      ],
+      "limits": [
+        "Does not document game collision, WPO, or engine export behavior",
+        "Page text read via public search result, not a local Blender run"
+      ],
+      "capture_status": "read_major_sections_via_public_search_text",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-SKIN",
+      "title": "Armature Skinning Introduction and Armature Deform Parenting",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/introduction.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Skinning introduction; Armature Deform parenting; automatic weights and caveats",
+      "evidence_type": "official manual",
+      "supports": [
+        "Parenting objects to bones moves them but does not deform vertices",
+        "Armature Deform parenting creates and sets up an Armature modifier",
+        "Automatic weights can overlap and require manual correction"
+      ],
+      "limits": [
+        "Does not establish a universal bone count or weight limit",
+        "Parenting plus modifier is not by itself a double-transform claim"
+      ],
+      "capture_status": "read_full_relevant_pages",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-CHAIN",
+      "title": "Armature Structure and Bone Chains",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/structure.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Bone chains, connected versus offset parenting, ramified chains, root/tip terminology",
+      "evidence_type": "official manual",
+      "supports": [
+        "Bone chains can branch",
+        "Child bones may be parented but not connected",
+        "A parent bone can be part of multiple chains"
+      ],
+      "limits": [
+        "No vegetation-specific or gameplay-specific guidance",
+        "No claim that naming or hierarchy alone determines runtime behavior"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-BBONE",
+      "title": "Bendy Bones (B-Bones)",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/bones/properties/bendy_bones.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "B-Bone purpose, segments, curve handles, roll, vertex mapping, keying set",
+      "evidence_type": "official manual",
+      "supports": [
+        "B-Bones replace long chains of small rigid bones with a curved evaluation",
+        "More segments improve smoothness but increase pose cost",
+        "Straight and Curved vertex mapping have different cost/quality"
+      ],
+      "limits": [
+        "B-Bone evaluation is not documented as a portable engine runtime format",
+        "No vegetation-specific parameters or budgets"
+      ],
+      "capture_status": "read_major_sections_via_public_search_text",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-SPLINE",
+      "title": "Spline IK",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/posing/bone_constraints/inverse_kinematics/spline_ik.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Setup, chain length, curve target, roll, offset, length/thickness modes, optimal bone length, hooks",
+      "evidence_type": "official manual",
+      "supports": [
+        "Spline IK aligns a connected bone chain to a curve and is suitable for ropes",
+        "Y Scale Mode controls whether the chain stretches, uses pre-IK scaling, or neither",
+        "Roughly equal bone lengths and control points every few bones are recommended"
+      ],
+      "limits": [
+        "No guarantee of length preservation in all modes",
+        "Constraint evaluation must be baked or converted for non-Blender consumers"
+      ],
+      "capture_status": "read_major_sections_via_public_search_text",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-HOOK",
+      "title": "Hook Modifier",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/hooks.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Hook purpose, object/vertex group/strength, modifier-stack warning, falloff",
+      "evidence_type": "official manual",
+      "supports": [
+        "Hooks can deform meshes, curves, and lattices from another object",
+        "Hook assignment stores original indices and must precede generative modifiers"
+      ],
+      "limits": [
+        "No engine export guarantee",
+        "No branch or vine-specific workflow"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-BAKE",
+      "title": "Bake Action",
+      "url": "https://docs.blender.org/manual/en/5.2/editors/nla/editing/strip.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Bake Action section: final motion, visual keying, clear constraints, frame step, channels",
+      "evidence_type": "official manual",
+      "supports": [
+        "Bake Action computes final motion including constraints/drivers into per-frame keys",
+        "Visual Keying and Clear Constraints are available",
+        "Baking is a way to turn evaluated rig behavior into explicit animation"
+      ],
+      "limits": [
+        "Baking does not make unsupported deformation models portable",
+        "No performance or engine-import claim"
+      ],
+      "capture_status": "read_relevant_section",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-CURVE",
+      "title": "Curve Geometry",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/curves/properties/geometry.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Offset/extrude, taper, bevel depth/resolution/caps, custom profile, tilt",
+      "evidence_type": "official manual",
+      "supports": [
+        "Curves can generate ribbons or tubes with controlled resolution and caps",
+        "Taper and point radius control thickness along a spline"
+      ],
+      "limits": [
+        "Curve data is an authoring representation, not a universal engine runtime asset",
+        "No vegetation-specific wind behavior"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "UE-WPO",
+      "title": "Unreal Engine Material Properties - World Position Offset",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-engine-material-properties",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.9 Documentation page; accessed 2026-11-13",
+      "read_scope": "World Position Offset maximum displacement, bounds extension, clamping artifacts, culling",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "WPO can push rendered geometry outside static bounds and require max-displacement/bounds handling",
+        "A zero max displacement does not extend culling bounds",
+        "Clamping WPO can trade popping for flattened/hitching motion"
+      ],
+      "limits": [
+        "Documents rendering/culling, not collision or physics following WPO",
+        "Version is a documentation example, not the chosen project engine"
+      ],
+      "capture_status": "read_full_relevant_section",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "UE-BOUNDS",
+      "title": "Set Bounds Scale",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/BlueprintAPI/Rendering/SetBoundsScale",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.8 Documentation page; accessed 2026-11-13",
+      "read_scope": "Purpose: frustum-culling bounds scale, useful for WorldPositionOffset",
+      "evidence_type": "official engine API documentation",
+      "supports": [
+        "Bounds scale is a separate rendering/culling control",
+        "WPO users may need explicit bounds expansion"
+      ],
+      "limits": [
+        "No cost-free bounds setting; larger bounds can hurt performance/shadows",
+        "No collision guarantee"
+      ],
+      "capture_status": "read_full_short_page",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "UE-VAT",
+      "title": "Animation to Texture Data Asset and Bake API",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/AnimToTextureDataAsset?application_version=5.7",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.7 Documentation page; accessed 2026-11-13",
+      "read_scope": "VAT data asset fields: vertex/bone mode, textures, sample rate, LODs, influences, UV channel",
+      "evidence_type": "official engine API documentation",
+      "supports": [
+        "VAT can store per-vertex positions/normals or per-bone transforms/weights",
+        "Static mesh LOD and skeletal mesh LOD are explicit bake inputs",
+        "Texture resolution, frame count, and bone influences are explicit costs"
+      ],
+      "limits": [
+        "Documented as an engine plugin workflow, not a Blender exporter or universal format",
+        "No runtime performance, collision, or dynamic branch interaction guarantee"
+      ],
+      "capture_status": "read_full_api_property_page",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "UE-LOD",
+      "title": "Per-Platform LODs",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/per-platform-lods",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.7 Documentation page; accessed 2026-11-13",
+      "read_scope": "Ordered skeletal-mesh LODs, reduced geometry and bones, project-dependent step severity",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Higher LODs may reduce bone counts",
+        "LOD count and reduction severity are project-specific"
+      ],
+      "limits": [
+        "No universal screen-size or bone budget",
+        "No vegetation-specific LOD recipe"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "UE-FOLIAGE",
+      "title": "Foliage Mode in Unreal Engine",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/foliage-mode-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.8 Documentation page; accessed 2026-11-13",
+      "read_scope": "Static Mesh Foliage instancing, Actor Foliage cost, cluster culling, per-instance fade, density scaling",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Static Mesh Foliage supports hardware instancing and single-draw-call clusters",
+        "Actor Foliage has normal Actor rendering cost",
+        "Per-instance fade and density scaling are explicit scalability tools"
+      ],
+      "limits": [
+        "Not evidence about skeletal trees or interactive collision",
+        "Cluster culling can cause abrupt group disappearance if not faded"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "UE-PIVOT",
+      "title": "Pivot Painter Tool 1.0",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/pivot-painter-tool-1.0?application_version=4.27",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 4.27 Documentation page; accessed 2026-11-13",
+      "read_scope": "Pivot/rotation data in vertex data, shader hierarchy, grass versus tree hierarchy, memory statement",
+      "evidence_type": "historical official engine documentation",
+      "supports": [
+        "Per-pivot vertex data can drive hierarchical vegetation motion in a vertex shader",
+        "Trees benefit from hierarchy painting; grass should use per-object painting",
+        "Shader-driven motion avoids stored skeletal animation but is calculated on the fly"
+      ],
+      "limits": [
+        "UE 4.27-era page, not current engine or Blender functionality",
+        "Memory percentage is an example claim, not a budget for this project",
+        "No collision or interactive response"
+      ],
+      "capture_status": "read_page_text_via_public_search",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "GH-VEGSH",
+      "title": "tuxalin/vegetation-shader - Procedural Wind",
+      "url": "https://github.com/tuxalin/vegetation-shader",
+      "author": "tuxalin (GitHub), with credited influences Tiago Sousa and Renaldas Zioma",
+      "version_date": "master tree SHA 5bb72ca4d6f31d4b218a4c1ff180d9a40ac407db; UE4-era; accessed 2026-11-13",
+      "read_scope": "README; branchWind.ush; foliageWind.ush; trunkWind.ush; repository file tree",
+      "evidence_type": "open-source shader source and README",
+      "supports": [
+        "Separate trunk/foliage wind functions and LOD variants",
+        "Per-branch phase, branch attenuation, edge attenuation, branch weight",
+        "Mass/height/multi-frequency controls for trunk and foliage motion",
+        "Phase and amplitude can be encoded in texture or vertex color"
+      ],
+      "limits": [
+        "UE4 material project only; no current-engine verification",
+        "No collision or gameplay interaction",
+        "Uasset material graphs were not opened",
+        "No render or performance test"
+      ],
+      "capture_status": "read_readme_and_three_shader_files",
+      "local_evidence": "evidence/vegetation-shader-source.md"
+    },
+    {
+      "id": "GH-TREERIG",
+      "title": "pajama-studio/lowpoly-tree-generator",
+      "url": "https://github.com/pajama-studio/lowpoly-tree-generator",
+      "author": "pajama-studio / Rand Monster",
+      "version_date": "main tree SHA 4377dd602717e04705e73943cd8f0ed8d21bba91; created 2026-07; accessed 2026-11-13",
+      "read_scope": "README; src/rig.js; src/vines.js; repository file tree",
+      "evidence_type": "open-source implementation source and README",
+      "supports": [
+        "Optional rig separated from static generation",
+        "Bone chains derived from trunk/root/primary/secondary semantic curves",
+        "Branches parented at nearest point on the parent curve",
+        "Two-bone closest-segment weighting for low-poly trees",
+        "Level-specific wind strength and deterministic phase",
+        "Wind clips sampled for export",
+        "Vine recipe supports dual anchors and slack but read code generates static vine geometry"
+      ],
+      "limits": [
+        "Three.js/GLB implementation, not Blender or Unreal",
+        "Code was read, not executed; no GLB export or engine import",
+        "No LOD/collision/performance evidence",
+        "Nearest-point parenting and two-bone weights are untested on complex forks"
+      ],
+      "capture_status": "partial_source_read: README + rig.js + vines.js",
+      "local_evidence": "evidence/tree-rig-source.md"
+    }
+  ],
+  "blocked": [
+    {
+      "title": "Blender 5.2 Cloth path (incorrect URL)",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth.html",
+      "reason": "404 Not Found; navigation shell only. Replaced by /physics/cloth/introduction.html.",
+      "attempts": 1,
+      "used_as_evidence": false
+    },
+    {
+      "title": "Blender 5.2 Soft Body path (incorrect URL)",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/soft_body.html",
+      "reason": "404 Not Found; navigation shell only. Used specific /physics/soft_body/... pages instead.",
+      "attempts": 1,
+      "used_as_evidence": false
+    },
+    {
+      "title": "Blender 5.2 Rigid Body path (incorrect URL)",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body.html",
+      "reason": "404 Not Found; navigation shell only. Used specific /physics/rigid_body/... pages instead.",
+      "attempts": 1,
+      "used_as_evidence": false
+    },
+    {
+      "title": "Public research search backend",
+      "url": "https://docs.blender.org/manual/en/5.2/",
+      "reason": "RATE_LIMITED after several targeted queries and direct reads; stopped retrying rather than changing or falling back from the backend. Already-read pages were retained as evidence.",
+      "attempts": 3,
+      "used_as_evidence": false
+    }
+  ],
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

@@ -1,0 +1,510 @@
+{
+  "domain": "flexible-assets",
+  "research_date": "2026-11-13",
+  "target_note": "Asset-side baseline: Blender 5.2.1; documentation baseline: Blender 5.2 LTS Manual. Engine examples are version-stated documentation reads, not a production engine target and not runtime verification.",
+  "sources": [
+    {
+      "id": "BL-SKIN",
+      "title": "Armature Skinning Introduction and Armature Deform Parenting",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/introduction.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Parenting versus deformation; Armature Deform parenting creates/sets up an Armature modifier",
+      "evidence_type": "official manual",
+      "supports": [
+        "Bone/object parenting moves children but does not deform their vertices",
+        "Armature Modifier plus weights is the deforming mechanism",
+        "Armature Deform parenting is a shortcut that adds an Armature modifier"
+      ],
+      "limits": [
+        "No game-engine consumption guarantee",
+        "Object parenting plus modifier is not automatically a double transform"
+      ],
+      "capture_status": "read_full_relevant_pages",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-SPLINE",
+      "title": "Spline IK",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/posing/bone_constraints/inverse_kinematics/spline_ik.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Setup, chain length, curve target, roll, offset, length/thickness modes, bone-length guidance, hooks",
+      "evidence_type": "official manual",
+      "supports": [
+        "Spline IK aligns connected bones to a curve and is suitable for ropes",
+        "Y Scale Mode can stretch to fit, use pre-IK scale, or keep original length",
+        "Roughly equal bone lengths and control points every few bones are recommended",
+        "Hooks are recommended for curve control points"
+      ],
+      "limits": [
+        "Length preservation is not universal across scale modes",
+        "Constraint evaluation must be baked for non-Blender consumers",
+        "No runtime collision or engine guarantee"
+      ],
+      "capture_status": "read_major_sections_via_public_search_text",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-BBONE",
+      "title": "Bendy Bones (B-Bones)",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/bones/properties/bendy_bones.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "B-Bone evaluation, segments, curvature, roll, vertex mapping, keying",
+      "evidence_type": "official manual",
+      "supports": [
+        "B-Bones replace long chains of small rigid bones with a curved bone evaluation",
+        "More segments improve smoothness but increase pose cost",
+        "Curved vertex mapping costs more than Straight"
+      ],
+      "limits": [
+        "Not documented as a portable engine runtime feature",
+        "No hose/cable-specific material or collision guidance"
+      ],
+      "capture_status": "read_major_sections_via_public_search_text",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-HOOK",
+      "title": "Hook Modifier",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/hooks.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Mesh/curve/lattice hooks, influence, modifier-stack warning, falloff",
+      "evidence_type": "official manual",
+      "supports": [
+        "Hook can control curve control points with another object",
+        "Hook stores original indices and should precede generative modifiers"
+      ],
+      "limits": [
+        "No game-runtime or export guarantee"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-CURVE",
+      "title": "Curve Geometry",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/curves/properties/geometry.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Offset/extrude, taper, bevel depth/resolution/caps, custom profile, tilt",
+      "evidence_type": "official manual",
+      "supports": [
+        "Curves can generate tubes with controlled depth, resolution, and caps",
+        "Taper/radius control thickness along length",
+        "Custom bevel profiles can create non-circular hose/cable sections"
+      ],
+      "limits": [
+        "Curve objects are authoring data, not a universal engine asset",
+        "No simulation or collision behavior"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-CLOTHINTRO",
+      "title": "Cloth Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth/introduction.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Modifier behavior/order, apply-to-freeze, cache, CPU cost, workflow, springs, initial penetration",
+      "evidence_type": "official manual",
+      "supports": [
+        "Cloth is a modifier evaluated in stack order",
+        "Applying Cloth freezes the current shape and removes the modifier",
+        "Simulation results are cached; computation is CPU-intensive",
+        "Initial penetration can make simulation unstable"
+      ],
+      "limits": [
+        "No engine runtime or export guarantee",
+        "No direct bag/tent recipe"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-CLOTHEX",
+      "title": "Cloth Examples - Flag and Cloth on Armature",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth/examples.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Flag grid/pin/simulate/apply workflow; cloth on armature pinning; modifier order; bind pose and teleport caveats",
+      "evidence_type": "official manual with stepwise examples",
+      "supports": [
+        "A flag can be a grid with its pole edge pinned, simulated, then frozen",
+        "Cloth can be pinned to an armature with a vertex group",
+        "Cloth modifier is below the Armature modifier in the example stack",
+        "Fast movement or teleport can break cloth simulation"
+      ],
+      "limits": [
+        "Text steps only; no finished flag asset or engine export",
+        "No bag/tent/soft-toy example in the read text"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-CLOTHSHAPE",
+      "title": "Cloth Shape - Pin Group, Sewing, Dynamic Mesh",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth/settings/shape.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Pin weights, stiffness, sewing springs/max force, shrinking, dynamic mesh, rest shape key",
+      "evidence_type": "official manual",
+      "supports": [
+        "Pin group vertex weights control how strongly cloth is held",
+        "Sewing springs connect two cloth regions and need bounded force for stability",
+        "Dynamic Mesh and Rest Shape Key are distinct rest-shape workflows"
+      ],
+      "limits": [
+        "No universal pin weight or spring value",
+        "No engine runtime guarantee"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-CLOTHPHYS",
+      "title": "Cloth Physical Properties",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth/settings/physical_properties.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Mass, air viscosity, tension/compression/shear/bending, internal springs, pressure, volume, non-manifold caveat",
+      "evidence_type": "official manual",
+      "supports": [
+        "Cloth material behavior is split into tension, compression, shear, and bending",
+        "Internal springs can make a mesh behave like a soft body",
+        "Pressure can simulate soft-shelled objects but is gas-like, not actual fluid simulation",
+        "Non-manifold holes allow pressure to escape and cause drift"
+      ],
+      "limits": [
+        "No direct bag pattern or seam construction",
+        "Pressure is an approximation, not fluid dynamics"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-CLOTHCOLL",
+      "title": "Cloth Collisions",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth/settings/collisions.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Prerequisites, quality, object collision, self collision, distance/impulse, troubleshooting",
+      "evidence_type": "official manual",
+      "supports": [
+        "Collision objects must be meshes with Collision enabled and share layers",
+        "Higher quality reduces tears/penetration at more time cost",
+        "Self-collision is recommended for close-up cloth but adds compute cost",
+        "Increasing stiffness can help cloth torn by a deforming mesh"
+      ],
+      "limits": [
+        "No engine runtime collision guarantee",
+        "No universal quality/distance threshold"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-CLOTHCACHE",
+      "title": "Cloth Cache",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth/settings/cache.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Baking, cache invalidation after moving/editing, subdivision-level caching, start/end restrictions",
+      "evidence_type": "official manual",
+      "supports": [
+        "Moving/editing cloth after simulation requires clearing the cache",
+        "Cache is per subdivision level; render and preview levels should match",
+        "Start/end frames cannot change without clearing the bake"
+      ],
+      "limits": [
+        "No export format or engine cache guarantee",
+        "No performance numbers"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-SOFTGOAL",
+      "title": "Soft Body Goal and Aerodynamics",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/soft_body/forces/exterior.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Goal semantics, goal weights, aerodynamic edge force, spring/damping technical model",
+      "evidence_type": "official manual",
+      "supports": [
+        "Goal 1 means no soft-body simulation; goal 0 means full physical influence",
+        "Goal can be driven by vertex group weights",
+        "Soft-body edges can receive wind/aerodynamic force"
+      ],
+      "limits": [
+        "No soft-toy or bag-specific asset example",
+        "No engine runtime guarantee"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-SOFTCOLL",
+      "title": "Soft Body Collision",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/soft_body/collision.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Vertex-based collisions, mesh collider requirement, face/edge collision cost, troubleshooting",
+      "evidence_type": "official manual",
+      "supports": [
+        "Soft-body collision is primarily vertex-based; sparse meshes miss collisions",
+        "Collision objects must be meshes with Collision enabled",
+        "Face collision is expensive and difficult to control"
+      ],
+      "limits": [
+        "No universal mesh density",
+        "No game engine behavior"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-RBINTRO",
+      "title": "Rigid Body Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/introduction.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Rigid-body purpose, active/passive, mesh-only, animation interaction, apply-transform note",
+      "evidence_type": "official manual",
+      "supports": [
+        "Rigid body changes position/orientation but does not deform geometry",
+        "Only mesh objects can be rigid bodies",
+        "Rigid-body simulation interacts with the animation system"
+      ],
+      "limits": [
+        "No chain-specific setup",
+        "No engine runtime guarantee"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-RBTIPS",
+      "title": "Rigid Body Tips",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/tips.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Animated passive mistake, bake-to-keyframes, small-object stability, fast-object tunneling, scaling",
+      "evidence_type": "official manual",
+      "supports": [
+        "Animated passive colliders must have the Animated option enabled",
+        "Rigid-body dynamics can be baked to normal keyframes",
+        "Small/fast objects can tunnel or be unstable; Blender gives a 20 cm example guideline"
+      ],
+      "limits": [
+        "The 20 cm note is Blender simulation guidance, not a universal asset-size gate",
+        "No chain-specific link solution"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-RBCON",
+      "title": "Rigid Body Constraints Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/constraints/introduction.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Joints, empty-hosted constraints, local anchor behavior, limits, breakable, iterations",
+      "evidence_type": "official manual",
+      "supports": [
+        "Rigid-body constraints connect two bodies and are often hosted on an empty",
+        "Constraint anchors are fixed in each object's local coordinates for the simulation",
+        "Constraints can have limits and be breakable"
+      ],
+      "limits": [
+        "No chain wrap/friction recipe",
+        "No engine runtime guarantee"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-SURFDEF",
+      "title": "Surface Deform Modifier",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/surface_deform.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Proxy-driven deformation, binding requirements, global-coordinate binding, falloff, sparse bind",
+      "evidence_type": "official manual",
+      "supports": [
+        "A low-resolution mesh can drive a high-resolution mesh via Surface Deform",
+        "Official documentation names cloth simulation proxy as a use case",
+        "Binding uses global coordinates; later object transforms are ignored"
+      ],
+      "limits": [
+        "DCC workflow only; no engine runtime guarantee",
+        "Requires well-matching meshes and valid target topology"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "BL-BAKE",
+      "title": "Bake Action",
+      "url": "https://docs.blender.org/manual/en/5.2/editors/nla/editing/strip.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Bake Action section: final motion, visual keying, clear constraints, frame step, channels",
+      "evidence_type": "official manual",
+      "supports": [
+        "Bake Action computes final motion including constraints/drivers into keys",
+        "Visual Keying and Clear Constraints are explicit options",
+        "Baking is the route from evaluated rig behavior to explicit animation"
+      ],
+      "limits": [
+        "Does not make unsupported simulation models portable",
+        "No engine import guarantee"
+      ],
+      "capture_status": "read_relevant_section",
+      "local_evidence": "evidence/blender-5.2-rigging.md"
+    },
+    {
+      "id": "BL-SHAPE",
+      "title": "Shape Keys Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/shape_keys/introduction.html",
+      "author": "Blender Documentation Team / Blender Foundation",
+      "version_date": "Blender 5.2 LTS Manual; accessed 2026-11-13",
+      "read_scope": "Relative versus absolute shape keys, morph-target terminology, use cases",
+      "evidence_type": "official manual",
+      "supports": [
+        "Shape keys deform vertices into new shapes and are equivalent to morph targets",
+        "Relative keys are for blended shapes; absolute keys are for sequential deformation"
+      ],
+      "limits": [
+        "Not a continuous collision/physics solution",
+        "No runtime support guarantee"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/blender-5.2-simulation.md"
+    },
+    {
+      "id": "UE-CABLE",
+      "title": "Cable Components in Unreal Engine",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/cable-components-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.9 Documentation page; accessed 2026-11-13",
+      "read_scope": "Simulation/rendering, plugin activation, placement, Blueprint, end attachment, collision/stiffness, property table",
+      "evidence_type": "official engine documentation with stepwise operations",
+      "supports": [
+        "Cable simulation uses Verlet particles with distance constraints",
+        "Rendering is a separate tube mesh built by a scene proxy",
+        "One or both ends can be attached; disabling Attach End makes a free end",
+        "Collision and stiffness greatly increase cost; Collision is Experimental"
+      ],
+      "limits": [
+        "No Blender workflow; no chain-link physical simulation",
+        "Documentation version not a project target",
+        "No actual cable was created or run"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "UE-CABLE-API",
+      "title": "UCableComponent API",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Plugins/CableComponent/UCableComponent",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.7 Documentation page; accessed 2026-11-13",
+      "read_scope": "Cable length, segments, solver iterations, substepping, collision, friction, teleport/reattach fields",
+      "evidence_type": "official engine API documentation",
+      "supports": [
+        "CableLength is rest length; NumSegments and SolverIterations are explicit controls",
+        "Collision is marked Experimental",
+        "Teleport/reattach reset fields exist for runtime cable state"
+      ],
+      "limits": [
+        "No cloth, chain-link, or vegetation behavior",
+        "No runtime verification in this research"
+      ],
+      "capture_status": "read_full_api_field_table",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    },
+    {
+      "id": "GH-CABLE",
+      "title": "NoxWings/Cable-Component",
+      "url": "https://github.com/NoxWings/Cable-Component",
+      "author": "NoxWings (GitHub)",
+      "version_date": "master tree SHA 8415e8c7ce78c7618ab1d69a10f208d9c9b573e9; Unity 5.4.0f3; accessed 2026-11-13",
+      "read_scope": "CableComponent.cs, CableParticle.cs, README.md, ProjectVersion.txt; repository tree",
+      "evidence_type": "open-source implementation source; no license file observed",
+      "supports": [
+        "Minimal Verlet particle cable with fixed/free ends",
+        "Separate simulation and LineRenderer update",
+        "Stiffness solver is an empty TODO; collision is absent",
+        "Demonstrates why minimal motion is not production acceptance"
+      ],
+      "limits": [
+        "No license file observed; do not reuse or redistribute",
+        "No collision, no production geometry, no chain/cloth",
+        "Code read only; not compiled or run",
+        "Unity 5.4.0f3 is an old version"
+      ],
+      "capture_status": "read_source_files",
+      "local_evidence": "evidence/flexible-case-sources.md"
+    },
+    {
+      "id": "UE-LOD",
+      "title": "Per-Platform LODs",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/per-platform-lods",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 5.7 Documentation page; accessed 2026-11-13",
+      "read_scope": "Ordered LOD sets, reduced geometry and bones, project-dependent severity",
+      "evidence_type": "official engine documentation",
+      "supports": [
+        "Higher LODs can reduce geometry and bone counts",
+        "LOD step severity is project-specific"
+      ],
+      "limits": [
+        "No universal distance or segment-count gate",
+        "No flexible-asset-specific guidance"
+      ],
+      "capture_status": "read_full_page",
+      "local_evidence": "evidence/unreal-engine-consumers.md"
+    }
+  ],
+  "blocked": [
+    {
+      "title": "Blender 5.2 Cloth path (incorrect URL)",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/cloth.html",
+      "reason": "404 Not Found; navigation shell only. Replaced by /physics/cloth/introduction.html.",
+      "attempts": 1,
+      "used_as_evidence": false
+    },
+    {
+      "title": "Blender 5.2 Soft Body path (incorrect URL)",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/soft_body.html",
+      "reason": "404 Not Found; navigation shell only. Used specific soft_body pages instead.",
+      "attempts": 1,
+      "used_as_evidence": false
+    },
+    {
+      "title": "Blender 5.2 Rigid Body path (incorrect URL)",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body.html",
+      "reason": "404 Not Found; navigation shell only. Used specific rigid_body pages instead.",
+      "attempts": 1,
+      "used_as_evidence": false
+    },
+    {
+      "title": "Public research search backend",
+      "url": "https://docs.blender.org/manual/en/5.2/",
+      "reason": "RATE_LIMITED after several targeted queries and direct reads; stopped retrying rather than changing or falling back from the backend. Already-read pages were retained as evidence.",
+      "attempts": 3,
+      "used_as_evidence": false
+    }
+  ],
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

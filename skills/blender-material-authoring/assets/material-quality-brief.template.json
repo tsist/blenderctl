@@ -1,0 +1,156 @@
+{
+  "schema_version": "1.0",
+  "document_role": "material_reference_and_visual_acceptance_plan_not_plugin_manifest",
+  "status": "draft",
+  "brief_id": null,
+  "revision": 1,
+  "frozen_at_utc": null,
+  "supersedes": null,
+  "change_reason_and_scope_or_acceptance_basis": null,
+  "target": {
+    "material_and_finish": null,
+    "condition_and_style": null,
+    "objects_or_regions": [],
+    "physical_dimensions_and_units": null,
+    "engine_and_version": null,
+    "normal_display_scale": null,
+    "closest_inspection_scale": null,
+    "texture_resolution": null
+  },
+  "references": [
+    {
+      "id": "R01",
+      "asset_or_work_title": null,
+      "page_url_or_authorized_local_path": null,
+      "creator_or_site": null,
+      "accessed_date": null,
+      "evidence_role": null,
+      "usage": "style_quality_reference",
+      "actually_viewed_overall_and_detail": [],
+      "image_identity_or_page_capture_and_region": null,
+      "why_selected": null,
+      "known_scale_and_lighting": null,
+      "uncertainties_and_non_applicable_parts": [],
+      "license_and_use_notes": null
+    }
+  ],
+  "quality_criteria": [
+    {
+      "id": "Q01",
+      "dimension": "material_identity_finish_and_style",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    },
+    {
+      "id": "Q02",
+      "dimension": "macro_organization_direction_and_regions",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    },
+    {
+      "id": "Q03",
+      "dimension": "mesoscale_structures",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    },
+    {
+      "id": "Q04",
+      "dimension": "microstructure_and_reflection_response",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    },
+    {
+      "id": "Q05",
+      "dimension": "physical_scale_uv_and_sampling",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    },
+    {
+      "id": "Q06",
+      "dimension": "surface_continuity_and_relevant_boundaries",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    },
+    {
+      "id": "Q07",
+      "dimension": "author_to_disk_reconstruction_quality",
+      "reference_ids": [],
+      "required_for_visual_pass": true,
+      "expected_observation": null,
+      "inspection_view_and_scale": null,
+      "rejection_condition": null,
+      "assessment": "pending",
+      "render_evidence_and_source_sha": [],
+      "visible_evidence_or_gap": null,
+      "next_action": null
+    }
+  ],
+  "required_dimensions_to_consider": [
+    "material_identity_finish_and_style",
+    "macro_organization_direction_and_regions",
+    "mesoscale_structures",
+    "microstructure_and_reflection_response",
+    "physical_scale_uv_and_sampling",
+    "surface_continuity_and_relevant_boundaries",
+    "author_to_disk_reconstruction_quality"
+  ],
+  "allowed_differences": [
+    "Non-specified grain, knot, rust or scratch positions and random seed may differ; fill the task-specific limits before authoring."
+  ],
+  "comparison_conditions": {
+    "model_and_uv_identity": null,
+    "cameras_and_display_scale": null,
+    "lighting_and_required_relit_views": null,
+    "color_management_exposure_and_engine": null,
+    "known_reference_vs_candidate_condition_differences": []
+  },
+  "review": {
+    "executor_self_review": "pending",
+    "parent_visual_review": "pending",
+    "user_feedback": "not_run",
+    "unresolved_critical_criteria": [],
+    "notes": "Keep a judgment row for all seven listed dimensions, and split applicable ones into observable criteria. Met requires actual reference and current-render observation. Critical gaps or unobserved items prevent visual pass. Not applicable requires a reason. Freeze a version and record its SHA in a separate receipt, never inside this JSON. Numeric similarity does not judge art quality."
+  }
+}

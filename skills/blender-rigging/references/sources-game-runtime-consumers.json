@@ -1,0 +1,316 @@
+{
+  "scope": "057 cross-domain game asset runtime consumption; public read-only research; only own audit directory written",
+  "status": "draft",
+  "research_state": "qualified_for_method_design_with_bounded_sources",
+  "mechanism_state": "not_run",
+  "case_state": "official_text_examples_read_only; not_asset_execution",
+  "production_state": "not_run",
+  "software_run": false,
+  "models_downloaded": false,
+  "engines_installed": false,
+  "uploaded": false,
+  "paid_access_used": false,
+  "third_party_code_copied": false,
+  "sources": [
+    {
+      "id": "R01",
+      "title": "Unity 6.0 Scripting Root Motion",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/ScriptingRootMotion.html",
+      "final_url": "https://docs.unity.com/en-us/engine/6000.0/manual/animation-section/animation-mecanim/avatar-creationand-setup/scripting-root-motion",
+      "author": "Unity Technologies",
+      "version_date": "Unity6000.0 LTS manual; page title explicitly6000.0",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "完整Scripting Root Motion教程步骤",
+        "Runspeed曲线/Controller同名参数",
+        "OnAnimatorMove示例及Handled by Script"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "root运动来源与消费可显式分离",
+        "in-place教程案例不提供碰撞/网络解决方案"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R01.txt",
+      "raw_html": "evidence/R01.html",
+      "raw_sha256": "901155e3e445675dcab543c0bd09aaee03e77d16716b4f3b4bfeb913f324baab",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R02",
+      "title": "Unity 6.0 Rig Import Settings",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/FBXImporter-Rig.html",
+      "final_url": "https://docs.unity.com/en-us/engine/6000.0/manual/assets-and-media/asset-types/models/importing/fbximporter-rig",
+      "author": "Unity Technologies",
+      "version_date": "Unity6000.0 LTS manual",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "Generic/Humanoid用途和Root node",
+        "Skin Weights/Max Bones Vertex/权重阈值",
+        "Strip Bones/Optimize Game Object/Extra Transforms to Expose"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "任意骨架不能自动套人形映射",
+        "导入权场截断与归一/优化挂点的消费者责任"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R02.txt",
+      "raw_html": "evidence/R02.html",
+      "raw_sha256": "1503463d45ab6039d417bd830237ad39d77db83ce8a9894834b44b99b26c897d",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R03",
+      "title": "Unity 6.0 Skinned Mesh Renderer",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/class-SkinnedMeshRenderer.html",
+      "final_url": "https://docs.unity.com/en-us/engine/6000.0/manual/assets-and-media/asset-types/mesh/components-reference/class-skinned-mesh-renderer",
+      "author": "Unity Technologies",
+      "version_date": "Unity6000.0 LTS manual",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "Bounds",
+        "Quality及全局/局部cap",
+        "Update When Offscreen",
+        "Mesh/Root bone"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "import/runtime影响数和bounds/离屏更新分开",
+        "Renderer的根、蒙皮和性能责任"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R03.txt",
+      "raw_html": "evidence/R03.html",
+      "raw_sha256": "5e333dc5e49d99ebf9f662f2a84fb2b57058d70feaed9d84608b5310ba8b549a",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R04",
+      "title": "Unreal Skeletal Mesh Sockets",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/skeletal-mesh-sockets-in-unreal-engine",
+      "final_url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/skeletal-mesh-sockets-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "page title Unreal Engine5.9 Documentation",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "Creating/Managing/Editing Sockets",
+        "Mesh Sockets",
+        "Socket Details含Force Always Animated",
+        "Basic/Dynamic Attachment及Keep Relative/Keep World/Snap/Weld"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "挂点偏移属于不同资产",
+        "附着保持规则与LOD父链",
+        "游戏附件具体官方操作案例"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R04.txt",
+      "raw_html": "evidence/R04.html",
+      "raw_sha256": "b9942cf528fc2835668614a137e14e350bacd53c78a1084416c63a5948082830",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R06",
+      "title": "Unreal Skeletal Mesh LODs",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/skeletal-mesh-lods-in-unreal-engine",
+      "final_url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/skeletal-mesh-lods-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "page title Unreal Engine5.9 Documentation",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "Bones to Prioritize及Weight of Prioritization",
+        "Reducing Bones/Bones to Remove",
+        "相关LOD Hysteresis/Morph tolerance/Bake Pose属性描述"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "LOD几何优先与删骨/静态烘焙不是全动作保证",
+        "Skeleton Tree存在不等同实际LOD骨求值"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R06.txt",
+      "raw_html": "evidence/R06.html",
+      "raw_sha256": "d2d001c7c4124184e3b3cf682f94e610d552239afa579e6e90654c5232b0c3c2",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R07",
+      "title": "Unreal Material Inputs / World Position Offset",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/material-inputs-in-unreal-engine",
+      "final_url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/material-inputs-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "page title Unreal Engine5.9 Documentation",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "World Position Offset输入及周期球体例",
+        "原始bounds/Scale Bounds/裁剪与阴影警告"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "材质变形和bounds需同时考虑",
+        "渲染位移不代签独立碰撞/玩法消费者"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R07.txt",
+      "raw_html": "evidence/R07.html",
+      "raw_sha256": "0767f37182bce106ec9ecb3c9e4721c62b645a8cabc3614b2bfd6806ed7b3d69",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R08",
+      "title": "Blender 5.2 glTF",
+      "url": "https://docs.blender.org/manual/en/5.2/addons/scene_gltf2.html",
+      "final_url": "https://docs.blender.org/manual/en/5.2/addons/scene_gltf2.html",
+      "author": "Blender Documentation Team",
+      "version_date": "Blender Manual5.2 URL; local binary5.2.1 not executed",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "Animations Import/Export",
+        "Actions/Active Actions merged/NLA Tracks/Scene",
+        "TRS/pose/shape支持范围和bone-driven shape子级采样条件",
+        "Data Armature/Skinning和Bake Merge/Rest Ranges/Sampling相关段落"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "原生控制与目标表示分离",
+        "Action/slot/mode/采样/组合身份",
+        "多模式及新旧合并描述须实际出口核验"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R08.txt",
+      "raw_html": "evidence/R08.html",
+      "raw_sha256": "2caae77cb7912cfa7620ce1a89994f43684eb94788bd2b63b611b66bd42780f8",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    },
+    {
+      "id": "R09",
+      "title": "Unreal Root Motion",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/root-motion-in-unreal-engine",
+      "final_url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/root-motion-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "page title Unreal Engine5.9 Documentation",
+      "accessed_at": "2026-11-13",
+      "read_scope": [
+        "Overview/Root Bone",
+        "Enabling Root Motion及四种消费模式",
+        "Results含Movement Mode/物理状态",
+        "Debugging Root Motion中capsule/mesh区分"
+      ],
+      "evidence_type": "official_documentation_text",
+      "supports": [
+        "root motion需启用并指定消费方式",
+        "角色移动/骨root与碰撞体不同",
+        "Walking Falling/Flying仅UE样例语义"
+      ],
+      "limits": [
+        "未运行Blender/Unity/Unreal",
+        "未下载/打开文中模型",
+        "未观看内嵌视频/逐帧图像",
+        "版本/API事实不作为跨引擎普遍硬门"
+      ],
+      "capture_status": "200_with_readable_body",
+      "local_evidence": "evidence/R09.txt",
+      "raw_html": "evidence/R09.html",
+      "raw_sha256": "79b81cffc6172b4a9b2e9023480fdbba23dc5aa07e80805355e3579ec6014f0a",
+      "licence_boundary": "仅阅读和归纳；未复制/纳入第三方实现或安装依赖"
+    }
+  ],
+  "blocked_not_adopted": [
+    {
+      "id": "R05",
+      "title": "Unreal Applying a Physical Animation Profile",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-apply-a-physical-animation-profile-in-unreal-engine",
+      "accessed_at": "2026-11-13",
+      "capture_status": "HTTP200_shell_only_21_chars",
+      "read_scope": [],
+      "supports": [],
+      "local_evidence": "evidence/R05.txt",
+      "limits": "未取得物理动画正文；两次同类壳后停止该路线，不补猜API，不用作正证据"
+    },
+    {
+      "id": "R10",
+      "title": "Unreal Physics Based Animation",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/physics-based-animation-in-unreal-engine",
+      "accessed_at": "2026-11-13",
+      "capture_status": "HTTP200_shell_only_21_chars",
+      "read_scope": [],
+      "supports": [],
+      "local_evidence": "evidence/R10.txt",
+      "limits": "未取得物理动画正文；两次同类壳后停止该路线，不补猜API，不用作正证据"
+    }
+  ],
+  "internal_prior": [
+    {
+      "path": "wiki:procedures/animation-commercial-delivery-specifications.md",
+      "read": "original via wiki_get",
+      "use": "historical navigation only; T/A pose/backend/Fab and motion-category generalisations not used as industry rules"
+    },
+    {
+      "path": "wiki:procedures/blender-finite-chain-physics-output-profile.md",
+      "read": "original via wiki_get",
+      "use": "finite project evidence only; output source routing/cold scope not presented as game-engine external evidence"
+    },
+    {
+      "path": "work/audit/<batch>/",
+      "read": "production report original",
+      "use": "reuse prior method qualifications; current new claims supported by above directly read official sources"
+    }
+  ],
+  "unresolved": [
+    "UE physical animation exact profile/blending APIs not acquired",
+    "No actual target engine version/project/platform specified",
+    "No import, root/physics handoff, attachment/LOD/bounds or performance execution",
+    "No network/replication/continuous contact proof"
+  ],
+  "search_boundary": "No direct web/search first-class tool was exposed; Agent Reach skill read, prior known web rate limit not retried or backend swapped; public official origin pages read with standard TLS validation.",
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

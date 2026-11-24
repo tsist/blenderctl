@@ -1,4 +1,5 @@
 interface:
-  display_name: "Blender 工作方法论"
-  short_description: "组织 Blender 制作思路、预览与验收，并依据真实实践持续改进方法"
-  default_prompt: "使用 $blender-work-methodology 完成本次 Blender 任务，并依据实际结果判断是否需要更新工作方法。"
+  display_name: "Blender 制片方法"
+  short_description: "按十个部门拆解 Blender 委托，衔接上下游交接、用户审看点与验收"
+  default_prompt: "按 Blender 制片方法拆解这份委托要经过的部门、交接内容和审看节点。"
+  default_prompt: "Use $blender-work-methodology for this Blender workflow task."

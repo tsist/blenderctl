@@ -1,51 +1,92 @@
 ---
 name: blender-video-editing
-description: 使用 Blender 原生 VSE、Video Editing Workflow 插件与公共 CLI 制作白膜分镜参考、剪辑 AI 视频和 Blender 动画，处理镜头候选、人工接续、声音字幕、模板、输出与验收；用于实际剪辑制作，不替代建模、复杂合成或生成平台提交。
+description: 使用 Blender 原生 VSE 与公共 CLI 制作分镜粗剪、按镜头编号原位换片、接手现场时间线手调、编排字幕音轨与导出成片。接到多镜拼装、白膜预演剪辑、AI 或正式渲染回流替换、切点微调、混音字幕及成片输出任务时使用。
 metadata:
-  version: "0.1.3"
+  version: "1.0.0"
 ---
 
 # Blender 视频剪辑
 
-围绕故事意图与实际可观看的成片工作。主要交付白膜参考剪辑与对应 AI 成片，次要处理 Blender 渲染动画；同样可以接收 CG、动画与实拍素材。插件管理时间线语义和薄 GUI，公共 CLI 管理作业、资源、保存、恢复与输出，agent 负责剪辑判断、观察和迭代。
+本技能属于 [剪辑部门](../blender-work-methodology/references/departments/editing.md)，负责把白膜分镜、正式渲染画面、AI 镜头候选、对白音乐与中文字幕编排成节奏顺畅的可播放成片。公共入口与批次目录规范见 [blender-cli](../blender-cli/SKILL.md)，所有修改都在独立工作副本上执行，源文件与母本保持原样留作对照。
 
-发行版 0.1.3 对应 CLI 0.63.0、插件核心 0.1.1、模板库 0.1.0。运行需要 Python 3.12+ 和 Blender 5.2；既有制作验证基线为 Blender 5.2.1 LTS。将 `BLENDERCTL_ROOT` 设为匹配版本的仓库根，使用根目录 `blenderctl.ps1` 或 `tools/blenderctl/cli.py`。独立安装本技能时仍须保留该仓库与工具依赖；技能目录内的文档和 helper 不能替代运行核心。首次执行读 [公共执行合同](references/execution.md)。
+## 怎么做
 
-## 创作与输入
+### 1. 核对入口、镜头表与素材规格
 
-从请求、已有工程和镜头表确认故事意图、参考、主画幅、目标时长与交付。只补问无法查明且影响正确性的输入。先确认整体创作方案，再在已授权方向内自主制作与迭代；改变故事意图或关键审美时交付可审阅候选，由用户决定方向。
+动手前先查当前剪辑契约，拿到准确子命令与 Schema，省去猜字段名的返工。
 
-- 已渲染白膜视频或图像序列直接进入剪辑。已有场景可调度可用的 Blender CLI/MCP，显式指定相机、帧域、帧率与输出，再接收实际产物及 SHA；建模、绑定和复杂表演另用相应工具。
-- 白膜交付整段预演、逐镜头视频和镜头表。稳定镜头编号贯穿白膜、AI 候选和剪辑版本，不随排序变化。
-- AI 回流保留原片、多候选和选用记录，先核对时长、帧率、画幅、流、源入点、颜色与音频。生成结果允许调整入出点、节奏和少量顺序，明显偏离参考的改剪需说明原因。
+```powershell
+$ctl = './blenderctl.ps1'
+& $ctl discover --product video
+& $ctl video describe
+& $ctl video describe --operation manifest --schema
+```
 
-## 从粗剪到成片
+接手素材后，先把每一份外部文件的绝对路径和小写 SHA256 列进资源清单（包含图像序列每张图、视频、音频、字体、代理以及所用的 `ffmpeg`/`ffprobe`）。核对视频素材是否满足与时间线一致的有理帧率（如 `[24, 1]`）、恒定帧率（CFR）、零起点和方像素。遇到异帧率或可变帧率（VFR）素材，先跑 `scripts/prepare_media.py` 派生同帧率 PNG 序列与 48kHz 对齐 PCM，再进时间线，避免切点漂移。
 
-先组织镜头用途、信息揭示、空间与情绪，再决定切点、时长和声音落点。先判断整体粗剪是否成立，再改局部。比较候选的动作可用区间、主体连续性和画面缺陷；保留动作 handles，避免仅靠停帧或拉长掩盖素材不足。
+### 2. 搭起粗剪时间线，先定结构再追细节
 
-使用基础剪切、排序、裁切缩放、有限叠化、镜头时长调整、候选替换、已验证的视觉变速/停帧和基础色彩修整。复杂局部效果交给合成工作流，按 [媒体交接](references/media-handoff.md) 明确帧域、handles、颜色/Alpha 和回流映射。
+按镜头表里的稳定 `shot_id` 在新场景里摆好各镜预演画面、临时对白、音乐节拍与参考字幕。区间统一用左闭右开 `[start, end_exclusive)`，`duration` 记有效贡献帧数。
 
-对白、BGM、音效与原音分别组织，明确保留或替换原音。字幕保留可编辑文字、时轴与样式，检查中文字体、换行、安全区、烧录与独立 SRT。横竖版使用明确的时间线版本，重构图后重新检查主体、运动和字幕。实际作品制作及用户反馈迭代读 [剪辑判断与复盘](references/editorial.md)。
+- **从零建粗剪**：写好 `action: "create"` 的请求 JSON，通过 `blenderctl.ps1 --jobs-dir $jobs --compact request $req`（或 `video run`）生成可编辑 VSE 工作副本。
+- **套用现成样式**：白膜审阅、AI 回流、CG 展示或中文阅读优先场景，可直接用 `scripts/video_templates.py` 编译四套内置无代码配方，快速产出标准请求。
+- **过粗剪审看①**：把整段预演拼通、声音节奏对齐后先给用户看。把镜头顺序、时长和停顿在白膜阶段敲定，再让下游投入正式渲染。
 
-需要白膜审阅、AI 成片、CG 展示或中文字幕样式复用时，读 [通用模板库](references/templates.md)。仓库入口为 `templates/video/cli.py`，模板只编译请求，实际执行仍走公共 CLI。模板库首版限定 SDR、SEQUENCE 顺序布局、硬切。
+### 3. 按镜头编号原位换片，改切点同步回写镜头表
 
-## 执行与保护
+正式渲染或 AI 镜头候选陆陆续续回来后，按稳定的 `shot_id` 原位替换对应条带，保住已经调准的入出点、转场、音轨和字幕。
 
-- 公共入口为 `video describe`、`video.run`、`video.inspect`。请求用 UTF-8 JSON，全局参数在子命令前。同时核对退出码、JSON `ok/error` 和权威 job 终态。
-- 源 `.blend` 及每份实际外部资源声明绝对路径与小写 SHA-256：图像序列逐帧、电影、声音、字体、代理、缓存及编码工具。只有确认无外部资源时才使用空 `resources`。
-- 时间范围采用 `[start,end_exclusive)`，duration 为有效贡献帧数，FPS 为 `[numerator,denominator]`。分开源帧、时间线帧、字幕毫秒和声音样本。
-- MOVIE 需要同项目有理帧率的 CFR、零起点、方像素及完整解码探测。异帧率/VFR 先用技能 `scripts/prepare_media.py` 显式派生 PNG 与对齐 PCM，保留 PTS、映射及量化尾差。
-- 修改生成新候选，保护源、锁定条带和非目标。人工编辑本工作流工程后先保存明确快照，再重算 SHA、`inspect` 并限定 patch 范围；冲突保留双方版本。后台不能识别 GUI 未保存编辑。未知条带保留并说明限制。
-- 原片与代理分开记录身份。已验证预览支持同画幅低分辨率 PNG IMAGE；`scripts/prepare_proxy.py` 生成代理，定稿省略 preview 并使用原片。代理配置存在不证明实际读取，直接 MOVIE/VFR/HDR 代理不在当前范围。
-- 同画幅预览保留原 canvas，用整数 1–100% 的 `resolution_percentage` 缩小，output 宽高须精确匹配。不同画幅或更大分辨率通过新 timeline 版本重构图。
-- 取消/恢复使用公共 job 接口，沿用原请求和身份绑定。恢复不能重签旧 SHA，也不承诺任意中间帧缓存续算。新尝试使用新 job 和新输出目录。
+- **同镜多候选比选**：把同镜头候选放到相同时间区间、显示变换与音量下对比，记录 `candidate_id`、可用帧段和选用理由。用 `action: "patch"` 里的 `select_candidate` 或定向 `update` 换片，动作落点变了就同步重校切点。
+- **微调单镜右边界**：短 SDR 受管时间线需要拉长或缩短某镜末尾时，运行 `blenderctl.ps1 --jobs-dir $jobs --compact video ripple`（传 `--scene`、`--workflow-id`、`--clip`、`--duration` 与 `--edge END`），让后续条带顺势波纹移动。
+- **切点变更回写镜头表**：只要剪辑时延长或缩短了某个镜头，先把新起止帧与手柄帧（handles）写回镜头表主档（由 VSE 左闭右开区间 `[start, end_exclusive)` 换算为镜头表和批渲染的闭区间 `[first, last]` 时，按 `last = start + duration - 1` 换算），再通知 [相机](https://github.com/tsist/blender-camera-workflow/blob/main/skills/blender-camera-workflow/SKILL.md)、动画或 [批渲染](https://github.com/tsist/blender-render-batch/blob/main/skills/blender-render-batch/SKILL.md) 部门补足对应帧段，保持全片一盘棋。
 
-## 资格与交付
+### 4. 接手用户在 Blender 窗口里的手调
 
-HLG、任意外来 VSE 工程接续、音频变速/非零声像等高级音频、HDR 设备观看不在本发行支持范围。复杂演出与真实长片作品验收仅为未来目标。既有 4K SDR 和短 HDR10/PQ 技术证据不推导长时 4K HDR 资格；高负载 4K HDR 扩展曾造成系统失去响应，当前发布不继续该路线。存储预算与超时不能保证内存上限或桌面响应。
+后台命令读的是磁盘文件；用户在打开的 Blender 窗口里手调了条带、字幕或锁定状态时，按下面三步安全接手：
 
-原生 `RetimingKey.timeline_frame` setter 和 `bpy.ops.sound.mixdown` 的失败路线停用。视觉速度使用完整源→META→SPEED FRAME_NUMBER 的 CONSTANT 源帧映射；声音使用连续 FFmpeg 解码和整数样本窗口混合。嵌套 SOUND、未资格化音量动画等拒绝。能力组合与已知失败读 [当前资格](references/qualification.md)。
+1. 在目标 Blender 窗口挂载会话目录，后台运行 `video inspect-live --session-dir $sDir --session-id $sId --scene $scene` 读取尚未保存的现场状态。
+2. 请用户另存为明确的工作快照，重新算快照 SHA256，跑一次 `video inspect` 获取受管条带与锁定状态。
+3. 写定向 `patch` 只改需要动的目标字段。锁定条带、手改过的非目标字段以及未知条带保持原样；出现修改冲突时保留双方版本供用户拍板。
 
-技术正确、agent 视听判断和用户审美认可分别记录。字幕数量或 SRT 完整不证明烧录显现；检查每条实际字幕与最终编码。缺播放/听检能力时记录 `not_run`，数值不能替代实际听感。人工检查集中在产出案例，不要求用户操作 GUI 完成技术验收；自动原生编辑不冒充可见 GUI 测试。宣称完成前读 [验收与边界](references/acceptance.md)。
+### 5. 配齐音轨、中文字幕、变速与部门交接
 
-交付可编辑候选及依赖、实际输出/预览、镜头表、候选选用记录、必要 SRT、版本回退入口和已验未验说明。`video-shots.json` 包含所有 clip；面向用户的镜头表筛选视觉镜头并按 start 排序，不把 TEXT/SOUND 条带数当镜头数。
+- **分轨混音**：把对白、BGM、音效和原音分轨摆放，优先保住对白清晰度。声音输出走 48kHz 连续解码与整数采样混合，并在主增益之后做削波检查；含未静音音轨输出时，在 `output` 与 `resources` 中显式带上 `ffmpeg` 和 `ffprobe`。
+- **可编辑中文字幕**：现有纯文本 SRT 先跑 `scripts/srt_to_clips.py` 转成按有理帧率量化的 TEXT 条带 JSON，再并入时间线。显式绑定本机中文字体（如 `msyh.ttc`）并把同次修改共享到同一份打包字体，控制总打包字体数量在 Blender 槽位上限以内。调剪后同步更新字幕时间，分别核对烧录画面与外挂 SRT。
+- **视觉变速与停帧**：把完整源素材放入 META，在内部用 SPEED 的 `FRAME_NUMBER` 按源帧索引打 `CONSTANT` 关键帧，外层 META 保留目标半开区间，每帧输出前刷新缓存。
+- **轻量预览与多画幅**：同画幅小尺寸审片用整数 1–100% 的 `resolution_percentage` 缩小；高分辨率 PNG 序列预览可用 `scripts/prepare_proxy.py` 生成 25%/50%/75% 独立代理并经 `output.preview.proxies` 显式绑定，定稿导出原片时去掉 `preview`。横竖版或更大画幅另建新时间线版本，重新做 `fit` 裁切与字幕安全区检查。
+- **跨部门与外部软件交接**：复杂调色、辉光或扣像按显式媒体清单（含 handles、色彩空间、Alpha 与 `source_in`）交给 [合成部门](https://github.com/tsist/blender-compositing-workflow/blob/main/skills/blender-compositing/SKILL.md)。需要和外部剪辑软件交换纯剪切时间线时，用 `video otio export` 与 `video otio import` 往返。
+
+### 6. 导出成片、管控长作业并做冷重开验收
+
+- **长作业管控**：耗时导出加上 `--async` 提交，用 `blenderctl.ps1 --jobs-dir $jobs --compact video job wait $jobId --wait-seconds 30` 分段等待，取消或查终态走 `video job cancel/status/result`。
+- **恢复旧作业**：续跑或查取历史 0.1.4 分发作业时，保留原 `--jobs-dir`，在 `video` 子命令前加上 `--video-release 0.1.4`，再执行 `video job result $jobId`；用 `resume` 指向旧完整 `video-report.json` 及其 SHA256 在新作业里重跑完整输出。
+- **冷重开与真片核对**：导出完成后另起独立进程重开候选工程核对帧域与引用。整片与逐镜视频全部真实解码，亲眼抽看切点前后、快动作、停帧与每条字幕首中末，亲耳听检对白清晰度、音乐过渡与音画落点；待听检或待设备观看项如实标注 `not_run`。
+
+## 交给下游
+
+审看①（粗剪）、审看②（精剪）与最终交付分别提供：
+
+- **可编辑 VSE 工程副本**：完整绝对路径、小写 SHA256 以及可重连的外部媒体资源清单。
+- **镜头表**：从 `video-shots.json` 筛选出真实视觉镜头并按 `start` 排序，附各镜候选选用记录与相对白膜的切点改动说明。
+- **可播放成片与外挂字幕**：核对过分辨率、帧率、音画同步与响度的整片/逐镜视频，以及以各自 0 秒起算的独立 SRT。
+- **外部交换与验收说明**：需要外部剪辑往返时附纯剪切 OTIO 文件；分项列出技术核对结果、视听观察结论与待验证项。
+
+## 例子：3 镜 15 秒短片从白膜粗剪到正式成片
+
+接到任务：「把 `work/reel/` 下 3 个白膜镜头拼成 15 秒 1080p 24fps 粗剪，用户手调后再换入正式渲染片，配对白、BGM 和中文字幕导出成片。」
+
+1. **建批次查契约**：在 `work/audit/<batch>/` 建 `jobs` 目录，跑 `blenderctl.ps1 video describe` 确认字段，算清 3 段白膜、BGM 与 `msyh.ttc` 的 SHA256。
+2. **出粗剪过审看①**：写 `create` 请求，用 `shot001`、`shot002`、`shot003` 建 360 帧时间线，跑 `video run` 生成 `candidate-v001.blend` 并导出 50% 分辨率粗剪 MP4 给用户看。
+3. **接手手调并回写镜头表**：用户在 Blender 里把 `shot002` 拉长了 12 帧并锁定了片头标题。先跑 `video inspect-live` 核对现场，保存为 `manual-snap-v001.blend` 后跑 `video inspect` 确认锁条带，把 `shot002` 新帧域回写镜头表主档，通知批渲染按新长度出正式片。
+4. **原位换片配字幕混音**：收到 3 段正式渲染 PNG 序列后，用 `srt_to_clips.py` 把定稿对白 SRT 转成 TEXT 条带 JSON，写 `patch` 请求按 `shot_id` 原位替换 3 个视觉条带，加上对白/BGM 音轨与淡入淡出，保持片头锁条带原样。
+5. **导出与冷重开验收**：跑 `video run` 导出 1080p 正式 MP4 与独立 SRT，另起进程冷重开最终候选工程确认零丢引用；抽看每个切点与全部字幕首中末、核对 48kHz PCM 零削波并听检对白与音乐过渡，连同工程副本、筛选后的镜头表和成片交付用户审看②。
+
+## 参考
+
+- [剪辑判断、候选比较与成片复盘](references/editorial.md)
+- [公共 CLI、现场窗口接手、人工往返与长作业恢复](references/cli-and-roundtrip.md)
+- [素材预处理、代理预览、音轨字幕与成片导出](references/media-audio-subtitles.md)
+- [合成显式媒体交接与纯剪切 OTIO 往返](references/handoff-and-otio.md)
+- [通用剪辑模板库使用指南](references/templates.md)
+- [契约文档、本地 Wiki 与历史证据索引](references/sources.md)
+- 配套脚本：`scripts/prepare_media.py`（异帧率/VFR 派生）、`scripts/prepare_proxy.py`（独立 PNG 代理）、`scripts/srt_to_clips.py`（SRT 转 TEXT JSON）、`scripts/video_templates.py`（模板编译）

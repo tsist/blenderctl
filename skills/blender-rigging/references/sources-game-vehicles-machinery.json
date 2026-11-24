@@ -1,0 +1,703 @@
+{
+  "domain": "vehicles-machinery",
+  "research_snapshot": "2026-11-13",
+  "scope_note": "Blender 5.2 LTS manual and one FlightGear c172p open-source issue are the verified basis. No Blender or engine run. Engine-specific vehicle APIs are not asserted.",
+  "sources": [
+    {
+      "id": "V01",
+      "title": "Bone Structure",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/bones/structure.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Main text on bone head/tail, roll, and local axes.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "A bone has head, body, and tail; its local Y axis is aligned from root to tip and is the roll axis.",
+        "Bone local axes are not world axes."
+      ],
+      "limits": [
+        "Does not define any engine skeleton convention.",
+        "Read as extracted manual text, not executed."
+      ],
+      "capture_status": "captured_manual_excerpt",
+      "independent_primary_check": {
+        "capture": "body_captured_pending_read",
+        "http_status": 200,
+        "root_review": "body sections read by independent reviewer; D03/D10 also read by root",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": "V01.txt"
+      }
+    },
+    {
+      "id": "V02",
+      "title": "Bone Roll",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/bones/editing/bone_roll.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Bone roll definition and recalculate/set/clear roll operations.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Roll is the rest-pose rotation around the bone length.",
+        "Roll can be recalculated against local/global/view/cursor references or cleared."
+      ],
+      "limits": [
+        "Does not prescribe a roll convention for wheels, hinges, or engines."
+      ],
+      "capture_status": "captured_manual_excerpt",
+      "independent_primary_check": {
+        "capture": "body_captured_pending_read",
+        "http_status": 200,
+        "root_review": "body sections read by independent reviewer; D03/D10 also read by root",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": "V02.txt"
+      }
+    },
+    {
+      "id": "V03",
+      "title": "Skinning Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Main text distinguishing object/bone parenting from Armature modifier deformation.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Objects parented or constrained to bones are transformed but never deformed.",
+        "The Armature modifier is the path that modifies vertex/control-point relative positions."
+      ],
+      "limits": [
+        "Conceptual distinction; no vehicle-specific workflow or engine behavior."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V04",
+      "title": "Armature Modifier",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/armature.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Armature modifier purpose, Vertex Groups/Envelopes, Multi Modifier, empty-group tip.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Bones deform vertices in same-named vertex groups when Vertex Groups binding is used.",
+        "The modifier deforms existing geometry; multiple armature modifiers can be mixed via Multi Modifier."
+      ],
+      "limits": [
+        "Does not state a universal influence count or guarantee auto weights.",
+        "No engine skinning contract."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V05",
+      "title": "Armature Deform Parent",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/parenting.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Armature Deform parenting, Empty/Automatic/Envelope weights, Cube+BoneA/B/C example, overwrite warning.",
+      "evidence_type": "official_manual_operational_example",
+      "supports": [
+        "Armature Deform parenting makes the armature the parent and adds an Armature modifier to each child.",
+        "Empty Groups creates empty groups named after deform bones; automatic weights may need manual correction.",
+        "Automatic/envelope weights overwrite existing same-named vertex group content."
+      ],
+      "limits": [
+        "Not a vehicle example; no wheel radius, suspension, mass, collision, or engine import.",
+        "Parent+modifier is the documented setup, not evidence about engine double transforms."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V06",
+      "title": "Weight Paint Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/sculpt_paint/weight_paint/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Weight paint purpose, normalized weights, armature auto-normalization, locking and multi-paint.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Deformation weights usually need normalization; the Armature modifier normalizes automatically.",
+        "Normalized workflow and locking help control redistribution."
+      ],
+      "limits": [
+        "Does not state a four-influence cap; engine limits must be verified separately."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V07",
+      "title": "Parenting Objects",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/editing/parent.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Object parent, Keep Transform, Parent Inverse, Clear Parent, non-uniform scale limitation.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Object parent transforms children but children do not transform the parent.",
+        "Keep Transform computes Parent Inverse to preserve world transform.",
+        "A rotated parent with non-uniform scale can shear a child; clearing parent may lose the shear."
+      ],
+      "limits": [
+        "Does not define engine parent/attachment behavior."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V08",
+      "title": "Apply (Object)",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/editing/apply.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Apply Location/Rotation/Scale/Rotation & Scale, shared data warning, armature caveat.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Applying transforms resets object values and changes how modifiers/constraints/parenting evaluate.",
+        "Applying to armatures does not affect pose transforms, animation curves, or constraints; apply before rigging is recommended."
+      ],
+      "limits": [
+        "Does not require applying every object or every transform."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V09",
+      "title": "Inverse Kinematics Constraint",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/constraints/tracking/ik_solver.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "IK purpose, pole target, iterations, chain length, stretch, position/rotation weights, evaluation order.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "IK rotates a chain to follow a target; pole target determines chain roll/elbow direction.",
+        "Chain length, iterations, stretch, and weights are explicit settings.",
+        "IK constraints modify multiple bones and are evaluated after other constraints on affected bones."
+      ],
+      "limits": [
+        "Does not guarantee arbitrary closed-loop mechanisms.",
+        "No engine IK contract."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V10",
+      "title": "Inverse Kinematics Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/posing/bone_constraints/inverse_kinematics/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "IK solver overview, iTaSC, precision/iterations, reiteration, substeps, stability and arm example.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "IK stability depends on precision, iterations, and substeps; unstable motion can be improved with more steps.",
+        "Substep duration guidance is about 10 ms in the manual's example."
+      ],
+      "limits": [
+        "No universal iteration/substep values for vehicles or mechs."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V11",
+      "title": "Spline IK Constraint",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/constraints/tracking/spline_ik.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Spline IK purpose, chain length/fitting, even divisions, chain offset, scale modes, setup guidance.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Spline IK fits a bone chain to a curve and is suited to flexible parts and ropes.",
+        "Bone length/rest shape and chain scaling modes affect the fit."
+      ],
+      "limits": [
+        "No direct vehicle track/hose example; requires testing."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V12",
+      "title": "Rigid Body Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Rigid body scope, active/passive, animation interaction, transform behavior, scale, mesh-only constraint.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Rigid body simulation moves/orients objects but does not deform them.",
+        "Only mesh objects can be rigid bodies.",
+        "Active bodies are simulated; passive bodies are animated; simulation overrides dynamic transforms."
+      ],
+      "limits": [
+        "Blender-specific; does not describe engine vehicle physics."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V13",
+      "title": "Rigid Body Collisions",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/properties/collisions.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Collision shapes, primitive vs mesh/convex, compound parent, source base/deform/final, deforming, surface response, margin, collections.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Primitive shapes are fastest; convex hull/mesh better approximate geometry; compound parent combines child shapes for concave proxies.",
+        "Collision source can be base, deformed, or final mesh; deformation can be enabled.",
+        "Mesh/convex shapes use object origin as center of gravity; primitives use geometric center."
+      ],
+      "limits": [
+        "Does not provide vehicle-specific collider dimensions or mass values."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V14",
+      "title": "Rigid Body Constraints Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/constraints/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Constraint host/anchor behavior, breakable/threshold, disable collisions, limits, iterations, Child Of alternative.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Rigid body constraints usually attach to an Empty; anchor points are fixed in each object's local space at simulation start.",
+        "Breakable allows a constraint to break at an impulse threshold; disable collisions lets constrained objects pass through each other.",
+        "Motor constraints are not breakable."
+      ],
+      "limits": [
+        "Does not define engine constraint export or runtime destruction."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V15",
+      "title": "Motor Constraint",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/constraints/types/motor.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Motor translation/rotation, axis semantics, Hinge comparison, alignment warning, target velocity/max impulse.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Motor rotation uses the constraint host's X axis; Hinge uses Z.",
+        "If the axes are not aligned, the motor may appear to have no effect because the hinge blocks motion."
+      ],
+      "limits": [
+        "Blender rigid-body mechanism only; not an engine wheel-motor contract."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V16",
+      "title": "Rigid Body Tips",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/tips.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Baking to keyframes, steps per second, solver iterations, small objects, mesh-shape tunneling, collision thickness.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Rigid body dynamics can be baked to normal keyframes.",
+        "Small objects are less stable; the manual suggests about 20 cm as a practical guideline.",
+        "Thin mesh shapes can tunnel; more steps/iterations can improve stability but excessive steps are not a cure-all."
+      ],
+      "limits": [
+        "The 20 cm figure is a guideline, not a universal hard gate."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V17",
+      "title": "glTF 2.0",
+      "url": "https://docs.blender.org/manual/en/5.2/addons/scene_gltf2.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Supported features, animation import/export modes, action/NLA requirements, only transform/pose-bone/shape-key animation, sampling, armature export options.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "glTF animation changes object transforms, pose bones, or shape-key values.",
+        "Physics, light, and material property animation are ignored by the supported animation subset.",
+        "Actions must be active or stashed to NLA; sampling is recommended when exporting constrained animation.",
+        "Armature export offers rest-position and deform-bones-only options."
+      ],
+      "limits": [
+        "Does not define engine import behavior beyond glTF.",
+        "glTF adaptation may lose Blender-specific constraints/controllers."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V18",
+      "title": "FBX (Legacy)",
+      "url": "https://docs.blender.org/manual/en/5.2/files/import_export/fbx_legacy.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Bake animation, constraints missing, bone orientation correction, armature instances unsupported, action linking notes.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "FBX exports constraint results as keyframes but does not save the constraints themselves.",
+        "Bone orientation may need correction because FBX/Blender bone axes differ.",
+        "Armature instances are not supported."
+      ],
+      "limits": [
+        "FBX-specific; not a general rigging correctness statement."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "V19",
+      "title": "glTF 2.0 Skin schema",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/main/specification/2.0/schema/skin.schema.json",
+      "author": "Khronos Group",
+      "version_date": "glTF 2.0 schema on main; no commit pinned; read 2026-11-13",
+      "read_scope": "Raw skin schema: joints, inverseBindMatrices, skeleton root requirements.",
+      "evidence_type": "official_spec_schema",
+      "supports": [
+        "A glTF skin's joints are node indices; inverseBindMatrices is an accessor with at least one matrix per joint; skeleton is a node index.",
+        "Skeletal consumption is structural (node/joint indices), not a required business-name convention."
+      ],
+      "limits": [
+        "Schema only; does not assert per-vertex influence count, engine limits, or Blender exporter behavior.",
+        "Main-branch snapshot was not pinned to a commit."
+      ],
+      "capture_status": "captured_raw_schema"
+    },
+    {
+      "id": "V20",
+      "title": "Howto: Animate models",
+      "url": "https://wiki.flightgear.org/Howto:Animate_models",
+      "author": "FlightGear Wiki contributors",
+      "version_date": "FlightGear Wiki; no reliable page date exposed; read 2026-11-13",
+      "read_scope": "Relevant sections: object-name, property, animation order, axis, center, rotate, factor/offset, geometry axis/center since 2017.2.",
+      "evidence_type": "official_project_wiki",
+      "supports": [
+        "A part must be named in the 3D model and matched by object-name; animations without object-name apply to the entire model.",
+        "Rotate animations use a property, axis, center, factor, and offset; animation order matters.",
+        "A geometry object can define axis/center for some animations since 2017.2."
+      ],
+      "limits": [
+        "FlightGear-specific XML format; not Blender or general engine behavior.",
+        "Page appears maintained but no reliable version date was exposed."
+      ],
+      "capture_status": "captured_relevant_sections"
+    },
+    {
+      "id": "V21",
+      "title": "c172p PR #992: Add elevator trim tab",
+      "url": "https://github.com/c172p-team/c172p/pull/992",
+      "author": "c172p-team; PR author wlbragg; comments by gilbertohasnofb, dany93, et al.",
+      "version_date": "Merged 2018-03-10; merge commit e98a983c6b019a718caf3c6e9ed68a4c271ea2ef; read 2026-11-13",
+      "read_scope": "PR title/body and selected review comments about trim-tab animation axis, target object, proportionality, and direction.",
+      "evidence_type": "open_source_project_maintenance_discussion",
+      "supports": [
+        "The trim animation initially rotated the entire elevator rather than only the trim tab.",
+        "Reviewers called for a rotation-axis adjustment and proportional trim-tab motion.",
+        "The trim tab's direction relative to the elevator is a concrete sign-convention trap."
+      ],
+      "limits": [
+        "Did not read the c172p XML/model files or run FlightGear.",
+        "Historical PR, not current FlightGear behavior or a full aircraft rig.",
+        "No mass, collision, or flight-dynamics validation."
+      ],
+      "capture_status": "captured_issue_comments_excerpt"
+    },
+    {
+      "id": "V22",
+      "title": "Pose Apply",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/posing/editing/apply.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Pose as Rest Pose, Pose Selected as Rest Pose, Visual Transform to Pose.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Pose as Rest Pose changes the armature rest state and can require re-binding, constraint/driver/animation adjustment.",
+        "Visual Transform to Pose bakes evaluated constraint results into regular pose transforms."
+      ],
+      "limits": [
+        "Manual-level; not run on a vehicle asset."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "VC01",
+      "title": "Vehicle Art Setup",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/vehicle-art-setup-in-unreal-engine",
+      "author": "Epic Games",
+      "version_date": "Accessed 2026-11-13; page title Unreal Engine 5.9, body retains legacy Vehicle Game/PhAT/raycast workflow",
+      "read_scope": [
+        "Entire extracted body: Basics, Joints, Binding, Export/Import, Physics Asset, Body/Wheel Collision, Taking it Further"
+      ],
+      "evidence_type": "official_documentation_with_legacy_example",
+      "supports": [
+        "wheel center/axis/radius contract for the documented UE example",
+        "rigid single-joint wheel skinning is a valid representation",
+        "visual mesh, wheel interaction, physics bodies and bounds have distinct responsibilities"
+      ],
+      "limits": [
+        "No image/video inspection or Vehicle Game/Chaos run",
+        "Page title alone does not establish current Chaos behavior",
+        "Do not generalize 5-joint count, X/Z axis, raycast wheel behavior or delete-all-physics-bodies instructions"
+      ],
+      "capture_status": "200_with_full_readable_body",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/UE01.html",
+          "bytes": 73909,
+          "sha256": "677da33fb43006ef7b524be63e3fed8773c773302827c8edd46964fecc58ff55"
+        },
+        {
+          "path": "evidence/UE01.txt",
+          "bytes": 6451,
+          "sha256": "aad91c8faf7a93628fc46754a85e5f7df8841b00546a2de8b181d052e83fb01e"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    },
+    {
+      "id": "VC02",
+      "title": "Rigacar: a Blender add-on to rig a car",
+      "url": "https://digicreatures.net/articles/rigacar.html",
+      "author": "David Gayerie / digicreatures",
+      "version_date": "2018-08-10; last update 2021-11-30; supports Blender3.0/2.9x/2.83 in article; accessed 2026-11-13",
+      "read_scope": [
+        "Full article text: model preparation/origins/naming/deformation rig/final rig/ground sensors/suspension/wheel and steering bake/advice and limitations"
+      ],
+      "evidence_type": "original_author_case_and_workflow",
+      "supports": [
+        "BMW27 rigid-part reference and bone-parent workflow",
+        "body/wheel/brake origins and distinct control responsibilities",
+        "ground projection and artistic suspension distinct from car physics",
+        "Y-axis preview limitation and path-dependent wheel/steering bake"
+      ],
+      "limits": [
+        "No BMW27 model download/open, no video viewing, no image-detail inspection",
+        "Old author-specific axes/names/apply/layers are not universal production requirements",
+        "No Blender5.2.1 installation or compatibility validation"
+      ],
+      "capture_status": "200_with_full_readable_body",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/RC01.html",
+          "bytes": 37476,
+          "sha256": "87a49d4ac47ef0cb0e753182ed6609a8d5f5cf66556673f553e7db6c72ad1f9f"
+        },
+        {
+          "path": "evidence/RC01.txt",
+          "bytes": 19944,
+          "sha256": "1510e3c3a0374418a339ca1f4c5274bf0b6b98074663c0e8f643b2c50db33a26"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    },
+    {
+      "id": "VC03",
+      "title": "Rigacar README",
+      "url": "https://github.com/digicreatures/rigacar/blob/f25da074279ac9c59d72e05c4f457015d6bb2dd1/README.md",
+      "author": "David Gayerie and contributors",
+      "version_date": "commit f25da074279ac9c59d72e05c4f457015d6bb2dd1, 2022-03-27",
+      "read_scope": [
+        "Entire README"
+      ],
+      "evidence_type": "original_author_repository_documentation",
+      "supports": [
+        "generator/wheel automation/realtime animation baking as intended project goals",
+        "canonical author documentation and video links"
+      ],
+      "limits": [
+        "README goals are not runtime or production evidence",
+        "Video links not watched"
+      ],
+      "capture_status": "read_via_GitHub_connector",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/rigacar-README.md",
+          "bytes": 647,
+          "sha256": "00a0e9a9ec1018626a7e7cc04e56cc37bf29278e42d4e2c17fd5e90ecf602d3b"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    },
+    {
+      "id": "VC04",
+      "title": "Rigacar add-on identity and license header",
+      "url": "https://github.com/digicreatures/rigacar/blob/f25da074279ac9c59d72e05c4f457015d6bb2dd1/__init__.py",
+      "author": "David Gayerie and contributors",
+      "version_date": "commit f25da074279ac9c59d72e05c4f457015d6bb2dd1; bl_info version7.1, minimum Blender2.83",
+      "read_scope": [
+        "Lines1-32: GPLv3-or-later source header and bl_info",
+        "UI labels for wheel bake, Y-only preview and suspension pitch/roll"
+      ],
+      "evidence_type": "fixed_source_metadata_and_interface",
+      "supports": [
+        "exact old version identity",
+        "separate steering/wheel bake, suspension properties",
+        "source license GPLv3-or-later"
+      ],
+      "limits": [
+        "Not executed; minimum-version field is not current compatibility certification",
+        "Not a complete source review"
+      ],
+      "capture_status": "read_via_GitHub_connector",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/rigacar-__init__.py",
+          "bytes": 7662,
+          "sha256": "a6ef2dc30bf47cf4eea108426a59b77b63eaec2d6b401cd98fff5cfbadcbc43a"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    },
+    {
+      "id": "VC05",
+      "title": "Rigacar car rig generator: wheel, sensor and suspension sections",
+      "url": "https://github.com/digicreatures/rigacar/blob/f25da074279ac9c59d72e05c4f457015d6bb2dd1/car_rig.py",
+      "author": "David Gayerie and contributors",
+      "version_date": "commit f25da074279ac9c59d72e05c4f457015d6bb2dd1, 2022-03-27",
+      "read_scope": [
+        "ArmatureGenerator.generate and separate pitch/roll properties around459-488",
+        "Wheel/sensor creation around670-730",
+        "Constraint and control setup around766-910",
+        "generate_ground_projection_constraint and child-of around940-970"
+      ],
+      "evidence_type": "fixed_source_design_reference",
+      "supports": [
+        "ground sensor/MCH wheel/rotation/control layers are separate",
+        "artistic suspension effect is driver/constraint organized",
+        "ground projection is a Shrinkwrap constraint with local-axis settings"
+      ],
+      "limits": [
+        "Only named source sections read, not all ~60KB source audited",
+        "No execution, dynamics or physical accuracy claim",
+        "No third-party source copied into product"
+      ],
+      "capture_status": "read_via_GitHub_connector",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/rigacar-car_rig.py",
+          "bytes": 60095,
+          "sha256": "ee6aa3ba768a674c702bacbf5d2f438e25cd5c4375fc672b37ca738e819796ab"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    },
+    {
+      "id": "VC06",
+      "title": "Rigacar steering and wheel rotation bake operators",
+      "url": "https://github.com/digicreatures/rigacar/blob/f25da074279ac9c59d72e05c4f457015d6bb2dd1/bake_operators.py",
+      "author": "David Gayerie and contributors",
+      "version_date": "commit f25da074279ac9c59d72e05c4f457015d6bb2dd1, 2022-03-27",
+      "read_scope": [
+        "BakingOperator._bake_action",
+        "carWheelsRotationBake including _evaluate_distance_per_frame and _bake_wheel_rotation",
+        "carSteeringBake and beginning of _evaluate_rotation_per_frame, around195-355"
+      ],
+      "evidence_type": "fixed_source_design_reference",
+      "supports": [
+        "visual bone sampling before deriving wheel property animation",
+        "frame displacement, orientation sign, brake participation and radius division",
+        "wheel rotation and steering are explicitly separate bake responsibilities"
+      ],
+      "limits": [
+        "Not run; no arbitrary path, slip/contact, interpolation or continuous accuracy certification",
+        "Old bpy Action APIs are not assumed valid on5.2.1",
+        "No source code incorporation"
+      ],
+      "capture_status": "read_via_GitHub_connector",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/rigacar-bake_operators.py",
+          "bytes": 18321,
+          "sha256": "5343a9e2f877fc10b63993f5adf386f7f1ca2946d99ba6f7a4072a6a651fd9fe"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    },
+    {
+      "id": "VC07",
+      "title": "Rigacar LICENSE",
+      "url": "https://github.com/digicreatures/rigacar/blob/f25da074279ac9c59d72e05c4f457015d6bb2dd1/LICENSE",
+      "author": "Project authors / Free Software Foundation license text",
+      "version_date": "commit f25da074279ac9c59d72e05c4f457015d6bb2dd1; GNU GPLv3 text, 2007-06-29",
+      "read_scope": [
+        "License name/version header; full license text captured; source-file headers separately checked for or-later grant"
+      ],
+      "evidence_type": "license",
+      "supports": [
+        "license identity for design-reference source capture"
+      ],
+      "limits": [
+        "No dependency or code introduced into product",
+        "Not a legal compatibility opinion for future distribution"
+      ],
+      "capture_status": "read_via_GitHub_connector",
+      "accessed_at": "2026-11-13",
+      "evidence_files": [
+        {
+          "path": "evidence/rigacar-LICENSE",
+          "bytes": 35142,
+          "sha256": "d62f065830aa3739cc031156b9690805c7b2e811b4a178c8b4acd8725d561c94"
+        }
+      ],
+      "evidence_base_directory": "work/audit/<batch>/"
+    }
+  ],
+  "blocked": [
+    {
+      "url": "https://docs.godotengine.org/en/4.5/classes/class_vehiclewheel3d.html",
+      "status": "RATE_LIMITED",
+      "attempted": "2026-11-13",
+      "impact": "No Godot VehicleWheel3D fields or defaults were used; engine-specific wheel contracts remain unverified."
+    },
+    {
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/chaos-destruction-overview-in-unreal-engine",
+      "status": "RATE_LIMITED",
+      "attempted": "2026-11-13",
+      "impact": "No current UE5 destruction docs were used; only the explicitly read UE 4.27 page is cited, and only for that version."
+    },
+    {
+      "url": "https://projects.blender.org/blender/blender-manual/raw/branch/main/manual/animation/armatures/skinning/introduction.rst",
+      "status": "TLS_FAILURE",
+      "attempted": "2026-11-13",
+      "impact": "Raw RST source route abandoned; claims rely only on the read manual pages/snippets."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender-manual/main/manual/animation/armatures/skinning/introduction.rst",
+      "status": "HTTP_404",
+      "attempted": "2026-11-13",
+      "impact": "GitHub mirror path was not valid; no raw manual source obtained from this route."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/FlightGear/flightgear-aircraft/master/c172p/c172p.xml",
+      "status": "HTTP_404",
+      "attempted": "2026-11-13",
+      "impact": "The c172p XML itself was not read; the case is limited to PR discussion and the FlightGear animation wiki."
+    }
+  ],
+  "supplementary_blocked": [
+    {
+      "id": "UE02",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-set-up-chaos-vehicles-in-unreal-engine",
+      "capture_status": "HTTP200_page_shell_only",
+      "text_chars": 17,
+      "qualification": "not_adopted; no vehicle/Chaos body text obtained",
+      "local_evidence": "evidence/UE02.txt",
+      "action": "stopped this route; no API guessed or access bypassed"
+    },
+    {
+      "id": "UE03",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/chaos-vehicles-in-unreal-engine",
+      "capture_status": "HTTP200_page_shell_only",
+      "text_chars": 17,
+      "qualification": "not_adopted; no vehicle/Chaos body text obtained",
+      "local_evidence": "evidence/UE03.txt",
+      "action": "stopped this route; no API guessed or access bypassed"
+    }
+  ],
+  "supplementary_audit_directory": "work/audit/<batch>/",
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

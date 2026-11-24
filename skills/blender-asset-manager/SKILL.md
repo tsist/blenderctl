@@ -1,46 +1,118 @@
 ---
 name: blender-asset-manager
-description: 管理 Blender 资产分类、命名、标签、Catalog 与索引；用于整理、入库、命名规划及分类迁移，不用于普通建模渲染。
+description: 按项目规范完成 Blender 资产分类、命名校验、Catalog 映射、事务发布、新工程拖入验收与版本升级。接到审看通过的模型或材质要正式入库、整理资产目录、从注册库取用集合零件材质或发新版时用它。
 metadata:
-  version: "0.2.1"
+  version: "1.0.0"
 ---
 
-# Blender 资产管理
+# Blender 资产入库与管理
 
-建立可检索、可追溯的分类与名称，产出索引、逐项命名/Catalog 映射或已验证副本。保护源包、身份及引用。
+本技能负责把用户审看通过的模型、材质或节点组按规范命名、归类、打包并发布进正式 Blender 资产库，同时负责从注册库取用资产与发新版，属于 [资产入库部门](../blender-work-methodology/references/departments/asset-library.md)。实际读写 `.blend` 与提交后台事务配合 [blender-cli](../blender-cli/SKILL.md)。
 
-先读当前项目已有资产标准；新库可采用随包[通用基线](references/asset-standard.md)。已有规则与用户当前要求优先；示例标准不授予操作许可。空白模板在 assets/templates，需填实才能使用。
+## 怎么做
 
-库根/工程/批次目录由用户当次明确，限定检查，不默认扫描磁盘。项目有当前分类指针时回读目标记录；没有就限定盘点，不虚构历史索引。证据结构见[证据导航](references/project-evidence.md)。记忆/Wiki 是可选宿主能力，缺失时正常推进。
+### 第一步：核对注册库与现有分类
 
-分类命名读[分类与名称](references/classification-and-naming.md)；修改 Catalog、共享索引或物理路径读[Catalog 与执行](references/catalog-and-execution.md)。分类建议不需启动 Blender。
+动手前先查当前 CLI 的资产入口，再核对目标库在 Blender 偏好设置里的注册状态和现有 Catalog。注册名与 Catalog UUID 全从当前配置实取，确保入库位置与资产浏览器完全一致。
 
-## 身份与范围
+```powershell
+$ctl = './blenderctl.ps1'
 
-- 文件数不等于资产数，一个 blend 可包含多个独立资产。
-- 复用 asset_id；无 ID 时以文件/类型/数据块/library 定位，首次登记才生成持久 UUID，不重复发号。
-- 用途决定分类，来源/作者/许可/生命周期独立字段，包编号不当资产 ID。
-- Catalog UUID、资产 ID、内容 SHA、路径与作业 ID 互不替代；同路径不同 UUID 或跨库同 UUID 不自动冲突。
-- 文件级分类、按 ID 的管理记录和 CLI 发布索引各有结构；null 是未采集，空数组是确认无项。
+# 查资产入库与取用的当前入口
+& $ctl discover --product asset-library
 
-## 形成方案
+# 核对目标库注册状态，并解析现有 Catalog 路径
+& $ctl asset libraries --name 'User Library' --catalog-path 'Models/Props/Audio Equipment'
+```
 
-依据优先：用户确认、当前数据块用途、有来源记录、待确认候选。文件名可支持候选，不能证明作者、许可或功能。建议列身份、原/拟分类、标签、依据、未决项。
+目标库已经登记时，直接沿用查到的库根与 Catalog UUID；缺少子分类时，留在后面的正式事务里追加新条目。目标库尚未登记时，先把已验候选原样留好，告诉用户在 Blender 的 **编辑 → 偏好设置 → 文件路径 → 资产库** 里登记并保存后再入库。
 
-新发布副本按采用标准命名；源包及已有资产保留原名。更名/迁移填 assets/templates/migration-map.csv，含旧新路径/数据块/Catalog、前 SHA、备份及状态。显示名和逻辑分类调整不自动授权物理迁移。
+### 第二步：定分类、起名字并跑名称预检
 
-`python <技能目录>/scripts/check_names.py --input <候选JSON绝对路径>` 只读检查随包基线的新发布名；项目规则不同先确认，不能批量修旧名。预检不分配 ID、不更名、不证明分类/许可/发布质量。
+先划清资产边界。整件模型标为一个集合资产，拖进新工程一摆就齐；确实会被单独拿去复用的零件或材质，在同文件里另标独立资产并各自分配 `asset_id`。
 
-## 执行与验收
+按用途定主分类和三位类型码，新发布文件按 `<TYPE>_<Subject>_v<NNN>[_<Variant>][_LOD<N>].blend` 起名（如 `MOD_MonitorDial_v001.blend`、`MOD_SofaChair_v001_Oak_LOD0.blend`）。主题优先用 ASCII PascalCase 方便跨软件流转，中文显示名放进资产记录和浏览器展示名，原始包文件名留作来源字段。
 
-blend 操作用[Blender CLI](../blender-cli/SKILL.md)和当前合同；MCP 可用时核对会话，跨入口保护 GUI 未保存状态。批次证据放授权工程内、资产库外的新目录。
+候选取名定好后，先写一份 UTF-8 JSON（包含目标绝对目录 `directory` 与候选文件名列表 `names`），跑随包校验脚本查 Windows 非法字符、格式规范和目录大小写重名：
 
-常规读取、草案、新副本与已授权可逆修改直接推进；目标冲突、删除、范围扩张或外部发布按本次授权处理，历史授权不外推。同名/同大小/同字节/.blend1 不授权删除。
+```powershell
+$d = & $ctl discover --product asset-library | ConvertFrom-Json
+$py = (Get-ChildItem -Path (Split-Path $d.data.selected_blender.file -Parent) -Recurse -Filter 'python.exe' | Select-Object -First 1).FullName
+& $py './.agents/skills\blender-asset-manager\scripts\check_names.py' --input '<候选JSON绝对路径>'
+```
 
-草案验身份/字段/依据/歧义；实际写入另验非目标保护、依赖、独立重开及用途所需导入/预览。交付映射、文件、pass/fail/not_run/not_applicable 和理由，命名规划通过不当全库合格。
+返回 `ok: true` 且退出码为 `0` 后进入下一步。分类编码、标签规则、多层次命名与贴图命名细则见 [分类与命名](references/classification-and-naming.md)。
 
-### 取用已发布的资产
+### 第三步：备齐打包工程与独立贴图
 
-在目标 Blender 版本和单独的接收工程打开 Asset Browser，选定获准使用的库和 Catalog。用作品会采用的导入方式实际拖入目标数据块，例如用 Append 导入可编辑集合。保存接收工程后独立重开，核对预期数据块、修改器、UV、材质与贴图解析。若下游要编辑该资产，在接收工作副本做一次对应编辑并重开查看，核对源库内容指纹。
+保留获用户认可的可编辑主工程，确保零件层级、修改器栈、UV 与节点材质完好。把材质用到的贴图打包进要发布的 `.blend`，这样资产拖进任意新工程都能立刻显示正确画面；同时在发布包的 `textures/` 目录另交一份独立贴图文件，方便后续贴图精修或跨软件取用。
 
-发布更新版时沿用该资产的持久 ID。若分类未变，沿用原 Catalog UUID，并按库规范采用新版本路径。复核浏览器呈现当前版，冷开已有工程确认原版引用仍可用。交接记录资产 ID、Catalog、选用版本、导入方式及实际重开结果。
+同步核对来源、作者、许可依据和本次允许用途，把已确认的事实写进资产记录，待核实项如实留待核对。
+
+### 第四步：按发布事务链正式写入库
+
+在注册库外部建独立批次目录 `work/audit/<batch>//`，分设 `jobs` 和 `transactions` 两个目录，源工程保持完好留作对照。全程固定同一套目录，按下面顺序走完四步：
+
+1. **生成发布候选（`asset prepare`）**：基于源工程与实测 SHA-256 生成工作副本，写入集合资产与独立复用件的标记、Catalog UUID、标签和显示名。
+2. **生成单文件分片（`asset index`）**：为发布候选产出覆盖该文件全部活动资产的索引分片，保证多资产文件里每条记录都完整登记。
+3. **冻结基线并规划事务（`asset plan`）**：冻结当前库索引、历史与 Catalog 文件的哈希，合并单文件分片并校验发布凭据。首次发布时把目标项的 `expected_output_sha256` 设为 `null`，要求目标路径空闲；确需替换已授权旧文件时，填入实测文件哈希。
+4. **提交并核对终态（`transaction apply`）**：人工或程序复核计划无误后执行 `& $ctl --jobs-dir $jobs --transactions-dir $tx transaction apply <transaction_id>`，再跑 `transaction status <transaction_id>` 确认事务完成且锁已释放。
+
+请求清单写法、冲突处理与中断恢复见 [Catalog、发布事务与版本升级](references/catalog-and-execution.md)。
+
+### 第五步：新工程真拖入与冷重开验收
+
+入库完成后，新建一份干净工程验证真实使用体验。优先在资产浏览器切到目标库和 Catalog，选列表视图并将导入设置设为 `Append` 与 `Instance Collections → When Appending`，把资产拖进 3D 视口保存；需要脚本化复现或批量验收时，先查入口再落位：
+
+```powershell
+# 查集合资产并取出 placement
+& $ctl asset find-collections --name 'User Library' --catalog-path 'Models/Props/Audio Equipment' --asset-id '<asset_id>'
+
+# 把集合放到新工程指定集合里（另存为库外接收副本）
+& $ctl asset place-collection --params '<place-request.json>' --output '<receiver.blend>'
+```
+
+要验证独立零件或材质时，用 `asset find-assets --type Object`（或 `--type Material`）查出 `placement`，交给 `asset use-asset` 放进目标集合或指定材质槽。
+
+接着对接收工程做两道必查检验：
+
+1. **轻量实例冷重开与依赖检验**：另起进程冷重开接收工程，跑 `project verify` 确认外部未声明依赖为零，并确认默认放置形态为轻量的集合实例。
+2. **转本地可编辑检验**：对接收工程跑一次 `scene prepare`（操作 `object.make_collection_local`），把集合实例转为本地可编辑零件；保存后再次冷重开，核对零件层级、修改器、UV、打包贴图和局部变换都完好可改。
+
+### 第六步：沿用身份发新版，保留旧路径稳住老工程
+
+同一件资产需要升级时，沿用原来的 `asset_id` 和 `Catalog UUID`，给新版起下一个版本号（如从 `v001` 升到 `v002`）并写到新文件路径。
+
+在同一个发布事务里同时提交两份候选：新版文件带着完整资产标记进入活动索引；旧版文件用 `asset prepare` 的 `unmark` 撤下该资产的浏览器显示标记，同时把旧 `.blend` 文件路径和可链接数据块原样留在库里。事务提交后，刷新资产浏览器只会看到最新版，老工程原来链接的旧版本路径依然稳稳打开，升不升级留给使用者自己拍板。需要找回旧版原始文件时，按 `asset-history.json` 核对 `preserved_sha256` 后复制到库外恢复路径。
+
+## 交给下游
+
+向用户或下游镜头部门交付以下四项产物：
+
+- 正式资产库里的发布路径、`asset_id`、版本号与 Catalog 路径。
+- 在干净新工程里拖入并完成冷重开、转本地可编辑验收的接收样例工程与预览图。
+- 随发布包附带的独立贴图文件夹。
+- 完整的资产卡片记录与本次事务回执路径。
+
+验收发现问题按归属分流返修：
+
+- 资产浏览器搜不到、分类放错、缩略图发黑或命名冲突：留在本部门修 Catalog UUID、资产标记与预览图。
+- 拖进新工程后尺寸异常、原点偏移或掉贴图：退回建模部门或 UV 与材质部门修单位变换、原点与贴图打包，再发新版入库。
+
+## 例子：把审看通过的监听旋钮发布进正式库并升级到新版
+
+接到委托：「材质审看通过了，把 `work/monitor-dial/master.blend` 里的整套监听旋钮和旋钮金属材质发布进 `User Library` 的 `Models/Props/Audio Equipment`，验收拖入可用。」
+
+1. **查库与规划**：跑 `asset libraries --name 'User Library' --catalog-path 'Models/Props/Audio Equipment'` 确认库已注册并拿到现有 Catalog UUID。主件集合归入 `MOD` / `Models/Props/Audio Equipment`，常用金属材质另标独立材质资产归入 `MAT` / `Materials/Realistic`，新文件名定为 `MOD_MonitorDial_v001.blend`。
+2. **跑名称预检**：把目录和 `MOD_MonitorDial_v001.blend` 写入 JSON，运行 `check_names.py` 返回 `ok: true`。核对主工程已打包全部贴图，并把独立贴图拷贝进发布包的 `textures/`。
+3. **跑发布事务**：在 `work/audit/<batch>/` 和 `transactions` 下依次运行 `asset prepare`、`asset index`、`asset plan`（设置 `expected_output_sha256: null`），复核计划后执行 `transaction apply`，用 `transaction status` 确认入库完成。
+4. **新工程真拖入与冷重开**：新建空工程，从 `User Library` 的 `Models/Props/Audio Equipment` 拖入 `Monitor Dial`（列表视图、`Append`、开启 `Instance Collections`），保存后冷重开并跑 `project verify` 确认外部未声明依赖为零；再对接收工程跑 `scene prepare` 的 `object.make_collection_local` 转本地，单转旋钮 `15°` 后冷重开，确认修改器、UV、打包贴图和相邻部件都完好。
+5. **汇报交付**：把库内路径、`asset_id`、版本号 `v001`、Catalog 路径、接收样例和拖入预览图交给用户收尾。
+6. **后续升级 `v002`**：旋钮刻度优化后，沿用同一个 `asset_id` 和 Catalog UUID 生成 `MOD_MonitorDial_v002.blend`，在同一事务里对 `MOD_MonitorDial_v001.blend` 执行 `unmark` 撤下浏览器标记但保留旧文件，提交后确认浏览器显示 `v002` 且老工程链接 `v001` 仍能正常重开。
+
+## 参考
+
+- [分类与命名](references/classification-and-naming.md)
+- [Catalog、发布事务与版本升级](references/catalog-and-execution.md)
+- [规范文档与台账入口](references/sources.md)
+- 新发布名称预检脚本：`scripts/check_names.py`

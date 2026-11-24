@@ -1,4 +1,5 @@
 interface:
   display_name: "Blender Rigging"
-  short_description: "Bones, binding weights, expression keys and hair physics"
-  default_prompt: "Use $blender-rigging to inspect and operate the rigging development components."
+  short_description: "设计、搭建与验收角色、生物及游戏资产的骨架、蒙皮权重、表情与次级动态"
+  default_prompt: "先用 blenderctl discover --product rigging 查清当前可用入口，再按先骨架双审后蒙皮求权的顺序推进绑定与交接。"
+  default_prompt: "Use $blender-rigging for this Blender workflow task."

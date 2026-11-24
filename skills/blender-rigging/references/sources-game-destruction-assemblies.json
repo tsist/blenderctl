@@ -1,0 +1,414 @@
+{
+  "domain": "destruction-assemblies",
+  "research_snapshot": "2026-11-13",
+  "scope_note": "Blender 5.2 LTS manual, one Unreal Engine 4.27 official destruction overview, and Cell Fracture distribution/legacy pages are the verified basis. No Blender or engine run. UE5/Unity/Godot destruction APIs are not asserted.",
+  "sources": [
+    {
+      "id": "D01",
+      "title": "Rigid Body Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Rigid body scope, active/passive bodies, animation interaction, simulation override, scale, mesh-only restriction.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Rigid bodies move/orient objects but do not deform geometry.",
+        "Only mesh objects can participate in Blender rigid body simulation.",
+        "Active bodies are simulated, passive bodies are animated, and dynamic transforms are overridden by the simulation."
+      ],
+      "limits": [
+        "Blender-specific; not an engine destruction API."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D02",
+      "title": "Rigid Body Collisions",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/properties/collisions.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Primitive/mesh/convex shapes, compound parent, collision source base/deform/final, deforming, friction/bounciness, margin.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Compound parent combines child collision shapes and is usually faster/more stable than an equivalent mesh shape.",
+        "Collision source can be base mesh, deformed mesh, or final evaluated mesh; deformation can be enabled.",
+        "Primitive centers of gravity are geometric centers, while convex/mesh shapes use object origin."
+      ],
+      "limits": [
+        "No universal fragment size, margin, or collision count."
+      ],
+      "capture_status": "captured_manual_excerpt",
+      "independent_primary_check": {
+        "capture": "body_captured_pending_read",
+        "http_status": 200,
+        "root_review": "body sections read by independent reviewer; D03/D10 also read by root",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": "D02.txt"
+      }
+    },
+    {
+      "id": "D03",
+      "title": "Rigid Body Constraints Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/constraints/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Constraint host/anchor behavior, breakable threshold, disable collisions, limits, iterations, Child Of alternative, Motor exception.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Constraints usually attach to an Empty; anchor points are computed at start and fixed in each body's local space.",
+        "Breakable allows constraint failure at an impulse threshold; Disable Collisions lets constrained bodies pass through each other.",
+        "Breakable is disabled for Motor constraints.",
+        "If the fixed-anchor model is limiting, the manual suggests multiple objects plus a non-physics Child Of setup."
+      ],
+      "limits": [
+        "Constraint break is not mesh fracture; it creates no new surfaces.",
+        "No engine export guarantee."
+      ],
+      "capture_status": "captured_manual_excerpt",
+      "independent_primary_check": {
+        "capture": "body_captured_pending_read",
+        "http_status": 200,
+        "root_review": "body sections read by independent reviewer; D03/D10 also read by root",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": "D03.txt"
+      }
+    },
+    {
+      "id": "D04",
+      "title": "Rigid Body Tips",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/tips.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Bake to keyframes, steps per second, solver iterations, small objects, thin mesh tunneling, collision thickness.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Rigid body results can be baked to ordinary keyframes.",
+        "Small objects are unstable in the current simulation; the manual suggests about 20 cm as a practical guideline.",
+        "Thin mesh shapes can tunnel and may need thickness or collision margin; excessive steps are not a universal fix."
+      ],
+      "limits": [
+        "The 20 cm suggestion is a guideline, not a hard domain gate.",
+        "Baking transforms is not equivalent to a vertex-animation/VAT pipeline."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D05",
+      "title": "Rigid Body World",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/world.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Rigid Body World collection membership and constraint collection.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Only rigid bodies and constraints in the Rigid Body World collection(s) are taken into account by the simulation."
+      ],
+      "limits": [
+        "Does not define engine-side ownership or networking."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D06",
+      "title": "Motor Constraint",
+      "url": "https://docs.blender.org/manual/en/5.2/physics/rigid_body/constraints/types/motor.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Motor rotation/translation, axis semantics, Hinge comparison, alignment warning, target velocity/max impulse.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Motor rotation uses the constraint host's X axis; Hinge uses Z.",
+        "Misaligned axes can make the motor appear ineffective because the hinge blocks motion."
+      ],
+      "limits": [
+        "Blender mechanism only; not a runtime fracture or engine joint contract."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D07",
+      "title": "Armature Modifier",
+      "url": "https://docs.blender.org/manual/en/5.2/modeling/modifiers/deform/armature.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Armature deformation purpose, vertex groups/envelopes, multi-modifier mixing.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "The Armature modifier deforms existing mesh vertices through vertex groups or envelopes.",
+        "It is a deformation path, not a topology-changing fracture path."
+      ],
+      "limits": [
+        "Does not define whether an engine can destructively modify the mesh at runtime."
+      ],
+      "capture_status": "captured_manual_excerpt",
+      "independent_primary_check": {
+        "capture": "body_captured_pending_read",
+        "http_status": 200,
+        "root_review": "body sections read by independent reviewer; D03/D10 also read by root",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": "D07.txt"
+      }
+    },
+    {
+      "id": "D08",
+      "title": "Skinning Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Object/bone parenting versus Armature modifier; only the modifier changes vertex/control-point relative positions.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Bone-parented objects are transformed as wholes and never deformed.",
+        "Only the Armature-modifier path deforms geometry."
+      ],
+      "limits": [
+        "Conceptual distinction, not a destruction workflow."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D09",
+      "title": "Armature Deform Parent",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/skinning/parenting.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Armature Deform parenting, Empty/Automatic/Envelope weights, Cube+BoneA/B/C example, overwrite warning.",
+      "evidence_type": "official_manual_operational_example",
+      "supports": [
+        "Armature Deform parenting creates the armature parent relationship and an Armature modifier.",
+        "Empty Groups creates empty same-named groups; Automatic Weights can need manual correction.",
+        "Automatic/envelope weights overwrite existing same-named vertex group content."
+      ],
+      "limits": [
+        "Not a destruction example; no fracture, mass, collision, or engine import."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D10",
+      "title": "Pose Apply",
+      "url": "https://docs.blender.org/manual/en/5.2/animation/armatures/posing/editing/apply.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Pose as Rest Pose and Visual Transform to Pose.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Pose as Rest Pose permanently changes the armature rest state and may require re-binding and animation/constraint/driver adjustment.",
+        "Visual Transform to Pose bakes evaluated constraint results into regular pose transforms."
+      ],
+      "limits": [
+        "Not run; no destruction asset was bound or baked."
+      ],
+      "capture_status": "captured_manual_excerpt",
+      "independent_primary_check": {
+        "capture": "body_captured_pending_read",
+        "http_status": 200,
+        "root_review": "body sections read by independent reviewer; D03/D10 also read by root",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": "D10.txt"
+      }
+    },
+    {
+      "id": "D11",
+      "title": "glTF 2.0",
+      "url": "https://docs.blender.org/manual/en/5.2/addons/scene_gltf2.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Supported features, animation modes, object/pose-bone/shape-key limits, sampling, armature export options.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "glTF animation covers object transforms, pose bones, and shape keys; physics/material property animation is outside the supported set.",
+        "Actions must be active or stashed to NLA and sampling is recommended when constraints are involved.",
+        "The read Blender glTF documentation describes mesh/skin/animation, not a destruction asset container; extensions and custom consumers were not assessed."
+      ],
+      "limits": [
+        "Does not define engine-side fracture, chunk ownership, or cache formats."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D12",
+      "title": "FBX (Legacy)",
+      "url": "https://docs.blender.org/manual/en/5.2/files/import_export/fbx_legacy.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Constraint omission, baking, bone orientation correction, armature instance limitation.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "FBX writes constraint results as keyframes but does not save constraints.",
+        "Bone orientation may require correction after import; armature instances are not supported."
+      ],
+      "limits": [
+        "Not an engine destruction asset format."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D13",
+      "title": "Chaos Destruction Overview",
+      "url": "https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/Physics/ChaosPhysics/ChaosDestruction/ChaosDestructionOverview/",
+      "author": "Epic Games",
+      "version_date": "Unreal Engine 4.27 documentation; read 2026-11-13",
+      "read_scope": "Full overview: Geometry Collections, fracture methods/sub-fracture, levels, clustering, max cluster level, damage thresholds, cluster group index, collision particles fraction, fields and anchors.",
+      "evidence_type": "official_engine_workflow",
+      "supports": [
+        "Geometry Collections, fracturing, clustering, connection graph, and fields form a destruction asset/system separate from skinning.",
+        "Small modules versus larger combined modules trade placement flexibility against draw calls, seams, and repetition.",
+        "Fracture levels and clustering can control visual detail and rigid-body counts; Max Cluster Level limits breakage depth.",
+        "Damage thresholds are authored per level/actor; the example uses descending thresholds, but values are illustrative.",
+        "DynamicState can switch states (Sleeping/Kinematic/Static/Dynamic/User Defined); Kill and Anchor fields handle cleanup and support locking.",
+        "Collision Particles Fraction affects collision quality; low values can cause incorrect collision."
+      ],
+      "limits": [
+        "Only UE 4.27; do not infer UE5 field names, defaults, behavior, or performance.",
+        "No engine run, threshold calibration, visual check, or network test.",
+        "Example values are not universal defaults."
+      ],
+      "capture_status": "captured_full_overview_text",
+      "independent_primary_check": {
+        "capture": "failed_no_retry",
+        "http_status": null,
+        "root_review": "403 stopped; no independent original-text confirmation",
+        "evidence_base_directory": "work/audit/<batch>/",
+        "text_file": null
+      }
+    },
+    {
+      "id": "D14",
+      "title": "Cell Fracture — Blender Extensions",
+      "url": "https://extensions.blender.org/add-ons/cell-fracture/",
+      "author": "Blender Extensions / original authors ideasman42, phymec, Sergey Sharybin",
+      "version_date": "Published 2024-05-14; compatibility Blender 4.2+; read 2026-11-13",
+      "read_scope": "Extension listing: bundled in Blender 4.1, current limited-support extension, location, authors, compatibility.",
+      "evidence_type": "official_extension_listing",
+      "supports": [
+        "Cell Fracture was bundled in Blender 4.1 and is now an extension with limited support.",
+        "The extension lists Blender 4.2 and newer compatibility.",
+        "It is not evidence that Blender 5.2.1 has it installed."
+      ],
+      "limits": [
+        "Listing metadata only; no code or operation was executed.",
+        "Current extension behavior and bugs were not tested."
+      ],
+      "capture_status": "captured_listing_metadata"
+    },
+    {
+      "id": "D15",
+      "title": "Cell Fracture — Blender 3.5 Manual",
+      "url": "https://docs.blender.org/manual/en/3.5/addons/object/cell_fracture.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 3.5 Manual; read 2026-11-13",
+      "read_scope": "Historical activation/usage: object mode, operator search, settings, next-layer output, bundled GPL add-on.",
+      "evidence_type": "official_manual_historical",
+      "supports": [
+        "The historical workflow selects an object, runs 'Cell fracture selected mesh', configures settings, and places fragments on the next layer.",
+        "Cell Fracture was bundled at Blender 3.5."
+      ],
+      "limits": [
+        "Blender 3.5 is old; not evidence of Blender 5.2.1 behavior or current operator/API.",
+        "Page is marked Todo and refers to archived old docs."
+      ],
+      "capture_status": "captured_manual_text"
+    },
+    {
+      "id": "D16",
+      "title": "object_fracture_cell repository README",
+      "url": "https://projects.blender.org/Dustin-Conlon/object_fracture_cell/src/branch/main",
+      "author": "Dustin-Conlon / Cell Fracture community",
+      "version_date": "Repository main; read 2026-11-13",
+      "read_scope": "README: formerly bundled through Blender 4.1, now an Extensions-platform add-on, community-maintained, no support expected, build command.",
+      "evidence_type": "open_source_repository_readme",
+      "supports": [
+        "Cell Fracture is community-maintained as an extension and is no longer a guaranteed built-in.",
+        "The project explicitly says no support is expected."
+      ],
+      "limits": [
+        "README only; source code internals were not read, and the build command was not run.",
+        "No license or version compatibility was independently verified beyond the listing."
+      ],
+      "capture_status": "captured_readme_text"
+    },
+    {
+      "id": "D17",
+      "title": "Add-ons — Blender 5.2 LTS Manual",
+      "url": "https://docs.blender.org/manual/en/5.2/addons/index.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Add-ons index listing (Node Wrangler, Rigify, glTF 2.0, UI Translations, VR Scene Inspection).",
+      "evidence_type": "official_manual_index",
+      "supports": [
+        "The Blender 5.2 manual add-ons index does not list Cell Fracture."
+      ],
+      "limits": [
+        "An index absence is not proof of the local installation state; it only shows the official manual scope. The local add-on state was not run."
+      ],
+      "capture_status": "captured_index_listing"
+    },
+    {
+      "id": "D18",
+      "title": "Weight Paint Introduction",
+      "url": "https://docs.blender.org/manual/en/5.2/sculpt_paint/weight_paint/introduction.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Normalized weight workflow and Armature auto-normalization.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Deformation weights are normally normalized; the Armature modifier normalizes automatically.",
+        "Weight locking and auto-normalize help redistribute weights."
+      ],
+      "limits": [
+        "Does not imply a universal four-influence limit or validate auto weights."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    },
+    {
+      "id": "D19",
+      "title": "Parenting Objects",
+      "url": "https://docs.blender.org/manual/en/5.2/scene_layout/object/editing/parent.html",
+      "author": "Blender Foundation / Blender Manual contributors",
+      "version_date": "Blender 5.2 LTS Manual; read 2026-11-13",
+      "read_scope": "Object parenting, Keep Transform/Parent Inverse, Clear Parent, non-uniform scale limitation.",
+      "evidence_type": "official_manual",
+      "supports": [
+        "Object parent transforms children; Keep Transform preserves world placement via Parent Inverse.",
+        "Non-uniform parent scale with rotation can cause shear that may be lost when clearing parent."
+      ],
+      "limits": [
+        "Does not define engine attachment/ownership behavior."
+      ],
+      "capture_status": "captured_manual_excerpt"
+    }
+  ],
+  "blocked": [
+    {
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/chaos-destruction-overview-in-unreal-engine",
+      "status": "RATE_LIMITED",
+      "attempted": "2026-11-13",
+      "impact": "No current UE5 Chaos Destruction page was read; this domain deliberately stays on the named UE 4.27 version."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/main/scripts/addons_core/cell_fracture/__init__.py",
+      "status": "HTTP_404",
+      "attempted": "2026-11-13",
+      "impact": "Cell Fracture source code was not read from this path; no source-level algorithm claims are made."
+    },
+    {
+      "url": "https://projects.blender.org/blender/blender-manual/raw/branch/main/manual/animation/armatures/skinning/introduction.rst",
+      "status": "TLS_FAILURE",
+      "attempted": "2026-11-13",
+      "impact": "Raw manual source route abandoned; only read HTML/search excerpts are used."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender-manual/main/manual/animation/armatures/skinning/introduction.rst",
+      "status": "HTTP_404",
+      "attempted": "2026-11-13",
+      "impact": "Manual GitHub mirror path was invalid; no raw RST obtained."
+    }
+  ],
+  "source_audit_directory": "work/audit/<batch>/",
+  "qualification": "research and read-case evidence; runtime/production not_run unless explicitly named",
+  "root_method_origin": "work/audit/<batch>/",
+  "root_adoption": "Methods curated by root; source/report statements that exceed their conditions are not adopted. Snippet-only, abstract/overview and old-version references retain their limits; no production or current-version promise.",
+  "evidence_base_directory": "work/audit/<batch>/",
+  "evidence_resolution": "Use per-source evidence_base_directory if present, otherwise this root field. source_audit_directory locates original reports, not necessarily evidence."
+}

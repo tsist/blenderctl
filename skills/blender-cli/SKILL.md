@@ -1,63 +1,102 @@
 ---
 name: blender-cli
-description: 使用 blenderctl 创建、检查、修改 Blender 工作副本，执行渲染、动画、模拟、格式交换与可恢复流水线；用于实际操作已保存工程并验证产物，不用于实时 GUI 操控或纯知识解释。
+description: 通过项目公共入口 blenderctl 查找动作、读取工程、在工作副本上执行修改、等待长作业、接手现场窗口并做独立重开与发布事务。只要实际读写 .blend、调度自研插件后台动作或核验交付产物就用它。
 metadata:
-  version: "0.3.0"
+  version: "1.0.0"
 ---
 
-# Blender CLI
+# Blender CLI 调用手册
 
-用公开 blenderctl 完成目标并验收实际产物。此技能配套公共引擎 **0.63.1**。当前 Windows Blender 5.3.0 适配提供 `rigging-workflow` 的 v003 入口。所选专项仍须按该发行的帮助、输入契约和实际输出核验。
+本技能管怎么调 `./blenderctl.ps1`。项目当前唯一支持与验收的宿主是 Windows Blender `5.3.0`，启动器默认使用工作区内置的这套环境。具体某一门工艺怎么做，读对应部门的专项技能；跨部门顺序见 [blender-work-methodology](../blender-work-methodology/SKILL.md)。
 
-## 定位工具
+## 第一步：用 discover 找到准确入口
 
-从用户指定目录或 `BLENDERCTL_ROOT` 找仓库根，核对 `tools/blenderctl/cli.py` 与 `docs/cli/schemas/`。PowerShell 启动器使用 Python 3.12+，可用 `BLENDERCTL_PYTHON` 明确指定。用 `--blender` 指定实际可执行文件。采用 Windows 便携安装时，可配置 `BLENDERCTL_BLENDER_ROOT`，再用 `--blender-version 5.3.0` 选择宿主。将全局选项放在子命令前。
+动手前先查公共目录，拿到经过核验的命令前缀和所需字段，省去猜子命令和参数名的麻烦。
 
 ```powershell
-$root = $env:BLENDERCTL_ROOT
-$ctl = Join-Path $root 'blenderctl.ps1'
-& $ctl --version
-python '<技能目录>\scripts\discover.py' --root $root --command material.run
-& $ctl material describe --operation study --section study
+$ctl = './blenderctl.ps1'
+
+# 按作品目标或专项产品浏览
+& $ctl discover --goal asset
+& $ctl discover --product material --actions
+
+# 按动作 ID 精确取出启动器
+$d = & $ctl discover --action asset.find_by_type | ConvertFrom-Json
+$item = $d.data.actions.items[0]
 ```
 
-发现脚本读取公开合同，不启动 Blender或认证 GUI 状态；安装到其他目录后仍用显式 root/环境变量。按需查[领域导航](references/domains.md)、当前帮助与 Schema，不重复灌入全量节点树或默认字段。
+拿到 `$item` 后按下面顺序用：
 
-先从当前索引、领域describe或命令help的真实返回确认接口，再定位真实Schema路径；不猜命令、文件名或报告字段层级。同任务记录已读接口、版本、Schema路径/SHA和适用输入，未变化时保留摘要与引用；版本、输入或外部文件变化后复读受影响章节。`--compact`仅按实际支持的材质接口使用，不假定extension.run、project.verify等支持。
+1. **先跑帮助看参数**：取出 `$item.launchers[0].argv` 直接执行一次，看清最新参数说明；同一动作有多个版本时加 `--product` 和 `--edition` 挑定。要是 `launchers` 为空，读 `launcher_reason` 看它属于纯界面按钮还是需要现场窗口条件。
+2. **顺着 `command_argv` 拼输入**：把真实文件路径和业务参数接在 `command_argv` 后面。返回里带有 `request_fields` 就填进请求 JSON；带有 `session_open_fields` 就在开现场会话时带上。
+3. **专项细则用 `describe` 查**：像 `material`、`uv`、`geometry`、`toon-workflow` 都自带 `describe` 子命令（如 `& $ctl material describe --operation study --section study`），不启动 Blender 就能读到参数分节说明。
 
-## 从目标查当前入口
+## 第二步：建批次目录，先读后改
 
-- 入库与已有库整理先查 `asset --help`。盘点、准备候选和发布计划分别查看 `asset index --help`、`asset prepare --help` 和 `asset plan --help`。资产身份及实际拖入验收见[资产管理](../blender-asset-manager/SKILL.md)。
-- 工程快照及交接先查 `project verify --help` 和 `project prepare-copy --help`。沿用当前 Schema 的资源清单、源 SHA 和作业目录。现场编辑先由专项入口确认会话身份，再另存可供后台消费的工程。
-- 体素初绑、选骨重算、返修和同骨架转权用 `rigging-workflow discover` 查看公开 v003 动作。设置 `BLENDERCTL_RIGGING_ROOT` 指向独立骨骼仓库的检出根，按发现结果与子命令帮助构造请求。具体分工、人工修复和动作验收见[绑定技能](../blender-rigging/SKILL.md)。
+每次任务在 `work/audit/<batch>//` 下建独立的 `jobs` 和 `transactions` 目录，全局参数统一放在子命令前面。
 
-## 材质工作单元
+```powershell
+$batch = 'work/audit/<batch>/'
+$jobs  = Join-Path $batch 'jobs'
+$tx    = Join-Path $batch 'transactions'
+New-Item -ItemType Directory -Path $jobs, $tx -Force | Out-Null
 
-单目标 `material.run`，明确多对象/槽/面清单 `material.batch`，有限数值对照 `material.study`，结构导出 `material.template-save`。先 `material describe` 获取相关章节或完整请求；`--section` 与 `--schema` 不同时给。
+$src = '<PROJECT_ROOT>/work\lamp\source.blend'
+$sha = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
 
-study 点名 assignment/layer，最多8候选、每候选6视图、总32视图。参数仅含 normal_strength、roughness、metallic、ior、coat_weight、coat_roughness、coat_ior；White 只隔离点名层颜色。先读差异/语义风险/无效旋钮和进度，再看图人工判断。贴图覆盖 roughness 常量时，scale/bias 用 run/batch。
+# 先只读摸清对象名、材质槽与外部引用
+& $ctl --jobs-dir $jobs inspect $src --expected-sha256 $sha
+& $ctl --jobs-dir $jobs scene inspect $src --expected-sha256 $sha
+```
 
-材质执行/读取优先 `--compact`，完整结果仍在磁盘，摘要含 file/SHA/bytes 引用。显示失败不重新制作。长任务用同一 jobs 根的 `job wait <id> --wait-seconds 30`（0–55秒），仍运行时读真实阶段/恢复引用，不重复提交。
+先读结构报告再写修改请求，对象名、集合名、UV 层名和帧域全都从报告里实取。所有编辑命令都在新作业目录里生成工作候选（如 `model-candidate.blend`），原文件保持完好留作对照。
 
-## 执行与验收
+## 第三步：提交请求与等待长作业
 
-先核对 Scene/View Layer、对象/槽/面、模式、共享数据、依赖及实际名称。CLI 的 `SAVED_DISK_V1` 看不到未保存 GUI 编辑，跨入口用独立持久快照。
+- **短参数直接走命令行，复杂参数写 UTF-8 JSON**：写好 `{"schema_version": "1.0", "command": "领域.动作", "params": {...}}` 后运行 `& $ctl --jobs-dir $jobs request $reqFile`。命令行用空格和连字符（`project prepare-copy`），JSON 请求里用点号和下划线（`project.prepare_copy`）。
+- **用 `--compact` 省上下文**：跑 `material`、`geometry` 和 `model inspect` 时加上 `--compact`，终端直接拿精简摘要、源 SHA 和报告路径，完整 JSON 照常留在作业目录供随时按需细查。
+- **长作业用 `job wait` 等结果**：提交耗时渲染、烘焙或参数对比后，运行 `& $ctl --jobs-dir $jobs --compact job wait $jobId --wait-seconds 30`（单次最长 55 秒），一次拿回终态或当前做到第几项进度；还在跑就顺着同一个 `$jobId` 接着等。
 
-输入绝对路径、真实 SHA 和完整资源清单，不默认空资源。修改产生新候选，源保持不变。新批次指定独立 `--jobs-dir`，事务另指定并复用 `--transactions-dir`；全局选项在子命令之前，复杂请求用 UTF-8 JSON。
+## 第四步：接手打开的 Blender 窗口
 
-参数化复用实际存在的请求生成器/报告适配器，按当前Schema验证输出；缺失构建器是待开发能力，不编造命令或强制每例开发。UV修改优先当前model.prepare合同的uv.layer/uv.set，不为普通UV操作自写通用RNA签名。资源live/orphan分类须有引用证据并标未知项，孤立不等于可删除；封包保留相对依赖与复制关系，按实际修改影响面核对非目标数据。
+后台命令读的是磁盘快照；用户在打开的 Blender 5.3.0 窗口里做了手调时，先走对应插件的现场交接入口把改动收进工作副本：
 
-完整JSON留盘，交互返回实际报告路径、SHA及本次决策必要字段，按真实字段层级投影；不隐藏错误、异步未完状态或保护信息。
+- **材质手调**：目标窗口挂好会话后，运行 `& $ctl material handoff-live --session-dir $sDir --session-id $sId --operation inspect` 核对，再用 `--operation submit --mode SINGLE`（或 `BATCH`）生成带 SHA 的工作副本继续往下做。
+- **相机、几何节点、绑定、合成与剪辑**：分别走 `camera session-live`、`geometry session-live`、`rigging-workflow session-live`、`compositing session-live` 和 `video inspect-live`（先运行各自 `--help` 看会话目录参数）。
 
-同时检查退出码、JSON ok/error、整体及逐项状态、异步终态。提交成功/文件存在不等于验收；只消费已验证产物。独立重开核对目标及非目标，实际解码查看图像，动画/模拟检查关键和必要中间状态，交换用目标读取器验。技术、视觉及用户反馈分开记录。
+## 第五步：看结果、做几何体检与冷重开
 
-具体执行见[执行与验收](references/execution.md)。仅把当前 ALLOWED 命令放入 DAG；材质、事务、宿主管理及审阅入口独立。恢复/取消见[恢复与发布](references/recovery.md)：绑定源、资源、实现、任务和视图身份，不改旧 SHA；取消只作用于本任务作业。
+每次跑完同时看 `$LASTEXITCODE` 和返回 JSON 里的 `ok`。`ok` 为 `true` 时，顺着 `artifacts` 给出的路径取候选文件接着用；`ok` 为 `false` 时先读 `error` 和作业目录日志定位原因。
 
-计时区分总墙钟、顶层作业和内部阶段；嵌套case/view已包含父级时不重复累加。工具秒数不能解释全部会话时间，缺遥测区间标未测，不归因模型、等待或GPU。历史耗时复盘仅提出待匹配验证的优化候选，原证未公开，不代表已实现提速；见[效率章节](../blender-work-methodology/references/efficient-work-units.md)。
+1. **通用几何体检**：在白模里程碑、外部生成导入初筛或正式交付前，对保存好的 `.blend` 跑一次只读体检：
+   ```powershell
+   & $ctl --jobs-dir $jobs --compact model inspect $candidate --expected-sha256 $cSha --qa-profile game
+   ```
+   按用途选 `game`、`render`、`mobile_strict` 或 `print`。报告把负缩放、法线粗糙度贴图误设 `sRGB`、使用中的空材质槽、丢贴图归进 `hard_blockers`（先修清再往下交），把共面闪烁、浮空件、对称 UV 重叠、多边面归进 `review_signals` 供结合画面判断。属于无争议的纯数据贴图色彩空间或未用空材质槽，可在 `model prepare` 里加 `{"op": "qa.fix_safe", "profile": "game", "dry_run": false}` 在新副本上一键修好。
+2. **另起进程冷重开并看真图**：交付前对最终候选再跑一次 `inspect` 或 `project verify`（核对完整外部资源清单，包括贴图、VDB、USD 与模拟缓存），动画抽查关键帧数值，视觉任务渲出代表画面打开核对。
 
-交付保留 blend、纹理、frames/VDB/usdc、缓存、回执及上游作业。先检查消费者再清理，缺全局反向消费者索引时注明影响面。资产命名/入库转[资产管理](../blender-asset-manager/SKILL.md)。无隔离不冒称隔离，未验平台/断电一致性/硬配额不得宣称支持，安全拒绝不能换入口绕过。
+## 第六步：中断续跑与正式发布
 
+- **续跑**：`pipeline` 或 `workflow` 中断后，用原 `--jobs-dir` 跑 `pipeline resume <job_id>` 或 `workflow resume` 重评未完步骤；单步命令修好输入后从源副本重新提交。
+- **发布到正式位置或资产库**：工作候选验收通过后，写新文件用 `project plan-copy`，覆盖已授权目标或发布进 `<ASSET_LIBRARY>` 走 `asset plan` 加 `transaction apply`（全程保持同一个 `--transactions-dir`）。细节见 [恢复与发布](references/recovery.md)。
 
-## Video workflow in CLI 0.63.0
+## 例子：给一件道具做交付前体检并修好贴图色彩空间
 
-Use `video describe` for the current schema and [video editing](../blender-video-editing/SKILL.md) for editorial execution. Its template library is at `templates/video/cli.py` under `BLENDERCTL_ROOT`. Preserve implementation hashes and use the exact source release; independent specialty snapshots may share a version string while differing in code.
+接到任务：「检查 `work/prop/dial.blend` 能不能按游戏资产交付，修好无争议的小毛病。」
+
+1. 建批次目录 `work/audit/<batch>/`，算出 `dial.blend` 的小写 SHA256。
+2. 查帮助确认参数：`& $ctl model inspect --help`。
+3. 跑体检：`& $ctl --jobs-dir $jobs --compact model inspect $src --expected-sha256 $sha --qa-profile game`。
+4. 看返回：`ok` 为 `true`，`qa-report.json` 提示法线贴图误标成了 `sRGB` 且多出两个未使用的空材质槽，其余拓扑与 UV 正常。
+5. 写一份 `manifest.json` 放入 `{"operations": [{"op": "qa.fix_safe", "profile": "game", "dry_run": false}]}`，运行 `& $ctl --jobs-dir $jobs model prepare --file $src --expected-sha256 $sha --manifest $manifest`。
+6. 从返回 `artifacts` 取出新生成的 `model-candidate.blend` 和它的新 SHA，另跑一次 `model inspect --qa-profile game` 冷重开复查，`hard_blockers` 清零，连同候选路径和体检报告交给资产入库部门。
+
+## 参考
+
+- [命令写法、请求 JSON 与建模 UV 扩展](references/execution.md)
+- [流水线、错误码、脚本回执与事务发布](references/recovery.md)
+- [子命令与专项分派速查表](references/domains.md)
+- [契约文档与 Schema 索引](references/sources.md)
+- 离线契约速查脚本：`scripts/discover.py` · 最小流水线样例：`assets/studio-pipeline.json`
+
+维护：唯一维护源是 `./.agents/skills/blender-cli/`，改完运行同步脚本更新各镜像。
