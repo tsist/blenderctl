@@ -86,6 +86,11 @@ class HostTests(unittest.TestCase):
                 'print(json.dumps([Path(__file__).name, *sys.argv[1:]]))\n'
                 'sys.exit(17)\n', encoding='utf-8',
             )
+        if sys.platform == 'linux':
+            (runtime / 'linux-capabilities.json').write_text(json.dumps({
+                'schema_version': 1, 'edition': '0.42.3-agent-v003',
+                'routes': {name: [mode] for name, (_, mode) in routes.items()},
+            }), encoding='utf-8')
         group = ('rigging-workflow', '--rigging-root', str(checkout))
         result = self.rig_call(*group, 'discover')
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -96,6 +101,22 @@ class HostTests(unittest.TestCase):
         request = self.work / 'source request.json'
         run = self.work / 'new run'
         blender = self.work / 'Portable Blender' / 'blender.exe'
+        if sys.platform == 'linux':
+            blender = self.work / 'Portable Blender' / 'blender'
+            blender.parent.mkdir()
+            blender.write_text('#!/bin/sh\nexit 0\n', encoding='utf-8')
+            blender.chmod(0o700)
+            alias = self.work / 'blender alias'
+            alias.symlink_to(blender)
+            for runtime_options in [(), ('--blender-version', '5.3.0'), ('--blender', 'blender'),
+                            ('--blender', str(alias)), ('--blender', str(blender.parent))]:
+                denied = self.rig_call(*runtime_options, *group, 'candidate-entry', 'inspect',
+                                       '--request', str(request), '--run-dir', str(run))
+                self.assertEqual(denied.returncode, 2, denied.stderr)
+                self.assertEqual(json.loads(denied.stdout)['error']['code'], 'INVALID_REQUEST')
+                self.assertFalse(run.exists())
+            self.assertTrue(discovery['source_availability_only'])
+            self.assertEqual(discovery['host'], 'linux')
         for route, (filename, mode) in routes.items():
             with self.subTest(route=route):
                 result = self.rig_call('--blender', str(blender), *group, route, mode, '--request', str(request), '--run-dir', str(run))
@@ -105,8 +126,30 @@ class HostTests(unittest.TestCase):
                     '--blender', str(blender.resolve()),
                 ])
         cancelled = self.rig_call(*group, 'candidate-repair', 'cancel', '--run-dir', str(run))
-        self.assertEqual(cancelled.returncode, 17, cancelled.stderr)
-        self.assertEqual(json.loads(cancelled.stdout), ['rigging_candidate.py', 'cancel', '--run-dir', str(run)])
+        if sys.platform != 'linux':
+            self.assertEqual(cancelled.returncode, 17, cancelled.stderr)
+            self.assertEqual(json.loads(cancelled.stdout), ['rigging_candidate.py', 'cancel', '--run-dir', str(run)])
+        else:
+            self.assertNotEqual(cancelled.returncode, 0, cancelled.stderr)
+            self.assertEqual(json.loads(cancelled.stdout)['error']['code'], 'UNSUPPORTED')
+            denied = self.rig_call('--blender', str(blender), *group, 'candidate-selected-skin', 'execute',
+                                   '--request', str(request), '--run-dir', str(run))
+            self.assertEqual(json.loads(denied.stdout)['error']['code'], 'UNSUPPORTED')
+            manifest = runtime / 'linux-capabilities.json'
+            manifest.write_text('{"schema_version":1,"edition":"0.42.3-agent-v003","routes":{"candidate-selected-skin":["execute"]}}', encoding='utf-8')
+            denied = self.rig_call(*group, 'discover')
+            self.assertEqual(json.loads(denied.stdout)['error']['code'], 'INVALID_REQUEST')
+            manifest.write_text('{"schema_version":1,"edition":"0.42.3-agent-v003","routes":{},"routes":{}}',
+                                encoding='utf-8')
+            denied = self.rig_call(*group, 'discover')
+            self.assertEqual(json.loads(denied.stdout)['error']['code'], 'INVALID_REQUEST')
+            manifest.unlink()
+            discovery = json.loads(self.rig_call(*group, 'discover').stdout)
+            self.assertTrue(all(row['available'] and not row['linux_modes'] for row in discovery['commands']))
+            denied = self.rig_call('--blender', str(blender), *group, 'candidate-selected-skin', 'inspect',
+                                   '--request', str(request), '--run-dir', str(run))
+            self.assertEqual(json.loads(denied.stdout)['error']['code'], 'UNSUPPORTED')
+            self.assertFalse(run.exists())
         self.assertFalse((self.work / 'jobs').exists())
 
     def test_rigging_workflow_reports_missing_checkout(self):

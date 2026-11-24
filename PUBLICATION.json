@@ -117,8 +117,8 @@
     },
     {
       "file": "docs/RIGGING.md",
-      "sha256": "14c320474136d342dc108ec4a606f2b058beb2f079a3e0bfdf34c8f639d3a9be",
-      "bytes": 2336
+      "sha256": "b56cc001b473fbaea163fb2b0a00dcb745d62ee144141167efcbc1211f041115",
+      "bytes": 3696
     },
     {
       "file": "docs/SKILLS.md",
@@ -1322,8 +1322,8 @@
     },
     {
       "file": "tests/test_host.py",
-      "sha256": "0db38240865b3e162a488bd2c72fcf2ae133396803af784489872ed2fac79ae9",
-      "bytes": 8275
+      "sha256": "7f1f136fbaead39d6c2158c685bd1b79659c0ee8bb5cd26b402b34f0050606b0",
+      "bytes": 11319
     },
     {
       "file": "tests/test_job_bridge.py",
@@ -2457,8 +2457,8 @@
     },
     {
       "file": "tools/rigging_workflow_cli.py",
-      "sha256": "f5735e6c05e53081f6ddd63cba3202fa3591f14ba4e689fdcd41b503cb28b5e8",
-      "bytes": 4685
+      "sha256": "0332cf5eafeef577a6e4a07205ecc8a4fc7d91c006e1d137b974a8a573cc7d32",
+      "bytes": 7839
     },
     {
       "file": "tools/video_editing_workflow_addon/LICENSE.txt",
