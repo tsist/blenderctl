@@ -15,6 +15,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 CLI = ROOT / 'tools/blenderctl/cli.py'
+RIG_CLI = ROOT / 'tools/rigging_workflow_cli.py'
 
 
 class HostTests(unittest.TestCase):
@@ -27,6 +28,10 @@ class HostTests(unittest.TestCase):
 
     def call(self, *args):
         return subprocess.run([sys.executable, str(CLI), '--jobs-dir', str(self.work / 'jobs'), *args],
+                              cwd=self.work, capture_output=True, text=True, encoding='utf-8', timeout=30)
+
+    def rig_call(self, *args):
+        return subprocess.run([sys.executable, str(RIG_CLI), *args],
                               cwd=self.work, capture_output=True, text=True, encoding='utf-8', timeout=30)
 
     def test_version_help_from_unrelated_directory(self):
@@ -60,6 +65,56 @@ class HostTests(unittest.TestCase):
             self.assertEqual(len(content), row['bytes'])
             self.assertEqual(hashlib.sha256(content).hexdigest(), row['sha256'])
         self.assertFalse((self.work / 'jobs').exists())
+
+    def test_rigging_workflow_discovers_and_dispatches_standalone_commands(self):
+        checkout = self.work / 'rigging [source]'
+        runtime = checkout / 'cli-v003'
+        package = runtime / 'rigging_workflow'
+        package.mkdir(parents=True)
+        (package / '__init__.py').touch()
+        scripts = runtime / 'cli'
+        scripts.mkdir()
+        routes = {
+            'candidate-entry': ('character_entry_candidate.py', 'inspect'),
+            'candidate-selected-skin': ('selected_skinning_cli.py', 'inspect'),
+            'candidate-repair': ('rigging_candidate.py', 'inspect'),
+            'candidate-skinning-policy': ('skinning_policy_candidate.py', 'plan'),
+        }
+        for filename, _ in routes.values():
+            (scripts / filename).write_text(
+                'import json, sys\nfrom pathlib import Path\n'
+                'print(json.dumps([Path(__file__).name, *sys.argv[1:]]))\n'
+                'sys.exit(17)\n', encoding='utf-8',
+            )
+        group = ('rigging-workflow', '--rigging-root', str(checkout))
+        result = self.rig_call(*group, 'discover')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        discovery = json.loads(result.stdout)
+        self.assertEqual(discovery['edition'], '0.42.3-agent-v003')
+        self.assertEqual(len(discovery['commands']), len(routes))
+        self.assertTrue(all(row['available'] for row in discovery['commands']))
+        request = self.work / 'source request.json'
+        run = self.work / 'new run'
+        blender = self.work / 'Portable Blender' / 'blender.exe'
+        for route, (filename, mode) in routes.items():
+            with self.subTest(route=route):
+                result = self.rig_call('--blender', str(blender), *group, route, mode, '--request', str(request), '--run-dir', str(run))
+                self.assertEqual(result.returncode, 17, result.stderr)
+                self.assertEqual(json.loads(result.stdout), [
+                    filename, mode, '--run-dir', str(run), '--request', str(request), '--blender', str(blender),
+                ])
+        cancelled = self.rig_call(*group, 'candidate-repair', 'cancel', '--run-dir', str(run))
+        self.assertEqual(cancelled.returncode, 17, cancelled.stderr)
+        self.assertEqual(json.loads(cancelled.stdout), ['rigging_candidate.py', 'cancel', '--run-dir', str(run)])
+        self.assertFalse((self.work / 'jobs').exists())
+
+    def test_rigging_workflow_reports_missing_checkout(self):
+        result = self.rig_call(
+            'rigging-workflow', '--rigging-root', str(self.work / 'missing'),
+            'candidate-entry', 'inspect', '--request', str(self.work / 'request.json'), '--run-dir', str(self.work / 'run'),
+        )
+        self.assertEqual(result.returncode, 3, result.stderr)
+        self.assertEqual(json.loads(result.stdout)['error']['code'], 'NOT_FOUND')
 
     def test_schema_local_references_resolve(self):
         paths = list((ROOT / 'docs/cli/schemas').glob('*.json'))

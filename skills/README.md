@@ -1,11 +1,11 @@
 # Blender agent skills / Blender 配套技能
 
-Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. Public bundle version: **0.4.0**.
+Six companion skills for **blenderctl 0.63.1** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. The current source bundle is **0.5.0**.
 
 | Skill | Use |
 | --- | --- |
 | `blender-video-editing` | Whitebox/AI/CG editing, shot candidates, audio/subtitles, manual continuation and SDR templates |
-| `blender-rigging` | Bones, binding weights, expression Shape Keys and hair-bone physics; separate development baseline |
+| `blender-rigging` | Character rigging and the v003 Windows Blender 5.3.0 command-line preview |
 | `blender-cli` | Saved-file CLI operations, discovery, rendering, job/transaction protection and recovery |
 | `blender-work-methodology` | Plugin/CLI work units, reference/assembly decisions, progress, preview and acceptance |
 | `blender-material-authoring` | References, PBR layers/channels, image budgets, managed material operations and validation |
@@ -13,7 +13,7 @@ Five companion skills for **blenderctl 0.63.0** and **Material Workflow 0.7.0**,
 
 ## Install in Codex
 
-Download `blenderctl-skills-0.4.0.zip` from the [skills release](https://github.com/tsist/blenderctl/releases/tag/v0.63.0-r2), or use the repository. Keep all six skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
+Install from the current repository checkout. Keep all six skill folders as siblings because they link to each other. They use the standard `SKILL.md`, `agents/openai.yaml`, `references/`, `scripts/` and `assets/` structure; other agent hosts must support or adapt that structure themselves.
 
 From the repository root:
 
@@ -46,10 +46,6 @@ Live Blender MCP, native image generation, optional fallback services and memory
 
 ## 中文说明
 
-0.2.0修订方法论、材质与CLI指导：按需回读合同和证据，前移区域/UV与关键区域可观察性检查，按依赖准备生图与有界诊断，复制前核对依赖，最终质量反馈前备齐交付说明。构建器、通用诊断预设和全链路遥测仍是待开发候选，不宣称本次指导修订已测得提速。资产管理指导内容不变，仅随技能包更新版本标识；CLI与插件未升级。
+0.5.0 技能包包含 CLI 操作、制作方法论、材质制作、资产管理、视频剪辑和角色绑定。六个技能保持同级安装。新选骨重算和转权使用 5.3.0 的独立骨骼候选源码。将 `BLENDERCTL_RIGGING_ROOT` 指向骨骼仓库根，并按[公开 CLI 接入说明](https://github.com/tsist/blenderctl/blob/main/docs/RIGGING.md)查询命令。资产取用在目标 Blender 版本实际拖入和保存，再独立重开检查。
 
-五个技能保持同级安装：CLI操作、制作方法论、材质制作、资产管理、视频剪辑。`BLENDERCTL_ROOT` 指向另行解压的公开源码，`BLENDER_PATH` 可保存实际 Blender 路径；调用时仍显式传 `--blender $env:BLENDER_PATH`。辅助脚本不启动 Blender；只有本次实际制作/验收才走已授权 CLI。资产根由用户当次明确，随包资产标准是新项目可采用的基线，已有项目规则优先。
-
-原个人技能和工作区规则保持完整。公开版移除本机盘符/用户名、私人 Wiki、固定任务编号、原资产及用户对话；六个领域方法仍是 candidate，历史教训不冒充公开可复现或跨模型验证。本包保留原生生图优先的材质路线，用户当前明确要求优先。
-
-结构/链接、安装冲突保护、实际辅助脚本和 CI 的验证见 [skills verification](https://github.com/tsist/blenderctl/blob/main/docs/SKILLS.md)。软件已验 Windows/Blender 5.2.1 基线不因发布指导文件而扩大。
+辅助脚本只读取公开合同。软件与技能可分别安装，同一作业的恢复沿用原发行和源指纹。结构、链接及安装验证见 [skills verification](https://github.com/tsist/blenderctl/blob/main/docs/SKILLS.md)。

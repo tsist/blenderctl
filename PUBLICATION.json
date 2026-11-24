@@ -1,11 +1,11 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r1",
+  "release": "0.63.1-r2",
   "cli": "0.63.1",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
-  "skill_bundle": "0.4.0",
+  "skill_bundle": "0.5.0",
   "runtime_identity": "69e4b0502e1fb6f3459a4bde931a30a338e3ac639295ef5b3e7024a63e42dee2",
   "runtime_files": 189,
   "license": "GPL-3.0-or-later",
@@ -42,8 +42,8 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "de4d972a52293d86cdb73a677e6d13f4b0fc67fa5d7cfd0fb23db37d531409bc",
-      "bytes": 3461
+      "sha256": "2404dd7716e51911bd0ee6a3a127087f44b133c3e53dfd2999a8335c19bf0428",
+      "bytes": 3805
     },
     {
       "file": "CONTRIBUTING.md",
@@ -57,13 +57,13 @@
     },
     {
       "file": "README.md",
-      "sha256": "bb44d3ba219bc4e200556b2971182168b7136dcd4966e5dc54990ac014f3e705",
-      "bytes": 5267
+      "sha256": "1dc51b1dd4ba316dee481ee2ad709a1eb59335f596de8b2e3452e24e9d94da73",
+      "bytes": 5483
     },
     {
       "file": "README.zh-CN.md",
-      "sha256": "d8ef9740e4f5ce7029b2062c7ab230aa94b01e1a1825f82954ce85356dcefac8",
-      "bytes": 4163
+      "sha256": "29fe14f0694f0a678b9763e4a6e21fc5de383a3d32a27657d8e9f2fbf5fb4df6",
+      "bytes": 4348
     },
     {
       "file": "RELEASE-VALIDATION.json",
@@ -82,8 +82,8 @@
     },
     {
       "file": "blenderctl.ps1",
-      "sha256": "4f8a4f915df164310ae4c89586535db76bdc194d5230c5e848e2a31d8de86d6a",
-      "bytes": 865
+      "sha256": "3fc1a100de38e693ce79261b0fe2603700c9df8e9091da6c57ab01400d072228",
+      "bytes": 1254
     },
     {
       "file": "docs/CLI_REFERENCE.md",
@@ -112,13 +112,13 @@
     },
     {
       "file": "docs/RIGGING-PUBLICATION.md",
-      "sha256": "39bb0028ed232f8dfd4c2608267ef4dfaaf9484b3ec091264c5107e86f326037",
-      "bytes": 418
+      "sha256": "5f0d50ba2bab6d1cdaa507685026f44cc730bde094f50220f983e9618cdfa7d5",
+      "bytes": 834
     },
     {
       "file": "docs/RIGGING.md",
-      "sha256": "6bb99bccdb66504c3df2324586024ed4bc2a4aed0bb8c8b1d92d9ced53796678",
-      "bytes": 1648
+      "sha256": "14c320474136d342dc108ec4a606f2b058beb2f079a3e0bfdf34c8f639d3a9be",
+      "bytes": 2336
     },
     {
       "file": "docs/SKILLS.md",
@@ -937,8 +937,8 @@
     },
     {
       "file": "skills/README.md",
-      "sha256": "e97e262f04d52701541b30519e305dcb4dac7882fa096069cf8d63109fb5e98c",
-      "bytes": 5268
+      "sha256": "1cc06a3ae31c754539412bd6c8324bb1d46782ec898300353545786e1d686d49",
+      "bytes": 4377
     },
     {
       "file": "skills/blender-asset-manager/LICENSE",
@@ -947,8 +947,8 @@
     },
     {
       "file": "skills/blender-asset-manager/SKILL.md",
-      "sha256": "f554b9ff0278cf227de4658a4d914ad69859769099376aff1b57025a89dd5531",
-      "bytes": 3188
+      "sha256": "3da7aa9cd57f29e54e32b8d2b1483550fd0e745f0197c7a698e76110bcbb5430",
+      "bytes": 3949
     },
     {
       "file": "skills/blender-asset-manager/agents/openai.yaml",
@@ -1007,8 +1007,8 @@
     },
     {
       "file": "skills/blender-cli/SKILL.md",
-      "sha256": "c7ca2df8ecf7c6b1ffeaaa6399a5964e674b82a43d59637954d7ab374c719556",
-      "bytes": 5711
+      "sha256": "21db9804ad89d6288fc52b64175115e0b22e8d4e41dff2241a62c6401dfea761",
+      "bytes": 6604
     },
     {
       "file": "skills/blender-cli/agents/openai.yaml",
@@ -1107,8 +1107,8 @@
     },
     {
       "file": "skills/blender-rigging/SKILL.md",
-      "sha256": "4bc6632d15a6253b249affc5061fed5217576003f0339d060ce9f19e624b96e0",
-      "bytes": 2601
+      "sha256": "a5956170797b24af3c119210d32d14e5c2276344f755d9fe7094d26f7fc765ac",
+      "bytes": 2200
     },
     {
       "file": "skills/blender-rigging/agents/openai.yaml",
@@ -1177,8 +1177,8 @@
     },
     {
       "file": "skills/blender-work-methodology/SKILL.md",
-      "sha256": "33fc1f86a15a073a2787ebd92764b5fa084ae38fe669cb438ba79662249eaa57",
-      "bytes": 16598
+      "sha256": "7d49afa74787e9a2a7488b3728741799e428cc50a62b246d149da6fdb4f11586",
+      "bytes": 17911
     },
     {
       "file": "skills/blender-work-methodology/agents/openai.yaml",
@@ -1247,8 +1247,8 @@
     },
     {
       "file": "skills/manifest.json",
-      "sha256": "4743594ee663495e3b0f82ae8b69e39bf4ecd45f58d52c322c1852f885d33ff5",
-      "bytes": 1486
+      "sha256": "fe943199f88be668aba5167ab83558c67f85e158a5ad38fd505e39ab7bb7c5ad",
+      "bytes": 1547
     },
     {
       "file": "skills/requirements-images.txt",
@@ -1322,8 +1322,8 @@
     },
     {
       "file": "tests/test_host.py",
-      "sha256": "548c413175e8bb6100716f13c9351165192d3696726dae4564a29e439ee15d8f",
-      "bytes": 5118
+      "sha256": "3b44a0c4639794c1c14c93543f8ec249c9d99a88153c19f9c8b043542c9e641f",
+      "bytes": 8245
     },
     {
       "file": "tests/test_job_bridge.py",
@@ -2456,6 +2456,11 @@
       "bytes": 6514
     },
     {
+      "file": "tools/rigging_workflow_cli.py",
+      "sha256": "f5735e6c05e53081f6ddd63cba3202fa3591f14ba4e689fdcd41b503cb28b5e8",
+      "bytes": 4685
+    },
+    {
       "file": "tools/video_editing_workflow_addon/LICENSE.txt",
       "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
       "bytes": 35821
@@ -2500,5 +2505,10 @@
       "sha256": "89372ec259925925997199baa76aacd8f57910f482e373f28fedf5fa97876bf1",
       "bytes": 2359
     }
-  ]
+  ],
+  "rigging_adapter": {
+    "edition": "0.42.3-agent-v003",
+    "entrypoint": "tools/rigging_workflow_cli.py",
+    "runtime": "separate blender-rigging-workflow checkout"
+  }
 }

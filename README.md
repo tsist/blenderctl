@@ -10,11 +10,12 @@ Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md): CLI operation, work methodology, material authoring and asset management. The separate **0.4.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+[Companion agent skills](skills/README.md): CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.5.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
 
 ## What you get
 
 - CLI adapters for scene construction, mesh/UV/node work, materials, rigs/animation, simulation, rendering, media, tracking, format exchange, dependencies, and asset workflows. Each adapter has a bounded contract; this is not every Blender operation.
+- `rigging-workflow` calls the standalone v003 commands for character binding, selected-bone weight recalculation, rig repair and weight transfer policy. [Setup and commands](docs/RIGGING.md)
 - Immutable job requests, explicit source/resource hashes, cancellation, recoverable pipelines, and separately reviewed file transactions.
 - Material Workflow: static PBR layers, managed node graphs, templates, explicit object/slot/face assignments, Cycles/Eevee diagnostic views, contact sheets, batch checkpoints, and bounded parameter studies.
 - A Blender sidebar for material drafts, batch assignments, and persistent snapshots handed to the same CLI backend.

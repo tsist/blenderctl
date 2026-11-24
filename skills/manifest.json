@@ -1,18 +1,18 @@
 {
-  "bundle_version": "0.4.0",
+  "bundle_version": "0.5.0",
   "license": "GPL-3.0-or-later",
-  "cli_version": "0.63.0",
+  "cli_version": "0.63.1",
   "extension_version": "0.7.0",
   "skills": [
     {
       "name": "blender-cli",
-      "source_guidance": "Blender CLI local skill, efficiency revision 2026-10-06",
-      "version": "0.2.0"
+      "source_guidance": "Windows Blender 5.3.0 and public rigging candidate routes",
+      "version": "0.3.0"
     },
     {
       "name": "blender-work-methodology",
-      "source_guidance": "0.30.0",
-      "version": "0.2.0"
+      "source_guidance": "Production handoffs for editable assets, rigging and shots",
+      "version": "0.3.0"
     },
     {
       "name": "blender-material-authoring",
@@ -21,8 +21,8 @@
     },
     {
       "name": "blender-asset-manager",
-      "source_guidance": "Asset management standard 1.0, guidance unchanged",
-      "version": "0.2.0"
+      "source_guidance": "Asset Browser consumption and saved-project handoff",
+      "version": "0.2.1"
     },
     {
       "name": "blender-video-editing",
@@ -31,8 +31,8 @@
     },
     {
       "name": "blender-rigging",
-      "source_guidance": "Independent rigging development baseline; detailed quality not accepted",
-      "version": "0.1.0-dev1"
+      "source_guidance": "Independent rigging workflow v003 source preview and 0.40.1 workbench",
+      "version": "0.42.3-agent-v003"
     }
   ],
   "optional_dependencies": {

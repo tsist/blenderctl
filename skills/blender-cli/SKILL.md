@@ -2,16 +2,16 @@
 name: blender-cli
 description: 使用 blenderctl 创建、检查、修改 Blender 工作副本，执行渲染、动画、模拟、格式交换与可恢复流水线；用于实际操作已保存工程并验证产物，不用于实时 GUI 操控或纯知识解释。
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Blender CLI
 
-用公开 blenderctl 完成目标，以实际产物验收。配套基线为 CLI **0.54.1**、Material Workflow **0.7.0**，原生运行已验 Windows / Blender **5.2.1 LTS**；注册存在不代表功能、视觉或跨平台通过。
+用公开 blenderctl 完成目标并验收实际产物。此技能配套公共引擎 **0.63.1**。当前 Windows Blender 5.3.0 适配提供 `rigging-workflow` 的 v003 入口。所选专项仍须按该发行的帮助、输入契约和实际输出核验。
 
 ## 定位工具
 
-仓库根采用用户指定目录或 `BLENDERCTL_ROOT`，不假定个人磁盘布局；须含 `tools/blenderctl/cli.py` 与 `docs/cli/schemas/`。Python 3.12+；Blender 必须通过 `--blender` 显式绑定本机可执行文件；`BLENDER_PATH` 仅可作为传给该参数的 shell 变量，本快照不会自动读取它。缺运行时如实报告，不擅自下载、安装或替换环境。
+从用户指定目录或 `BLENDERCTL_ROOT` 找仓库根，核对 `tools/blenderctl/cli.py` 与 `docs/cli/schemas/`。PowerShell 启动器使用 Python 3.12+，可用 `BLENDERCTL_PYTHON` 明确指定。用 `--blender` 指定实际可执行文件。采用 Windows 便携安装时，可配置 `BLENDERCTL_BLENDER_ROOT`，再用 `--blender-version 5.3.0` 选择宿主。将全局选项放在子命令前。
 
 ```powershell
 $root = $env:BLENDERCTL_ROOT
@@ -24,6 +24,12 @@ python '<技能目录>\scripts\discover.py' --root $root --command material.run
 发现脚本读取公开合同，不启动 Blender或认证 GUI 状态；安装到其他目录后仍用显式 root/环境变量。按需查[领域导航](references/domains.md)、当前帮助与 Schema，不重复灌入全量节点树或默认字段。
 
 先从当前索引、领域describe或命令help的真实返回确认接口，再定位真实Schema路径；不猜命令、文件名或报告字段层级。同任务记录已读接口、版本、Schema路径/SHA和适用输入，未变化时保留摘要与引用；版本、输入或外部文件变化后复读受影响章节。`--compact`仅按实际支持的材质接口使用，不假定extension.run、project.verify等支持。
+
+## 从目标查当前入口
+
+- 入库与已有库整理先查 `asset --help`。盘点、准备候选和发布计划分别查看 `asset index --help`、`asset prepare --help` 和 `asset plan --help`。资产身份及实际拖入验收见[资产管理](../blender-asset-manager/SKILL.md)。
+- 工程快照及交接先查 `project verify --help` 和 `project prepare-copy --help`。沿用当前 Schema 的资源清单、源 SHA 和作业目录。现场编辑先由专项入口确认会话身份，再另存可供后台消费的工程。
+- 体素初绑、选骨重算、返修和同骨架转权用 `rigging-workflow discover` 查看公开 v003 动作。设置 `BLENDERCTL_RIGGING_ROOT` 指向独立骨骼仓库的检出根，按发现结果与子命令帮助构造请求。具体分工、人工修复和动作验收见[绑定技能](../blender-rigging/SKILL.md)。
 
 ## 材质工作单元
 

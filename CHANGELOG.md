@@ -1,3 +1,9 @@
+# 0.63.1-r2 — 2026-11-24
+
+- Connect the Windows launcher to the standalone Rigging Workflow v003 source with discovery and four portable candidate commands.
+- Update the CLI, rigging, work methodology and asset management skills in companion bundle 0.5.0.
+- Preserve the qualified 0.63.1 core and its pinned video template runtime identity.
+
 # 0.63.1-r1 — 2026-11-19
 
 - Bind the bundled video template compiler to the 0.63.1 runtime identity. The prior bundle retained the 0.63.0 pin and refused to compile templates.
