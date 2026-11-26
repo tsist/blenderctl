@@ -7,6 +7,7 @@
 | 用途 | 命令入口 | 要点 |
 |---|---|---|
 | 查环境与能力清单 | `--version`、`doctor`、`capabilities`、`discover` | `--version`、`--help`、`discover` 同步秒回且不建作业；`doctor` 和 `capabilities` 会建作业，记得带上 `--jobs-dir` |
+| 一键聚焦与真视口 4 视角快检 | `preview`（`preview FILE.blend`、`preview session {start,status,stop,list}`） | Windows 隔离桌面零干扰直出，纯只读免手算 SHA；支持 `--objects`/`--collection`/`--isolate`、`quad`/`orbit`/`3x3`/`single`、`wireframe`/`solid`/`solid_wire`/`matcap`/`face_orientation`/`material`/`rendered`（Cycles DLSS 优先含显式 OptiX 回退、EEVEE Next）、`--wire-overlay` 与 `--compare-modes` |
 | 只读查看 `.blend` 与对比差异 | `inspect`、`query`、`diff`、`validate`、`dependency` | 摸清数据块、选择器属性、两版文件差异与外部资源重连计划 |
 | 工程依赖核验、复制与链接覆盖 | `project verify`、`prepare-copy`、`plan-copy`、`link`、`override` | 核对外部资源闭包，生成相对路径重映射副本，管理库链接与 Library Override |
 | 场景组装与通用几何体检 | `scene`、`model`（含 `model inspect --qa-profile`、`model panel-controls`） | 建相机灯光集合、网格与修改器栈操作、游戏/渲染/打印体检、硬表面面板选区交接 |

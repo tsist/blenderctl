@@ -1,5 +1,7 @@
 # blenderctl + Blender workflows
 
+**0.63.1-r3** 新增 **`blenderctl preview`**：基于 Windows 隔离桌面（`CreateDesktopW`）的零干扰真视口 4 视角快检工具，支持一键聚焦物体/集合（留上下文或 `--isolate` 独显）、线框/实体/实体叠半透明线框/MatCap/法线红蓝/LookDev/Cycles **NVIDIA DLSS Ray Reconstruction**（驱动 ≥ 620，未满足显式回退 GPU OptiX）与 EEVEE Next 渲染预览、同机位四阶段对比板及可选热会话复用。详见 [视口快检说明](docs/VIEWPORT_PREVIEW.md)。
+
 **0.63.1** 已实测 Windows Blender 5.3.0 的运行时选择、5.2 工程另存、合成效果栈与静态材质预览。旧入口仍可选择 5.2.1。专项插件的版本和边界请查各自仓库。[兼容说明](docs/COMPATIBILITY.md) · [骨骼插件说明](docs/RIGGING.md)
 
 **0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
@@ -12,6 +14,7 @@
 
 ## 能力
 
+- `preview`：Windows 隔离桌面真视口 4 视角一键聚焦快检，支持线框、实体、原生半透明线框叠加、MatCap、法线红蓝、LookDev、Cycles DLSS/OptiX 与 EEVEE Next 预览及热会话复用。[使用与示例](docs/VIEWPORT_PREVIEW.md)
 - 场景、网格、UV、节点、骨骼动画、模拟、渲染、剪辑、跟踪、格式交换、依赖与资产操作的有界适配器；每个接口都有自己的输入和已验边界。
 - `rigging-workflow` 接入独立骨骼仓的 v003 命令，支持新角色蒙皮、按所选骨骼局部重算、已有绑定返修和转权策略。[配置与命令](docs/RIGGING.md)
 - 独立作业、源与资源 SHA、取消、检查点、流水线恢复、显式文件事务。
@@ -46,6 +49,6 @@ python tests/run_blender_smoke.py --blender $env:BLENDER_PATH --output ./test-ou
 python scripts/build_release.py --output ./dist
 ```
 
-集成测试自行生成几何、UV 和纹理，执行 CPU 渲染、源保护、保存重开与插件注册验证。后台执行不能判断 GUI 未保存内容；请先保存独立快照。通用自动 UV、UDIM/动画贴图、自动审美决策及 DLSS 尚未提供。含依赖的候选工程必须保留相关作业目录。完整验收与未验范围见 [发布验证记录](docs/RELEASE_VERIFICATION.md)。
+集成测试自行生成几何、UV 和纹理，执行 CPU 渲染、源保护、保存重开与插件注册验证。后台执行不能判断 GUI 未保存内容；请先保存独立快照。通用自动 UV、UDIM/动画贴图与自动审美决策尚未提供；Cycles 视口 DLSS 降噪可通过 `blenderctl preview` 在 Windows Blender 5.3 + RTX 显卡 + NVIDIA 驱动 ≥ 620 环境使用（离线终渲 `render run` 使用 OPTIX / OPENIMAGEDENOISE）。含依赖的候选工程必须保留相关作业目录。完整验收与未验范围见 [发布验证记录](docs/RELEASE_VERIFICATION.md)。
 
 仓库不包含 Blender 安装包、私人资产、运行时配置或历史审计目录。贡献与安全反馈见 [CONTRIBUTING](CONTRIBUTING.md)、[SECURITY](SECURITY.md)。

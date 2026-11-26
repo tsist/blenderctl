@@ -64,16 +64,31 @@ $sha = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant(
 - **材质手调**：目标窗口挂好会话后，运行 `& $ctl material handoff-live --session-dir $sDir --session-id $sId --operation inspect` 核对，再用 `--operation submit --mode SINGLE`（或 `BATCH`）生成带 SHA 的工作副本继续往下做。
 - **相机、几何节点、绑定、合成与剪辑**：分别走 `camera session-live`、`geometry session-live`、`rigging-workflow session-live`、`compositing session-live` 和 `video inspect-live`（先运行各自 `--help` 看会话目录参数）。
 
-## 第五步：看结果、做几何体检与冷重开
+## 第五步：一键真视口快检、几何体检与冷重开
 
 每次跑完同时看 `$LASTEXITCODE` 和返回 JSON 里的 `ok`。`ok` 为 `true` 时，顺着 `artifacts` 给出的路径取候选文件接着用；`ok` 为 `false` 时先读 `error` 和作业目录日志定位原因。
 
-1. **通用几何体检**：在白模里程碑、外部生成导入初筛或正式交付前，对保存好的 `.blend` 跑一次只读体检：
+1. **一键聚焦与真视口 4 视角快检（推荐优先）**：任何建模、绑定、UV、材质、布光迭代后，直接用隔离桌面真视口秒出预览图（0 弹窗/0 抢焦点，纯只读不改源 `.blend`，自动控图 ≤ 2048px）：
+   ```powershell
+   # 默认 Quad 四视角（顶/前-Y/右+X 正交 + 前3/4 透视）实体+45%半透明线框
+   & $ctl --jobs-dir $jobs --compact preview $candidate --output "$batch\quad_wire.png"
+
+   # 聚焦单个零件/集合：默认保留上下文查穿插；加 --isolate 独显目标但保留灯光世界
+   & $ctl --jobs-dir $jobs --compact preview $candidate --objects "Body,Handle" --isolate --mode matcap
+
+   # 同机位四阶段联检板（大形 / 半透明线框 / LookDev / Cycles DLSS 或 OptiX 回退）
+   & $ctl --jobs-dir $jobs --compact preview $candidate --compare-modes solid,solid_wire,material,rendered --view front_3q
+
+   # 其他专业检查模式与热会话复用
+   # --mode: wireframe(--xray) | solid(--solid-color random) | solid_wire(--wire-opacity 0.45) | matcap | face_orientation | material(--wire-overlay 0.35) | rendered(--render-engine cycles|eevee --denoiser auto|dlss|optix --strict-denoiser)
+   # 多轮迭代免冷启动：preview session start -> preview $file --session <id> [--framing-from prior.json] -> preview session stop <id>
+   ```
+2. **通用几何体检**：在白模里程碑、外部生成导入初筛或正式交付前，对保存好的 `.blend` 跑一次只读体检：
    ```powershell
    & $ctl --jobs-dir $jobs --compact model inspect $candidate --expected-sha256 $cSha --qa-profile game
    ```
    按用途选 `game`、`render`、`mobile_strict` 或 `print`。报告把负缩放、法线粗糙度贴图误设 `sRGB`、使用中的空材质槽、丢贴图归进 `hard_blockers`（先修清再往下交），把共面闪烁、浮空件、对称 UV 重叠、多边面归进 `review_signals` 供结合画面判断。属于无争议的纯数据贴图色彩空间或未用空材质槽，可在 `model prepare` 里加 `{"op": "qa.fix_safe", "profile": "game", "dry_run": false}` 在新副本上一键修好。
-2. **另起进程冷重开并看真图**：交付前对最终候选再跑一次 `inspect` 或 `project verify`（核对完整外部资源清单，包括贴图、VDB、USD 与模拟缓存），动画抽查关键帧数值，视觉任务渲出代表画面打开核对。
+3. **另起进程冷重开并看真图**：交付前对最终候选再跑一次 `inspect` 或 `project verify`（核对完整外部资源清单，包括贴图、VDB、USD 与模拟缓存），动画抽查关键帧数值，视觉任务用 `preview` 或正式渲染核对代表画面。
 
 ## 第六步：中断续跑与正式发布
 

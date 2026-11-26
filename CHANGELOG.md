@@ -1,3 +1,11 @@
+# 0.63.1-r3 — 2026-11-26
+
+- Add top-level `blenderctl preview` (`tools/viewport_preview/`) for zero-disruption Windows isolated-desktop (`CreateDesktopW`) real-viewport 4-view fast review without touching open Blender windows or modifying source `.blend` files.
+- Support one-command object/collection focusing (`-Y` front convention, keep context or `--isolate`), `quad`/`orbit`/`3x3`/`single`/`camera:<Name>` layouts, `--framing-from` cross-revision framing lock, 7 display modes (`wireframe`, `solid`, `solid_wire`, `matcap`, `face_orientation`, `material`, `rendered`), orthogonal `--wire-overlay` semi-transparent wireframe on any mode, `--compare-modes` matched 4-stage sheets, and optional `preview session` hot reuse.
+- Support Blender 5.3 Cycles GPU viewport **NVIDIA DLSS Ray Reconstruction** (`--denoiser auto|dlss --dlss-quality ...`, requires NVIDIA driver >= 620) with explicit GPU `OPTIX` fallback reporting, `--strict-denoiser` gate, EEVEE Next viewport preview, non-uniform content readiness guard for DLSS kernel warm-up, and automatic temporary fill lighting for unlit asset files.
+- Add cross-platform host unit tests (`tests/test_viewport_preview.py`), `docs/VIEWPORT_PREVIEW.md`, and refresh companion skill bundle to **0.7.0**.
+- Preserve the qualified 0.63.1 core runtime and pinned video template runtime identity (`189` files, byte-for-byte unchanged).
+
 # 0.63.1-r2 — 2026-11-24
 
 - Connect the Windows launcher to the standalone Rigging Workflow v003 source with discovery and four portable candidate commands.

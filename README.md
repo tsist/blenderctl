@@ -1,5 +1,7 @@
 # blenderctl + Blender workflows
 
+**0.63.1-r3** adds `blenderctl preview`: zero-disruption Windows isolated-desktop real-viewport 4-view fast review (`wireframe`/`solid`/`solid_wire`/`matcap`/`face_orientation`/`material`/`rendered` with Blender 5.3 Cycles **NVIDIA DLSS Ray Reconstruction** or explicit OptiX fallback, EEVEE Next, one-command focus/`--isolate`, same-view `--compare-modes` boards, and optional hot sessions). See [viewport preview guide](docs/VIEWPORT_PREVIEW.md).
+
 **0.63.1** adds Windows Blender 5.3.0 selection, 5.2-to-5.3 project copies and multi-effect compositor checks. See the [compatibility matrix](docs/COMPATIBILITY.md) and [independent rigging setup](docs/RIGGING.md).
 
 **0.63.0 publication:** the qualified video-editing snapshot is now included, with Video Editing Workflow 0.1.1, portable skill and template library 0.1.0. See [video setup and limits](docs/VIDEO-EDITING.md), [current validation](docs/VALIDATION.md) and the [standalone video repository](https://github.com/tsist/blender-video-editing-workflow). Existing material guidance below remains available; other frozen specialty repositories can have different implementation identities despite sharing a CLI version.
@@ -10,10 +12,11 @@ Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md): CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.5.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+[Companion agent skills](skills/README.md): CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.7.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
 
 ## What you get
 
+- `preview`: isolated-desktop Windows Blender 5.3 real-viewport 4-view fast review with object/collection focusing, semi-transparent wireframe overlay on any mode, MatCap/face-orientation diagnostics, same-view 4-stage comparison boards, optional hot sessions, and Cycles GPU **DLSS Ray Reconstruction** (driver ≥ 620, explicit OptiX fallback) + EEVEE Next previews. [Guide and examples](docs/VIEWPORT_PREVIEW.md)
 - CLI adapters for scene construction, mesh/UV/node work, materials, rigs/animation, simulation, rendering, media, tracking, format exchange, dependencies, and asset workflows. Each adapter has a bounded contract; this is not every Blender operation.
 - `rigging-workflow` calls the standalone v003 commands for character binding, selected-bone weight recalculation, rig repair and weight transfer policy. [Setup and commands](docs/RIGGING.md)
 - Immutable job requests, explicit source/resource hashes, cancellation, recoverable pipelines, and separately reviewed file transactions.
@@ -50,6 +53,6 @@ The integration test creates its own cube, UVs and texture, renders with CPU, ch
 
 ## Boundaries
 
-CLI inputs are **saved disk snapshots**. Background jobs cannot detect unsaved GUI edits. Material workflows require existing UVs and static image files; automatic general-purpose UV repair, UDIM/animated textures, automatic aesthetic selection and DLSS are not included. Script execution requires explicit trust; the Windows AppContainer route is experimental and has no fallback. Preserve successful job directories when candidates refer to their textures, caches or receipts.
+CLI inputs are **saved disk snapshots**. Background jobs cannot detect unsaved GUI edits. Material workflows require existing UVs and static image files; automatic general-purpose UV repair, UDIM/animated textures, and automatic aesthetic selection are not included. Cycles DLSS viewport denoising is available via `blenderctl preview` on Windows Blender 5.3 with an RTX GPU and NVIDIA driver ≥ 620 (final offline `render run` uses OPTIX or OPENIMAGEDENOISE). Script execution requires explicit trust; the Windows AppContainer route is experimental and has no fallback. Preserve successful job directories when candidates refer to their textures, caches or receipts.
 
 Blender, third-party binaries, private assets and user configuration are not distributed. See [third-party notices](THIRD_PARTY_NOTICES.md), [security policy](SECURITY.md), and [contribution guide](CONTRIBUTING.md).
