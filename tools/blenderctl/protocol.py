@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 import uuid
 
-VERSION = "0.63.1"
+VERSION = "0.64.0"
 SCHEMA = "1.0"
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_BLENDER = ROOT / "runtime/blender/releases/5.2.1/blender-5.2.1-windows-x64/blender.exe"
@@ -38,7 +38,7 @@ COMMANDS=(*COMMANDS,'video.run','video.inspect')
 COMMANDS=(*COMMANDS,'compositing.run','compositing.inspect','compositing.encode','compositing.template-save','compositing.template-run','compositing.batch','compositing.study')
 HOST_COMMANDS=(*HOST_COMMANDS,'compositing.encode')
 HOST_COMMANDS=(*HOST_COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
-COMMANDS=(*COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
+COMMANDS=(*COMMANDS,'workflow.preflight','workflow.run','workflow.resume','production.run')
 
 
 def resource_schema(command):
@@ -117,6 +117,9 @@ def validate(request):
     if not isinstance(command, str) or command not in COMMANDS:
         raise Failure("INVALID_REQUEST", f"Unknown command: {command}")
     params = request.get("params", {})
+    if command == 'production.run':
+        from production_contract import normalize_params
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_params(params)}
     if command == 'workflow.preflight':
         if not isinstance(params, dict) or set(params) != {'requests'}:
             raise Failure('INVALID_REQUEST', 'Preflight requires requests')

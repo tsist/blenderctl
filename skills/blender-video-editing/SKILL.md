@@ -2,10 +2,12 @@
 name: blender-video-editing
 description: 使用 Blender 原生 VSE 与公共 CLI 制作分镜粗剪、按镜头编号原位换片、接手现场时间线手调、编排字幕音轨与导出成片。接到多镜拼装、白膜预演剪辑、AI 或正式渲染回流替换、切点微调、混音字幕及成片输出任务时使用。
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Blender 视频剪辑
+
+现有受管工程的批量精剪可用 `production.run` 的 `video` 域。先冻结原始时间线和媒体指纹。按绝对帧、镜头相对位置、具名标记或前项结果定位切分、移除和插入，以 `group` 独立提交有效组，或用 `batch` 在冲突时回滚整批。读回每项实际剪点、锁定音轨和媒体来源，再用独立重开与导出解码核对。[批量剪辑契约](https://github.com/tsist/blender-video-editing-workflow)
 
 本技能属于 [剪辑部门](../blender-work-methodology/references/departments/editing.md)，负责把白膜分镜、正式渲染画面、AI 镜头候选、对白音乐与中文字幕编排成节奏顺畅的可播放成片。公共入口与批次目录规范见 [blender-cli](../blender-cli/SKILL.md)，所有修改都在独立工作副本上执行，源文件与母本保持原样留作对照。
 

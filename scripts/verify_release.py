@@ -12,7 +12,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 ADDON = 'tools/video_editing_workflow_addon/'
 BLOCKED = {'.git', '__pycache__', '.venv', 'audit', 'research', 'tests-output', 'dist'}
-IDENTITY = '69e4b0502e1fb6f3459a4bde931a30a338e3ac639295ef5b3e7024a63e42dee2'
+IDENTITY = 'ed46e2744d79096f4f09e060d5b9e188be20e8e2072d5e5cd7ad69db5e76cbc0'
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
@@ -54,7 +54,7 @@ def verify(root=ROOT):
     runtime = [{'file': p.relative_to(root).as_posix(), 'expected_sha256': sha(p.read_bytes())}
                for p in sorted(runtime_paths)]
     identity = sha(json.dumps(runtime, sort_keys=True, separators=(',', ':')).encode())
-    if len(runtime) != 189 or identity != IDENTITY or identity != publication['runtime_identity']:
+    if len(runtime) != 191 or identity != IDENTITY or identity != publication['runtime_identity']:
         raise ValueError('Qualified runtime identity changed')
     if not set(row['file'] for row in runtime) <= set(names):
         raise ValueError('Runtime missing from release inventory')

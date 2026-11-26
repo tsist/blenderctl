@@ -6,7 +6,7 @@ from scene_contract import obj,array,enum,integer,number,validate
 ALLOWED=('query','diff','dependency.audit','validate','identity.prepare','asset.prepare','asset.index','scene.prepare','scene.inspect','model.prepare','model.inspect','node.prepare','node.inspect','material.preview','texture.bake','rig.prepare','rig.inspect','animation.sample','simulation.prepare','simulation.inspect','simulation.bake','render.run','media.prepare','media.export','exchange.export','exchange.import','exchange.convert','extension.prepare','extension.run')
 ALLOWED=(*ALLOWED,'asset.preview.prepare','dependency.plan-relink','dependency.prepare','sculpt.replay','rig.package')
 ALLOWED=(*ALLOWED,'tracking.prepare','tracking.inspect','tracking.solve')
-ALLOWED=(*ALLOWED,'inspect','project.verify','project.prepare_copy','project.link.prepare','project.override.prepare','project.override.resync','exchange.analyze')
+ALLOWED=(*ALLOWED,'inspect','project.verify','project.prepare_copy','project.link.prepare','project.override.prepare','project.override.resync','exchange.analyze','production.run')
 ID={'type':'string','pattern':'^[A-Za-z][A-Za-z0-9_-]{0,47}$'}
 POINTER={'type':'string','minLength':2,'maxLength':256,'pattern':'^/[^~]+$'}
 LIMITS=obj({'cpu_threads':integer(1,8),'memory_mb':integer(256,32768),'disk_mb':integer(1,32768),'gpu_mb':integer(0,32768)})

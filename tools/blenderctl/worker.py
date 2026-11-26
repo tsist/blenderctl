@@ -180,6 +180,9 @@ def main():
             data = doctor()
         elif command == "capabilities":
             data = capabilities()
+        elif command == 'production.run':
+            from production_worker import run
+            data = run(request['params'], job)
         elif command=='sculpt.review':
             import sculpt_review
             data=sculpt_review.run(request['params'],job)

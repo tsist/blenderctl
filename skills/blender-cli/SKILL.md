@@ -2,10 +2,12 @@
 name: blender-cli
 description: 通过项目公共入口 blenderctl 查找动作、读取工程、在工作副本上执行修改、等待长作业、接手现场窗口并做独立重开与发布事务。只要实际读写 .blend、调度自研插件后台动作或核验交付产物就用它。
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Blender CLI 调用手册
+
+本仓的 `production.run` 适用于 Blender 5.3.0 `02f0899d78e3` 的动画曲线、场景合成、灯光和 VSE。先按公开发行说明核验并解包 `blender53-production-1.0.0.zip`，再用 `--blender <实际程序> request <请求.json>` 提交。请求指定 `domain`、`release`、源文件和 SHA-256。独立步骤可交 `pipeline run` 并行。先读 `production-report.json` 的操作和保存后重开结果，再领用 `production-candidate.blend` 作独立核对。[四域请求说明](https://github.com/tsist/blenderctl/blob/main/docs/PRODUCTION.md)
 
 本技能管怎么调 `./blenderctl.ps1`。项目当前唯一支持与验收的宿主是 Windows Blender `5.3.0`，启动器默认使用工作区内置的这套环境。具体某一门工艺怎么做，读对应部门的专项技能；跨部门顺序见 [blender-work-methodology](../blender-work-methodology/SKILL.md)。
 

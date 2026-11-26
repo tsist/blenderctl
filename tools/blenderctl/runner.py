@@ -44,11 +44,23 @@ def prepare(request, blender=DEFAULT_BLENDER, root=DEFAULT_JOBS, timeout=120, tr
     blender = Path(blender).resolve()
     if not blender.is_file() and request["command"] not in (*OPERATIONS,"transaction.status", "transaction.rollback", "transaction.recover", "compositing.encode"):
         raise Failure("NOT_FOUND", f"Blender executable not found: {blender}")
+    production_identity = {}
+    if request['command'] == 'production.run':
+        from production_contract import implementation_files, implementation_identity, selected_release
+        params = request['params']
+        release = selected_release(params.get('release'))
+        domain = params['domain']
+        files = implementation_files(domain, release)
+        production_identity = {
+            'production_release': release,
+            'production_implementation_sha256': implementation_identity(
+                {path: digest(path) for path in files}, domain, release),
+        }
     job = Path(root).resolve() / uuid.uuid4().hex
     job.mkdir(parents=True, exist_ok=False)
     atomic_json(job / "request.json", request)
     atomic_json(job / "launch.json", {"blender": str(blender), "timeout_seconds": timeout,
-                                     "transactions_root": str(Path(transactions_root).resolve()),**({'limits':limits} if limits else {}),**({'resource_domain':resource_domain} if resource_domain else {})})
+                                     "transactions_root": str(Path(transactions_root).resolve()),**({'limits':limits} if limits else {}),**({'resource_domain':resource_domain} if resource_domain else {}), **production_identity})
     atomic_json(job / "status.json", {"job_id": job.name, "state": "queued", "created_at": time.time(), "heartbeat_at": time.time()})
     if request["command"]=="compositing.encode":
         from compositing_encode_public import launch_identity
@@ -183,6 +195,22 @@ def _execute_worker(job, parent_checkpoint=None):
     try:
         checkpoint()
         atomic_json(job / "status.json", state)
+        if request['command'] == 'production.run':
+            from filesystem import FileGuard
+            from production_contract import implementation_files, implementation_identity
+            params = request['params']
+            for descriptor in [params, *params['resources']]:
+                path = descriptor['file']
+                guard = input_guards.enter_context(FileGuard(path))
+                input_hashes[path] = guard.sha256(checkpoint)
+                if input_hashes[path] != descriptor['expected_sha256']:
+                    raise Failure('CONFLICT', f'Production input fingerprint differs from the request: {path}')
+            domain = params['domain']
+            release = launch['production_release']
+            files = implementation_files(domain, release)
+            protected = {path: input_guards.enter_context(FileGuard(path)).sha256(checkpoint) for path in files}
+            if implementation_identity(protected, domain, release) != launch['production_implementation_sha256']:
+                raise Failure('CONFLICT', 'Production add-on changed while the job was queued')
         if request['command']=='sculpt.replay':
             from reviews import protect
             d=request['params']['manifest']['source']
@@ -407,7 +435,7 @@ def _execute_worker(job, parent_checkpoint=None):
             if request['command'].startswith('video.'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
-            if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'):
+            if request['command'] in ('sculpt.replay','material.run','material.template-save','material.batch','material.study','geometry.run','geometry.inspect','lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch','production.run'):
                 detail=result.get('error') or {}
                 raise Failure(detail.get('code') if detail.get('code') in CODES else 'WORKER_FAILED',str(detail.get('message',detail)))
             raise Failure("VALIDATION_FAILED", str(result.get("error")))
@@ -436,6 +464,10 @@ def _execute_worker(job, parent_checkpoint=None):
         error = {"code": "WORKER_FAILED", "message": str(exc)}
         (job / "supervisor-error.log").write_text(traceback.format_exc(), encoding="utf-8")
     finally:
+        if request['command'] == 'production.run':
+            for name in ('production-report.json', 'production-candidate.blend'):
+                if (name != 'production-candidate.blend' or not error) and (job / name).is_file():
+                    artifacts[name] = str(job / name)
         if request['command'].startswith('video.'):
             for path in job.rglob('*'):
                 if path.is_file() and (path.name.startswith('video-') or any(part in ('outputs','previews','shots','resources','proxies','cache') for part in path.relative_to(job).parts)):

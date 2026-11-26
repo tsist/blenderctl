@@ -1,6 +1,6 @@
 # Blender agent skills / Blender 配套技能
 
-Six companion skills for **blenderctl 0.63.1** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. The current source bundle is **0.5.0**.
+Six companion skills for **blenderctl 0.64.0** and **Material Workflow 0.7.0**, distributed under **GPL-3.0-or-later**. The current source bundle is **0.8.0**.
 
 | Skill | Use |
 | --- | --- |

@@ -1,13 +1,13 @@
 {
   "repository": "blenderctl",
-  "release": "0.63.1-r3",
-  "cli": "0.63.1",
+  "release": "0.64.0",
+  "cli": "0.64.0",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
-  "skill_bundle": "0.7.0",
-  "runtime_identity": "69e4b0502e1fb6f3459a4bde931a30a338e3ac639295ef5b3e7024a63e42dee2",
-  "runtime_files": 189,
+  "skill_bundle": "0.8.0",
+  "runtime_identity": "ed46e2744d79096f4f09e060d5b9e188be20e8e2072d5e5cd7ad69db5e76cbc0",
+  "runtime_files": 191,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -57,13 +57,13 @@
     },
     {
       "file": "README.md",
-      "sha256": "ab9f6cc35b8d6a1582600c7924b284a4a605c5b77701d0ab53c53b5c41b2c7fc",
-      "bytes": 6539
+      "sha256": "275c6e6151312dda7c95af4f28c3890fc5190d93d9b3e9b0e9ac1c7213db76f8",
+      "bytes": 6791
     },
     {
       "file": "README.zh-CN.md",
-      "sha256": "240a12f1151a30e69ead0270161def023fac459d2666fa000aa1b52f6a573089",
-      "bytes": 5319
+      "sha256": "5bb62759996f4354706305272b2ae300c90804a40fa831f9b186db7c33836e66",
+      "bytes": 5518
     },
     {
       "file": "RELEASE-VALIDATION.json",
@@ -104,6 +104,11 @@
       "file": "docs/MATERIAL_WORKFLOW.md",
       "sha256": "69af8711020be426cdd0d5184b83f9962cd35bb70449b5f0dafeaec8a6b0ab60",
       "bytes": 5032
+    },
+    {
+      "file": "docs/PRODUCTION.md",
+      "sha256": "034628d15e06fb17753c129d3a2be6f1427ef91f4bd9aa907939ecf02b7b3e41",
+      "bytes": 4350
     },
     {
       "file": "docs/RELEASE_VERIFICATION.md",
@@ -932,7 +937,7 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "92fe48e98e89140c812c9d6ce74198966b0307cf7e53285dd6e3419ad038c5e8",
+      "sha256": "8139ee1b5dde427a5470ee99d2c87f7a6b5d2612079c6271f7ca9a64871aa7de",
       "bytes": 4692
     },
     {
@@ -942,7 +947,7 @@
     },
     {
       "file": "skills/README.md",
-      "sha256": "1cc06a3ae31c754539412bd6c8324bb1d46782ec898300353545786e1d686d49",
+      "sha256": "c6340e462fc797d1e7369d96920fe6763da397356b4ccbf1e4bf956f7a981eae",
       "bytes": 4377
     },
     {
@@ -977,8 +982,8 @@
     },
     {
       "file": "skills/blender-cli/SKILL.md",
-      "sha256": "445e8f23d338ebb359bff45172cb68c984a4bac580e8f7fb60bcad93eee18a2c",
-      "bytes": 9338
+      "sha256": "92b4c23abeeea2beb4f9f75bd51da26270046d25f078a73a487d839e270b1766",
+      "bytes": 9908
     },
     {
       "file": "skills/blender-cli/agents/openai.yaml",
@@ -1152,8 +1157,8 @@
     },
     {
       "file": "skills/blender-video-editing/SKILL.md",
-      "sha256": "b21ad68f9da08b410aa708ddab8b74e8793151d79a6d0aa8f25ef343725483f9",
-      "bytes": 10199
+      "sha256": "d8f5c74c17dee7653be8ff1c1e5551a5cf922953fcc84a6077b9d435a92d6988",
+      "bytes": 10668
     },
     {
       "file": "skills/blender-video-editing/agents/openai.yaml",
@@ -1347,8 +1352,8 @@
     },
     {
       "file": "skills/manifest.json",
-      "sha256": "16c876078ae2bbf6d439ee2c16a59ebf00a1d72c7dcc3c639764b2e77d1e815b",
-      "bytes": 1720
+      "sha256": "93a2566b87ad0c5a7b4ec41f895b0a05e35d9282bfad6d90ee516f3846c90ae4",
+      "bytes": 1712
     },
     {
       "file": "skills/requirements-images.txt",
@@ -1377,7 +1382,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "00a3b6e7fd6e50cad0f0813daac93674b6d511036569699545f8e41f6e2f2172",
+      "sha256": "bc9c9ab7fe3607085f02d604d07f6715e2b60e4f71ae85f74f308d9dd50fd7bb",
       "bytes": 32601
     },
     {
@@ -1967,13 +1972,13 @@
     },
     {
       "file": "tools/blenderctl/pipeline.py",
-      "sha256": "d78b0bfdc655aa4b7eacd16bf18f6eecaf6de543368614278dc22c55bbb9bdb9",
-      "bytes": 33551
+      "sha256": "932c3fa44213635810419988fe94a190c41e96acec771ce326e6e3e33eb5512c",
+      "bytes": 33568
     },
     {
       "file": "tools/blenderctl/pipeline_contract.py",
-      "sha256": "6069a01487e205869fd202fa5b71375367e3b0b5dcd7c984684d9c643fc7b5f3",
-      "bytes": 5731
+      "sha256": "69c8d75c551a7fc8aa8b9412bdf6867c6f547e03883525c6dc8a698d9dde045d",
+      "bytes": 5748
     },
     {
       "file": "tools/blenderctl/preview_contract.py",
@@ -1996,6 +2001,16 @@
       "bytes": 5444
     },
     {
+      "file": "tools/blenderctl/production_contract.py",
+      "sha256": "bdae5ddfc83ce6aae321707be732870f5d6631809dbfb964cd707c58456a0610",
+      "bytes": 5868
+    },
+    {
+      "file": "tools/blenderctl/production_worker.py",
+      "sha256": "39d5daac338987c9486f776379983d9cb68640b2034bc27d325c370b879fa3a6",
+      "bytes": 7421
+    },
+    {
       "file": "tools/blenderctl/project_contract.py",
       "sha256": "dc64bc637c84c48f2f41ff0aca16bd18c424076b34b2c23608dda31b677daf1c",
       "bytes": 1315
@@ -2007,8 +2022,8 @@
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "c282e51a7cef29116f1a0df31ad052b8492db56d67e99db9997bddb5b51a8501",
-      "bytes": 30673
+      "sha256": "15e606879d815cc426139584975cf9212c5865a7e1bcb61c20066130854038a1",
+      "bytes": 30881
     },
     {
       "file": "tools/blenderctl/render_contract.py",
@@ -2117,8 +2132,8 @@
     },
     {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "630856e059016f6aa7cabad8d7b8f0840d84f6a97bd8e26e93624d3b1d703f7e",
-      "bytes": 42233
+      "sha256": "5be2569e72bc8e0ad91057f67b9684999d3efe889f3656915b618890dcf8c27f",
+      "bytes": 44297
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
@@ -2307,8 +2322,8 @@
     },
     {
       "file": "tools/blenderctl/worker.py",
-      "sha256": "4dfff35d302c9f9aea860cde5aa474a36321d7ea2477320363d758ca8f1c22a1",
-      "bytes": 17942
+      "sha256": "e743d6758fcc2ad797fff76e566bde6241849d4bdc8526fc688430ae55d835c3",
+      "bytes": 18077
     },
     {
       "file": "tools/blenderctl/workflow_contract.py",

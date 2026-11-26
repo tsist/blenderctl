@@ -12,7 +12,7 @@ NO_REUSE={'extension.run','simulation.bake','dependency.audit','asset.prepare','
 NO_REUSE.update(('tracking.prepare','tracking.inspect','tracking.solve'))
 NO_REUSE.update(('inspect','project.verify','project.prepare_copy','project.link.prepare','project.override.prepare','project.override.resync','exchange.analyze'))
 # Explicit work-unit admission does not grant standalone worker cache reuse.
-NO_REUSE.update(('geometry.run','geometry.inspect','material.run'))
+NO_REUSE.update(('geometry.run','geometry.inspect','material.run','production.run'))
 
 def key(v):return hashlib.sha256(json.dumps(v,sort_keys=True,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 

@@ -1,5 +1,7 @@
 # blenderctl + Blender workflows
 
+**0.64.0** adds the `production.run` request for four Blender 5.3.0 companion add-ons. It covers targeted animation edits, native compositor effects, multi-light goals, and transactional VSE recuts. [Production setup and requests](docs/PRODUCTION.md)
+
 **0.63.1-r3** adds `blenderctl preview`: zero-disruption Windows isolated-desktop real-viewport 4-view fast review (`wireframe`/`solid`/`solid_wire`/`matcap`/`face_orientation`/`material`/`rendered` with Blender 5.3 Cycles **NVIDIA DLSS Ray Reconstruction** or explicit OptiX fallback, EEVEE Next, one-command focus/`--isolate`, same-view `--compare-modes` boards, and optional hot sessions). See [viewport preview guide](docs/VIEWPORT_PREVIEW.md).
 
 **0.63.1** adds Windows Blender 5.3.0 selection, 5.2-to-5.3 project copies and multi-effect compositor checks. See the [compatibility matrix](docs/COMPATIBILITY.md) and [independent rigging setup](docs/RIGGING.md).
@@ -8,11 +10,11 @@
 
 Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-256 protected source files, isolated background jobs, editable candidates, and a matching layered-material Blender extension.
 
-**CLI 0.63.1 · Material Workflow 0.7.0 snapshot · GPL-3.0-or-later**
+**CLI 0.64.0 · Material Workflow 0.7.0 snapshot · GPL-3.0-or-later**
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md): CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.7.0** bundle includes installation guidance and helper scripts; see [skills verification](docs/SKILLS.md).
+[Companion agent skills](skills/README.md) cover CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.8.0** bundle includes installation guidance and helper scripts. [Skills verification](docs/SKILLS.md)
 
 ## What you get
 
