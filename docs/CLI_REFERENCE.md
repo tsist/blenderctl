@@ -9,6 +9,7 @@ The authoritative inputs are [public schemas](cli/schemas/) and the exact subcom
 | `scene`, `model`, `node` | Explicit scene/geometry/UV/node candidates and diagnostics |
 | `material`, `texture` | Layered material workflows, isolated previews and texture baking |
 | `rig`, `animation` | Local skeletons, weights, retargeting, sampled actions and packaging |
+| `rigging-workflow phase3` | [Win53 body motion, pose candidates and keyed live handoff](RIGGING_WIN53.md) |
 | `simulation` | Bounded physics, hair, volume and cache adapters |
 | `tracking` | Clip preparation, bounded native tracking and camera reconstruction |
 | `render`, `media` | Devices, frame rendering, VSE and media export |

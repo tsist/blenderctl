@@ -82,13 +82,13 @@
     },
     {
       "file": "blenderctl.ps1",
-      "sha256": "ae2782cb1fbc4f56badaac7d627d4d66e8fac40b7c9612e8077a991bba2b702f",
-      "bytes": 1664
+      "sha256": "fcc8fb633ee81735c3339d0509a8efde76a338340c12ea3e7df87e505166f0c9",
+      "bytes": 1888
     },
     {
       "file": "docs/CLI_REFERENCE.md",
-      "sha256": "f8317a7c2f896e87a6411f9fcaf2f766f7ffa776adc72ad7a237ea13c836578d",
-      "bytes": 3099
+      "sha256": "5125afdac00092ec90bcdb1f381ab4c8bcf38ecc1703f5242dc274e255356df9",
+      "bytes": 3209
     },
     {
       "file": "docs/COMPATIBILITY.md",
@@ -129,6 +129,11 @@
       "file": "docs/RIGGING.md",
       "sha256": "14c320474136d342dc108ec4a606f2b058beb2f079a3e0bfdf34c8f639d3a9be",
       "bytes": 2336
+    },
+    {
+      "file": "docs/RIGGING_WIN53.md",
+      "sha256": "49f37b7018b26a984d3917f4a8e0bdd72a955d3ad124a15b3d2287488be58cdd",
+      "bytes": 5146
     },
     {
       "file": "docs/SKILLS.md",
@@ -1087,8 +1092,8 @@
     },
     {
       "file": "skills/blender-rigging/SKILL.md",
-      "sha256": "5177807ae31386cde4c90746bdbf3f2eb190112c08de25369488b00473256a64",
-      "bytes": 11846
+      "sha256": "dace090c728ff556ef0894dd88129b8fe536eb4738396a3e766a99d41dd1f73b",
+      "bytes": 12279
     },
     {
       "file": "skills/blender-rigging/agents/openai.yaml",
@@ -1119,6 +1124,11 @@
       "file": "skills/blender-rigging/references/retargeting-and-cli-operations.md",
       "sha256": "b8879e25d14ad605518503ca791830c22021e6795ff40bf2e6701b61f4c0a1d7",
       "bytes": 8926
+    },
+    {
+      "file": "skills/blender-rigging/references/rigging-posing-win53.md",
+      "sha256": "59fa4a7f2ada3993e695c448fa68b39cb11c95cb94b1023d7fb2d695963d4afa",
+      "bytes": 3831
     },
     {
       "file": "skills/blender-rigging/references/skeleton-gate-and-matching.md",
@@ -1242,8 +1252,8 @@
     },
     {
       "file": "skills/blender-work-methodology/references/departments/animation.md",
-      "sha256": "661f07093cd0c162a60e1cf965160427e7f8f38048029e9dbfa9e1e260f423d5",
-      "bytes": 2776
+      "sha256": "334dda4f625df504563641559bf1f9f6b46e1f7f1d9edd012ae4ea9a5dcbfb26",
+      "bytes": 3121
     },
     {
       "file": "skills/blender-work-methodology/references/departments/asset-library.md",
@@ -1282,8 +1292,8 @@
     },
     {
       "file": "skills/blender-work-methodology/references/departments/rigging.md",
-      "sha256": "5bf532d89523ba3cf554812c5302d2c6aaee0d9bb4dd29f3a3d6263d5afae7a6",
-      "bytes": 2113
+      "sha256": "c9b88ae123a7c8ea92b374b42dc15c809d061870918ee7cd8ed8ed42f58400a9",
+      "bytes": 2486
     },
     {
       "file": "skills/blender-work-methodology/references/departments/surfacing.md",
@@ -1454,6 +1464,11 @@
       "file": "tests/test_production_hard_surface.py",
       "sha256": "f90684e52121d3ec48f889ca1e5225951a39b386233b816a16567aff05a77ac8",
       "bytes": 2601
+    },
+    {
+      "file": "tests/test_rig_phase3_contract.py",
+      "sha256": "4d44ec52a6769c8b5a8ee2604fb9c9056144e83dac59d26ec4bbe0c2e961d165",
+      "bytes": 2097
     },
     {
       "file": "tests/test_skill_install.py",
@@ -2599,6 +2614,36 @@
       "file": "tools/material_workflow_addon/ui_handoff.py",
       "sha256": "5e6b95881e0b3a0f0d52eee3f2dbcd5cc1f82c718d1bcbcd3241d13055fc43bd",
       "bytes": 6514
+    },
+    {
+      "file": "tools/rig_phase3_handoff/cli.py",
+      "sha256": "77de76c7765cdeacb5756e38858686dadbada66ec4073472d72a36e35951e1ed",
+      "bytes": 10260
+    },
+    {
+      "file": "tools/rig_phase3_handoff/handoff_io.py",
+      "sha256": "16c270eb74677c90894628f7f2d968945b6af7e10b98255ccb250b6df039aff9",
+      "bytes": 4309
+    },
+    {
+      "file": "tools/rig_phase3_handoff/live_session.py",
+      "sha256": "9db470cae4cc9ef0012cd938292a26f20b81fb88bbada745e6715d03037d6b39",
+      "bytes": 13690
+    },
+    {
+      "file": "tools/rig_phase3_handoff/posing_ops.py",
+      "sha256": "3b1a2b183ce832818bd5152c7af8abc90603a5bd2d1063d4e2d3e52b594a2263",
+      "bytes": 23082
+    },
+    {
+      "file": "tools/rig_phase3_handoff/retarget_ops.py",
+      "sha256": "2f267093d7bdf641640587d5f65bdda6547faad0161f522a1f6a40c4b0a14e02",
+      "bytes": 20248
+    },
+    {
+      "file": "tools/rig_phase3_handoff/runtime_pin.py",
+      "sha256": "e072ef66c932eb0503454584ed59eeda178ba75e2296266a744067809e7b39cc",
+      "bytes": 5872
     },
     {
       "file": "tools/rigging_workflow_cli.py",

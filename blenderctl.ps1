@@ -13,7 +13,10 @@ if (!$cliPython) { throw 'Set BLENDERCTL_PYTHON to Python 3.12+ or the matching 
 & $cliPython -c 'import sys; sys.exit(0 if sys.version_info >= (3,12) else 12)'
 if ($LASTEXITCODE -ne 0) { throw 'Python 3.12+ required. Set BLENDERCTL_PYTHON explicitly.' }
 
-$valueFlags = @('--blender', '--blender-version', '--jobs-dir', '--transactions-dir', '--timeout')
+$valueFlags = @(
+    '--blender', '--blender-version', '--jobs-dir', '--transactions-dir', '--timeout',
+    '--rigging-package', '--rigging-package-sha256'
+)
 $commandIndex = 0
 while ($commandIndex -lt $args.Count -and ([string]$args[$commandIndex]).StartsWith('--', [StringComparison]::Ordinal) -and $args[$commandIndex] -cne '--') {
     $token = [string]$args[$commandIndex]
@@ -29,6 +32,9 @@ if ($args.Count -gt $commandIndex) {
     $sub = [string]$args[$commandIndex]
     if ($sub -ceq 'rigging-workflow') {
         $entryPoint = 'tools\rigging_workflow_cli.py'
+        if ($args.Count -gt ($commandIndex + 1) -and $args[$commandIndex + 1] -ceq 'phase3') {
+            $entryPoint = 'tools\rig_phase3_handoff\cli.py'
+        }
     } elseif ($sub -ceq 'preview') {
         $entryPoint = 'tools\viewport_preview\cli.py'
     }

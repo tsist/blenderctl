@@ -1,6 +1,6 @@
 ---
 name: blender-rigging
-description: 设计、制作与修复 Blender 角色、生物及可动游戏资产的骨架、蒙皮权重、面部表情、次级动态与动作重定向。接到新角色绑定、机械机构联动、权重返修、衣物转权或外部动捕接入时使用。
+description: 设计、制作与修复 Blender 角色、生物及可动游戏资产的骨架、蒙皮权重、面部表情、次级动态与动作重定向。也适用于已有角色的身体 FBX、摆姿、脚底接触和现场手调接续。
 metadata:
   version: "1.0.0"
 ---
@@ -16,7 +16,8 @@ $ctl = './blenderctl.ps1'
 & $ctl discover --product rigging
 
 # 查看当前推荐候选或固定版的具体动作
-& $ctl discover --product rigging --edition <发行版> --actions
+$edition = '<发行版>'
+& $ctl discover --product rigging --edition $edition --actions
 ```
 
 ## 第一步：摸清运动职责，选最轻的绑定路线
@@ -72,6 +73,7 @@ $ctl = './blenderctl.ps1'
 
 ## 第五步：动作重定向、现场接续与交给下游
 
+- **已有 C94 与普通原生 FK 人形**。接身体 FBX、摆三拍、校核肩带或修脚跟时，先用 `rigging-workflow phase3 describe` 确认 Win53 专项开发候选。按带 SHA 的目标副本生成独立 Action，记录源 Take、目标 Slot 及两端时基。在自有工作窗口写入手调键，再捕获并独立重开。 [已有角色的摆姿、动作迁移与窗口接续](references/rigging-posing-win53.md)
 - **接外部动作与修脚底接触**：导入 MMD（PMX/VMD）或通用 FK（BVH/FBX）动捕时，通过 `discover --product rigging` 查清重定向队列与转换入口，按源帧率与目标帧率对齐身体和表情通道，记录 Action 与 Slot。出现脚滑或穿地时，走后台足底检测并生成交接单，送到现场审阅确认或撤回。用户在打开窗口里做了手调时，先走 `rigging-workflow session-live` 收拢状态再存副本。详见 [动作重定向与工作台 CLI 操练](references/retargeting-and-cli-operations.md)。
 - **独立冷开并交接动画部门**：最终交付副本另起进程冷开复验，核对源 SHA、部件拓扑与 UV 完整、全部变形骨权非零覆盖、代表姿态无爆点且能干净回静置姿态。交付清单写齐以下四项：
   1. 保存好的绑定工程副本路径与 SHA-256。
