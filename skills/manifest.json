@@ -1,13 +1,13 @@
 {
-  "bundle_version": "0.8.0",
+  "bundle_version": "0.9.0",
   "license": "GPL-3.0-or-later",
-  "cli_version": "0.64.0",
+  "cli_version": "0.65.0",
   "extension_version": "0.7.0",
   "skills": [
     {
       "name": "blender-cli",
-      "source_guidance": "Windows Blender 5.3.0 production requests, isolated-desktop viewport preview, discovery, and recovery",
-      "version": "1.1.0"
+      "source_guidance": "Windows Blender 5.3.0 production requests, signed hard-surface sweeps, isolated-desktop viewport preview, and recovery",
+      "version": "1.2.0"
     },
     {
       "name": "blender-work-methodology",

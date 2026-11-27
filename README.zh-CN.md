@@ -1,5 +1,7 @@
 # blenderctl + Blender workflows
 
+**0.65.0** 接入 Hard Surface Workflow 0.3.7。通过公开请求预检贴面扫掠、提交几何及接手续改已保存的命名站位。[贴面扫掠配置与请求](docs/HARD_SURFACE.md)
+
 **0.64.0** 通过公共 `production.run` 接入 Blender 5.3.0 的动画修正与 Slot 编辑、原生合成效果栈、目标调光和 VSE 批量精剪。[安装和请求说明](docs/PRODUCTION.md)
 
 **0.63.1-r3** 新增 **`blenderctl preview`**：基于 Windows 隔离桌面（`CreateDesktopW`）的零干扰真视口 4 视角快检工具，支持一键聚焦物体/集合（留上下文或 `--isolate` 独显）、线框/实体/实体叠半透明线框/MatCap/法线红蓝/LookDev/Cycles **NVIDIA DLSS Ray Reconstruction**（驱动 ≥ 620，未满足显式回退 GPU OptiX）与 EEVEE Next 渲染预览、同机位四阶段对比板及可选热会话复用。详见 [视口快检说明](docs/VIEWPORT_PREVIEW.md)。
@@ -10,9 +12,9 @@
 
 面向代理与人工的 Blender 自动化工具：用明确 JSON 清单与 SHA-256 保护源文件，通过独立后台作业产出可编辑候选，配套材质插件共用同一执行核心。
 
-**CLI 0.64.0 · 材质插件 0.7.0 · GPL-3.0-or-later**
+**CLI 0.65.0 · 材质插件 0.7.0 · GPL-3.0-or-later**
 
-另提供[四个配套 Blender 技能](skills/README.md)：CLI 操作、制作方法论、材质制作、资产管理。技能包 **0.1.0** 可独立下载安装，见[安装与验证](docs/SKILLS.md)。
+另提供[六个配套 Blender 技能](skills/README.md)，包括 CLI 操作、制作方法论、材质制作、资产管理、绑定和剪辑。技能包 **0.9.0** 可独立安装。[安装与验证](docs/SKILLS.md)
 
 ## 能力
 

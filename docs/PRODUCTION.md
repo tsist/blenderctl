@@ -2,6 +2,8 @@
 
 `production.run` uses the same add-on code as the four companion extensions. The qualified host is Windows Blender 5.3.0, build `02f0899d78e3`.
 
+For the separately installed Hard Surface Workflow 0.3.7 domain, use the [hard surface request guide](HARD_SURFACE.md).
+
 Download `blender53-production-1.0.0.zip` and `SHA256SUMS` from the [blenderctl release](https://github.com/tsist/blenderctl/releases/tag/v0.64.0). Compare the SHA-256 of the ZIP to the published sum, then extract it into the CLI checkout. Its manifest must be at `runtime/blender53-production/1.0.0/manifest.json`. The runtime also verifies every file in the selected add-on before running it. To enable the add-ons in Blender's interface, install their individual archives from the companion repositories.
 
 | Domain | Operations and companion documentation |

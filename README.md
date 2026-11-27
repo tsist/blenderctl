@@ -1,5 +1,7 @@
 # blenderctl + Blender workflows
 
+**0.65.0** adds Hard Surface Workflow 0.3.7 production requests for named-station surface sweeps, signed previews, local revision and saved-control handoff. [Hard surface setup and requests](docs/HARD_SURFACE.md)
+
 **0.64.0** adds the `production.run` request for four Blender 5.3.0 companion add-ons. It covers targeted animation edits, native compositor effects, multi-light goals, and transactional VSE recuts. [Production setup and requests](docs/PRODUCTION.md)
 
 **0.63.1-r3** adds `blenderctl preview`: zero-disruption Windows isolated-desktop real-viewport 4-view fast review (`wireframe`/`solid`/`solid_wire`/`matcap`/`face_orientation`/`material`/`rendered` with Blender 5.3 Cycles **NVIDIA DLSS Ray Reconstruction** or explicit OptiX fallback, EEVEE Next, one-command focus/`--isolate`, same-view `--compare-modes` boards, and optional hot sessions). See [viewport preview guide](docs/VIEWPORT_PREVIEW.md).
@@ -10,11 +12,11 @@
 
 Recoverable Blender automation for agents and people: explicit JSON inputs, SHA-256 protected source files, isolated background jobs, editable candidates, and a matching layered-material Blender extension.
 
-**CLI 0.64.0 · Material Workflow 0.7.0 snapshot · GPL-3.0-or-later**
+**CLI 0.65.0 · Material Workflow 0.7.0 snapshot · GPL-3.0-or-later**
 
 **[中文使用说明](README.zh-CN.md)** · [Getting started](docs/GETTING_STARTED.md) · [Material workflow](docs/MATERIAL_WORKFLOW.md) · [CLI reference](docs/CLI_REFERENCE.md) · [Compatibility](docs/COMPATIBILITY.md)
 
-[Companion agent skills](skills/README.md) cover CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.8.0** bundle includes installation guidance and helper scripts. [Skills verification](docs/SKILLS.md)
+[Companion agent skills](skills/README.md) cover CLI operation, work methodology, rigging, video editing, material authoring and asset management. The separate **0.9.0** bundle includes installation guidance and helper scripts. [Skills verification](docs/SKILLS.md)
 
 ## What you get
 

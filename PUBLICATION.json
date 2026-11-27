@@ -1,13 +1,13 @@
 {
   "repository": "blenderctl",
-  "release": "0.64.0",
-  "cli": "0.64.0",
+  "release": "0.65.0",
+  "cli": "0.65.0",
   "distribution": "0.1.3",
   "addon": "0.1.1",
   "template_library": "0.1.0",
-  "skill_bundle": "0.8.0",
-  "runtime_identity": "ed46e2744d79096f4f09e060d5b9e188be20e8e2072d5e5cd7ad69db5e76cbc0",
-  "runtime_files": 191,
+  "skill_bundle": "0.9.0",
+  "runtime_identity": "af5ab12d9909cc4b27f4f8ad933a2ac11cf2d6851445f3f692814992baaaebb1",
+  "runtime_files": 192,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -42,8 +42,8 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "f4d856bd9f12fdee0e37f7e63167ab8ea1225f7187f7874d3181f693fafd6d5c",
-      "bytes": 5187
+      "sha256": "5a389adcc240bfb04c4074de2c3fb939301f9c2b799e8271e442a5fc6bf8bfa9",
+      "bytes": 5671
     },
     {
       "file": "CONTRIBUTING.md",
@@ -57,18 +57,18 @@
     },
     {
       "file": "README.md",
-      "sha256": "275c6e6151312dda7c95af4f28c3890fc5190d93d9b3e9b0e9ac1c7213db76f8",
-      "bytes": 6791
+      "sha256": "0c9b410f1e612618da8dd095f3a40f6de3d36fdeff6680c475674103bfca3867",
+      "bytes": 7005
     },
     {
       "file": "README.zh-CN.md",
-      "sha256": "5bb62759996f4354706305272b2ae300c90804a40fa831f9b186db7c33836e66",
-      "bytes": 5518
+      "sha256": "001e5c19b9a99084e48a55812c5877927d13b9bd84dec8358a72b907e3401773",
+      "bytes": 5725
     },
     {
       "file": "RELEASE-VALIDATION.json",
-      "sha256": "637324c2ef394ef1534af5ffc78cebd69375a9bc172401a64c2a18c3fda63432",
-      "bytes": 654
+      "sha256": "342883658919b46fce507e55aeb62c6c938996fa8f8242ca966b17baa983a309",
+      "bytes": 995
     },
     {
       "file": "SECURITY.md",
@@ -101,14 +101,19 @@
       "bytes": 3697
     },
     {
+      "file": "docs/HARD_SURFACE.md",
+      "sha256": "9ba378204aa0ea9dff482258f87ec9f73c2751c0c1bf6f68375d10d2da0e7ac3",
+      "bytes": 4374
+    },
+    {
       "file": "docs/MATERIAL_WORKFLOW.md",
       "sha256": "69af8711020be426cdd0d5184b83f9962cd35bb70449b5f0dafeaec8a6b0ab60",
       "bytes": 5032
     },
     {
       "file": "docs/PRODUCTION.md",
-      "sha256": "034628d15e06fb17753c129d3a2be6f1427ef91f4bd9aa907939ecf02b7b3e41",
-      "bytes": 4350
+      "sha256": "f49a4058d19be67f925e505244b65b77720a1a0dc3eeb60876d6e36af0c11e4b",
+      "bytes": 4471
     },
     {
       "file": "docs/RELEASE_VERIFICATION.md",
@@ -906,6 +911,11 @@
       "bytes": 3039
     },
     {
+      "file": "docs/hard-surface-package.json",
+      "sha256": "a7c3fb329b987dc92f91d9b836f01f42765530e2d851c417bdaa7062a2e27254",
+      "bytes": 5987
+    },
+    {
       "file": "examples/create_fixture.py",
       "sha256": "178ca315c362059e990936d3488b95a879d8d29ad7fe5b4cef5d9e9b8d61565e",
       "bytes": 658
@@ -931,13 +941,18 @@
       "bytes": 3705
     },
     {
+      "file": "scripts/install_hard_surface.py",
+      "sha256": "6bb0e26a33f5a44179d7379c1211ffac1727f15a97ae3397e413926d9d1dba8e",
+      "bytes": 2839
+    },
+    {
       "file": "scripts/install_skills.py",
       "sha256": "5ba1c8a1e9791d0c6fd70539dd55e7faaf569f3690277883e51a227752efd6a4",
       "bytes": 2783
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "8139ee1b5dde427a5470ee99d2c87f7a6b5d2612079c6271f7ca9a64871aa7de",
+      "sha256": "ae5ff8aba2497c32437e0965e7593b185a68adf8caf286396cf8b5f09514e4da",
       "bytes": 4692
     },
     {
@@ -947,7 +962,7 @@
     },
     {
       "file": "skills/README.md",
-      "sha256": "c6340e462fc797d1e7369d96920fe6763da397356b4ccbf1e4bf956f7a981eae",
+      "sha256": "0687d731d96eb3f8e8d014709755b432238a1048d628519e573404636152e918",
       "bytes": 4377
     },
     {
@@ -982,8 +997,8 @@
     },
     {
       "file": "skills/blender-cli/SKILL.md",
-      "sha256": "92b4c23abeeea2beb4f9f75bd51da26270046d25f078a73a487d839e270b1766",
-      "bytes": 9908
+      "sha256": "9e952e45ae7062e7e5ca8e5644f80b42d422743dadfbc84924fe644e65fc9b60",
+      "bytes": 10696
     },
     {
       "file": "skills/blender-cli/agents/openai.yaml",
@@ -1352,8 +1367,8 @@
     },
     {
       "file": "skills/manifest.json",
-      "sha256": "93a2566b87ad0c5a7b4ec41f895b0a05e35d9282bfad6d90ee516f3846c90ae4",
-      "bytes": 1712
+      "sha256": "06e37f238612da9987cfb4b2b92d7ecf458dec794880544b7292b6217ff472ba",
+      "bytes": 1729
     },
     {
       "file": "skills/requirements-images.txt",
@@ -1382,7 +1397,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "bc9c9ab7fe3607085f02d604d07f6715e2b60e4f71ae85f74f308d9dd50fd7bb",
+      "sha256": "987c6d69a8bbfef56bc69ab02567d84ccb000e713511fabee00761ee3ad6bc64",
       "bytes": 32601
     },
     {
@@ -1434,6 +1449,11 @@
       "file": "tests/test_job_bridge.py",
       "sha256": "41bdd6e7df2174aca56d7075ffc494a348b49a17d2faea908cd429e36f82407c",
       "bytes": 8838
+    },
+    {
+      "file": "tests/test_production_hard_surface.py",
+      "sha256": "f90684e52121d3ec48f889ca1e5225951a39b386233b816a16567aff05a77ac8",
+      "bytes": 2601
     },
     {
       "file": "tests/test_skill_install.py",
@@ -2002,13 +2022,18 @@
     },
     {
       "file": "tools/blenderctl/production_contract.py",
-      "sha256": "bdae5ddfc83ce6aae321707be732870f5d6631809dbfb964cd707c58456a0610",
-      "bytes": 5868
+      "sha256": "e4ba60b9a74f10bf7c48adde4d610fcaaac0635440916b77b977599ee5b718e5",
+      "bytes": 6903
+    },
+    {
+      "file": "tools/blenderctl/production_hard_surface.py",
+      "sha256": "1a4619812887c5cf74ed4fa5c86de7d32d34eeb7d76a34b74e15246035637753",
+      "bytes": 5989
     },
     {
       "file": "tools/blenderctl/production_worker.py",
-      "sha256": "39d5daac338987c9486f776379983d9cb68640b2034bc27d325c370b879fa3a6",
-      "bytes": 7421
+      "sha256": "c5d5b8fa45372d06cce289a2303b24fa7e02ae6b8a7fd7636a9ae7c69e88d581",
+      "bytes": 7791
     },
     {
       "file": "tools/blenderctl/project_contract.py",
@@ -2022,7 +2047,7 @@
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "15e606879d815cc426139584975cf9212c5865a7e1bcb61c20066130854038a1",
+      "sha256": "1124ddd79423da819781944dbf20d93969ca37fc825be2aa4197ef21ff4c538f",
       "bytes": 30881
     },
     {

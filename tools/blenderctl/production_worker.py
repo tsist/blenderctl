@@ -6,7 +6,8 @@ import sys
 import bpy
 
 from protocol import CODES, Failure, atomic_json, digest, read_json
-from production_contract import PACKAGES, implementation_files, implementation_identity, package_root, release_manifest
+from production_contract import (HARD_SURFACE, PACKAGES, implementation_files, implementation_identity,
+                                 package_root, release_manifest)
 from projects import canonical, file_paths
 
 
@@ -25,6 +26,9 @@ def _context(selector):
 
 def _apply(domain, context, request, job):
     package = PACKAGES[domain]
+    if domain == HARD_SURFACE:
+        from production_hard_surface import apply
+        return apply(context, request)
     if domain == 'animation':
         module = importlib.import_module(package + '.production_operations')
         result = module.apply(context, request)
@@ -138,6 +142,9 @@ def run(params, job):
             if video_verify is not None:
                 video_resources['reopened'] = video_verify(
                     request, params['resources'], expected=video_resources['saved'], cache=video_cache)
+            if domain == HARD_SURFACE:
+                from production_hard_surface import check_reopen
+                report['sweep_reopened'] = check_reopen(_context(params.get('context')), result)
         except Exception as error:
             report['reopen'] = {'status': 'failed', 'message': str(error)}
             atomic_json(job / 'production-report.json', report)

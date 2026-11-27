@@ -2,10 +2,12 @@
 name: blender-cli
 description: 通过项目公共入口 blenderctl 查找动作、读取工程、在工作副本上执行修改、等待长作业、接手现场窗口并做独立重开与发布事务。只要实际读写 .blend、调度自研插件后台动作或核验交付产物就用它。
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Blender CLI 调用手册
+
+GitHub 公开版 blenderctl 0.65.0 通过 `production.run` 的 `hard-surface` 域调用 Hard Surface Workflow 0.3.7。先校验本地构建的扩展 ZIP，并用 `scripts/install_hard_surface.py` 安装 CLI 运行包。输入绑定 Windows Blender 5.3.0 `02f0899d78e3`、源 SHA、母壳、世界毫米站位及截面。用 `describe` 读配方字段，`preview` 查命中、宽厚与净空，再将 `preview_signature` 填入提交配方的 `expected_preview_signature` 并执行 `execute`。接续已保存的站位时，用 `inspect-sweep` 预检，再沿用返回的 `commit_request`。核对 `sweep_reopened`、保护区及候选 SHA。[公开安装和请求](https://github.com/tsist/blenderctl/blob/main/docs/HARD_SURFACE.md)
 
 本仓的 `production.run` 适用于 Blender 5.3.0 `02f0899d78e3` 的动画曲线、场景合成、灯光和 VSE。先按公开发行说明核验并解包 `blender53-production-1.0.0.zip`，再用 `--blender <实际程序> request <请求.json>` 提交。请求指定 `domain`、`release`、源文件和 SHA-256。独立步骤可交 `pipeline run` 并行。先读 `production-report.json` 的操作和保存后重开结果，再领用 `production-candidate.blend` 作独立核对。[四域请求说明](https://github.com/tsist/blenderctl/blob/main/docs/PRODUCTION.md)
 
@@ -13,7 +15,7 @@ metadata:
 
 ## 第一步：用 discover 找到准确入口
 
-动手前先查公共目录，拿到经过核验的命令前缀和所需字段，省去猜子命令和参数名的麻烦。
+现场工作区若提供 `discover`，先查公共目录并使用实际返回的入口。GitHub 公开版的贴面扫掠通过上面的 JSON 请求与 `describe` 获取契约。
 
 ```powershell
 $ctl = './blenderctl.ps1'

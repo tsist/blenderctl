@@ -8,12 +8,15 @@ import re
 from protocol import Failure, ROOT, read_json
 
 
-PACKAGES = {
+COMPANIONS = {
     'animation': 'animation_curves_workflow_addon',
     'compositing': 'compositing_workflow_addon',
     'video': 'video_editing_workflow_addon',
     'lighting': 'lighting_workflow_addon',
 }
+HARD_SURFACE = 'hard-surface'
+HARD_SURFACE_RELEASE = '0.3.7'
+PACKAGES = {**COMPANIONS, HARD_SURFACE: 'hard_surface_workflow_addon'}
 RELEASES = ROOT / 'runtime/blender53-production'
 DEFAULT_RELEASE = '1.0.0'
 RELEASE_ID = re.compile(r'[0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?')
@@ -33,17 +36,24 @@ def release_manifest(release):
     release = release_id(release)
     file = RELEASES / release / 'manifest.json'
     if not file.is_file():
-        raise Failure('NOT_FOUND', f'Production bundle {release} is missing. See docs/PRODUCTION.md.')
+        guide = 'HARD_SURFACE.md' if release == HARD_SURFACE_RELEASE else 'PRODUCTION.md'
+        raise Failure('NOT_FOUND', f'Production bundle {release} is missing. See docs/{guide}.')
     manifest = read_json(file)
+    if release == HARD_SURFACE_RELEASE:
+        pinned = read_json(ROOT / 'docs' / 'hard-surface-package.json')
+        if manifest != pinned:
+            raise Failure('CONFLICT', 'The installed hard-surface release manifest differs from its published inventory')
+        return manifest
     if (manifest.get('release') != release or manifest.get('schema_version') != '1.0'
-            or set(manifest.get('products', {})) != set(PACKAGES)):
+            or set(manifest.get('products', {})) != set(COMPANIONS)):
         raise Failure('VALIDATION_FAILED', f'Invalid production release manifest: {release}')
     return manifest
 
 
 def package_root(domain, release=None):
     release = selected_release(release)
-    release_manifest(release)
+    if domain not in release_manifest(release)['products']:
+        raise Failure('UNSUPPORTED', f'Production release {release} does not support {domain}')
     return RELEASES / release / 'packages' / PACKAGES[domain]
 
 
@@ -93,11 +103,17 @@ def normalize_params(params):
         raise Failure('INVALID_REQUEST', 'Production input requires a lowercase SHA-256')
     domain = params['domain']
     if not isinstance(domain, str) or domain not in PACKAGES:
-        raise Failure('INVALID_REQUEST', 'Domain must be animation, compositing, video or lighting')
+        raise Failure('INVALID_REQUEST', 'Domain must be animation, compositing, video, lighting or hard-surface')
     if not isinstance(params['request'], dict):
         raise Failure('INVALID_REQUEST', 'Domain request must be an object')
     if 'release' in params:
         release_id(params['release'])
+    if domain == HARD_SURFACE:
+        from production_hard_surface import validate_request
+        validate_request(params['request'])
+        if params.get('release', HARD_SURFACE_RELEASE) != HARD_SURFACE_RELEASE:
+            raise Failure('UNSUPPORTED', f'Hard-surface production requires release {HARD_SURFACE_RELEASE}')
+        params = {**params, 'release': HARD_SURFACE_RELEASE}
     if 'context' in params:
         context = params['context']
         if (not isinstance(context, dict) or set(context) != {'scene', 'view_layer'}

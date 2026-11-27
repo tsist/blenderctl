@@ -1,3 +1,9 @@
+# 0.65.0 — 2026-11-27
+
+- Add the Hard Surface Workflow 0.3.7 domain to `production.run` on Windows Blender 5.3.0 build `02f0899d78e3`. The signed preview, commit and saved-control handoff use the same sweep core as the Blender panel.
+- Install the hard-surface runtime from a separately built extension ZIP using a published member inventory. The existing four-domain runtime remains independently versioned.
+- Update the portable CLI skill to 1.2.0 and companion bundle to 0.9.0.
+
 # 0.63.1-r3 — 2026-11-26
 
 - Add top-level `blenderctl preview` (`tools/viewport_preview/`) for zero-disruption Windows isolated-desktop (`CreateDesktopW`) real-viewport 4-view fast review without touching open Blender windows or modifying source `.blend` files.
