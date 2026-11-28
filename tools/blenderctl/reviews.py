@@ -7,7 +7,7 @@ from protocol import ROOT,VERSION,Failure,atomic_json,read_json
 from review_contract import (REVIEW,RECEIPT,LIMITS,ACK,ACK_ISOLATED,validate,normalize,descriptor,key,binding,normalized_execution,canonical)
 
 def protect(d,stack,checkpoint=lambda:None,max_bytes=256*1024*1024):
-    descriptor(d)
+    descriptor(d,max_bytes)
     guard=stack.enter_context(FileGuard(d['file']))
     if Path(d['file']).stat().st_size>max_bytes:raise Failure('UNSUPPORTED','Review input exceeds bounded size')
     actual=guard.sha256(checkpoint)
@@ -36,7 +36,7 @@ def check_review(d,blender,stack,checkpoint):
     try:source=raw.decode('utf-8-sig')
     except UnicodeError as ex:raise Failure('INVALID_REQUEST','Review requires UTF-8 Python source') from ex
     if source!=r['source_utf8']:raise Failure('CONFLICT','Review source snapshot differs from script')
-    for d in spec['resources']:protect(d,stack,checkpoint)
+    for d in spec['resources']:protect(d,stack,checkpoint,spec['execution'].get('resource_max_bytes',256*1024**2))
     return r
 
 def verify_run(params,blender,stack,checkpoint=lambda:None):
@@ -61,7 +61,7 @@ def run(request,launch,job,checkpoint):
             raw=b''.join(g.chunks(checkpoint))
             try:source=raw.decode('utf-8-sig');tree=ast.parse(source)
             except (UnicodeError,SyntaxError,ValueError,RecursionError) as ex:raise Failure('INVALID_REQUEST','Cannot statically parse source: '+str(ex)) from ex
-            for d in spec['resources']:protect(d,stack,checkpoint)
+            for d in spec['resources']:protect(d,stack,checkpoint,spec['execution'].get('resource_max_bytes',256*1024**2))
             imports=sorted({a.name for n in ast.walk(tree) if isinstance(n,ast.Import) for a in n.names}|{n.module or '.' for n in ast.walk(tree) if isinstance(n,ast.ImportFrom)})
             r={'version':'1.0','kind':'script_review','spec':spec,'environment':env,'source_utf8':source,'imports':imports,'binding_sha256':binding(spec,env),'limitations':LIMITS}
             validate(r,REVIEW);canonical(r);name='extension-review.json'

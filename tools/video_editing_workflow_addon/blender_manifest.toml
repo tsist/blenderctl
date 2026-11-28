@@ -1,10 +1,10 @@
 schema_version = "1.0.0"
 id = "video_editing_workflow"
-version = "0.1.1"
-name = "Video Editing Workflow"
-tagline = "Managed editable video timelines and inspection"
+version = "1.0.0"
+name = "视频剪辑工作台"
+tagline = "拼装镜头、原位换片、编排字幕和导出成片"
 maintainer = "Blender AI"
 type = "add-on"
-blender_version_min = "5.2.0"
+blender_version_min = "5.3.0"
 license = ["SPDX:GPL-3.0-or-later"]
 tags = ["Sequencer"]

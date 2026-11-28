@@ -4,7 +4,11 @@
 
 ## 整角色体素蒙皮与同作业转权
 
-新角色默认使用体素蒙皮公共入口（用 `discover --product rigging` 确认当前推荐候选发行版），核心子命令位于 `rigging-workflow candidate-entry`：
+新角色默认一律使用自研 26 邻接体素蒙皮核心（严禁绕开体素求解器改用 Blender 原生 `ARMATURE_AUTO` 热力权重代替）：
+- **C94 整角色路线**：使用公共入口 `rigging-workflow candidate-entry`（先用 `discover --product rigging` 确认推荐候选版）；
+- **独立模块化人形/四足路线（`HUMAN` / `QUADRUPED`）**：使用自研 `rigging_workflow` v003 的 `modular_workflow.start_binding`（`proxy_mode='AUTO'` 或 `'VOXEL'`，`neighbor_count=26`，`transfer_distance_cells=0.5–4`，输出含 `field-support.json` 与 `transfer-projection.npz`；详见 `work/rigging-agent-workflow-20261124-v003/rigging_workflow/MODULAR-AI-CALLS.md`），其对双壳叠层网格与近距左右四肢防穿面串权远优于原生热力扩散。
+
+核心步骤如下：
 
 1. **核对生产网格与计算代理**：生产 RAW 负责保住原始点序、拓扑与 UV；网格存在开口或薄壁时，在独立计算副本生成闭体代理，留作体素占据与体积扩散场计算，原始生产网格保持完好。
 2. **单域或多域规划（`inspect` / `scope`）**：检查源工程 SHA、场景、视图层、骨架和部件清单；头部、躯干、四肢需要不同采样精细度时拆成多域，写清每域代理、骨列、遮罩与刚性范围。

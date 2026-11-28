@@ -9,6 +9,7 @@ def descriptor(path):
 
 def describe(operation=None, schema=False, section=None):
     from video_workflow_contract import schemas
+    from video_identity import package_source
     from video_editing_workflow_addon import contract
     available = schemas()
     if schema and section:
@@ -22,7 +23,8 @@ def describe(operation=None, schema=False, section=None):
         if operation not in available:
             raise Failure('INVALID_REQUEST', '--schema requires a video operation')
         return {'operation': operation, 'schema': available[operation]}
-    return {'cli_version': VERSION, 'addon_version': '0.1-dev', 'video_schema_version': '1.0',
+    plugin, _ = package_source()
+    return {'cli_version': VERSION, 'addon_version': plugin['version'], 'video_schema_version': '1.0',
             'operations': ['video.run', 'video.inspect'], 'actions': ['create', 'patch'],
             'state_source': 'SAVED_DISK_V1; explicit GUI saved snapshot only',
             'contract': descriptor(Path(contract.__file__)),

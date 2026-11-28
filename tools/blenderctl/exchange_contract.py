@@ -7,17 +7,32 @@ FORMATS=('GLB','OBJ','STL','PLY','FBX','USD','ABC')
 SUFFIX={'GLB':'.glb','OBJ':'.obj','STL':'.stl','PLY':'.ply','FBX':'.fbx','USD':'.usdc','ABC':'.abc'}
 IMPORT=obj({'format':enum(*FORMATS),'scene':NAME,'frame':integer(1,100000),'fps':integer(1,240),'scale_to_meters':number(.000001,1000000),'mode':enum('STATIC','ANIMATION')})
 IMPORT['properties']['geometry_adapter']=enum('EVALUATED_MESH_CACHE_V1','FBX_NATIVE_CLOCK_V1','GLB_NATIVE_CLOCK_V1')
+SHARED_RIG_IMPORT_ADAPTER='SHARED_RIG_NATIVE_TIME_V1'
+IMPORT['properties']['rig_adapter']=enum(SHARED_RIG_IMPORT_ADAPTER)
+IMPORT['properties'].update(materials=enum('PBR'), preserve_hierarchy=BOOL, triangulate=BOOL)
 IMPORT['allOf']=[{'if':{'required':['geometry_adapter']},'then':{'properties':{'mode':{'const':'ANIMATION'},'scale_to_meters':{'const':1}}}},
  {'if':{'required':['geometry_adapter'],'properties':{'geometry_adapter':{'const':'EVALUATED_MESH_CACHE_V1'}}},'then':{'properties':{'format':{'const':'USD'}}}},
  {'if':{'required':['geometry_adapter'],'properties':{'geometry_adapter':{'const':'FBX_NATIVE_CLOCK_V1'}}},'then':{'properties':{'format':{'const':'FBX'}}}}]
 IMPORT['allOf'].append({'if':{'required':['geometry_adapter'],'properties':{'geometry_adapter':{'const':'GLB_NATIVE_CLOCK_V1'}}},'then':{'properties':{'format':{'const':'GLB'}}}})
+IMPORT['allOf'].append({'if':{'required':['rig_adapter']},'then':{'not':{'required':['geometry_adapter']},'properties':{'format':enum('GLB','FBX'),'mode':{'const':'ANIMATION'},'scale_to_meters':{'const':1}}}})
 CACHE_SAMPLING=obj({'seed_substeps':{'type':'integer',**enum(1,2,4,8)},'max_depth':integer(0,24),'max_evaluations':integer(5,4096),'max_vertex_samples':integer(1,256000000),'max_position_error':number(1e-7,.001)})
 ANALYZE=obj({'scene':NAME,'view_layer':NAME,'objects':{**array(NAME,1,16),'uniqueItems':True},
  'frame_start':number(1,100000),'frame_end':number(1,100000),
  'sampling':obj({'seed_substeps':{'type':'integer',**enum(1,2,4,8)},'max_depth':integer(0,24),
  'max_evaluations':integer(5,4096),'max_vertex_samples':integer(1,16000000),'max_position_error':number(1e-7,.001)})})
 EXPORT=obj({'format':enum(*FORMATS),'scene':NAME,'view_layer':NAME,'objects':{**array(NAME,1,100),'uniqueItems':True},'mode':enum('STATIC','ANIMATION'),'frame_start':integer(1,100000),'frame_end':integer(1,100000),'meters_per_unit':number(.000001,1000000),'materials':enum('NONE','GLTF_PBR')})
-EXPORT['properties']['rig_adapter']=enum('BBONE_CAGE_V1','BBONE_MULTI_CAGE_V1')
+EXPORT['properties'].update(materials=enum('NONE','GLTF_PBR','PBR'),
+    preserve_hierarchy=BOOL, triangulate=BOOL, embed_textures=BOOL)
+SHARED_RIG_ADAPTER='BBONE_SHARED_CONTINUOUS_V1'
+RIG_SAMPLING=obj({'seed_substeps':{'type':'integer',**enum(1,2,4,8)},'max_depth':integer(0,8),
+ 'max_evaluations':integer(5,16384),'max_vertex_samples':integer(1,256000000),
+ 'max_affine_joints':integer(1,2048),'max_output_bytes':integer(1,536870912),
+ 'max_position_error':number(1e-7,.001)})
+# Optional shared-rig sampling extensions; omission keeps the original 32 tables.
+for _field in ('witness_substeps','format_substeps'):
+    RIG_SAMPLING['properties'][_field]={'type':'integer','enum':[1,2,4,8,32]}
+EXPORT['properties']['rig_adapter']=enum('BBONE_CAGE_V1','BBONE_MULTI_CAGE_V1',SHARED_RIG_ADAPTER)
+EXPORT['properties']['rig_sampling']=RIG_SAMPLING
 EXPORT['properties']['geometry_adapter']=enum('EVALUATED_MESH_CLIP_V1','EVALUATED_MESH_CACHE_V1')
 CLIP_SAMPLING=obj({'substeps':{'type':'integer',**enum(1,2,4,8)},'max_position_error':number(1e-7,.001),'max_vertex_samples':integer(1,16000000)})
 EXPORT['properties']['sampling']={'oneOf':[CLIP_SAMPLING,CACHE_SAMPLING]}
@@ -28,6 +43,11 @@ EXPORT['allOf'].extend([
  {'if':{'required':['geometry_adapter'],'properties':{'geometry_adapter':{'const':'EVALUATED_MESH_CACHE_V1'}}},'then':{'properties':{'format':{'const':'USD'},'sampling':CACHE_SAMPLING}}},
  {'if':{'required':['geometry_adapter'],'properties':{'geometry_adapter':{'const':'EVALUATED_MESH_CLIP_V1'}}},'then':{'properties':{'format':enum('GLB','FBX'),'sampling':CLIP_SAMPLING}}},
  {'if':{'required':['sampling']},'then':{'required':['geometry_adapter']}}])
+EXPORT['allOf'].extend([
+ {'if':{'required':['rig_adapter'],'properties':{'rig_adapter':{'const':SHARED_RIG_ADAPTER}}},
+  'then':{'required':['rig_sampling'],'not':{'anyOf':[{'required':['geometry_adapter']},{'required':['sampling']}]}}},
+ {'if':{'required':['rig_sampling']},
+  'then':{'required':['rig_adapter'],'properties':{'rig_adapter':{'const':SHARED_RIG_ADAPTER}}}}])
 for contract in (IMPORT,EXPORT):
     contract['allOf'].append({'if':{'required':['format','mode'],'properties':{'format':{'const':'USD'},'mode':{'const':'ANIMATION'}}},'then':{'required':['geometry_adapter'],'properties':{'geometry_adapter':{'const':'EVALUATED_MESH_CACHE_V1'}}}})
 CONVERT_ITEM=obj({'input':FILE,'import':IMPORT,'output_format':enum(*FORMATS)})
@@ -39,6 +59,7 @@ CONVERT=obj({'items':array(CONVERT_ITEM,1,8)})
 SCRIPT=obj({'script':FILE,'trust':{'const':'execute_local_python_without_sandbox'},'params':{'type':'object'},'outputs':{**array({'type':'string','minLength':1,'maxLength':128,'pattern':r'^output-[A-Za-z0-9_-]+\.(json|txt|blend|png|glb)$'},1,16),'uniqueItems':True}})
 SCRIPT['properties']['trust']=enum('execute_local_python_without_sandbox','execute_local_python_in_appcontainer')
 SCRIPT['properties']['isolation']={'const':'WINDOWS_APPCONTAINER_V1'}
+SCRIPT['properties']['resource_max_bytes']=integer(1,1024**3)
 SCRIPT['allOf']=[{'if':{'required':['isolation']},'then':{'properties':{'trust':{'const':'execute_local_python_in_appcontainer'}}},'else':{'properties':{'trust':{'const':'execute_local_python_without_sandbox'}}}}]
 STAR=obj({'adapter':{'const':'extra_mesh_star_v1'},'name':NAME,'points':integer(3,32),'outer_radius':number(.01,100),'inner_radius':number(.01,100),'height':number(.01,100)})
 PINNED={'interface.py':'44710b69bb90ab4491f5c10bd2563e5e6e7f3de15db2ebf104b7e73b23b9d1aa','add_mesh_star.py':'bdaa124caf1f90e302e85a2f7abb24e21f3b46baf132b3f100948642dc9633d4'}
@@ -56,6 +77,12 @@ def normalize(v,kind):
     if kind=='analyze' and not 0<v['frame_end']-v['frame_start']<=59:raise Failure('INVALID_REQUEST','Analysis needs a positive range of at most 59 frames')
     if kind=='prepare' and v['inner_radius']>=v['outer_radius']:raise Failure('INVALID_REQUEST','Star requires inner_radius < outer_radius')
     if kind=='export':
+        continuous=v.get('rig_adapter')==SHARED_RIG_ADAPTER
+        if continuous:
+            if 'rig_sampling' not in v:raise Failure('INVALID_REQUEST','Shared continuous rig export requires explicit rig_sampling budgets')
+            if 'sampling' in v or 'geometry_adapter' in v:raise Failure('INVALID_REQUEST','Shared rig_sampling excludes geometry sampling/adapters')
+            if v['frame_end']<=v['frame_start']:raise Failure('INVALID_REQUEST','Shared continuous rig export needs a positive frame interval')
+        elif 'rig_sampling' in v:raise Failure('INVALID_REQUEST','rig_sampling requires BBONE_SHARED_CONTINUOUS_V1')
         if v.get('geometry_adapter'):
             cache=v['geometry_adapter']=='EVALUATED_MESH_CACHE_V1'
             if 'rig_adapter' in v or 'sampling' not in v:raise Failure('INVALID_REQUEST','Mesh clip requires sampling and excludes rig_adapter')
@@ -65,15 +92,28 @@ def normalize(v,kind):
             if not cache and (v['frame_end']-v['frame_start'])*v['sampling']['substeps']+1>65:raise Failure('UNSUPPORTED','Mesh clip exceeds 65 sampled keys')
         elif 'sampling' in v:raise Failure('INVALID_REQUEST','Sampling requires explicit geometry_adapter')
         if v.get('rig_adapter'):
-            multi=v['rig_adapter']=='BBONE_MULTI_CAGE_V1'
-            if v['format'] not in (('GLB','FBX') if multi else ('GLB',)) or v['mode']!='ANIMATION' or v['materials']!='NONE' or v['meters_per_unit']!=1 or not 2<=len(v['objects'])<=(17 if multi else 2) or v['frame_end']-v['frame_start']>31:
+            multi=v['rig_adapter'] in ('BBONE_MULTI_CAGE_V1',SHARED_RIG_ADAPTER)
+            if v['format'] not in (('GLB','FBX') if multi else ('GLB',)) or v['mode']!='ANIMATION' or v['materials']!='NONE' or v['meters_per_unit']!=1 or not 2<=len(v['objects'])<=(17 if multi else 2) or not continuous and v['frame_end']-v['frame_start']>31:
                 raise Failure('UNSUPPORTED','Cage adapter requires bounded mesh/rig selection, GLB (multi also FBX), ANIMATION, NONE materials, meter scale one and at most 32 frames')
-        if v['frame_end']<v['frame_start'] or v['frame_end']-v['frame_start']>59:raise Failure('INVALID_REQUEST','Export range must span 1..60 frames')
+        if v['frame_end']<v['frame_start'] or not continuous and v['frame_end']-v['frame_start']>59:raise Failure('INVALID_REQUEST','Legacy export range must span 1..60 frames')
         if v['mode']=='STATIC' and v['frame_end']!=v['frame_start']:raise Failure('INVALID_REQUEST','Static export has one frame')
         if v['materials']=='GLTF_PBR' and v['format']!='GLB':raise Failure('UNSUPPORTED','PBR materials require GLB')
+    if kind in ('export','import'):
+        if v.get('materials')=='PBR' and v['format'] not in ('GLB','FBX','USD'):
+            raise Failure('UNSUPPORTED','PBR exchange supports GLB, FBX and USD')
+        if v['mode']!='STATIC' and any(option in v for option in ('preserve_hierarchy','triangulate','embed_textures')):
+            raise Failure('INVALID_REQUEST','Static preparation options require STATIC exchange')
+        if 'embed_textures' in v and (v.get('materials')!='PBR' or v['format']!='FBX'):
+            raise Failure('INVALID_REQUEST','embed_textures is an FBX PBR option')
+        if v.get('materials')=='PBR' and v['format']=='FBX' and v.get('embed_textures') is False:
+            raise Failure('UNSUPPORTED','FBX PBR exchange requires embedded textures')
+        if v.get('preserve_hierarchy') and v['format'] not in ('GLB','FBX','USD'):
+            raise Failure('UNSUPPORTED','Hierarchy preservation supports GLB, FBX and USD')
     if kind in ('export','import') and v['mode']=='ANIMATION':
         if v['format'] not in ('GLB','FBX') and not (v['format']=='USD' and v.get('geometry_adapter')=='EVALUATED_MESH_CACHE_V1'):raise Failure('UNSUPPORTED','USD animation requires explicit native mesh cache adapter')
         if v.get('meters_per_unit',v.get('scale_to_meters'))!=1:raise Failure('UNSUPPORTED','Animated exchanges require meter units at scale one')
+    if kind=='import' and v.get('rig_adapter'):
+        if v['rig_adapter']!=SHARED_RIG_IMPORT_ADAPTER or v['format'] not in ('GLB','FBX') or v['mode']!='ANIMATION' or v['scale_to_meters']!=1 or 'geometry_adapter' in v:raise Failure('INVALID_REQUEST','Shared rig native-time import requires GLB/FBX animation at meter scale one and excludes geometry_adapter')
     if kind=='import' and v.get('geometry_adapter'):
         expected={'FBX_NATIVE_CLOCK_V1':'FBX','GLB_NATIVE_CLOCK_V1':'GLB','EVALUATED_MESH_CACHE_V1':'USD'}[v['geometry_adapter']]
         if v['format']!=expected or v['mode']!='ANIMATION' or v['scale_to_meters']!=1:raise Failure('INVALID_REQUEST','Explicit geometry import requires matching format, animation and meter scale one')
@@ -93,9 +133,19 @@ def normalize(v,kind):
     return v
 def input_documents(params):
     docs=list(params.get('resources',[]));m=params.get('manifest',{})
+    resource_limit=m.get('resource_max_bytes',256*1024**2)
+    shared_main=(m.get('rig_adapter')==SHARED_RIG_IMPORT_ADAPTER
+                 and isinstance(params.get('file'),str)
+                 and isinstance(params.get('expected_sha256'),str))
+    for d in docs:
+        same_main=(shared_main and isinstance(d,dict) and isinstance(d.get('file'),str)
+                   and d.get('expected_sha256')==params['expected_sha256']
+                   and Path(d['file']).resolve()==Path(params['file']).resolve())
+        descriptor(d,512*1024**2 if same_main else resource_limit)
     for x in m.get('items',[]):
         descriptor(x['input'],1024**3 if x.get('geometry_adapter') in ('FBX_NATIVE_CLOCK_V1','GLB_NATIVE_CLOCK_V1') else 256*1024**2)
-    if 'script' in m:docs.append(m['script'])
-    if 'simulation_receipt' in params:docs.append(params['simulation_receipt'])
-    for d in docs:descriptor(d)
+    if 'script' in m:
+        descriptor(m['script']);docs.append(m['script'])
+    if 'simulation_receipt' in params:
+        descriptor(params['simulation_receipt']);docs.append(params['simulation_receipt'])
     return docs+[x['input'] for x in m.get('items',[])]

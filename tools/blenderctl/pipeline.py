@@ -4,21 +4,64 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack,nullcontext
 from pathlib import Path
 from protocol import VERSION,ROOT,CODES,Failure,atomic_json,read_json,digest,envelope,validate
-from pipeline_contract import normalize,get,put,SUCCESS,disk_usage
+from pipeline_contract import normalize,get,put,SUCCESS,disk_usage,REGISTRY,REGISTRY_SHA256
 from filesystem import FileGuard,PathLocks
 
 CONSTRUCTORS={'scene.prepare','model.prepare','node.prepare','rig.prepare','simulation.prepare','media.prepare','extension.prepare'}
-NO_REUSE={'extension.run','simulation.bake','dependency.audit','asset.prepare','asset.index','identity.prepare','sculpt.replay'}
+NO_REUSE={'extension.run','simulation.bake','dependency.audit','asset.prepare','asset.index','identity.prepare'}
 NO_REUSE.update(('tracking.prepare','tracking.inspect','tracking.solve'))
 NO_REUSE.update(('inspect','project.verify','project.prepare_copy','project.link.prepare','project.override.prepare','project.override.resync','exchange.analyze'))
 # Explicit work-unit admission does not grant standalone worker cache reuse.
 NO_REUSE.update(('geometry.run','geometry.inspect','material.run','production.run'))
+NO_REUSE.update(('animation.inspect','compositing.inspect','lighting.inspect','toon.inspect',
+                 'camera.inspect','modeling.import-local','video.inspect'))
 
 def key(v):return hashlib.sha256(json.dumps(v,sort_keys=True,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 
-def runtime_identity(blender,stack,checkpoint,workflow_mode=False):
+def native_build(blender,inventory,cache,strict_rehash):
+    # Only memoize the version probe, after verifying every shipped byte.
+    stamp=key((str(blender.resolve()),inventory)) if cache else None
+    if cache and not strict_rehash:
+        try:
+            record=read_json(cache)
+            if isinstance(record,dict) and record.get('sha256')==stamp:
+                build=record.get('build')
+                if isinstance(build,str) and re.fullmatch('[0-9a-f]+',build) and record.get('checksum')==key((stamp,build)):
+                    return build
+        except (Failure,OSError):
+            pass
+    version=subprocess.run([str(blender),'--version'],capture_output=True,encoding='utf-8',timeout=15,
+                           creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+    found=re.search(r'^\s*build hash:\s*([0-9a-f]+)\s*$',version.stdout,re.MULTILINE)
+    if version.returncode or not found:raise Failure('UNSUPPORTED','Cannot verify Blender build for pipeline runtime identity')
+    build=found.group(1)
+    if cache:
+        try:
+            atomic_json(cache,{'sha256':stamp,'build':build,'checksum':key((stamp,build))})
+        except OSError:
+            pass  # A build probe cache is optional.
+    return build
+
+def runtime_identity(blender,stack,checkpoint,workflow_mode=False,uv_batch_mode=False,*,build_cache=None,strict_rehash=False):
     # Exact implementation/engine bytes plus content SHA of shipped runtime files.
-    files=[*sorted(Path(__file__).parent.glob('*.py')),Path(blender),Path(sys.executable)]
+    next_checkpoint=0.0
+    def check_inventory_progress():
+        nonlocal next_checkpoint
+        now=time.monotonic()
+        if now>=next_checkpoint:
+            checkpoint()
+            next_checkpoint=now+.02
+
+    core=Path(__file__).parent
+    blender=Path(blender)
+    blender_guard=stack.enter_context(FileGuard(blender))
+    anchor_dirs={core,*core.parents}
+    python_home=Path(sys.executable).parent
+    if not python_home.is_relative_to(blender.absolute().parent):
+        anchor_dirs.update((python_home,*python_home.parents))
+    for directory in sorted(anchor_dirs,key=lambda path:len(path.parts)):
+        stack.enter_context(FileGuard(directory,directory=True))
+    files=[*sorted(core.glob('*.py')),core/'registry.json',Path(sys.executable)]
     if workflow_mode:
         # Both add-on closures contribute to the global identity; no relaxed
         # producer identity replaces the existing exact CLI/runtime guard.
@@ -26,16 +69,21 @@ def runtime_identity(blender,stack,checkpoint,workflow_mode=False):
             root=ROOT/'tools'/addon
             if not root.is_dir():raise Failure('UNSUPPORTED','Workflow add-on closure is missing: '+addon)
             files.extend(sorted(root.rglob('*.py')))
+    if uv_batch_mode:
+        from uv_workflow_contract import runtime_files
+        files.extend(runtime_files())
+        files=list(dict.fromkeys(files))
     hashes={}
     for p in files:
-        g=stack.enter_context(FileGuard(p));hashes[str(p)]=g.sha256(checkpoint)
+        g=stack.enter_context(FileGuard(p));hashes[str(p)]=g.sha256(check_inventory_progress)
     from installation import content_inventory
-    inventory=content_inventory(blender,checkpoint)
-    version=subprocess.run([str(blender),'--version'],capture_output=True,encoding='utf-8',timeout=15,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
-    found=re.search(r'^\s*build hash:\s*([0-9a-f]+)\s*$',version.stdout,re.MULTILINE)
-    if version.returncode or not found:raise Failure('UNSUPPORTED','Cannot verify Blender build for pipeline runtime identity')
+    inventory=content_inventory(blender,check_inventory_progress,stack=stack)
+    build=native_build(blender,inventory,build_cache,strict_rehash)
+    # Blender is itself a root member of the inventory, held deny-write for the job.
+    engine=inventory.get(blender.resolve().name)
+    hashes[str(blender)]=engine['sha256'] if engine else blender_guard.sha256(checkpoint)
     checkpoint()
-    return {'cli_version':VERSION,'hashes':hashes,'blender_build':found.group(1),'runtime_inventory':inventory,'scope':'exact engine/host/CLI bytes and native build; shipped runtime dependency SHA inventory excluding mutable portable user config; not a malicious-installation sandbox'}
+    return {'cli_version':VERSION,'hashes':hashes,'blender_build':build,'runtime_inventory':inventory,'scope':'exact engine/host/CLI bytes and native build; shipped runtime dependency SHA inventory excluding mutable portable user config; not a malicious-installation sandbox'}
 
 def documents(params):
     result=[]
@@ -55,11 +103,28 @@ def protect(params,command,blender,stack,checkpoint):
         verify_run(params,blender,stack,checkpoint)
     docs=documents(params)
     if command in ('geometry.run','geometry.inspect'):
+        for descriptor in (params.get('cache_manifest'),params.get('resume')):
+            if descriptor:
+                guard=stack.enter_context(FileGuard(descriptor['file']))
+                if guard.sha256(checkpoint)!=descriptor['expected_sha256']:
+                    raise Failure('CONFLICT','Geometry descriptor changed before pipeline expansion')
         from geometry_workflow_contract import input_documents
         docs+=input_documents(params)
     if command=='material.run':
         from material_workflow_contract import input_documents
         docs+=input_documents(params)
+    if command in ('uv.run','uv.inspect'):
+        from uv_workflow_contract import input_documents
+        docs+=input_documents(params,command)
+    if command=='camera.inspect':
+        from pipeline_camera import input_documents
+        docs+=input_documents(params)
+    if command=='modeling.import-local':
+        from modeling_workflow_contract import input_documents
+        docs+=input_documents(params)
+    if command=='video.inspect':
+        from video_workflow_contract import input_documents
+        docs+=input_documents(params,command)
     if command in ('project.link.prepare','project.override.prepare','project.override.resync'):
         if command=='project.override.resync':
             descriptor=params['manifest']['receipt'];guard=stack.enter_context(FileGuard(descriptor['file']))
@@ -126,11 +191,6 @@ def collect_outputs(job,stack,checkpoint):
     outputs={}
     request=read_json(job/'request.json')
     isolated=request.get('command')=='extension.run' and request.get('params',{}).get('manifest',{}).get('isolation')=='WINDOWS_APPCONTAINER_V1'
-    if request.get('command')=='sculpt.replay':
-        from sculpt_host import OUTPUTS
-        for name in OUTPUTS:
-            p=job/name;g=stack.enter_context(FileGuard(p));outputs[str(p)]=g.sha256(checkpoint)
-        return outputs
     # All regular worker artifacts, including embedded cache files and reports.
     # Exclude only mutable supervision records. No claimed reusable data may be a link.
     # Isolated jobs publish only host-received top-level outputs. Never walk or
@@ -144,9 +204,12 @@ def collect_outputs(job,stack,checkpoint):
             g=stack.enter_context(FileGuard(p));outputs[str(p)]=g.sha256(checkpoint)
     return outputs
 
-def reusable(step,rows):
+def reusable(step,rows,*,uv_batch_mode=False):
     # Closed inputs are a producer property, separate from this run's reuse flag.
     if step['command'] in NO_REUSE or step['command']=='dependency.prepare':return False
+    # UV batch separately requires a successful native closure/reopen proof;
+    # this flag only makes the exact-input cache lookup eligible for that check.
+    if step['command'] in ('uv.run','uv.inspect'):return uv_batch_mode
     if step['command']=='render.run' and step['params'].get('manifest',{}).get('device',{}).get('backend')!='CPU':return False
     if step['command']=='exchange.import':return step['params']['manifest']['mode']=='STATIC'
     if 'file' not in step['params'] and step['command'] in CONSTRUCTORS:return True
@@ -237,6 +300,11 @@ def verify_reuse(old,cache_key,stack,checkpoint,runtime=None):
             g=trial.enter_context(FileGuard(p))
             if g.sha256(checkpoint)!=sha:trial.close();return False
         if old.get('command')=='dependency.prepare':old['dependency_proof']=dependency_proof(old,runtime,trial,checkpoint)
+        if old.get('command') in ('uv.run','uv.inspect'):
+            from uv_batch import qualify
+            proof=qualify(old)
+            if not proof.get('reusable'):trial.close();return False
+            old['uv_result']=proof
         stack.enter_context(trial);return True
     except Failure as ex:
         trial.close()
@@ -244,13 +312,13 @@ def verify_reuse(old,cache_key,stack,checkpoint,runtime=None):
         return False
     except OSError:trial.close();return False
 
-def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_mode=False,defer_publication=False):
+def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_mode=False,defer_publication=False,uv_batch_mode=False):
     import runner
     guards=ExitStack()
     try:guards.enter_context(PathLocks([job]))
     except Failure as ex:
         guards.close();return envelope('pipeline.run',job.name,error={'code':ex.code,'message':str(ex)}),CODES[ex.code]
-    started=time.monotonic();request=read_json(job/'request.json');launch=read_json(job/'launch.json');status=read_json(job/'status.json');abort=threading.Event();rows={};error=None;manifest=None;runtime=None;futures={};max_active=0;observed_disk=0;last_disk=0;prior_id=None;prior={};pool=None
+    started=time.monotonic();request=read_json(job/'request.json');launch=read_json(job/'launch.json');status=read_json(job/'status.json');abort=threading.Event();rows={};error=None;manifest=None;runtime=None;runtime_key=None;futures={};max_active=0;observed_disk=0;last_disk=0;prior_id=None;prior={};pool=None
     status.update(state='running',supervisor_pid=os.getpid(),started_at=time.time());artifacts={'job_directory':str(job),'pipeline_state':str(job/'pipeline-state.json'),'pipeline_report':str(job/'pipeline-report.json')}
     if workflow_mode:artifacts['workflow_report']=str(job/'pipeline-report.json')
     def child_checkpoint():
@@ -267,8 +335,11 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
             if size>manifest['policy']['disk_mb']*1048576:raise Failure('RESOURCE_LIMIT','Observed pipeline disk budget exceeded; partial jobs retained')
             if shutil.disk_usage(job).free<manifest['policy']['min_free_mb']*1048576:raise Failure('RESOURCE_LIMIT','Free disk space below pipeline floor')
     def record(final=False):
-        report={'pipeline_report_version':'1.0','job_id':job.name,'manifest':manifest,'reuse_job':prior_id,'runtime_key':key(runtime) if runtime else None,'steps':list(rows.values()),'max_active_workers':max_active,'observed_disk_bytes':observed_disk,'elapsed_seconds':time.monotonic()-started,'complete':final,'error':error,'execution':'independent workers; no publication/transaction commands; explicit resume creates a new attempt'}
+        report={'pipeline_report_version':'1.0','job_id':job.name,'manifest':manifest,'reuse_job':prior_id,'runtime_key':runtime_key,'steps':list(rows.values()),'max_active_workers':max_active,'observed_disk_bytes':observed_disk,'elapsed_seconds':time.monotonic()-started,'complete':final,'error':error,'execution':'independent workers; no publication/transaction commands; explicit resume creates a new attempt'}
         if workflow_mode:report['workflow_report_version']='1.0'
+        if uv_batch_mode:
+            from uv_batch import summary
+            report.update(uv_batch_version='1.0',uv_summary=summary(list(rows.values())))
         atomic_json(job/('pipeline-report.json' if final else 'pipeline-state.json'),report)
         if final and any(r['command']=='asset.preview.prepare' for r in rows.values()):
             preview_rows=[]
@@ -279,27 +350,44 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
         return report
     def fail_row(row,ex):
         row.update(state='failed',error={'code':ex.code if isinstance(ex,Failure) else 'WORKER_FAILED','message':str(ex)},finished_at=time.time())
+        if uv_batch_mode:row['closed_inputs']=False
+    def load_lease_snapshot():
+        nonlocal runtime
+        if runtime is None:
+            runtime=runtime_lease.runtime
+            atomic_json(job/'pipeline-runtime.json',runtime)
+        return runtime
     try:
         with nullcontext(guards):
             if workflow_mode != (request['command'] in ('workflow.run','workflow.resume')):
                 raise Failure('INVALID_REQUEST','Workflow/pipeline supervisor domain mismatch')
-            prior_id=request['params'].get('job_id') if request['command'] in ('pipeline.resume','workflow.resume') else request['params'].get('reuse_job')
+            if uv_batch_mode != (request['command'] in ('uv.batch','uv.batch-resume')):
+                raise Failure('INVALID_REQUEST','UV batch supervisor domain mismatch')
+            prior_id=request['params'].get('job_id') if request['command'] in ('pipeline.resume','workflow.resume','uv.batch-resume') else request['params'].get('reuse_job')
             previous=runner.job_path(job.parent,prior_id) if prior_id else None
             if previous:guards.enter_context(PathLocks([previous]))
             for p in (job/'request.json',job/'launch.json'):guards.enter_context(FileGuard(p))
+            registration=guards.enter_context(FileGuard(REGISTRY))
+            if registration.sha256(checkpoint)!=REGISTRY_SHA256:
+                raise Failure('CONFLICT','Pipeline admission registry changed after supervisor import')
             atomic_json(job/'status.json',status)
             if previous:
                 prior_command=read_json(previous/'request.json')['command']
                 from workflow_contract import validate_prior
-                validate_prior(prior_command,workflow_mode)
+                if uv_batch_mode:
+                    if prior_command not in ('uv.batch','uv.batch-resume'):raise Failure('INVALID_REQUEST','UV recovery source must be a UV batch')
+                else:validate_prior(prior_command,workflow_mode)
                 for name in ('pipeline-report.json','pipeline-state.json'):
                     if (previous/name).exists():
                         guards.enter_context(FileGuard(previous/name));prior=read_json(previous/name);break
                 if not prior:raise Failure('CONFLICT','Prior pipeline has no recoverable definition yet')
+                if uv_batch_mode:
+                    from uv_batch import verify_parent
+                    verify_parent(previous,prior,guards)
             if request['command']=='asset.preview.batch':
                 from preview_contract import expand_batch
                 manifest=expand_batch(request['params']['manifest'])
-            else:manifest=manifest_normalizer(prior['manifest'] if request['command'] in ('pipeline.resume','workflow.resume') else request['params']['manifest'])
+            else:manifest=manifest_normalizer(prior['manifest'] if request['command'] in ('pipeline.resume','workflow.resume','uv.batch-resume') else request['params']['manifest'])
             rows={s['id']:{'id':s['id'],'command':s['command'],'state':'pending','depends_on':s['depends_on'],'child_job':None,'error':None} for s in manifest['steps']};byid={s['id']:s for s in manifest['steps']};oldrows={s['id']:s for s in prior.get('steps',[])};record();checkpoint()
             if workflow_mode:
                 from workflow_preflight import inspect_manifest
@@ -311,7 +399,31 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
             if request['command']=='pipeline.plan':
                 for row in rows.values():row['state']='planned'
             else:
-                runtime=runtime_identity(launch['blender'],guards,checkpoint,workflow_mode=workflow_mode);atomic_json(job/'pipeline-runtime.json',runtime);pool=ThreadPoolExecutor(max_workers=manifest['policy']['max_workers']);policy=manifest['policy'];halt=False
+                identity_started=time.monotonic()
+                strict_rehash=request['params'].get('strict_rehash',False)
+                runtime_lease=None
+                if not strict_rehash and not (workflow_mode or uv_batch_mode):
+                    from pipeline_lease import acquire
+                    runtime_lease=acquire(job.parent,launch['blender'])
+                if runtime_lease is None:
+                    runtime=runtime_identity(launch['blender'],guards,checkpoint,workflow_mode=workflow_mode,
+                                             uv_batch_mode=uv_batch_mode,build_cache=job.parent/'.pipeline-build-probe.json',
+                                             strict_rehash=strict_rehash)
+                    runtime_key=key(runtime)
+                else:
+                    guards.callback(runtime_lease.close)
+                    runtime_key=runtime_lease.runtime_key
+                    if runtime_lease.registry_sha256!=REGISTRY_SHA256:
+                        raise Failure('CONFLICT','Runtime lease admission registry differs from this supervisor')
+                preflight=job/'pipeline-preflight.json'
+                atomic_json(preflight,{'source':'lease' if runtime_lease else 'exact',
+                                       'identity_seconds':time.monotonic()-identity_started,
+                                       'lease_id':runtime_lease.id if runtime_lease else None,
+                                       'strict_rehash':strict_rehash,'runtime_key':runtime_key})
+                artifacts['pipeline_preflight']=str(preflight)
+                if runtime is not None:
+                    atomic_json(job/'pipeline-runtime.json',runtime)
+                pool=ThreadPoolExecutor(max_workers=manifest['policy']['max_workers']);policy=manifest['policy'];halt=False
                 while any(r['state'] in ('pending','running') for r in rows.values()):
                     checkpoint()
                     for future in list(futures):
@@ -322,10 +434,16 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
                             result,code=future.result();row.update(data=result.get('data'),error=result.get('error'),finished_at=time.time(),state='succeeded' if code==0 else 'cancelled' if code==7 else 'timed_out' if code==6 else 'failed')
                             if code==0:
                                 row['output_hashes']=collect_outputs(Path(row['child_directory']),guards,checkpoint)
+                                if uv_batch_mode:
+                                    from uv_batch import qualify
+                                    row['uv_result']=qualify(row,step['params'])
+                                    row['closed_inputs']=row['uv_result']['reusable'];keep_inputs=row['closed_inputs']
+                                    if not row['closed_inputs']:
+                                        raise Failure('VALIDATION_FAILED','UV hard checks are failed/incomplete; candidate retained for diagnosis')
                                 if step['command'] in ('project.link.prepare','project.override.prepare','project.override.resync'):
                                     retain_library_inputs(row,guards,checkpoint)
                                 if step['command']=='dependency.prepare':
-                                    row['dependency_proof']=dependency_proof(row,runtime,guards,checkpoint)
+                                    row['dependency_proof']=dependency_proof(row,load_lease_snapshot(),guards,checkpoint)
                                     row['closed_inputs']=True;keep_inputs=True
                         except Exception as ex:fail_row(row,ex)
                         finally:
@@ -351,15 +469,15 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
                                 if not isinstance(path,str) or path not in src.get('output_hashes',{}):raise Failure('INVALID_REQUEST','Binding must select a verified output file, not an arbitrary result value')
                                 put(step['params'],b['target'],path);put(step['params'],b['sha_target'],src['output_hashes'][path])
                             child=validate({'schema_version':'1.0','command':step['command'],'params':step['params']});step['params']=child['params']
-                            is_gpu=step['command']=='sculpt.replay' or (step['command'] in ('render.run','asset.preview.prepare') and step['params']['manifest']['device']['backend']!='CPU')
+                            is_gpu=(step['command'] in ('render.run','asset.preview.prepare') and step['params']['manifest']['device']['backend']!='CPU')
                             if workflow_mode:
                                 from workflow_contract import requires_gpu
                                 is_gpu=is_gpu or requires_gpu(step['command'],step['params'])
                             if is_gpu and not step['limits']['gpu_mb']:raise Failure('INVALID_REQUEST','GPU worker requires a nonzero declared gpu_mb reservation')
                             hashes=protect(child['params'],step['command'],launch['blender'],step_guards,checkpoint)
                             proof=consumer_proof(step,rows)
-                            closed=reusable(step,rows);ck=key({'runtime':key(runtime),'command':step['command'],'params':child['params'],'inputs':hashes,'limits':step['limits'],'dependencies':{d:rows[d].get('cache_key') for d in row['depends_on']},**({'dependency_proof':proof} if proof else {})})
-                            row.update(cache_key=ck,input_hashes=hashes,closed_inputs=closed)
+                            closed=reusable(step,rows,uv_batch_mode=uv_batch_mode);ck=key({'runtime':runtime_key,'command':step['command'],'params':child['params'],'inputs':hashes,'limits':step['limits'],'dependencies':{d:rows[d].get('cache_key') for d in row['depends_on']},**({'dependency_proof':proof} if proof else {})})
+                            row.update(cache_key=ck,input_hashes=hashes,closed_inputs=False if uv_batch_mode else closed)
                             if proof:row['dependency_proof']=proof
                             # Asset-file previews stay outside the generic closed
                             # producer lineage. A matching prior result only
@@ -367,12 +485,17 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
                             old=oldrows.get(ident,{})
                             if step['command']=='asset.preview.prepare' and step['reuse'] and not child['params'].get('reuse_receipt') and (old.get('data') or {}).get('receipt') and verify_reuse({**old,'closed_inputs':True},ck,guards,checkpoint,runtime):
                                 prior_data=old['data'];child['params']['reuse_receipt']={'file':prior_data['receipt'],'expected_sha256':prior_data['receipt_sha256']}
-                            if step['reuse'] and (closed or step['command']=='dependency.prepare') and verify_reuse(old,ck,guards,checkpoint,runtime):
+                            prior_runtime=load_lease_snapshot() if step['reuse'] and old and step['command']=='dependency.prepare' else runtime
+                            if step['reuse'] and (closed or step['command']=='dependency.prepare') and verify_reuse(old,ck,guards,checkpoint,prior_runtime):
                                 row.update(state='reused',data=old['data'],output_hashes=old['output_hashes'],reused_from=old.get('reused_from') or old.get('child_job'),finished_at=time.time())
                                 if old.get('child_directory'):row['child_directory']=old['child_directory']
+                                if uv_batch_mode:
+                                    row['uv_result']=copy.deepcopy(old['uv_result'])
+                                    row['closed_inputs']=True
+                                    guards.enter_context(step_guards)
                                 if step['command']=='dependency.prepare':
                                     row.update(closed_inputs=True,dependency_proof=old['dependency_proof']);guards.enter_context(step_guards)
-                                else:step_guards.close()
+                                elif not uv_batch_mode:step_guards.close()
                                 record();continue
                             child_job=runner.prepare(child,launch['blender'],job/'children',step['timeout_seconds'],launch['transactions_root'],limits=step['limits'],resource_domain=policy.get('resource_domain'))
                             row.update(state='running',child_job=child_job.name,child_directory=str(child_job),started_at=time.time());record()
@@ -385,6 +508,18 @@ def execute(job,parent_checkpoint=None,*,manifest_normalizer=normalize,workflow_
                             record()
                     if futures:time.sleep(.05)
                 checkpoint()
+                from installation import verify_members
+                try:
+                    load_lease_snapshot()
+                    verify_members(launch['blender'],runtime['runtime_inventory'],checkpoint)
+                    if runtime_lease is not None:
+                        runtime_lease.verify(checkpoint)
+                except (Failure,OSError):
+                    # A changed runtime invalidates all work from this attempt,
+                    # including paths that can normally supply reuse receipts.
+                    for row in rows.values():
+                        row.update(cache_key=None,closed_inputs=False)
+                    raise
                 if any(row['state'] not in SUCCESS for row in rows.values()):error={'code':'VALIDATION_FAILED','message':'Pipeline has failed/blocked steps; inspect report and explicitly resume'}
             # Recheck owned outputs and inputs while guards still held. Runtime
             # installation inventory is re-scanned on every new attempt.

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg_lighting" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222733"/>
+      <stop offset="100%" stop-color="#141820"/>
+    </linearGradient>
+    <radialGradient id="glow_lighting" cx="30%" cy="25%" r="72%">
+      <stop offset="0%" stop-color="#FACC15" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#713F12" stop-opacity="0.02"/>
+    </radialGradient>
+    <linearGradient id="badge_lighting" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="35%" stop-color="#FACC15"/>
+      <stop offset="100%" stop-color="#FACC15"/>
+    </linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13.5" fill="url(#bg_lighting)" stroke="#FACC15" stroke-width="2.4" stroke-opacity="0.92"/>
+  <rect x="3.8" y="3.8" width="56.4" height="56.4" rx="12.2" fill="url(#glow_lighting)"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+          <polygon points="27,16 11,43 43,43" fill="#FACC15" fill-opacity="0.24"/>
+          <line x1="22" y1="22" x2="12" y2="42" stroke="#FEF08A" stroke-width="2.2" stroke-opacity="0.85"/>
+          <line x1="32" y1="22" x2="41" y2="40" stroke="#FEF08A" stroke-width="2.2" stroke-opacity="0.85"/>
+          <line x1="27" y1="24" x2="27" y2="43" stroke="#FACC15" stroke-width="2.2" stroke-dasharray="3,2.5"/>
+          <path d="M18,19 C18,12.5 22,10 27,10 C32,10 36,12.5 36,19 Z" fill="#FACC15" stroke="#FFFFFF" stroke-width="2.4"/>
+          <line x1="12" y1="14" x2="15" y2="16" stroke="#FEF08A" stroke-width="2.3"/>
+          <line x1="42" y1="14" x2="39" y2="16" stroke="#FEF08A" stroke-width="2.3"/>
+        
+  </g>
+  <rect x="34" y="34" width="28" height="28" rx="8" fill="#11141B"/>
+  <rect x="36.2" y="36.2" width="23.6" height="23.6" rx="6.2" fill="url(#badge_lighting)"/>
+  <text x="48" y="53.6" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-weight="900" font-size="16.5" fill="#1C1917">L</text>
+</svg>

@@ -1,6 +1,6 @@
 ---
 name: blender-rigging
-description: 设计、制作与修复 Blender 角色、生物及可动游戏资产的骨架、蒙皮权重、面部表情、次级动态与动作重定向。也适用于已有角色的身体 FBX、摆姿、脚底接触和现场手调接续。
+description: 设计、制作与修复 Blender 角色、生物及可动游戏资产的骨架、蒙皮权重、面部表情、次级动态与动作重定向。也用于已有 C94 和普通原生 FK 人形的外部 FBX、肩带摆姿、脚底接触与现场手调交接。
 metadata:
   version: "1.0.0"
 ---
@@ -16,16 +16,17 @@ $ctl = './blenderctl.ps1'
 & $ctl discover --product rigging
 
 # 查看当前推荐候选或固定版的具体动作
-$edition = '<发行版>'
-& $ctl discover --product rigging --edition $edition --actions
+& $ctl discover --product rigging --edition <发行版> --actions
 ```
 
-## 第一步：摸清运动职责，选最轻的绑定路线
+## 第一步：摸清运动职责，按双路线分流（严禁绕开自研插件）
 
-先读上游交来的模型工作副本、对象名清单和委托动作范围，算出源文件 SHA-256 留作基线。把每个活动部件的职责拆成四句话：允许怎么动、挂在谁身上、由哪一层变形、交给谁消费。
+先读上游交来的模型工作副本、对象名清单和委托动作范围，算出源文件 SHA-256 留作基线。把每个活动部件的职责拆成四句话：允许怎么动、挂在谁身上、由哪一层变形、交给谁消费。**查清自研插件 `rigging_workflow` 能力时，除了查 `discover --product rigging --edition 0.42.3-agent-v003 --actions`，还须一并核查 `--query modular` 与 `work/rigging-agent-workflow-20261124-v003/rigging_workflow/` 内的模块化接口，不得仅因 `candidate-entry` 面向 C94 人形就绕开自研插件改写裸 Rigify + Blender 原生 `ARMATURE_AUTO` 热力蒙皮脚本。**
 
 - **简单刚性运动**：台灯摆臂、旋钮旋转、门盖开合这类整件绕轴或沿轨运动的道具，直接设准物体原点、父子层级或基础变换约束即可交动画，省去整套骨架维护。
-- **角色全身与生物四肢**：先查清物种的真实解剖关系，再选模板或模块化骨架。遇到陌生生物、特殊机构或未知目标引擎规则，先做只读拆解和资料复现，把关节中心与运动规律理顺再建骨。
+- **C94 人形角色（私有模板路线）**：沿用 C94 定位图谱与私有骨架模板时，走 `rigging-workflow candidate-entry`（整角色多域体素蒙皮与同作业转权）及 `0.40.1` 的 `c94_workflow.*` 入口。
+- **独立人形与四足生物（自研模块化路线，`HUMAN` / `QUADRUPED`）**：不依赖 C94 私有模板的新人形、犬猫/羊兔等四足动物，**优先走自研 `rigging_workflow` v003 的模块化同核接口**（`modular_rig` + `modular_positioning` + `modular_neutral` + `modular_workflow.start_binding`；参见同目录下 `MODULAR-USER-GUIDE.md` 与 `MODULAR-AI-CALLS.md`）。该路线底层由插件合规调用 Blender 自带 Rigify 组件（固定 `segments=1, bbones=1`）并叠加自研角色元数据、B-Bone 中立校验与 26 邻接防穿面体素场蒙皮，避免裸手写脚本丢元数据与热力跨肢体串权。遇到非标准物种、特殊机构或需要额外附属链（如长耳/饰品）时，先做只读拆解并在模块化核心之上显式记录扩展边界。
+- **1.0 开发版人形**从 `tools/addons/rigging_workflow` 装载。配置 `fingers.L`、`fingers.R` 与 `face`，分别启用双手五指与面部。双足支持 `segments=2, bbones=2`，从既有工程读取时沿用每个参考的已保存参数。用 `semantic_rig_map.describe(rig)` 检查 C4 的骨骼和可写控件映射。导出时使用 `semantic_rig_map.write(rig, path)` 写入新的 JSON 文件。
 - **已有外部绑定或旧角色返修**：先只读识别原骨架、控制器、形态键、Action 和驱动依赖。用户要求保原架构就走原骨架维护路线；需要换成工作台体系就在独立副本上重建并核对迁权映射。
 
 详细原理与跨物种方案见 [变形原理、解剖与身体方案](references/anatomy-and-body-plans.md)，交互道具、载具、武器、植被、柔性物与运行时消费见 [游戏可动资产与运行时消费](references/game-assets-and-runtime.md)。
@@ -44,7 +45,9 @@ $edition = '<发行版>'
 
 ## 第三步：体素蒙皮、部件转权与局部修权
 
-骨架通过审看①并拿到匹配回执后，再在工作副本上求权和修权。新角色默认走体素蒙皮公共入口，按部件性质分流：身体走单域或多域体素求解，贴体衣物从已应用身体做同作业转权，硬饰品走刚性单骨绑定。
+骨架通过审看①并拿到匹配回执后，再在工作副本上求权和修权。**无论 C94 人形还是独立模块化人形/四足，默认一律走自研 26 邻接体素蒙皮核心，禁止绕开体素求解器改用 Blender 原生 `ARMATURE_AUTO` 自动热力权重兜底**：
+- **C94 整角色**走 `rigging-workflow candidate-entry`（单/多域体素求解 + 同作业部件转权 + 刚性单骨绑定）；
+- **独立模块化人形/四足（`HUMAN` / `QUADRUPED`）**走 `rigging_workflow` v003 的 `modular_workflow.start_binding`（内部体素代理 `AUTO`/`VOXEL` + 26 邻接体积场 + 有界重心表面回写，并留存 `field-support.json` 与 `transfer-projection.npz` 回执；贴体服装与刚性附件接续走 `skinning_policy.prepare_transfer` / `prepare_rigid`）。
 
 ```powershell
 # 1. 检查整角色输入、复算域与同作业转权范围、求权试片与冷开核对
@@ -73,8 +76,8 @@ $edition = '<发行版>'
 
 ## 第五步：动作重定向、现场接续与交给下游
 
-- **已有 C94 与普通原生 FK 人形**。接身体 FBX、摆三拍、校核肩带或修脚跟时，先用 `rigging-workflow phase3 describe` 确认 Win53 专项开发候选。按带 SHA 的目标副本生成独立 Action，记录源 Take、目标 Slot 及两端时基。在自有工作窗口写入手调键，再捕获并独立重开。 [已有角色的摆姿、动作迁移与窗口接续](references/rigging-posing-win53.md)
-- **接外部动作与修脚底接触**：导入 MMD（PMX/VMD）或通用 FK（BVH/FBX）动捕时，通过 `discover --product rigging` 查清重定向队列与转换入口，按源帧率与目标帧率对齐身体和表情通道，记录 Action 与 Slot。出现脚滑或穿地时，走后台足底检测并生成交接单，送到现场审阅确认或撤回。用户在打开窗口里做了手调时，先走 `rigging-workflow session-live` 收拢状态再存副本。详见 [动作重定向与工作台 CLI 操练](references/retargeting-and-cli-operations.md)。
+- **已有 C94 与原生 FK 人形**：接 Mixamo、Cascadeur 等已授权 FBX，按原骨录制三拍、校核肩带或修脚跟支撑时，从 `rigging-workflow phase3 describe` 查当前公开能力。用带 SHA 的目标工作副本生成独立 Action，记录源 Take、目标 Action/Slot 和时基。自有工作窗口里的手调先写键，再用同一命令族的现场快照接续。[原控件摆姿、接片和手调步骤](references/rigging-posing-win53.md)
+- **MMD、BVH 与其他历史专用队列**：通过 `discover --product rigging` 找该来源与宿主的专用入口。身体和表情各自确认 Action/Slot、源帧率与目标时钟，足底接触按所用队列的报告、预览和撤回步骤走。[动作重定向与工作台 CLI 操练](references/retargeting-and-cli-operations.md)
 - **独立冷开并交接动画部门**：最终交付副本另起进程冷开复验，核对源 SHA、部件拓扑与 UV 完整、全部变形骨权非零覆盖、代表姿态无爆点且能干净回静置姿态。交付清单写齐以下四项：
   1. 保存好的绑定工程副本路径与 SHA-256。
   2. 控制器清单、常用控制板布局，以及一键回静置姿态的步骤。
@@ -98,6 +101,7 @@ $edition = '<发行版>'
 - [体素蒙皮、局部修权与变形诊断](references/voxel-skinning-and-local-repair.md)
 - [面部表情、姿态修形与控制板](references/face-correctives-and-controls.md)
 - [服装、附属物与次级动态](references/garments-accessories-and-dynamics.md)
+- [原控件摆姿、接片和现场续作](references/rigging-posing-win53.md)
 - [动作重定向与工作台 CLI 操练](references/retargeting-and-cli-operations.md)
 - [游戏可动资产与运行时消费](references/game-assets-and-runtime.md)
 - [历史发行版、审计路径与来源台账](references/sources.md)

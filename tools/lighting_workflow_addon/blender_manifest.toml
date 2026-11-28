@@ -1,10 +1,10 @@
 schema_version = "1.0.0"
 id = "lighting_workflow"
-version = "0.2.1"
-name = "Lighting Workflow"
-tagline = "Create and edit managed lighting rigs with explicit recovery"
+version = "1.1.0"
+name = "L·灯光 · 商业灯光工作台"
+tagline = "受管商业布光、色温与IES配光、体积雾及GPU自动测光"
 maintainer = "Blender AI"
 type = "add-on"
 tags = ["Lighting", "Render"]
-blender_version_min = "5.2.0"
+blender_version_min = "5.3.0"
 license = ["SPDX:GPL-3.0-or-later"]

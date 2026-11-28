@@ -6,7 +6,7 @@ import ctypes,hashlib,json,math,os,subprocess,sys,time,uuid
 from ctypes import wintypes as w
 import processes as owned_processes
 from compositing_encode_contract import (EncodeError,require,normalize_params,anchor_documents,
-                                        producer_documents,signature,from_row,mapping_policy)
+                                        producer_documents,signature,from_row,mapping_policy,PQ_VIEWS,PROJECT_VIEW)
 
 def digest(path):
     h=hashlib.sha256()
@@ -19,6 +19,25 @@ def atomic_json(path,value):
     path=Path(path);temp=path.with_name(path.name+'.new.'+uuid.uuid4().hex)
     with temp.open('x',encoding='utf-8') as f:json.dump(value,f,indent=2,allow_nan=False)
     os.replace(temp,path)
+def project_display_processor(config, source, selection, expected_interop, ocio):
+    display,view=selection['display'],selection['view']
+    require(display in config.getDisplays() and view in config.getViews(display),
+            'Configured display/view is unavailable: '+display+'/'+view,'INVALID_REQUEST')
+    display_space=config.getDisplayViewColorSpaceName(display,view)
+    space=config.getColorSpace(display if display_space=='<USE_DISPLAY_NAME>' else display_space)
+    require(space is not None and not space.isData() and space.getInteropID()==expected_interop,
+            'Configured display does not match the required physical encoding '+expected_interop,'INVALID_REQUEST')
+    return config.getProcessor(source,display,view,ocio.TRANSFORM_DIR_FORWARD)
+
+
+def verify_processor_dependencies(processor, closure):
+    files=list(processor.getProcessorMetadata().getFiles())
+    looks=list(processor.getProcessorMetadata().getLooks())
+    require(not looks and all(os.path.normcase(str(Path(file).resolve())) in closure for file in files),
+            'Processor look or consumed file outside guarded OCIO closure','CONFLICT')
+    return files, looks
+
+
 def implementation_identity():
     files=[describe(Path(__file__).with_name(name)) for name in ('compositing_encode.py','compositing_encode_contract.py','processes.py','bootstrap.py')]
     require(Path(owned_processes.__file__).resolve()==Path(__file__).with_name('processes.py').resolve(),'Owned process module path differs','CONFLICT')
@@ -223,20 +242,32 @@ def worker(job):
             cs=selected[0]['output_color_space'];cfg=ocio.Config.CreateFromFile(producer['source_color_identity']['ocio']['file']);cfg.validate()
             require(cfg.getColorSpace(cs['name']) is not None and cfg.getColorSpace(cs['name']).getInteropID()==cs['interop_id'],'Output OCIO space/interop differs')
             working=producer['source_color_identity']['working_space'];require(cfg.getColorSpace(ocio.ROLE_SCENE_LINEAR).getName()==working['name'] and cfg.getColorSpace(working['name']).getInteropID()==working['interop_id'],'Producer working-role differs from actual OCIO')
-            policy=mapping_policy(p);hdr=policy['kind']=='OCIO_DISPLAY_VIEW'
-            if hdr:
-                require(ocio.__version__=='2.5.0','This exact AgX mapping currently qualifies OCIO2.5.0 only','UNSUPPORTED')
+            policy=mapping_policy(p)
+            hdr=policy['kind'] in PQ_VIEWS
+            project_policy=policy['kind']==PROJECT_VIEW
+            p3_master=hdr and not project_policy
+            white_nits=policy['declared_display_reference_white_nits'] if hdr else p['encode_color']['reference_white_nits']
+            if project_policy:
+                processor=project_display_processor(cfg,cs['name'],policy,'pq_rec2020_display',ocio)
+            elif hdr:
+                require(ocio.__version__=='2.5.0','The original AgX mapping requires OCIO 2.5.0','UNSUPPORTED')
                 processor=cfg.getProcessor(cs['name'],policy['display'],policy['view'],ocio.TRANSFORM_DIR_FORWARD)
             else:processor=cfg.getProcessor(cs['name'],'Linear Rec.2020')
             cpu=processor.getOptimizedCPUProcessor(ocio.BIT_DEPTH_F32,ocio.BIT_DEPTH_F32,ocio.OPTIMIZATION_NONE)
-            consumed=list(processor.getProcessorMetadata().getFiles());looks=list(processor.getProcessorMetadata().getLooks())
             closure={os.path.normcase(str(Path(d['file']).resolve())) for d in producer['color_immutable_inputs']['files']}
-            require(not looks and all(os.path.normcase(str(Path(f).resolve())) in closure for f in consumed),'Processor look or consumed file outside guarded OCIO closure','CONFLICT')
+            consumed,looks=verify_processor_dependencies(processor,closure)
+            inspection={'display':'sRGB','view':'AgX' if hdr else 'Standard'}
+            if project_policy:
+                inspection=policy['sdr_preview']
+                preview_processor=project_display_processor(cfg,cs['name'],inspection,'srgb_rec709_display',ocio)
+                verify_processor_dependencies(preview_processor,closure)
+            else:
+                preview_processor=cfg.getProcessor(cs['name'],inspection['display'],inspection['view'],ocio.TRANSFORM_DIR_FORWARD)
             report['mapping_policy']=policy
             report['reference_transform']={'source_actual_output_space':cs,'target_linear_space':None if hdr else 'Linear Rec.2020','method':'Exact OCIO display/view CPU F32 OPTIMIZATION_NONE, explicit EV before view, alreadyPQ, no white gain' if hdr else 'OCIO CPU F32 OPTIMIZATION_NONE then analytic ST2084, explicit reference white and EV','processor_cache_id':processor.getCacheID(),'processor_files':consumed,'processor_looks':looks,'source_view_preserved_record_only':producer['source_color_identity']['view'],'source_exposure_recorded_only':producer['source_color_identity']['view']['exposure'],'encode_exposure_applied_only':p['encode_color']['exposure'],'source_display_policy':'EXPLICIT_OVERRIDE; no source style or perceptual equivalence acceptance'}
             if hdr:
                 neutral=np.ones((1,3),np.float32);cpu.applyRGB(neutral)
-                report['reference_transform'].update(declared_display_reference_white_nits=100,extra_gain='NONE',scene_unity_nits_channels=eotf(neutral)[0].tolist(),scene_unity_weighted_Y_nits=float(eotf(neutral)[0]@np.array([.2627,.678,.0593])),view_nominal_peak_nits=1000,strict_decoded_peak_guarantee=False)
+                report['reference_transform'].update(declared_display_reference_white_nits=white_nits,extra_gain='NONE',scene_unity_nits_channels=eotf(neutral)[0].tolist(),scene_unity_weighted_Y_nits=float(eotf(neutral)[0]@np.array([.2627,.678,.0593])),view_nominal_peak_nits=1000,strict_decoded_peak_guarantee=False)
             if 'resume' in p:
                 old=json.loads(Path(p['resume']['file']).read_text(encoding='utf-8'))
                 require(old.get('status')=='passed' and old['request_signature']==report['request_signature'] and old['implementation']==report['implementation'],'Only identical passed previous output can be reused','CONFLICT')
@@ -261,12 +292,13 @@ def worker(job):
                         else:rgb=rgb+(1-alpha[:,:,None])*np.array(p['alpha']['matte_rgb_output_linear'],dtype=np.float32)
                         alpha_rows.append({'index':index,'min':float(alpha.min()),'max':float(alpha.max()),'policy':p['alpha'],'association':'opaque' if p['alpha']['mode']=='require_opaque' else 'explicit caller PREMUL assertion; physical association not inferable from pixels','formula':'RGBpremul+(1-A)*matte in actual output-linear space' if p['alpha']['mode']=='composite_matte' else 'all A exactly1'})
                         if index==0:
-                            inspection_view='AgX' if hdr else 'Standard'
-                            display=cfg.getProcessor(cs['name'],'sRGB',inspection_view,ocio.TRANSFORM_DIR_FORWARD).getOptimizedCPUProcessor(ocio.BIT_DEPTH_F32,ocio.BIT_DEPTH_F32,ocio.OPTIMIZATION_NONE)
+                            inspection_view=inspection['view']
+                            display=preview_processor.getOptimizedCPUProcessor(
+                                ocio.BIT_DEPTH_F32,ocio.BIT_DEPTH_F32,ocio.OPTIMIZATION_NONE)
                             preview=rgb.copy()*np.float32(2**p['encode_color']['exposure']);display.applyRGB(preview)
                             step=max(1,math.ceil(max(width,height)/1600));preview=np.clip(preview[::step,::step],0,1)
                             image=oiio.ImageOutput.create(str(out/'standard-sdr-inspection.png'));ps=oiio.ImageSpec(preview.shape[1],preview.shape[0],3,oiio.UINT8);require(image.open(str(out/'standard-sdr-inspection.png'),ps),'Cannot write SDR inspection preview');require(image.write_image((preview*255+.5).astype(np.uint8)),'SDR preview write failed');image.close()
-                            report['sdr_preview']={**describe(out/'standard-sdr-inspection.png'),'width':preview.shape[1],'height':preview.shape[0],'view':inspection_view,'scope':inspection_view+' sRGB SDR inspection only; not HDR viewing or style acceptance'}
+                            report['sdr_preview']={**describe(out/'standard-sdr-inspection.png'),'width':preview.shape[1],'height':preview.shape[0],'view':inspection_view,'display':inspection['display'],'scope':'SDR inspection of the chosen OCIO view'}
                             inputs.protect(from_row(report['sdr_preview']))
                         if hdr:
                             rgb*=np.float32(2**p['encode_color']['exposure']);cpu.applyRGB(rgb)
@@ -282,12 +314,13 @@ def worker(job):
             report['references']=refs;report['source_decode']=source_decode;report['reference_stats']=reference_stats
             inputs.protect(from_row(describe(raw)))
             fps=str(p['fps'][0])+'/'+str(p['fps'][1]);size=str(width)+'x'+str(height);ffmpeg=p['runtime']['ffmpeg']['file'];ffprobe=p['runtime']['ffprobe']['file'];yuv=out/'prepared-limited42010.yuv'
-            vf='zscale=matrixin=gbr:matrix=bt2020nc:primariesin=bt2020:primaries=bt2020:transferin=smpte2084:transfer=smpte2084:rangein=full:range=limited:npl='+str(100 if hdr else p['encode_color']['reference_white_nits'])+':agamma=0:dither=error_diffusion,format=yuv420p10le'
+            vf='zscale=matrixin=gbr:matrix=bt2020nc:primariesin=bt2020:primaries=bt2020:transferin=smpte2084:transfer=smpte2084:rangein=full:range=limited:npl='+str(white_nits)+':agamma=0:dither=error_diffusion,format=yuv420p10le'
             command([ffmpeg,'-v','error','-f','rawvideo','-pixel_format','gbrpf32le','-video_size',size,'-framerate',fps,'-i',raw,'-vf',vf,'-f','rawvideo','-pix_fmt','yuv420p10le','-n',yuv],'prepare-yuv')
             inputs.protect(from_row(describe(yuv)))
             pending={'max_cll':math.ceil(max(s['max_cll_nits'] for s in reference_stats)),'max_fall':math.ceil(max(s['frame_average_nits'] for s in reference_stats))};attempts=[]
             for attempt in range(1,3):
-                video=out/f'attempt-{attempt:02d}.mp4';master='G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,1)' if hdr else 'G(8500,39850)B(6550,2300)R(35400,14600)WP(15635,16450)L(100000000,1)'
+                video=out/f'attempt-{attempt:02d}.mp4';master='G(13250,34500)B(7500,3000)R(34000,16000)' if p3_master else 'G(8500,39850)B(6550,2300)R(35400,14600)'
+                master+=f"WP(15635,16450)L({p['mastering']['max_nits']*10000},1)"
                 params=':'.join(['hdr10=1','hdr10-opt=0','master-display='+master,f"max-cll={pending['max_cll']},{pending['max_fall']}",'repeat-headers=1','colorprim=bt2020','transfer=smpte2084','colormatrix=bt2020nc','range=limited','pools=none','frame-threads=1','wpp=0','bframes=0','keyint='+str(max(count,3)),'log-level=1'])
                 cicp=['-color_primaries','bt2020','-color_trc','smpte2084','-colorspace','bt2020nc','-color_range','tv']
                 command([ffmpeg,'-v','error','-f','rawvideo','-pixel_format','yuv420p10le','-video_size',size,'-framerate',fps,*cicp,'-i',yuv,'-c:v','libx265','-preset',p['quality']['preset'],'-crf',str(p['quality']['crf']),'-profile:v','main10','-pix_fmt','yuv420p10le',*cicp,'-x265-params',params,'-tag:v','hvc1','-movflags','+faststart+write_colr','-metadata','comment=Virtual technical target only; no measured mastering display','-an','-n',video],f'encode-{attempt}')
@@ -300,8 +333,8 @@ def worker(job):
                 formatok=all(stream.get(k)==v for k,v in {'codec_name':'hevc','profile':'Main 10','codec_tag_string':'hvc1',**frame_cicp,'nb_read_frames':str(count)}.items()) and Fraction(stream['avg_frame_rate'])==Fraction(*p['fps']) and len(frames)==count and all(all(f.get(k)==v for k,v in frame_cicp.items()) for f in frames)
                 duration=Fraction(count*p['fps'][1],p['fps'][0]);timebase=Fraction(stream['time_base']);timingok=abs(Fraction(stream['duration'])-duration)<=timebase
                 for i,f in enumerate(frames):timingok=timingok and abs(Fraction(f['best_effort_timestamp_time'])-Fraction(i*p['fps'][1],p['fps'][0]))<=timebase
-                expected_master={'red_x':Fraction(35400,50000),'red_y':Fraction(14600,50000),'green_x':Fraction(8500,50000),'green_y':Fraction(39850,50000),'blue_x':Fraction(6550,50000),'blue_y':Fraction(2300,50000),'white_point_x':Fraction(15635,50000),'white_point_y':Fraction(16450,50000),'min_luminance':Fraction(1,10000),'max_luminance':Fraction(10000)}
-                if hdr:expected_master.update(red_x=Fraction(34000,50000),red_y=Fraction(16000,50000),green_x=Fraction(13250,50000),green_y=Fraction(34500,50000),blue_x=Fraction(7500,50000),blue_y=Fraction(3000,50000),max_luminance=Fraction(1000))
+                expected_master={'red_x':Fraction(35400,50000),'red_y':Fraction(14600,50000),'green_x':Fraction(8500,50000),'green_y':Fraction(39850,50000),'blue_x':Fraction(6550,50000),'blue_y':Fraction(2300,50000),'white_point_x':Fraction(15635,50000),'white_point_y':Fraction(16450,50000),'min_luminance':Fraction(1,10000),'max_luminance':Fraction(p['mastering']['max_nits'])}
+                if p3_master:expected_master.update(red_x=Fraction(34000,50000),red_y=Fraction(16000,50000),green_x=Fraction(13250,50000),green_y=Fraction(34500,50000),blue_x=Fraction(7500,50000),blue_y=Fraction(3000,50000),max_luminance=Fraction(1000))
                 metadataok=True
                 for f in frames:
                     masters=[s for s in f.get('side_data_list',[]) if s.get('side_data_type')=='Mastering display metadata'];clls=[s for s in f.get('side_data_list',[]) if s.get('side_data_type')=='Content light level metadata']
@@ -337,7 +370,7 @@ def worker(job):
             report['checks'].update(format=last['format'],bt2100_video_data=last['bt2100_video_data'],full_pts_duration=last['all_pts_duration'],every_frame_metadata=last['every_frame_metadata'],final_decode_metadata_binding='pass' if last['metadata_bound_to_decode'] else 'fail',full_frame_reference_fidelity='pass' if fidelityok else 'fail',zero_rgb_excursions='diagnostic_only_not_normative_gate',alpha='pass',all_inputs_sha='pending')
             inputs.recheck();report['input_guarded_files']=list(inputs.files.values());report['checks']['all_inputs_sha']='pass';require(all(report['checks'][k]=='pass' for k in ['format','bt2100_video_data','full_pts_duration','every_frame_metadata','final_decode_metadata_binding','full_frame_reference_fidelity','alpha','all_inputs_sha']),'Bounded encode verification failed')
             report['status']='passed';report['reused_validated_output']=False
-            report['limits']=[('AgXHDR exact view override; source exposure recorded, explicit encode EV only, no white gain or perceptual match acceptance.' if hdr else 'Standard explicit override changes sourceAgX appearance; no artistic acceptance.'),'No measured mastering display or HDR viewing.','NormalizedPQ statistics clipping is explicit policy, not established CTA mandate.','RGB excursions retained as diagnostics, not automatically normativeFAIL.','NativeHIGH/LOSSLESS3%FAIL and strict1000 experimentFAIL remain unchanged.']
+            report['limits']=[('PQ view override applies explicit encode exposure and records source exposure separately.' if hdr else 'Standard explicit override changes sourceAgX appearance; no artistic acceptance.'),'No measured mastering display or HDR viewing.','NormalizedPQ statistics clipping is explicit policy, not established CTA mandate.','RGB excursions retained as diagnostics, not automatically normativeFAIL.','NativeHIGH/LOSSLESS3%FAIL and strict1000 experimentFAIL remain unchanged.']
             report['artifacts']=[describe(x) for x in out.iterdir() if x.is_file() and x.name not in ['worker.stdout.log','worker.stderr.log','binding.json']]
     except Exception as e:
         report['error']={'code':getattr(e,'code','WORKER_FAILED'),'type':type(e).__name__,'message':str(e)}

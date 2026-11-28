@@ -106,7 +106,7 @@ metadata:
 
 ## 看图与传图
 
-传进会话的图，最长边 2048 像素以内，每张 2 MiB 以内。日常各阶段快检（白模布线、随机分件色、MatCap 曲面、法线红蓝翻面、LookDev 材质叠半透明线框、Cycles DLSS/OptiX 或 EEVEE Next 快速渲染预览）统一优先用 `./blenderctl.ps1 preview <file.blend>` 一键直出（已默认限宽 ≤ 2048px 且隔离桌面零干扰，多轮迭代可开 `preview session` 复用）；正式成片大原图留着原件，另做预览图传进会话。照片和渲染用 JPEG，透明图、线稿、文字用 PNG。
+传进会话的图，最长边 2048 像素以内，每张 2 MiB 以内。日常各阶段快检（白模布线、随机分件色、MatCap 曲面、法线红蓝翻面、LookDev 材质叠半透明线框、Cycles DLSS/OptiX 或 EEVEE Next 快速渲染预览）统一优先用 `blenderctl.ps1 preview <file.blend>` 一键直出（已默认限宽 ≤ 2048px 且隔离桌面零干扰，多轮迭代可开 `preview session` 复用）；正式成片大原图留着原件，另做预览图传进会话。照片和渲染用 JPEG，透明图、线稿、文字用 PNG。
 
 ## 例子：一盏桌面台灯
 
@@ -124,7 +124,7 @@ metadata:
 
 ## 参考
 
-- `部门卡`
+- [部门卡：前期参考](references/departments/reference.md)（其余 9 张部门卡见上表）
 - [各领域验收要点](references/domain-acceptance.md)
 - [技能写作规范](references/skill-writing-guide.md)
 - [已有制作方法](references/method-index.md)

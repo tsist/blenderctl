@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg_hard_surface" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222733"/>
+      <stop offset="100%" stop-color="#141820"/>
+    </linearGradient>
+    <radialGradient id="glow_hard_surface" cx="30%" cy="25%" r="72%">
+      <stop offset="0%" stop-color="#4F8BFF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#1E3A8A" stop-opacity="0.02"/>
+    </radialGradient>
+    <linearGradient id="badge_hard_surface" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BFDBFE"/>
+      <stop offset="35%" stop-color="#4F8BFF"/>
+      <stop offset="100%" stop-color="#4F8BFF"/>
+    </linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13.5" fill="url(#bg_hard_surface)" stroke="#4F8BFF" stroke-width="2.4" stroke-opacity="0.92"/>
+  <rect x="3.8" y="3.8" width="56.4" height="56.4" rx="12.2" fill="url(#glow_hard_surface)"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+          <polygon points="17,11 40,11 47,18 47,36 39,45 14,45 11,39 11,17" fill="#4F8BFF" fill-opacity="0.22" stroke="#F1F5F9" stroke-width="2.6"/>
+          <polygon points="24,11 40,11 47,18 33,26 24,20" fill="#4F8BFF" fill-opacity="0.45" stroke="#BFDBFE" stroke-width="2.1"/>
+          <path d="M17,28 L29,28 L33,34 L17,34 Z" fill="#141820" stroke="#4F8BFF" stroke-width="2.2"/>
+          <circle cx="19" cy="18.5" r="2.2" fill="#BFDBFE"/>
+        
+  </g>
+  <rect x="34" y="34" width="28" height="28" rx="8" fill="#11141B"/>
+  <rect x="36.2" y="36.2" width="23.6" height="23.6" rx="6.2" fill="url(#badge_hard_surface)"/>
+  <text x="48" y="53.6" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-weight="900" font-size="16.5" fill="#FFFFFF">H</text>
+</svg>

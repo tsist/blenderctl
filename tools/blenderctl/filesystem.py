@@ -1,6 +1,7 @@
 """Windows file identity, deny-write guards, and rename without replacing a destination."""
 import ctypes
 from ctypes import wintypes as w
+from functools import lru_cache
 import hashlib
 import os
 from pathlib import Path
@@ -8,6 +9,7 @@ from pathlib import Path
 from protocol import Failure
 
 
+@lru_cache(maxsize=1)
 def kernel():
     if os.name != "nt":
         raise Failure("UNSUPPORTED", "Transactions currently require Windows")
@@ -27,6 +29,12 @@ def kernel():
         getattr(k, name).argtypes = args
         getattr(k, name).restype = result
     return k
+
+
+class _FileInformation(ctypes.Structure):
+    _fields_ = [("attributes", w.DWORD), ("created", w.FILETIME), ("accessed", w.FILETIME),
+                ("written", w.FILETIME), ("volume", w.DWORD), ("size_high", w.DWORD),
+                ("size_low", w.DWORD), ("links", w.DWORD), ("index_high", w.DWORD), ("index_low", w.DWORD)]
 
 
 def native_path(path):
@@ -76,19 +84,16 @@ class FileGuard:
             self.handle = None
             fail_io(f"Cannot guard {self.path}")
         try:
-            attributes = self._information().attributes
-            if attributes & 0x400 or (not directory and attributes & 0x10):
+            info = self._information()
+            if info.attributes & 0x400 or (not directory and info.attributes & 0x10):
                 raise Failure("CONFLICT", "Reparse points and non-regular transaction files are forbidden")
+            self.size = (info.size_high << 32) | info.size_low
         except BaseException:
             self.close()
             raise
 
     def _information(self):
-        class Info(ctypes.Structure):
-            _fields_ = [("attributes", w.DWORD), ("created", w.FILETIME), ("accessed", w.FILETIME),
-                        ("written", w.FILETIME), ("volume", w.DWORD), ("size_high", w.DWORD),
-                        ("size_low", w.DWORD), ("links", w.DWORD), ("index_high", w.DWORD), ("index_low", w.DWORD)]
-        info = Info()
+        info = _FileInformation()
         if not self.k.GetFileInformationByHandle(self.handle, ctypes.byref(info)):
             fail_io("GetFileInformationByHandle")
         return info
@@ -100,7 +105,7 @@ class FileGuard:
     def chunks(self, checkpoint=lambda: None):
         if not self.k.SetFilePointerEx(self.handle, 0, None, 0):
             fail_io("SetFilePointerEx")
-        buffer = ctypes.create_string_buffer(1024 * 1024)
+        buffer = ctypes.create_string_buffer(max(1, min(1024 * 1024, self.size)))
         count = w.DWORD()
         while True:
             checkpoint()
@@ -108,7 +113,7 @@ class FileGuard:
                 fail_io("ReadFile")
             if not count.value:
                 break
-            yield buffer.raw[:count.value]
+            yield ctypes.string_at(buffer, count.value)
 
     def sha256(self, checkpoint=lambda: None):
         digest = hashlib.sha256()

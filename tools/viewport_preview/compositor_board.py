@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Contact-sheet board composer with crisp built-in bitmap headers and 2048px cap."""
+"""Contact-sheet board composer with TrueType headers and 2048px cap."""
 
 from __future__ import annotations
 
 import os
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, TYPE_CHECKING
 
@@ -11,93 +12,53 @@ if TYPE_CHECKING:
     import numpy as np
 
 
-# Clean 5x7 uppercase ASCII bitmap font (no external font files required).
-_GLYPHS: dict[str, tuple[int, ...]] = {
-    "A": (14, 17, 17, 31, 17, 17, 17),
-    "B": (30, 17, 17, 30, 17, 17, 30),
-    "C": (14, 17, 16, 16, 16, 17, 14),
-    "D": (30, 17, 17, 17, 17, 17, 30),
-    "E": (31, 16, 16, 30, 16, 16, 31),
-    "F": (31, 16, 16, 30, 16, 16, 16),
-    "G": (14, 17, 16, 23, 17, 17, 15),
-    "H": (17, 17, 17, 31, 17, 17, 17),
-    "I": (14, 4, 4, 4, 4, 4, 14),
-    "J": (7, 2, 2, 2, 18, 18, 12),
-    "K": (17, 18, 20, 24, 20, 18, 17),
-    "L": (16, 16, 16, 16, 16, 16, 31),
-    "M": (17, 27, 21, 21, 17, 17, 17),
-    "N": (17, 25, 21, 19, 17, 17, 17),
-    "O": (14, 17, 17, 17, 17, 17, 14),
-    "P": (30, 17, 17, 30, 16, 16, 16),
-    "Q": (14, 17, 17, 17, 21, 18, 13),
-    "R": (30, 17, 17, 30, 20, 18, 17),
-    "S": (15, 16, 16, 14, 1, 1, 30),
-    "T": (31, 4, 4, 4, 4, 4, 4),
-    "U": (17, 17, 17, 17, 17, 17, 14),
-    "V": (17, 17, 17, 17, 10, 10, 4),
-    "W": (17, 17, 17, 21, 21, 27, 17),
-    "X": (17, 17, 10, 4, 10, 17, 17),
-    "Y": (17, 17, 10, 4, 4, 4, 4),
-    "Z": (31, 1, 2, 4, 8, 16, 31),
-    "0": (14, 17, 19, 21, 25, 17, 14),
-    "1": (4, 12, 4, 4, 4, 4, 14),
-    "2": (14, 17, 1, 2, 4, 8, 31),
-    "3": (30, 1, 1, 14, 1, 1, 30),
-    "4": (2, 6, 10, 18, 31, 2, 2),
-    "5": (31, 16, 16, 30, 1, 1, 30),
-    "6": (14, 16, 16, 30, 17, 17, 14),
-    "7": (31, 1, 2, 4, 8, 8, 8),
-    "8": (14, 17, 17, 14, 17, 17, 14),
-    "9": (14, 17, 17, 15, 1, 1, 14),
-    "-": (0, 0, 0, 31, 0, 0, 0),
-    "+": (0, 4, 4, 31, 4, 4, 0),
-    " ": (0, 0, 0, 0, 0, 0, 0),
-    "_": (0, 0, 0, 0, 0, 0, 31),
-    ".": (0, 0, 0, 0, 0, 6, 6),
-    ",": (0, 0, 0, 0, 0, 6, 4),
-    ":": (0, 6, 6, 0, 6, 6, 0),
-    "/": (1, 2, 2, 4, 8, 8, 16),
-    "(": (2, 4, 8, 8, 8, 4, 2),
-    ")": (8, 4, 2, 2, 2, 4, 8),
-    "[": (14, 8, 8, 8, 8, 8, 14),
-    "]": (14, 2, 2, 2, 2, 2, 14),
-    "<": (2, 4, 8, 16, 8, 4, 2),
-    ">": (8, 4, 2, 1, 2, 4, 8),
-    "=": (0, 0, 31, 0, 31, 0, 0),
-    "%": (25, 25, 2, 4, 8, 19, 19),
-    "?": (14, 17, 1, 2, 4, 0, 4),
-    "|": (4, 4, 4, 4, 4, 4, 4),
-}
+@lru_cache(maxsize=1)
+def board_font():
+    import blf
+
+    fonts = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+    for filename in ("NotoSansSC-VF.ttf", "msyh.ttc", "Deng.ttf", "segoeui.ttf"):
+        path = fonts / filename
+        if path.is_file():
+            font_id = blf.load(str(path))
+            if font_id >= 0:
+                return font_id, str(path)
+    return 0, "Blender default font"
 
 
-def draw_text(
-    canvas: np.ndarray,
-    x: int,
-    y: int,
-    text: str,
-    scale: int,
-    max_width: int,
-    color: tuple[int, int, int] = (232, 238, 246),
-) -> None:
-    """Draw uppercase ASCII text onto a top-down uint8 HxWx3 canvas."""
-    h, w, _ = canvas.shape
-    step_x = 6 * scale
-    max_chars = max(1, (max_width - 4) // step_x)
-    clean = text.upper()[:max_chars]
-    for idx, ch in enumerate(clean):
-        glyph = _GLYPHS.get(ch, _GLYPHS["?"])
-        gx = x + idx * step_x
-        for row_idx, bits in enumerate(glyph):
-            py0 = y + row_idx * scale
-            py1 = min(h, py0 + scale)
-            if py0 >= h:
-                break
-            for col_idx in range(5):
-                if bits & (16 >> col_idx):
-                    px0 = gx + col_idx * scale
-                    px1 = min(w, px0 + scale)
-                    if px0 < w:
-                        canvas[py0:py1, px0:px1] = color
+def draw_text(canvas, x, y, text, scale, max_width, color=(232, 238, 246)):
+    """Rasterize Unicode text into a small region of the top-down canvas."""
+    import blf
+    import imbuf
+    import numpy as np
+
+    pixel_size = 11 if scale == 1 else 16
+    width = max(0, min(max_width, canvas.shape[1] - x))
+    height = min(pixel_size + 4, canvas.shape[0] - y)
+    if width <= 0 or height <= 0:
+        return
+    font, _ = board_font()
+    blf.size(font, pixel_size)
+    if blf.dimensions(font, text)[0] > width:
+        truncated = text
+        while truncated and blf.dimensions(font, truncated + "…")[0] > width:
+            truncated = truncated[:-1]
+        text = truncated + "…"
+    region = canvas[y:y + height, x:x + width]
+    image = imbuf.new((width, height), planes=32, buffer_type="BYTE")
+    try:
+        with image.with_buffer(write=True) as buffer:
+            raw = np.asarray(buffer)
+            raw[:, :, :3] = region[::-1]
+            raw[:, :, 3] = 255
+        with blf.bind_imbuf(font, image):
+            blf.color(font, *(v / 255 for v in color), 1.0)
+            blf.position(font, 0, height - pixel_size, 0)
+            blf.draw_buffer(font, text)
+        with image.with_buffer() as buffer:
+            region[:] = np.asarray(buffer)[::-1, :, :3]
+    finally:
+        image.free()
 
 
 def resize_rgb_bilinear(rgb: Any, target_h: int, target_w: int) -> Any:
@@ -130,6 +91,19 @@ def fit_tile_square(rgb: np.ndarray, cell_size: int) -> np.ndarray:
         x0 = (w - side) // 2
         rgb = rgb[y0 : y0 + side, x0 : x0 + side]
     return resize_rgb_bilinear(rgb, cell_size, cell_size)
+
+
+def draw_scale_bar(rgb, width, label):
+    """Place the measured scale inside the square kept by the contact sheet."""
+    height, image_width = rgb.shape[:2]
+    side = min(height, image_width)
+    if width > side - 48 or side < 96:
+        return False
+    x = (image_width - side) // 2 + 24
+    y = (height + side) // 2 - 28
+    rgb[y:y + 4, x:x + width] = (238, 243, 250)
+    draw_text(rgb, x, y - 20, label, 2, max(90, width))
+    return True
 
 
 def save_rgb_png(rgb_top_down: Any, dest: Path) -> dict[str, Any]:
@@ -170,8 +144,8 @@ def compose_board(
     import numpy as np
 
     scale = 2 if cell_size >= 360 else 1
-    tile_header = 7 * scale + 12
-    banner_h = 7 * scale + 16
+    tile_header = 8 * scale + 15
+    banner_h = 8 * scale + 18
     gap = max(6, cell_size // 96)
 
     # Cap cell_size automatically if board would exceed max_edge (e.g. 3x3 at 1024px)
@@ -182,8 +156,8 @@ def compose_board(
         avail_h = (max_edge - banner_h - (rows + 1) * gap - rows * tile_header) // rows
         cell_size = max(128, min(avail_w, avail_h))
         scale = 2 if cell_size >= 360 else 1
-        tile_header = 7 * scale + 12
-        banner_h = 7 * scale + 16
+        tile_header = 8 * scale + 15
+        banner_h = 8 * scale + 18
 
     board_w = cols * cell_size + (cols + 1) * gap
     board_h = banner_h + rows * (cell_size + tile_header) + (rows + 1) * gap
@@ -194,7 +168,7 @@ def compose_board(
     # Top banner bar
     canvas[0:banner_h, :] = (31, 36, 45)
     canvas[banner_h - 2 : banner_h, :] = banner_accent
-    draw_text(canvas, gap + 4, (banner_h - 7 * scale) // 2, banner_text, scale, board_w - 2 * gap)
+    draw_text(canvas, gap + 4, (banner_h - (11 if scale == 1 else 16)) // 2, banner_text, scale, board_w - 2 * gap)
 
     tile_rects: list[dict[str, Any]] = []
     for idx, tile in enumerate(tiles):
@@ -208,7 +182,7 @@ def compose_board(
         draw_text(
             canvas,
             x + 6,
-            y + (tile_header - 7 * scale) // 2,
+            y + (tile_header - (11 if scale == 1 else 16)) // 2,
             header_label,
             scale,
             cell_size - 12,
@@ -225,10 +199,10 @@ def compose_board(
             b_w = len(badge) * 6 * b_scale + 10
             bx = x + cell_size - b_w - 4
             if bx > x + cell_size // 2:
-                by = y + max(2, (tile_header - 11) // 2)
+                by = y + max(2, (tile_header - 16) // 2)
                 b_color = tile.get("badge_bg", (165, 92, 24))
-                canvas[by : by + 11, bx : bx + b_w] = b_color
-                draw_text(canvas, bx + 5, by + 2, badge, b_scale, b_w - 6, (255, 250, 240))
+                canvas[by : by + 16, bx : bx + b_w] = b_color
+                draw_text(canvas, bx + 5, by + 1, badge, b_scale, b_w - 6, (255, 250, 240))
 
         tile_rects.append({
             "index": idx,

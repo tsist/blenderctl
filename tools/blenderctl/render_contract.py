@@ -14,10 +14,25 @@ MEDIA=obj({'scene':NAME,'fps':integer(1,60),'width':integer(16,1920),'height':in
 RENDER_PIXEL_FRAME_DEFAULT=32_000_000
 RENDER_PIXEL_FRAME_MAX=512_000_000
 RUN['properties']['pixel_frame_budget']={**integer(1,RENDER_PIXEL_FRAME_MAX),'default':RENDER_PIXEL_FRAME_DEFAULT}
+RUN['properties']['denoiser']=enum('OPENIMAGEDENOISE','OPTIX')
+RUN['properties']['denoising_use_gpu']=BOOL
+SOURCE_SETTINGS_MODE='SOURCE_V1'
+C5_SETTINGS_MODE='SOURCE_C5'
+RUN['properties']['settings_mode']=enum(SOURCE_SETTINGS_MODE,C5_SETTINGS_MODE)
+RUN['properties']['width']=integer(16,8192)
+RUN['properties']['height']=integer(16,8192)
+RUN['properties']['output_passes']={**array(NAME,0,64),'uniqueItems':True}
+RUN['properties']['exr_codec']=enum('ZIP','DWAA')
+RUN['properties']['adaptive_sampling']=obj({'enabled':BOOL,'threshold':number(0,1),'min_samples':integer(0,4096)},['enabled','threshold','min_samples'])
+COLOR['properties']['look']=enum('None','AgX - Very High Contrast','AgX - High Contrast','AgX - Medium High Contrast','AgX - Base Contrast','AgX - Medium Low Contrast','AgX - Low Contrast','AgX - Very Low Contrast','AgX - Punchy','AgX - Greyscale')
 MEDIA_PIXEL_FRAME_DEFAULT=32_000_000
 MEDIA_PIXEL_FRAME_MAX=512_000_000
 MEDIA['properties']['pixel_frame_budget']={**integer(1,MEDIA_PIXEL_FRAME_MAX),'default':MEDIA_PIXEL_FRAME_DEFAULT}
 EXPORT=obj({'scene':NAME,'format':enum('PNG_SEQUENCE','MP4_H264_AAC','WAV_PCM16'),'frame_start':integer(1,100000),'frame_end':integer(2,100000),'color':COLOR})
+def is_source_run(v):
+    return isinstance(v,dict) and v.get('settings_mode') in (SOURCE_SETTINGS_MODE,C5_SETTINGS_MODE)
+def is_c5_run(v):
+    return isinstance(v,dict) and v.get('settings_mode')==C5_SETTINGS_MODE
 def file_input(item):
     p=Path(item['file'])
     if not p.is_absolute():raise Failure('INVALID_REQUEST','Media/resource paths must be absolute')
@@ -29,18 +44,36 @@ def normalize_run(v):
     if v['frames']!=sorted(v['frames']):raise Failure('INVALID_REQUEST','Frames must be sorted and unique')
     v.setdefault('pixel_frame_budget',RENDER_PIXEL_FRAME_DEFAULT)
     if v['width']*v['height']*len(v['frames'])>v['pixel_frame_budget']:raise Failure('UNSUPPORTED','Render exceeds declared output pixel-frame budget: '+str(v['pixel_frame_budget']))
+    if is_c5_run(v):
+        if v['passes'] or (v.get('output_passes') and v['format']!='OPEN_EXR_MULTILAYER'):
+            raise Failure('INVALID_REQUEST','C5 output_passes identify native saved EXR passes')
+        if v.get('adaptive_sampling') and v['engine']!='CYCLES':
+            raise Failure('INVALID_REQUEST','Adaptive sampling requires Cycles')
+    elif is_source_run(v):
+        # SOURCE_V1 keeps the saved engine/sampling/color state. Only these
+        # output declarations are request-owned in the first version.
+        if v['format']!='PNG' or v['depth'] not in ('8','16'):raise Failure('UNSUPPORTED','SOURCE_V1 supports PNG 8/16 output only')
+        if v['compositor']:raise Failure('UNSUPPORTED','SOURCE_V1 does not apply compositor graphs; use explicit render.run for compositing')
+        if v['passes']:raise Failure('UNSUPPORTED','SOURCE_V1 does not accept render passes')
     d=v['device'];backend=d['backend']
+    if v['color'].get('look','None')!='None' and v['color']['view']!='AgX':raise Failure('INVALID_REQUEST','AgX look requires the AgX view')
+    if 'denoiser' in v or 'denoising_use_gpu' in v:
+        if v['engine']!='CYCLES' or not v['denoise']:raise Failure('INVALID_REQUEST','Explicit denoising settings require Cycles denoise=true')
+        if v.get('denoising_use_gpu') and backend not in ('CUDA','OPTIX'):raise Failure('INVALID_REQUEST','GPU denoising requires an explicit GPU backend')
+        if v.get('denoiser')=='OPTIX' and (backend!='OPTIX' or v.get('denoising_use_gpu') is not True):raise Failure('INVALID_REQUEST','OptiX denoising requires the exact OptiX GPU backend and denoising_use_gpu=true')
     if v['engine']=='BLENDER_WORKBENCH' and v['samples']!=8:raise Failure('UNSUPPORTED','Workbench currently requires eight-sample antialiasing')
     if v['engine']=='CYCLES':
         if backend=='GRAPHICS' or (backend in ('CUDA','OPTIX'))!=('id' in d):raise Failure('INVALID_REQUEST','Cycles GPU requires exact device id; CPU has no device id')
     elif backend!='GRAPHICS' or 'id' in d:raise Failure('INVALID_REQUEST','Eevee/Workbench use the host graphics context')
-    if v['engine']!='CYCLES' and (v['denoise'] or v['motion_blur'] or v['passes']):raise Failure('UNSUPPORTED','Denoise, motion blur and passes are scoped to Cycles')
+    source_eevee_blur=v['engine']=='BLENDER_EEVEE' and is_source_run(v)
+    if v['engine']!='CYCLES' and (v['denoise'] or v['passes'] or (v['motion_blur'] and not source_eevee_blur)):
+        raise Failure('UNSUPPORTED','Denoise, motion blur and passes are scoped to Cycles')
     if v['format'] in ('PNG','JPEG'):
         if v['depth'] not in (('8',) if v['format']=='JPEG' else ('8','16')):raise Failure('INVALID_REQUEST','Invalid display format depth')
     elif v['depth'] not in ('16','32'):raise Failure('INVALID_REQUEST','EXR requires 16/32 bit float')
     if v['format']=='JPEG' and v['transparent']:raise Failure('INVALID_REQUEST','JPEG cannot preserve alpha')
     if v['passes'] and v['format']!='OPEN_EXR_MULTILAYER':raise Failure('INVALID_REQUEST','Render passes require multilayer EXR')
-    if v['format']=='OPEN_EXR_MULTILAYER' and v['compositor']:raise Failure('UNSUPPORTED','Multilayer raw passes and composited image use separate runs')
+    if v['format']=='OPEN_EXR_MULTILAYER' and v['compositor'] and not is_c5_run(v):raise Failure('UNSUPPORTED','Select C5 to retain raw passes and a composited layer')
     return v
 def normalize_media(v, *, check_files=True):
     v=copy.deepcopy(v)

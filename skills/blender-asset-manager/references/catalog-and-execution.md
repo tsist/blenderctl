@@ -1,6 +1,6 @@
 # Catalog、发布事务与版本升级
 
-当任务涉及读写 Catalog、修改 `.blend` 资产标记、执行正式入库、从注册库取用资产或发新版时，按本文件步骤配合 [blender-cli](../../blender-cli/SKILL.md) 执行。全部作业目录 `jobs` 和事务目录 `transactions` 建在注册库之外（如 `work/audit/<batch>//`）。
+当任务涉及读写 Catalog、修改 `.blend` 资产标记、执行正式入库、从注册库取用资产或发新版时，按本文件步骤配合 [blender-cli](../../blender-cli/SKILL.md) 执行。全部作业目录 `jobs` 和事务目录 `transactions` 建在注册库之外（如 `work/audit/<batch>/>/`）。
 
 ## 核对注册库与 Catalog
 

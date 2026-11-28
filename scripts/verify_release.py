@@ -12,7 +12,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 ADDON = 'tools/video_editing_workflow_addon/'
 BLOCKED = {'.git', '__pycache__', '.venv', 'audit', 'research', 'tests-output', 'dist'}
-IDENTITY = 'af5ab12d9909cc4b27f4f8ad933a2ac11cf2d6851445f3f692814992baaaebb1'
+IDENTITY = '473886b468f9fa6eb79804e4a74a56c69d59a7f94768df615e3feaa170a43b43'
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
@@ -35,7 +35,7 @@ def release_files(publication):
 def private_findings(text):
     normalized = text.replace('\\', '/').lower()
     patterns = [r'gh[pousr]_[A-Za-z0-9]{30,}', r'github_pat_[A-Za-z0-9_]{40,}',
-                r'sk-[A-Za-z0-9_-]{32,}', r'AKIA[A-Z0-9]{16}',
+                r'(?<![A-Za-z0-9_-])sk-(?:proj-|svcacct-)?[A-Za-z0-9]{24,}', r'AKIA[A-Z0-9]{16}',
                 r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----']
     return ((('173' + '99') in normalized) or re.search(r'f:/+blender ai|wm-20\d\d-\d\d-\d\d-|runtime/+audit/', normalized)
             or any(re.search(p, text) for p in patterns))
@@ -54,7 +54,7 @@ def verify(root=ROOT):
     runtime = [{'file': p.relative_to(root).as_posix(), 'expected_sha256': sha(p.read_bytes())}
                for p in sorted(runtime_paths)]
     identity = sha(json.dumps(runtime, sort_keys=True, separators=(',', ':')).encode())
-    if len(runtime) != 192 or identity != IDENTITY or identity != publication['runtime_identity']:
+    if len(runtime) != publication['runtime_files'] or identity != IDENTITY or identity != publication['runtime_identity']:
         raise ValueError('Qualified runtime identity changed')
     if not set(row['file'] for row in runtime) <= set(names):
         raise ValueError('Runtime missing from release inventory')
@@ -62,6 +62,10 @@ def verify(root=ROOT):
         path = safe_file(root, name)
         if path.suffix.lower() in {'.pyc', '.blend', '.blend1', '.exe', '.dll'} or path.name in {'AGENTS.md', '.env', 'secrets.json'}:
             raise ValueError('Forbidden release file: ' + name)
+        if path.suffix.lower() == '.png':
+            if path.read_bytes()[:8] != b'\x89PNG\r\n\x1a\n':
+                raise ValueError('Invalid PNG: ' + name)
+            continue
         text = path.read_text(encoding='utf-8-sig')
         if private_findings(text):
             raise ValueError('Private content pattern in: ' + name)

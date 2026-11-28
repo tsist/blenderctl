@@ -7,7 +7,7 @@ metadata:
 
 # Blender 视频剪辑
 
-现有受管工程的批量精剪可用 `production.run` 的 `video` 域。先冻结原始时间线和媒体指纹。按绝对帧、镜头相对位置、具名标记或前项结果定位切分、移除和插入，以 `group` 独立提交有效组，或用 `batch` 在冲突时回滚整批。读回每项实际剪点、锁定音轨和媒体来源，再用独立重开与导出解码核对。[批量剪辑契约](https://github.com/tsist/blender-video-editing-workflow)
+保存的正式 VSE 时间线可走 `blenderctl video finish --params FILE`。按 `shot_id` 换入正式媒体时附逐帧 SHA-256，核对切点、Compositor Strip 修饰符、对白及自动闪避。旧版 `video run` 作业沿用原目录和原发行选择器。
 
 本技能属于 [剪辑部门](../blender-work-methodology/references/departments/editing.md)，负责把白膜分镜、正式渲染画面、AI 镜头候选、对白音乐与中文字幕编排成节奏顺畅的可播放成片。公共入口与批次目录规范见 [blender-cli](../blender-cli/SKILL.md)，所有修改都在独立工作副本上执行，源文件与母本保持原样留作对照。
 
@@ -61,8 +61,16 @@ $ctl = './blenderctl.ps1'
 ### 6. 导出成片、管控长作业并做冷重开验收
 
 - **长作业管控**：耗时导出加上 `--async` 提交，用 `blenderctl.ps1 --jobs-dir $jobs --compact video job wait $jobId --wait-seconds 30` 分段等待，取消或查终态走 `video job cancel/status/result`。
-- **恢复旧作业**：续跑或查取历史 0.1.4 分发作业时，保留原 `--jobs-dir`，在 `video` 子命令前加上 `--video-release 0.1.4`，再执行 `video job result $jobId`；用 `resume` 指向旧完整 `video-report.json` 及其 SHA256 在新作业里重跑完整输出。
+- **恢复旧作业**：`video job status/result/wait` 从保存的请求和报告识别 0.1.4、0.1.5、0.2.0 及当前实现。换过作业目录时用 `--jobs-dir` 指定位置。缺少可识别的实现指纹时，在子命令前显式传 `--edition video@版本`。续跑用原请求参数与完整 `video-report.json`，同时传 `--resume-sha256`，每次输出写入新作业。
 - **冷重开与真片核对**：导出完成后另起独立进程重开候选工程核对帧域与引用。整片与逐镜视频全部真实解码，亲眼抽看切点前后、快动作、停帧与每条字幕首中末，亲耳听检对白清晰度、音乐过渡与音画落点；待听检或待设备观看项如实标注 `not_run`。
+
+## Blender 5.3 批量精剪
+
+从 `discover --product video` 核对本机候选。一次 `production.run` 请求用 `domain=video` 和 `operations` 提交多个切分、插入、移除。镜头号、唯一标记与帧区间默认依提交前快照定位；`result_of` 明确接某个前项的实际边界。每项显式列受影响轨道，关联镜头可以用同一 `group`。
+
+`atomicity=group` 下冲突组自动恢复，独立组可继续。`atomicity=batch` 用于要求整体锁片的批次。带外链时在 `params.resources` 声明每份文件及 SHA-256，含图序每帧、字幕字体和独立文件代理。MOVIE 使用已核验项目 FFprobe 获取同帧率 CFR 的时序证据。
+
+查看 `operation_log` 的原始和实际剪点、媒体入点、位移及回滚状态，重新打开候选核对实际解码、锁定轨、跨剪点字幕和标记。遇到时序无法保持的复杂条带，回执给出冲突。不同工程可在公共流水线并行。本机候选调用（`work/audit/<batch>/`）
 
 ## 交给下游
 

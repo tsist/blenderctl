@@ -1,9 +1,9 @@
 """Editable native Video Sequencer work units. No global state on import."""
 bl_info = {
-    'name': 'Video Editing Workflow', 'author': 'Blender AI',
-    'version': (0, 1, 1), 'blender': (5, 2, 0),
-    'location': 'Video Sequencer > Sidebar > Workflow',
-    'description': 'Inspect and edit managed video timelines with the public CLI',
+    'name': '视频剪辑工作台', 'author': 'Blender AI',
+    'version': (1, 0, 0), 'blender': (5, 3, 0),
+    'location': '视频序列编辑器侧栏',
+    'description': '拼装镜头、原位换片、编排字幕和导出成片',
     'category': 'Sequencer',
 }
 

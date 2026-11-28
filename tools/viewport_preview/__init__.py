@@ -10,4 +10,7 @@ VALID_MODES = (
     "face_orientation",
     "material",
     "rendered",
+    "render_pass",
+    "uv_checker",
+    "uv_stretch",
 )

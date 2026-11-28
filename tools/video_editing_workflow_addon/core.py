@@ -11,14 +11,34 @@ from fractions import Fraction
 from pathlib import Path
 
 import bpy
+from . import finishing
 from .contract import WorkflowError, normalize_manifest, validate_clip
 from .protection import (snapshot_protection, resource_paths, native_strip_record,
                          compare_protection)
 from . import retiming
 
 
+RIPPLE_MAX_SECONDS = 600
+RIPPLE_MAX_WIDTH = 1920
+RIPPLE_MAX_HEIGHT = 1080
+CAPTION_STYLE = {'wrap_width', 'use_outline', 'outline_color', 'outline_width',
+                 'use_shadow', 'shadow_color', 'use_box', 'box_color', 'alignment_x'}
+
+
 def _error(code, message):
     raise WorkflowError(code, message)
+
+
+def batch_edit(request, *, checkpoint_dir):
+    """Run the candidate's batch operation in an isolated Blender worker."""
+    from .batch_edit import run
+    return run(request, checkpoint_dir=checkpoint_dir)
+
+
+def verify_batch_resources(request, resources, *, expected=None, cache=None):
+    """Validate a loaded VSE project's media and compare a saved expectation."""
+    from .batch_resources import verify
+    return verify(request, resources, expected=expected, cache=cache)
 
 
 def _json(value):
@@ -188,6 +208,10 @@ def _actual(scene, strip):
             src.update(speed=1, freeze=False)
     if spec['kind'] == 'TEXT':
         result.update(text=media.text, font_size=int(media.font_size), color=list(media.color))
+        for key in CAPTION_STYLE:
+            if key in spec:
+                value = getattr(media, key)
+                result[key] = list(value) if key.endswith('_color') else value
         if media.font and 'font' in spec:
             if _path(media.font.filepath) != spec['font']['file']:
                 result['font'] = _file(media.font.filepath)
@@ -307,6 +331,35 @@ def _assert_fields(scene, strip, spec, fields):
             _error('VALIDATION_FAILED', 'Native clip differs at ' + spec['id'] + '.' + key)
 
 
+def _scope(timeline, action):
+    rate = timeline['fps'][0] / timeline['fps'][1]
+    seconds = (timeline['frame_end_exclusive'] - timeline['frame_start']) / rate
+    if (max(timeline['width'], timeline['height']) > max(RIPPLE_MAX_WIDTH, RIPPLE_MAX_HEIGHT) or
+            timeline['width'] * timeline['height'] > RIPPLE_MAX_WIDTH * RIPPLE_MAX_HEIGHT or
+            seconds > RIPPLE_MAX_SECONDS):
+        _error('UNSUPPORTED', action + ' is limited to short SDR timelines up to '
+               + str(RIPPLE_MAX_WIDTH) + 'x' + str(RIPPLE_MAX_HEIGHT) + ' and '
+               + str(RIPPLE_MAX_SECONDS) + ' seconds')
+    return {'name': 'short_SDR', 'max_width': RIPPLE_MAX_WIDTH,
+            'max_height': RIPPLE_MAX_HEIGHT, 'max_seconds': RIPPLE_MAX_SECONDS,
+            'width': timeline['width'], 'height': timeline['height'],
+            'seconds': seconds, 'fps': timeline['fps']}
+
+
+def _source_limit(scene, strip, spec):
+    media = _media(strip)
+    if spec['kind'] not in {'IMAGE', 'MOVIE', 'SOUND'}:
+        return
+    source = spec['source']
+    if spec['kind'] == 'IMAGE' and len(source['files']) == 1:
+        return
+    count = int(media.content_duration)
+    last = source['source_in'] if source['freeze'] else (
+        source['source_in'] + math.floor((spec['duration'] - 1) * source['speed']))
+    if last >= count:
+        _error('INVALID_REQUEST', 'Updated duration exceeds actual source samples: ' + spec['id'])
+
+
 def _style(scene, strip, spec, fields=None, font_cache=None):
     fields = set(spec) if fields is None else set(fields)
     if 'name' in fields:
@@ -348,6 +401,8 @@ def _style(scene, strip, spec, fields=None, font_cache=None):
     if spec['kind'] == 'TEXT':
         if 'text' in fields:
             strip.text = spec['text']
+        for key in CAPTION_STYLE.intersection(fields):
+            setattr(strip, key, spec[key])
         if 'font_size' in fields:
             strip.font_size = spec['font_size']
         if 'color' in fields:
@@ -505,7 +560,9 @@ def apply(manifest):
             if cid not in specs:
                 _error('NOT_FOUND', 'Clip missing: ' + cid)
             strip = owned[cid]
-            if strip.lock or scene.sequence_editor.channels[strip.channel - 1].lock:
+            # A pure unlock can release a manual strip lock without widening the edit.
+            unlocking = strip.lock and op == 'update' and edit['changes'] == {'lock': False}
+            if (strip.lock and not unlocking) or scene.sequence_editor.channels[strip.channel - 1].lock:
                 _error('CONFLICT', 'Clip is locked: ' + cid)
             current, baseline = specs[cid], _read(strip, '_vwe_baseline', {})
             if op == 'remove':
@@ -525,7 +582,7 @@ def apply(manifest):
             else:
                 fields = edit['changes']
             for field, value in fields.items():
-                if not _equal(current.get(field), baseline.get(field)) and not _equal(current.get(field), value):
+                if not unlocking and not _equal(current.get(field), baseline.get(field)) and not _equal(current.get(field), value):
                     _error('CONFLICT', 'Manual edit conflicts at ' + cid + '.' + field)
             if cid in state['diagnostics']['manual_animation'] and set(fields) - {'name', 'channel', 'lock', 'shot_id', 'candidate_id', 'alternatives'}:
                 _error('CONFLICT', 'Manual animation conflicts: ' + cid)
@@ -570,7 +627,7 @@ def apply(manifest):
                 if op == 'replace' and current['kind'] in {'IMAGE', 'MOVIE'} and 'transform' not in fields:
                     fit_scale = _read(strip, '_vwe_fit_scale')
                     if fit_scale is None:
-                        # Compatibility with early development candidates.
+                        # Compatibility with earlier saved strip records.
                         if strip.type == 'META' or current.get('fit') == 'ORIGINAL':
                             fit_scale = [1.0, 1.0]
                         else:
@@ -619,3 +676,198 @@ def apply(manifest):
     return {'workflow_id': workflow, 'scene': name, 'changed_ids': changed,
             'operation_log': operation_log, 'inspection': inspect(name, workflow),
             'protection': {**protection, 'status': 'passed', 'scope': 'Existing non-target content'}}
+
+
+def export_cut_specs(scene_name, workflow_id):
+    """Return a platform-neutral cut-only description of one managed timeline.
+
+    The exchange remains lossless only for neutral Movie/Sound cuts. Anything
+    OTIO cannot carry (generators, effects, retiming, grades, transforms, fades,
+    subtitles, unmanaged strips or manual animation) is rejected here instead
+    of being silently omitted by an exporter.
+    """
+    scene = bpy.data.scenes.get(scene_name)
+    if scene is None or scene.get('_vwe_workflow') != workflow_id:
+        _error('CONFLICT', 'Export target is not this workflow Scene')
+    state = inspect(scene_name, workflow_id)
+    timeline = state['timeline']
+    scope = _scope(timeline, 'Cut-only OTIO')
+    if state['diagnostics']['unmanaged_strips']:
+        _error('UNSUPPORTED', 'Cut-only OTIO requires a fully managed Scene')
+    if state['diagnostics']['manual_animation']:
+        _error('UNSUPPORTED', 'Cut-only OTIO cannot represent manual animation')
+    owned = _owned(scene, workflow_id)
+    result = []
+    names = set()
+    for clip in state['clips']:
+        cid, kind = clip['id'], clip['kind']
+        if kind not in {'MOVIE', 'SOUND'}:
+            _error('UNSUPPORTED', 'Cut-only OTIO supports only MOVIE/SOUND clips: ' + cid)
+        if clip.get('alternatives'):
+            _error('UNSUPPORTED', 'Cut-only OTIO cannot carry alternative candidates: ' + cid)
+        if clip.get('fade_in') or clip.get('fade_out'):
+            _error('UNSUPPORTED', 'Cut-only OTIO cannot carry fades: ' + cid)
+        source = clip['source']
+        if source.get('speed', 1) != 1 or source.get('freeze', False):
+            _error('UNSUPPORTED', 'Cut-only OTIO cannot carry retiming: ' + cid)
+        if source.get('stream', 0) != 0:
+            _error('UNSUPPORTED', 'Cut-only OTIO cannot carry non-default streams: ' + cid)
+        if len(source['files']) != 1:
+            _error('UNSUPPORTED', 'Cut-only OTIO requires one source file per clip: ' + cid)
+        strip = owned[cid]
+        if kind == 'MOVIE':
+            if source.get('color_space') != 'sRGB':
+                _error('UNSUPPORTED', 'Cut-only OTIO requires sRGB movie sources: ' + cid)
+            transform = clip.get('transform', {})
+            crop = clip.get('crop', {})
+            grade = clip.get('grade', {})
+            if (clip.get('opacity', 1) != 1 or
+                    any(transform.get(key, default) != default for key, default in
+                        (('x', 0), ('y', 0), ('scale_x', 1), ('scale_y', 1), ('rotation_degrees', 0))) or
+                    any(crop.get(key, 0) != 0 for key in ('left', 'right', 'top', 'bottom')) or
+                    grade.get('multiply', 1) != 1 or grade.get('saturation', 1) != 1):
+                _error('UNSUPPORTED', 'Cut-only OTIO cannot carry transforms, crops, grades or opacity: ' + cid)
+        else:
+            if clip.get('volume', 1) != 1 or clip.get('pan', 0) != 0:
+                _error('UNSUPPORTED', 'Cut-only OTIO cannot carry volume/pan: ' + cid)
+        _source_limit(scene, strip, clip)
+        media = _media(strip)
+        row = copy.deepcopy(clip)
+        row['full_length'] = int(media.content_duration)
+        if row['name'] in names:
+            _error('UNSUPPORTED', 'Cut-only OTIO requires unique clip names: ' + row['name'])
+        names.add(row['name'])
+        result.append(row)
+    if not result:
+        _error('UNSUPPORTED', 'Cut-only OTIO requires at least one managed clip')
+    result.sort(key=lambda row: (row['channel'], row['start'], row['id']))
+    return {'scene': scene.name, 'workflow_id': workflow_id, 'timeline': timeline,
+            'channels': max(row['channel'] for row in result), 'clips': result,
+            'scope': scope}
+
+
+def ripple(scene_name, workflow_id, clip_id, duration, edge='END'):
+    """Extend/shorten one managed clip's end and move later managed material.
+
+    Only clips that begin at or after the old half-open end move. Material that
+    crosses the boundary stays anchored; the output frame range is at least the
+    remaining material and the shifted timeline end. All changed strips are
+    excluded from the non-target witness and are independently reopened.
+    """
+    scene = bpy.data.scenes.get(scene_name)
+    if scene is None or scene.get('_vwe_workflow') != workflow_id:
+        _error('CONFLICT', 'Ripple target is not this workflow Scene')
+    if edge != 'END':
+        _error('UNSUPPORTED', 'Only right-edge duration ripple is supported')
+    if not isinstance(duration, int) or isinstance(duration, bool) or duration < 1:
+        _error('INVALID_REQUEST', 'Ripple duration must be a positive integer')
+    state = inspect(scene_name, workflow_id)
+    old_timeline = _timeline(scene)
+    _scope(old_timeline, 'Ripple editing')
+    owned = _owned(scene, workflow_id)
+    specs = {row['id']: copy.deepcopy(row) for row in state['clips']}
+    if clip_id not in specs:
+        _error('NOT_FOUND', 'Clip missing: ' + clip_id)
+    current = specs[clip_id]
+    strip = owned[clip_id]
+    if strip.lock or scene.sequence_editor.channels[strip.channel - 1].lock:
+        _error('CONFLICT', 'Clip is locked: ' + clip_id)
+    baseline = _read(strip, '_vwe_baseline', {})
+    if (not _equal(current.get('duration'), baseline.get('duration')) and
+            not _equal(current.get('duration'), duration)):
+        _error('CONFLICT', 'Manual edit conflicts at ' + clip_id + '.duration')
+    if clip_id in state['diagnostics']['manual_animation']:
+        _error('CONFLICT', 'Manual animation conflicts: ' + clip_id)
+    old_end = current['start'] + current['duration']
+    delta = duration - current['duration']
+    target = copy.deepcopy(current)
+    target['duration'] = duration
+    shifted = []
+    if delta:
+        shifted = sorted((cid for cid, spec in specs.items()
+                          if cid != clip_id and spec['start'] >= old_end),
+                         key=lambda cid: (specs[cid]['start'], specs[cid]['channel'], cid))
+        for cid in shifted:
+            spec, current_strip = specs[cid], owned[cid]
+            if current_strip.lock or scene.sequence_editor.channels[current_strip.channel - 1].lock:
+                _error('CONFLICT', 'Ripple would move a locked clip: ' + cid)
+            if cid in state['diagnostics']['manual_animation']:
+                _error('CONFLICT', 'Ripple would move manually animated clip: ' + cid)
+            base = _read(current_strip, '_vwe_baseline', {})
+            if not _equal(spec.get('start'), base.get('start')) or not _equal(spec.get('duration'), base.get('duration')):
+                _error('CONFLICT', 'Ripple would compound manual timing: ' + cid)
+            moved = copy.deepcopy(spec)
+            moved['start'] += delta
+            specs[cid] = moved
+        for unknown in state['diagnostics']['unmanaged_strips']:
+            if unknown['start'] >= old_end:
+                _error('UNSUPPORTED', 'Ripple would leave unmanaged strip behind: ' + unknown['name'])
+    _source_limit(scene, strip, target)
+    new_end = old_timeline['frame_end_exclusive'] + delta
+    for spec in specs.values():
+        new_end = max(new_end, spec['start'] + spec['duration'])
+    for unknown in state['diagnostics']['unmanaged_strips']:
+        new_end = max(new_end, unknown['start'] + unknown['duration'])
+    new_timeline = copy.deepcopy(old_timeline)
+    new_timeline['frame_end_exclusive'] = max(new_end, new_timeline['frame_start'] + 1)
+    _scope(new_timeline, 'Ripple editing')
+    specs[clip_id] = validate_clip(target, new_timeline)
+    for cid, spec in list(specs.items()):
+        specs[cid] = validate_clip(spec, new_timeline)
+    _preflight_collisions(specs, state['diagnostics']['unmanaged_strips'])
+
+    touched = [clip_id] + shifted
+    excluded, excluded_paths = [], []
+    for cid in touched:
+        changed_strip = owned[cid]
+        excluded.append(changed_strip.name)
+        excluded_paths.append(changed_strip.path_from_id())
+        if changed_strip.type == 'META':
+            excluded_paths.extend(child.path_from_id() for child in changed_strip.strips)
+    before = snapshot_protection(scene_name, excluded, excluded_paths)
+    _set_timeline(scene, new_timeline)
+    # Native handle setters resolve an overlap by moving the edited strip to
+    # another channel. Vacate the destination first: positive ripple from the
+    # right, negative ripple after the target has made room on the left.
+    order = (list(reversed(shifted)) + [clip_id]) if delta > 0 else ([clip_id] + shifted)
+    for cid in order:
+        changed_strip = owned[cid]
+        prior = {key: {'baseline': _read(changed_strip, key, {} if key != '_vwe_curves' else []),
+                       'observed': observed}
+                 for key, observed in (('_vwe_baseline', _actual(scene, changed_strip)),
+                                       ('_vwe_curves', _curve_snapshot(scene, changed_strip)),
+                                       ('_vwe_native', native_strip_record(changed_strip)))}
+        if cid == clip_id:
+            if changed_strip.type == 'META':
+                retiming.update_mapping(scene, changed_strip, specs[cid]['start'], specs[cid]['duration'])
+            else:
+                changed_strip.right_handle = specs[cid]['start'] + specs[cid]['duration']
+            fields = {'start', 'duration', 'channel'}
+        else:
+            if changed_strip.type == 'META':
+                retiming.update_mapping(scene, changed_strip, specs[cid]['start'], specs[cid]['duration'])
+            else:
+                changed_strip.content_start += delta
+            fields = {'start', 'duration', 'channel'}
+        _style(scene, changed_strip, specs[cid], fields)
+        changed_strip['_vwe_spec'] = _json(specs[cid])
+        _assert_fields(scene, changed_strip, specs[cid], fields)
+        _store(scene, changed_strip, specs[cid], prior)
+    after = snapshot_protection(scene_name, excluded, excluded_paths)
+    protection = compare_protection(before, after)
+    if protection['status'] != 'pass':
+        _error('VALIDATION_FAILED', 'Non-target project contents changed during ripple edit')
+    changed = [clip_id] + shifted
+    operation_log = [{'op': 'update', 'id': clip_id, 'fields': ['duration']}]
+    operation_log.extend({'op': 'ripple_shift', 'id': cid, 'fields': ['start'], 'delta': delta}
+                         for cid in shifted)
+    return {'workflow_id': workflow_id, 'scene': scene_name, 'changed_ids': changed,
+            'operation_log': operation_log,
+            'ripple': {'id': clip_id, 'edge': 'END', 'boundary': old_end,
+                       'old_duration': current['duration'], 'new_duration': duration,
+                       'delta': delta, 'shifted_ids': shifted,
+                       'timeline_before': old_timeline, 'timeline_after': new_timeline,
+                       'scope': 'short_SDR'},
+            'inspection': inspect(scene_name, workflow_id),
+            'protection': {**protection, 'status': 'passed',
+                           'scope': 'Existing non-target content'}}

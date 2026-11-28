@@ -3,7 +3,9 @@ import copy
 import hashlib
 import json
 import math
+import os
 import uuid
+from pathlib import Path
 import bpy
 from .contract import WorkflowError, normalize_blueprint
 
@@ -15,12 +17,31 @@ CORE_NODE_ID = 'gnw_core'
 INTERFACE = 'gnw_interface'
 BASELINE = 'gnw_baseline'
 GENERATED = 'gnw_generated_state'
+FOREACH_INPUT = 'GeometryNodeForeachGeometryElementInput'
+FOREACH_OUTPUT = 'GeometryNodeForeachGeometryElementOutput'
+FOREACH_ITEMS = {'Input': 'input_items', 'Main': 'main_items', 'Generation': 'generation_items'}
+
+
+def _library_file(library):
+    return str(Path(bpy.path.abspath(library.filepath, library=library.parent)).resolve())
+
+
+def _id_library(value):
+    override = value.override_library
+    return value.library or (override.reference.library if override and override.reference else None)
 
 
 def plain(value):
     if isinstance(value, bpy.types.ID):
         kind = {'Object': 'OBJECT', 'Collection': 'COLLECTION', 'Material': 'MATERIAL', 'Image': 'IMAGE', 'GeometryNodeTree': 'GROUP'}.get(value.bl_rna.identifier)
-        if kind: return {'kind': kind, 'name': value.name}
+        if kind:
+            result = {'kind': kind, 'name': value.name}
+            library = _id_library(value)
+            if library:
+                result['library_file'] = _library_file(library)
+                if value.override_library:
+                    result['override'] = True
+            return result
         return {'id_type': value.bl_rna.identifier, 'name': value.name,
                 'library': value.library.filepath if value.library else None}
     if value is None or type(value) in (str, bool, int): return value
@@ -38,6 +59,15 @@ def plain(value):
 def _dump(value): return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
 
 
+def _graph_value(value):
+    state = plain(value)
+    if isinstance(value, bpy.types.ID) and 'library_file' in state:
+        # Library IDs have unique names in a project. Resource checks bind their files separately.
+        state.pop('library_file')
+        state['library'] = _id_library(value).name
+    return state
+
+
 def _local(tree, allow_dynamic=False):
     if tree.library or tree.override_library:
         raise WorkflowError('UNSUPPORTED', 'Linked/override node group is protected: ' + tree.name)
@@ -49,7 +79,11 @@ def _local(tree, allow_dynamic=False):
 
 
 def socket_find(sockets, selector):
-    matches = [s for s in sockets if s.identifier == selector]
+    prefix, separator, name = selector.partition(':')
+    if separator and prefix in FOREACH_ITEMS:
+        matches = [s for s in sockets if s.identifier.startswith(prefix + '_') and s.name == name]
+    else:
+        matches = [s for s in sockets if s.identifier == selector]
     if not matches: matches = [s for s in sockets if s.name == selector]
     if len(matches) != 1: raise WorkflowError('CONFLICT' if matches else 'NOT_FOUND', 'Socket must resolve uniquely: ' + selector)
     socket = matches[0]
@@ -82,8 +116,6 @@ def _set(owner, key, value):
 def _socket_value(socket, value):
     prop = socket.bl_rna.properties.get('default_value')
     if prop and prop.type == 'POINTER':
-        if value is not None and (not isinstance(value, dict) or set(value) != {'kind', 'name'}):
-            raise WorkflowError('INVALID_REQUEST', 'Pointer input requires explicit kind/name')
         setattr(socket, 'default_value', _resource(value) if value is not None else None)
     else: _set(socket, 'default_value', value)
 
@@ -98,13 +130,93 @@ def _order_links(links):
 
 
 def _resource(spec, groups=None):
-    if spec['kind'] == 'GROUP' and groups and spec['name'] in groups: return groups[spec['name']]
+    if (not isinstance(spec, dict) or not {'kind', 'name'} <= spec.keys() or
+            spec.keys() - {'kind', 'name', 'library_file', 'override'}):
+        raise WorkflowError('INVALID_REQUEST', 'Pointer input requires explicit kind/name and optional library_file')
+    library_file = spec.get('library_file')
+    if library_file and (not isinstance(library_file, str) or not Path(library_file).is_absolute()):
+        raise WorkflowError('INVALID_REQUEST', 'Resource library_file must be an absolute path')
+    if 'override' in spec and (type(spec['override']) is not bool or not library_file):
+        raise WorkflowError('INVALID_REQUEST', 'Override resource requires an explicit library_file')
+    if not library_file and spec['kind'] == 'GROUP' and groups and spec['name'] in groups:
+        return groups[spec['name']]
+    if not isinstance(spec['kind'], str) or not isinstance(spec['name'], str):
+        raise WorkflowError('INVALID_REQUEST', 'Resource kind and name must be strings')
     collection = {'OBJECT': bpy.data.objects, 'COLLECTION': bpy.data.collections, 'MATERIAL': bpy.data.materials,
-                  'IMAGE': bpy.data.images, 'GROUP': bpy.data.node_groups}[spec['kind']]
-    item = collection.get(spec['name'])
-    if item is None: raise WorkflowError('NOT_FOUND', 'Missing resource: ' + spec['name'])
-    if item.library or item.override_library: raise WorkflowError('UNSUPPORTED', 'Linked/override resource is not supported')
+                  'IMAGE': bpy.data.images, 'GROUP': bpy.data.node_groups}.get(spec['kind'])
+    if collection is None:
+        raise WorkflowError('INVALID_REQUEST', 'Unknown resource kind or invalid name')
+    candidates = []
+    for item in collection:
+        if item.name != spec['name']:
+            continue
+        library = _id_library(item)
+        if library_file and (not library or os.path.normcase(_library_file(library)) != os.path.normcase(str(Path(library_file).resolve()))
+                             or bool(item.override_library) != spec.get('override', False)):
+            continue
+        candidates.append(item)
+    if len(candidates) != 1:
+        raise WorkflowError('CONFLICT' if candidates else 'NOT_FOUND', 'Resource name must resolve uniquely: ' + spec['name'])
+    item = candidates[0]
+    if item.is_missing:
+        raise WorkflowError('NOT_FOUND', 'Linked resource data is missing: ' + item.name)
+    if _id_library(item) and spec['kind'] not in {'OBJECT', 'COLLECTION'}:
+        raise WorkflowError('UNSUPPORTED', 'Only linked Object and Collection IDs are supported as read-only GN references')
     return item
+
+
+def foreach_zones(tree):
+    """Serialize native zone declaration. Dynamic links use Input:/Main:/Generation: names."""
+    declarations = []
+    for node in tree.nodes:
+        if node.bl_idname != FOREACH_INPUT:
+            continue
+        output = node.paired_output
+        if output is None:
+            raise WorkflowError('CONFLICT', 'Unpaired For Each input: ' + node.name)
+        row = {'input': node.get(NODE_ID, node.name), 'output': output.get(NODE_ID, output.name), 'domain': output.domain}
+        for key in FOREACH_ITEMS.values():
+            row[key] = []
+            for item in getattr(output, key):
+                spec = {'name': item.name, 'type': item.socket_type}
+                if key == 'generation_items':
+                    spec['domain'] = item.domain
+                row[key].append(spec)
+        declarations.append(row)
+    return declarations
+
+
+def foreach_zone_links(tree):
+    """Return blueprint links with stable socket labels through native item recreation."""
+    def selector(node, socket):
+        prefix = socket.identifier.partition('_')[0]
+        if node.bl_idname in (FOREACH_INPUT, FOREACH_OUTPUT) and prefix in FOREACH_ITEMS:
+            return prefix + ':' + socket.name
+        return socket.identifier
+
+    return [
+        {'from': [link.from_node.get(NODE_ID, link.from_node.name), selector(link.from_node, link.from_socket)],
+         'to': [link.to_node.get(NODE_ID, link.to_node.name), selector(link.to_node, link.to_socket)]}
+        for link in tree.links
+        if link.from_node.bl_idname in (FOREACH_INPUT, FOREACH_OUTPUT) or
+        link.to_node.bl_idname in (FOREACH_INPUT, FOREACH_OUTPUT)
+    ]
+
+
+def _build_foreach_zone(spec, inp, out):
+    out.domain = spec['domain']
+    for key in FOREACH_ITEMS.values():
+        items = getattr(out, key)
+        items.clear()
+        for row in spec[key]:
+            try:
+                item = items.new(row['type'], row['name'])
+            except (TypeError, RuntimeError) as exc:
+                raise WorkflowError('INVALID_REQUEST', str(exc)) from exc
+            if 'domain' in row:
+                _set(item, 'domain', row['domain'])
+    if not inp.pair_with_output(out) or inp.paired_output != out:
+        raise WorkflowError('VALIDATION_FAILED', 'For Each pairing failed')
 
 
 def _interface(tree, specs):
@@ -147,11 +259,13 @@ def _tree_state(tree, trail=()):
     rows = []
     for node in tree.nodes:
         props = {}
-        if node.bl_idname == 'GeometryNodeSimulationInput':
+        if node.bl_idname in ('GeometryNodeSimulationInput', FOREACH_INPUT):
             paired = node.paired_output
             props['paired_output'] = paired.get(NODE_ID, paired.name) if paired else None
         for prop in node.bl_rna.properties:
             key = prop.identifier
+            if node.bl_idname == FOREACH_OUTPUT and key in ('active_input_index', 'active_generation_index', 'active_main_index', 'inspection_index'):
+                continue
             if prop.is_readonly or key in ('rna_type', 'name', 'location', 'location_absolute', 'width', 'width_hidden', 'height', 'dimensions', 'select', 'parent', 'color', 'use_custom_color', 'label', 'hide', 'show_options', 'show_preview', 'show_texture'):
                 continue
             if prop.type == 'COLLECTION':
@@ -162,13 +276,13 @@ def _tree_state(tree, trail=()):
                 continue
             if key == 'node_tree' and node.node_tree: props[key] = _tree_state(node.node_tree, trail)
             elif prop.type in ('BOOLEAN', 'INT', 'FLOAT', 'ENUM', 'STRING', 'POINTER'):
-                props[key] = plain(getattr(node, key))
+                props[key] = _graph_value(getattr(node, key))
         rows.append({'id': node.get(NODE_ID, node.name), 'name': node.name, 'type': node.bl_idname,
                      'properties': props, 'inputs': [{'identifier': s.identifier, 'name': s.name,
                                                        'type': s.bl_idname, 'available': not s.is_unavailable,
-                                                       'default': plain(s.default_value) if hasattr(s, 'default_value') else None} for s in node.inputs],
+                                                       'default': _graph_value(s.default_value) if hasattr(s, 'default_value') else None} for s in node.inputs],
                      'outputs': [{'identifier': s.identifier, 'name': s.name, 'type': s.bl_idname,
-                                  'default': plain(s.default_value) if hasattr(s, 'default_value') else None} for s in node.outputs],
+                                  'default': _graph_value(s.default_value) if hasattr(s, 'default_value') else None} for s in node.outputs],
                      'custom_properties': {k: plain(v) for k, v in node.items() if not k.startswith('gnw_')}})
     links = [{'from': [l.from_node.get(NODE_ID, l.from_node.name), l.from_socket.identifier],
               'to': [l.to_node.get(NODE_ID, l.to_node.name), l.to_socket.identifier],
@@ -258,6 +372,8 @@ def build_graph(blueprint, name=None):
             paired = inp.pair_with_output(out)
             if paired is False or inp.paired_output != out:
                 raise WorkflowError('VALIDATION_FAILED', 'Simulation pairing failed')
+        for zone in spec.get('foreach_zones', []):
+            _build_foreach_zone(zone, nodes[zone['input']], nodes[zone['output']])
         for bake in spec.get('bake_nodes', []):
             node = nodes[bake['node']]
             node.bake_items.clear()
@@ -333,14 +449,17 @@ def _restore_parameter_state(modifier, state):
             else: _set(item, field, value)
 
 
-def _write_parameter(modifier, key, value):
-    rows = interface_map(modifier.node_group)
-    if key not in rows or rows[key]['direction'] != 'INPUT' or rows[key]['type'] == 'NodeSocketGeometry':
+def _parameter_input(modifier, key):
+    row = interface_map(modifier.node_group).get(key)
+    if not row or row['direction'] != 'INPUT' or row['type'] == 'NodeSocketGeometry':
         raise WorkflowError('INVALID_REQUEST', 'Unknown writable public parameter: ' + key)
-    row = rows[key]
+    return row, _typed(modifier, row['identifier'])
+
+
+def _write_parameter(modifier, key, value):
+    row, item = _parameter_input(modifier, key)
     if type(value) in (int, float) and not row.get('min', -math.inf) <= value <= row.get('max', math.inf):
         raise WorkflowError('INVALID_REQUEST', 'Public parameter outside declared range: ' + key)
-    item = _typed(modifier, row['identifier'])
     mode = getattr(item, 'type', None)
     if mode is not None and mode != 'VALUE': raise WorkflowError('UNSUPPORTED', 'Attribute-bound input requires explicit field workflow: ' + key)
     if isinstance(value, dict): value = _resource(value)
@@ -352,6 +471,35 @@ def _write_parameter(modifier, key, value):
         else: _set(item, 'value', value)
     else:
         item['value'] = value
+
+
+def _write_parameter_binding(modifier, key, binding):
+    row, item = _parameter_input(modifier, key)
+    mode = binding['type']
+    current = getattr(item, 'type', None)
+    if mode == 'VALUE' and current in (None, 'VALUE'):
+        _write_parameter(modifier, key, binding['value'])
+        return
+
+    properties = item.bl_rna.properties
+    mode_property = properties.get('type')
+    if (not mode_property or mode_property.type != 'ENUM' or item.is_property_readonly('type')
+            or mode not in {option.identifier for option in mode_property.enum_items}):
+        raise WorkflowError('UNSUPPORTED', 'Public parameter does not support binding mode ' + mode + ': ' + key)
+    if mode == 'ATTRIBUTE':
+        attribute_property = properties.get('attribute_name')
+        socket = next((socket for socket in modifier.node_group.interface.items_tree
+                       if socket.item_type == 'SOCKET' and socket.identifier == row['identifier']), None)
+        if (not attribute_property or attribute_property.type != 'STRING' or item.is_property_readonly('attribute_name')
+                or getattr(socket, 'structure_type', None) == 'SINGLE'):
+            raise WorkflowError('UNSUPPORTED', 'Public parameter does not accept a named field: ' + key)
+        _set(item, 'type', mode)
+        _set(item, 'attribute_name', binding['attribute_name'])
+        if item.type != mode or item.attribute_name != binding['attribute_name']:
+            raise WorkflowError('VALIDATION_FAILED', 'Native named field binding did not round-trip: ' + key)
+    else:
+        _set(item, 'type', mode)
+        _write_parameter(modifier, key, binding['value'])
 
 
 def _restore_values(modifier, values):
@@ -686,6 +834,7 @@ def apply_target(target, before_evaluate=None, before_first_evaluation=None):
         if action == 'adopt' and oldgroup and oldgroup.name == target['source_group']:
             _restore_parameter_state(modifier, oldparameterstate)
         for key, value in target.get('parameters', {}).items(): _write_parameter(modifier, key, value)
+        for key, binding in target.get('parameter_bindings', {}).items(): _write_parameter_binding(modifier, key, binding)
         effective_recipe = target.get('recipe')
         if action == 'parameters' and oldgroup and STATE in oldgroup:
             effective_recipe = json.loads(oldgroup[STATE]).get('recipe')

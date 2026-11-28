@@ -1,6 +1,6 @@
 """Native, parameter-driven Geometry Nodes blueprints (metres and radians)."""
 from copy import deepcopy
-from math import tau
+from math import isfinite, pi, tau
 
 _DEFAULTS = {
     'spiral_stair': {'steps':16,'height':3.0,'radius':1.0,'turn_angle':tau,
@@ -11,7 +11,19 @@ _DEFAULTS = {
                     'path_object':None,'use_external_path':False},
     'surface_scatter': {'size':10.0,'relief':1.2,'density':3.0,'seed':17,
                         'scale':1.0,'max_slope':0.65},
+    'biome_scatter': {
+        'terrain': None, 'species': None, 'camera': None,
+        'terrain_material': None, 'species_material': None,
+        'include_terrain': False, 'camera_frustum': False, 'camera_distance': False,
+        'distance_min': 0.65, 'density_max': 12.0, 'seed': 17,
+        'max_slope': pi / 3, 'min_height': -10000.0, 'max_height': 10000.0,
+        'weight_attribute': '', 'min_scale': 0.75, 'max_scale': 1.3,
+        'yaw_range': tau, 'max_camera_distance': 200.0,
+    },
 }
+
+_BIOME_POINTERS = {'terrain': 'OBJECT', 'species': 'COLLECTION', 'camera': 'OBJECT',
+                   'terrain_material': 'MATERIAL', 'species_material': 'MATERIAL'}
 
 def recipe_defaults(name):
     if name not in _DEFAULTS:
@@ -173,20 +185,152 @@ def _scatter(p):
         outputs.append((kind+'_instances','Instances'))
     return g.output(g.join('final',('terrain','Geometry'),*outputs))
 
+
+def _biome(p):
+    g = _Graph('biome_scatter', p)
+    for key, kind in _BIOME_POINTERS.items():
+        g.socket(key, key, 'INPUT', 'NodeSocket' + kind.title(), p[key])
+    for key in ('include_terrain', 'camera_frustum', 'camera_distance'):
+        g.socket(key, key, 'INPUT', 'NodeSocketBool', p[key])
+    g.socket('weight_attribute', 'weight_attribute', 'INPUT', 'NodeSocketString', p['weight_attribute'])
+    spacing = g.parameter('distance_min', 0.001, 10000)
+    density = g.parameter('density_max', 0, 100000, 'per_m2')
+    seed = g.parameter('seed', 0, 1000000, 'seed')
+    slope = g.parameter('max_slope', 0, pi, 'rad')
+    min_height = g.parameter('min_height', -100000, 100000)
+    max_height = g.parameter('max_height', -100000, 100000)
+    min_scale = g.parameter('min_scale', 0.001, 100, 'factor')
+    max_scale = g.parameter('max_scale', 0.001, 100, 'factor')
+    yaw_range = g.parameter('yaw_range', 0, tau, 'rad')
+    distance = g.parameter('max_camera_distance', 0.001, 100000)
+
+    def output(node, kind, inputs, socket, properties=None):
+        g.node(node, kind, inputs, properties)
+        return (node, socket)
+
+    def switch(node, typ, test, false, true):
+        return output(node, 'GeometryNodeSwitch', {'Switch': test, 'False': false, 'True': true},
+                      'Output', {'input_type': typ})
+
+    def compare(node, operation, a, b):
+        return output(node, 'FunctionNodeCompare', {'A': a, 'B': b}, 'Result', {'operation': operation})
+
+    def boolean(node, operation, first, second=None):
+        inputs = {'Boolean': first}
+        if second is not None:
+            inputs['Boolean_001'] = second
+        return output(node, 'FunctionNodeBooleanMath', inputs, 'Boolean', {'operation': operation})
+
+    def xyz(node, vector):
+        g.node(node, 'ShaderNodeSeparateXYZ', {'Vector': vector})
+        return [(node, axis) for axis in 'XYZ']
+
+    terrain = output('terrain_geometry', 'GeometryNodeObjectInfo', {'Object': ('in', 'terrain')},
+                     'Geometry', {'transform_space': 'RELATIVE'})
+    position = output('position', 'GeometryNodeInputPosition', {}, 'Position')
+    normal = output('normal', 'GeometryNodeInputNormal', {}, 'Normal')
+    _, _, normal_z = xyz('slope_z', normal)
+    slope_ok = compare('slope_mask', 'GREATER_EQUAL', normal_z, g.math('slope_cosine', 'COSINE', slope))
+    weight = output('named_weight', 'GeometryNodeInputNamedAttribute', {'Name': ('in', 'weight_attribute')}, 'Attribute')
+    density_factor = switch('weight_mask', 'FLOAT', ('named_weight', 'Exists'), 1.0,
+                            g.math('clamp_weight', 'MINIMUM',
+                                   g.math('positive_weight', 'MAXIMUM', weight, 0.0), 1.0))
+    points = output('poisson', 'GeometryNodeDistributePointsOnFaces',
+                    {'Mesh': terrain, 'Selection': slope_ok, 'Distance Min': spacing,
+                     'Density Max': density, 'Density Factor': density_factor, 'Seed': seed},
+                    'Points', {'distribute_method': 'POISSON'})
+
+    # Height and camera tests run on actual distributed points, not interpolated face centres.
+    _, _, z = xyz('world_height', position)
+    height_ok = boolean('height_mask', 'AND', compare('height_minimum', 'GREATER_EQUAL', z, min_height),
+                        compare('height_maximum', 'LESS_EQUAL', z, max_height))
+    camera = ('in', 'camera')
+    camera_matrix = output('camera_transform', 'GeometryNodeObjectInfo', {'Object': camera}, 'Transform',
+                           {'transform_space': 'RELATIVE'})
+    inverse = output('camera_inverse', 'FunctionNodeInvertMatrix', {'Matrix': camera_matrix}, 'Matrix')
+    camera_position = output('point_camera_space', 'FunctionNodeTransformPoint',
+                             {'Vector': position, 'Transform': inverse}, 'Vector')
+    projection = output('camera_projection', 'GeometryNodeCameraInfo', {'Camera': camera}, 'Projection Matrix')
+    projected = output('point_ndc', 'FunctionNodeProjectPoint', {'Vector': camera_position, 'Transform': projection}, 'Vector')
+    clips = [compare('clip_' + axis.lower(), 'LESS_EQUAL', g.math('abs_' + axis.lower(), 'ABSOLUTE', coord), 1.0)
+             for axis, coord in zip('XYZ', xyz('ndc_axes', projected))]
+    _, _, camera_z = xyz('camera_axes', camera_position)
+    front = compare('in_front_of_camera', 'LESS_THAN', camera_z, 0.0)
+    frustum_ok = boolean('viewport_clip', 'AND', boolean('ndc_xy', 'AND', *clips[:2]),
+                         boolean('ndc_z_and_front', 'AND', clips[2], front))
+    distance_value = output('camera_point_distance', 'ShaderNodeVectorMath',
+                            {'Vector': position, 'Vector_001': ('camera_transform', 'Location')}, 'Value',
+                            {'operation': 'DISTANCE'})
+    range_ok = compare('distance_clip', 'LESS_EQUAL', distance_value, distance)
+    camera_ok = boolean('camera_mask', 'AND', switch('frustum_enabled', 'BOOLEAN', ('in', 'camera_frustum'), True, frustum_ok),
+                        switch('distance_enabled', 'BOOLEAN', ('in', 'camera_distance'), True, range_ok))
+    visible = boolean('visible', 'AND', height_ok, camera_ok)
+    points = output('visible_points', 'GeometryNodeDeleteGeometry',
+                    {'Geometry': points, 'Selection': boolean('discard', 'NOT', visible)}, 'Geometry', {'domain': 'POINT'})
+
+    prototypes = output('linked_species', 'GeometryNodeCollectionInfo',
+                        {'Collection': ('in', 'species'), 'Separate Children': True, 'Reset Children': True}, 'Instances')
+    # Recolour each local evaluated prototype independently before repetition. Linked IDs stay read-only.
+    g.node('prototype_each', 'GeometryNodeForeachGeometryElementInput', {'Geometry': prototypes})
+    g.node('prototype_group', 'GeometryNodeForeachGeometryElementOutput')
+    g.data['foreach_zones'] = [{
+        'input': 'prototype_each', 'output': 'prototype_group', 'domain': 'INSTANCE',
+        'input_items': [], 'main_items': [], 'generation_items': [{'name': 'Prototypes', 'type': 'GEOMETRY'}],
+    }]
+    realized = output('prototype_mesh', 'GeometryNodeRealizeInstances', {'Geometry': ('prototype_each', 'Element')}, 'Geometry')
+    colored = output('prototype_color', 'GeometryNodeSetMaterial',
+                     {'Geometry': realized, 'Material': ('in', 'species_material')}, 'Geometry')
+    instance = output('prototype_instance', 'GeometryNodeGeometryToInstance', {'Geometry': colored}, 'Instances')
+    g.link(instance, ('prototype_group', 'Generation:Prototypes'))
+    material = ('in', 'species_material')
+    species_override = output('species_override', 'FunctionNodeCompare', {'A': material}, 'Result',
+                              {'data_type': 'MATERIAL', 'operation': 'NOT_EQUAL'})
+    prototypes = switch('species_variant', 'GEOMETRY', species_override, prototypes,
+                        ('prototype_group', 'Generation:Prototypes'))
+    size = output('species_count', 'GeometryNodeAttributeDomainSize', {'Geometry': prototypes}, 'Instance Count',
+                  {'component': 'INSTANCES'})
+    index = output('random_species', 'FunctionNodeRandomValue',
+                   {'Min': 0, 'Max': g.math('last_species', 'SUBTRACT', size, 1.0), 'Seed': seed},
+                   'Value', {'data_type': 'INT'})
+    yaw = output('random_yaw', 'FunctionNodeRandomValue',
+                 {'Min': 0.0, 'Max': yaw_range, 'Seed': g.math('yaw_seed', 'ADD', seed, 1009)}, 'Value')
+    scale = output('random_scale', 'FunctionNodeRandomValue',
+                   {'Min': min_scale, 'Max': max_scale, 'Seed': g.math('scale_seed', 'ADD', seed, 2027)}, 'Value')
+    rotation = output('local_yaw', 'FunctionNodeEulerToRotation', {'Euler': g.xyz('yaw_vector', z=yaw)}, 'Rotation')
+    aligned = output('align_to_surface', 'FunctionNodeRotateRotation',
+                     {'Rotation': ('poisson', 'Rotation'), 'Rotate By': rotation}, 'Rotation', {'rotation_space': 'LOCAL'})
+    instances = output('scatter_instances', 'GeometryNodeInstanceOnPoints',
+                       {'Points': points, 'Instance': prototypes, 'Pick Instance': True, 'Instance Index': index,
+                        'Rotation': aligned, 'Scale': g.xyz('uniform_scale', scale, scale, scale)}, 'Instances')
+    terrain_override = output('terrain_override', 'FunctionNodeCompare', {'A': ('in', 'terrain_material')}, 'Result',
+                              {'data_type': 'MATERIAL', 'operation': 'NOT_EQUAL'})
+    terrain_colored = output('terrain_color', 'GeometryNodeSetMaterial',
+                             {'Geometry': terrain, 'Material': ('in', 'terrain_material')}, 'Geometry')
+    surface = switch('terrain_variant', 'GEOMETRY', terrain_override, terrain, terrain_colored)
+    joined = g.join('terrain_and_instances', surface, instances)
+    return g.output(switch('terrain_enabled', 'GEOMETRY', ('in', 'include_terrain'), instances, joined))
+
 def build_recipe(name,parameters=None):
     p=recipe_defaults(name)
     unknown=set(parameters or {})-set(p)
     if unknown:raise ValueError('Unknown recipe parameters: '+', '.join(sorted(unknown)))
     for key,val in (parameters or {}).items():
+        if name == 'biome_scatter' and key in _BIOME_POINTERS:
+            if val is not None and (not isinstance(val, dict) or val.get('kind') != _BIOME_POINTERS[key] or not val.get('name')):
+                raise ValueError(key + ' requires an explicit ' + _BIOME_POINTERS[key] + ' resource')
+            p[key] = val
+            continue
+        if type(p[key]) in (str, bool):
+            if type(val) is not type(p[key]):
+                raise ValueError('Wrong type for recipe parameter: ' + key)
+            p[key] = val
+            continue
         if key=='path_object':
-            if val is not None and (not isinstance(val,dict) or set(val)!={'kind','name'} or val['kind']!='OBJECT' or not isinstance(val['name'],str)):
+            if val is not None and (not isinstance(val,dict) or val.get('kind')!='OBJECT' or not isinstance(val.get('name'),str)):
                 raise ValueError('path_object requires explicit OBJECT resource')
             p[key]=val;continue
-        if key=='use_external_path':
-            if not isinstance(val,bool):raise ValueError('Boolean required: '+key)
-            p[key]=val;continue
-        if isinstance(val,bool) or not isinstance(val,(int,float)):
+        if isinstance(val,bool) or not isinstance(val,(int,float)) or not isfinite(val):
             raise ValueError('Recipe parameter must be numeric: '+key)
         if isinstance(p[key],int) and not isinstance(val,int):raise ValueError('Integer required: '+key)
-        p[key]=val
-    return {'spiral_stair':_stair,'curve_fence':_fence,'surface_scatter':_scatter}[name](p)
+        p[key] = type(p[key])(val)
+    return {'spiral_stair':_stair,'curve_fence':_fence,'surface_scatter':_scatter,'biome_scatter':_biome}[name](p)

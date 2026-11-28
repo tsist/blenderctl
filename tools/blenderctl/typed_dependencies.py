@@ -136,7 +136,10 @@ def audit(params,job):
                 tree=owner if isinstance(owner,bpy.types.NodeTree) else getattr(owner,'node_tree',None)
                 if not tree or tree.as_pointer() in seen_trees:continue
                 seen_trees.add(tree.as_pointer());allowed=set(NODE_TYPES.get(tree.bl_idname,()))|ZONE_TYPES
-                if tree.bl_idname=='ShaderNodeTree':allowed.add('ShaderNodeOutputLight')
+                if tree.bl_idname=='ShaderNodeTree':
+                    # File-closure only: FloatCurve/CurveMapping stores local
+                    # math data, no file/ID inputs; does not extend node editing.
+                    allowed.update(('ShaderNodeOutputLight','ShaderNodeFloatCurve'))
                 for node in tree.nodes:
                     if node.bl_idname not in allowed:issues.append({'code':'NODE_DEPENDENCY_UNKNOWN','file':file,'owner':identity(owner),'node':node.name,'type':node.bl_idname})
             # Libraries are read from each native Main independently. Blender may

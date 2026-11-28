@@ -22,10 +22,14 @@ def normalize(m):
     for v in m['base'].values():require(v is None or isinstance(v,str) and bool(re.fullmatch('[0-9a-f]{64}',v)),'Base values must be SHA256 or null for absent')
     require(isinstance(m['updates'],list) and 1<=len(m['updates'])<=50,'Requires 1..50 complete file updates')
     for u in m['updates']:
-        fields(u,('candidate','output','index','lifecycle','acceptance','retirement'),('candidate','output','index','lifecycle'))
+        fields(u,('candidate','output','expected_output_sha256','index','lifecycle','acceptance','retirement','qa_profile'),('candidate','output','index','lifecycle'))
+        require(u.get('qa_profile', 'render') in ('render','game'), 'qa_profile must be render or game')
         descriptor(u['candidate']);descriptor(u['index'])
         require(isinstance(u['output'],str) and Path(u['output']).is_absolute() and Path(u['output']).suffix.lower()=='.blend','Output must be an absolute blend path')
         u['output']=str(Path(u['output']).resolve())
+        expected = u.get('expected_output_sha256')
+        require(expected is None or isinstance(expected, str) and re.fullmatch('[0-9a-f]{64}', expected),
+                'expected_output_sha256 must be a lowercase SHA256 or null for a new file')
         require(Path(u['output']).is_relative_to(m['library_root']),'Output outside library')
         require(u['lifecycle'] in ('working','published') and u.get('retirement','archived') in ('archived','quarantine'),'Invalid lifecycle')
         if u['lifecycle']=='published':require('acceptance' in u,'Published assets require acceptance evidence')
@@ -50,7 +54,31 @@ def check_records(records):
         require(not list(schema_errors(record,schema)),'Invalid asset record schema')
         primary(record)
 
-def plan(manifest,launch,job,checkpoint):
+def merge_catalog(text, existing, requested):
+    """Keep native Catalog comments, ordering and untouched definitions verbatim."""
+    changed = {}
+    for row in requested:
+        uid = row['uuid'].lower()
+        fields = {'path': row['path'], 'simple_name': row['simple_name']}
+        if existing.get(uid) != fields:
+            changed[uid] = f"{uid}:{row['path']}:{row['simple_name']}"
+    if not changed:
+        return text
+    lines = text.splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        content = line.rstrip('\r\n')
+        uid = content.strip().partition(':')[0].lower()
+        if uid in existing and uid in changed:
+            lines[i] = changed.pop(uid) + line[len(content):]
+    if changed:
+        first_line_ending = re.search(r'\r\n|\n|\r', text)
+        newline = first_line_ending.group() if first_line_ending else os.linesep
+        if lines and not lines[-1].endswith(('\r', '\n')):
+            lines.append(newline)
+        lines.extend(changed[uid] + newline for uid in sorted(changed))
+    return ''.join(lines)
+
+def plan(manifest,launch,job,checkpoint,*,force=False):
     from filesystem import FileGuard,PathLocks
     import transactions as tx
     m=normalize(copy.deepcopy(manifest));root=Path(m['library_root'])
@@ -89,36 +117,82 @@ def plan(manifest,launch,job,checkpoint):
         old_ids=[r['asset_id'] for r in base['index']];require(len(set(old_ids))==len(old_ids),'Duplicate base index asset IDs')
         retained=[r for r in base['index'] if primary(r) not in outputs];retired=[r for r in base['index'] if primary(r) in outputs]
         merged=list(retained);items=[];retire_modes={}
+        indexed_outputs = {primary(r) for r in retired}
         for u in m['updates']:
+            output = u['output']
+            tracked = canonical(output) in indexed_outputs
+            if 'expected_output_sha256' in u:
+                expected = u['expected_output_sha256']
+                replacing = expected is not None
+                if replacing:
+                    if not Path(output).is_file():
+                        raise Failure('CONFLICT', 'Expected a reviewed existing library file: ' + output)
+                    hold({'file': output, 'expected_sha256': expected})
+            else:
+                replacing = tracked
+            if not replacing and os.path.lexists(output):
+                raise Failure('CONFLICT', 'Asset creation requires a new path. To replace a reviewed file, '
+                              'supply its expected_output_sha256: ' + output)
             hold(u['candidate']);hold(u['index'])
             records=read_json(u['index']['file']);check_records(records)
+            if records and u['lifecycle'] == 'published':
+                stem = Path(output).stem
+                package_type = stem.partition('_')[0]
+                versions = {record['version'] for record in records}
+                require(package_type in {record['type'] for record in records} and len(versions) == 1,
+                        'Published filename must carry a type present in the file and one common release version')
+                version, = versions
+                pattern = re.escape(package_type) + r'_.+_' + re.escape(version) + r'(?:_[A-Za-z0-9]+)*'
+                require(int(version[1:]) >= 1 and re.fullmatch(pattern, stem),
+                        'Published filename must carry the declared type and version, with optional variant/LOD suffixes')
             for r in records:
                 require(primary(r)==canonical(u['output']),'Shard output differs from planned output')
                 r['lifecycle']=u['lifecycle']
                 if u['lifecycle']=='published':
-                    require(int(r['version'][1:])>=1 and bool(re.fullmatch(re.escape(r['type'])+r'_.+_'+re.escape(r['version'])+r'(?:_[A-Za-z0-9]+)*',Path(u['output']).stem)),'Published filename must carry the declared type and version, with optional variant/LOD suffixes')
                     hold(u['acceptance']);r['validation']={'status':'pass','receipt':u['acceptance']}
                 for old in retired:
                     if old['asset_id']==r['asset_id'] and old['lifecycle']=='published' and (old['version']==r['version'] or int(r['version'][1:])<=int(old['version'][1:])):
                         raise Failure('CONFLICT','Published asset changes require an increasing new version')
                 merged.append(r)
             retire_modes[canonical(u['output'])]=u.get('retirement','archived')
-            items.append({'kind':'blend_exact','mode':'replace' if Path(u['output']).exists() else 'create','file':u['candidate']['file'],'output':u['output']})
+            items.append({'kind':'blend_exact','mode':'replace' if replacing else 'create','file':u['candidate']['file'],'output':output})
         ids=[r['asset_id'] for r in merged]
         if len(set(ids))!=len(ids):raise Failure('CONFLICT','Asset ID remains active in another file; retire that file in the same batch')
-        definitions=base['catalog']
-        for c in m['catalogs']:definitions[c['uuid']]={'path':c['path'],'simple_name':c['simple_name']}
-        catalog_text='VERSION 1\n'+''.join(f"{uid}:{c['path']}:{c['simple_name']}\n" for uid,c in sorted(definitions.items()))
-        cat=job/NAMES['catalog'];cat.write_text(catalog_text,encoding='utf-8');tx.validate_document(cat,'catalog')
+        catalog_guard = held.get(str(root / NAMES['catalog']))
+        original = 'VERSION 1' + os.linesep
+        if catalog_guard is not None:
+            original = b''.join(catalog_guard.chunks(checkpoint)).decode('utf-8')
+        catalog_text = merge_catalog(original, base['catalog'], m['catalogs'])
+        cat=job/NAMES['catalog'];cat.write_bytes(catalog_text.encode('utf-8'));tx.validate_document(cat,'catalog')
         file_map={primary(r):primary(r) for r in retained}
         file_map.update({canonical(u['output']):u['candidate']['file'] for u in m['updates']})
         for logical,actual in file_map.items():
             if actual not in held:
                 held[actual]=stack.enter_context(FileGuard(actual))
+        publication_qa = []
+        quality_inputs = {}
+        for update in m['updates']:
+            if update['lifecycle'] != 'published':
+                continue
+            profile = update.get('qa_profile', 'render')
+            params = {**update['candidate'], 'options': {'profile': profile}}
+            qa = tx.worker(job, launch, {'schema_version': SCHEMA, 'command': 'qa.inspect', 'params': params}, checkpoint, {})
+            passed = qa['qa']['engineering_gates_passed']
+            if type(passed) is not bool:
+                raise Failure('VALIDATION_FAILED', 'Candidate QA did not report an engineering verdict')
+            report = {'file': qa['report'], 'expected_sha256': digest(qa['report'], checkpoint)}
+            hold(report)
+            quality_inputs[report['file']] = report
+            publication_qa.append({'candidate': update['candidate'], 'profile': profile, 'passed': passed, 'report': report['file'],
+                                   'report_sha256': report['expected_sha256'],
+                                   'overridden': force and not passed})
+            atomic_json(job/'publication-qa.json', publication_qa)
+            if not passed and not force:
+                raise Failure('VALIDATION_FAILED', 'Published candidate failed QA; see ' + str(qa['report']))
         scope={'root':str(root),'records':merged,'catalog_text':catalog_text,'file_map':file_map}
         validation=tx.worker(job,launch,{'schema_version':SCHEMA,'command':'_library_validate','params':scope},checkpoint,{})
         # Apply/recover will hold these unchanged files and resource/evidence inputs.
-        stable={**history_inputs,**{d['file']:d for d in validation['inputs']}}
+        stable={**history_inputs,**quality_inputs,**{d['file']:d for d in validation['inputs']}}
         for logical,actual in file_map.items():
             if logical not in outputs:stable[actual]={'file':actual,'expected_sha256':held[actual].sha256(checkpoint)}
         if set(map(canonical,stable)) & set(outputs):raise Failure('CONFLICT','An updated output is also a protected external resource')
@@ -135,6 +209,7 @@ def plan(manifest,launch,job,checkpoint):
         hist=next(i for i in p['items'] if i['output']==str(root/NAMES['history']))
         with FileGuard(hist['file']) as guard:hist.update(source_sha256=guard.sha256(checkpoint),source_identity=guard.identity(),source_bytes=Path(hist['file']).stat().st_size)
         p['schema_version']='1.3';p['asset_scope']={**scope,'stable_inputs':list(stable.values())}
+        p['policy']['publication_qa']=publication_qa
         p['policy']['purpose']='validated_asset_library';s['plan_hash']=tx.canonical_hash(p)
         atomic_json(directory/'plan.json',p);tx.persist(directory,s)
         atomic_json(job/'library-preflight.json',validation)
@@ -173,6 +248,16 @@ def validate_worker(scope):
         findings+=validate_snapshot(data)['findings']
         if any(f['severity']=='error' for f in findings):raise Failure('VALIDATION_FAILED','Library file failed validation: '+str(findings))
         published=any(r['lifecycle']=='published' for r in records)
+        from assets import previews
+        embedded = previews()
+        from inspection import key
+        for asset in records:
+            for block in asset["blender"]["datablocks"]:
+                expected = asset["blender"].get("embedded_preview")
+                if expected is not None and embedded.get(key({**block, "library": None})) != expected:
+                    raise Failure("VALIDATION_FAILED", "Embedded thumbnail changed since indexing")
+            for preview in (f for f in asset["files"] if f["role"] == "preview"):
+                evidence({"file": preview["path"], "expected_sha256": preview["sha256"]})
         for d in data['dependencies']['items']:
             if d['role']=='output':continue
             if published and d['status'] not in ('exists','packed','builtin','generated','no_external_path'):raise Failure('VALIDATION_FAILED','Published dependency coverage is incomplete')

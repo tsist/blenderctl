@@ -1,10 +1,10 @@
-"""Explicit sequential work units; the legacy pipeline admission set is unchanged."""
+"""Explicit sequential work units with additional write operations."""
 import copy,re
 from protocol import Failure
 from scene_contract import obj,array,enum,validate
 import pipeline_contract as pipeline
 
-EXTRA_COMMANDS=('geometry.run','geometry.inspect','material.run')
+EXTRA_COMMANDS=('geometry.run','material.run')
 ALLOWED=(*pipeline.ALLOWED,*EXTRA_COMMANDS)
 STEP=copy.deepcopy(pipeline.STEP)
 STEP['properties']['command']=enum(*ALLOWED)
@@ -16,7 +16,7 @@ def normalize(value):
     value=copy.deepcopy(value)
     validate(value,MANIFEST)
     # Share the existing topology/binding/budget validator through its explicit
-    # schema argument. The workflow commands are never added to pipeline.ALLOWED.
+    # schema argument. Additional write operations require sequential workflow.
     value=pipeline.normalize(value,schema=MANIFEST)
     return value
 

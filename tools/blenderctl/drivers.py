@@ -1,5 +1,6 @@
 """Auditable native expression evaluation with unchanged default script refusal."""
 import hashlib,json,math
+from host_compat import is_supported_host
 import bpy
 from inspection import all_ids,identity,properties,curve_content
 from protocol import Failure,atomic_json,digest
@@ -50,7 +51,7 @@ def check(profile,source,job=None):
     normalize(profile)
     if not source or digest(source)!=profile['source_sha256']:raise Failure('CONFLICT','Driver profile source SHA256 mismatch')
     if bpy.context.preferences.filepaths.use_scripts_auto_execute:raise Failure('UNSUPPORTED','Driver profile requires automatic Python execution disabled')
-    if tuple(bpy.app.version)!=(5,2,1):raise Failure('UNSUPPORTED','NATIVE_SIMPLE_V1 is validated for Blender 5.2.1')
+    if not is_supported_host(bpy.app.version):raise Failure('UNSUPPORTED','NATIVE_SIMPLE_V1 requires Blender 5.3.0 or later')
     rows,handles=inventory()
     if len(rows)!=profile['driver_count'] or sha(rows)!=profile['inventory_sha256']:raise Failure('CONFLICT','Driver inventory differs from profile')
     unresolved={r['driver_id'] for r in rows if not r['driven_path_resolved']}

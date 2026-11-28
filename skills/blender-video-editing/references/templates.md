@@ -16,7 +16,7 @@
 先查可用模板与输入契约：
 
 ```powershell
-$py  = '<PROJECT_ROOT>/runtime\blender\releases\5.3.0\blender-5.3.0-windows-x64\5.3\python\bin\python.exe'
+$py  = '<PROJECT_ROOT>\runtime\blender\releases\5.3.0\blender-5.3.0-windows-x64\5.3\python\bin\python.exe'
 $tpl = './.agents/skills\blender-video-editing\scripts\video_templates.py'
 
 & $py -B $tpl list
@@ -41,7 +41,7 @@ $tpl = './.agents/skills\blender-video-editing\scripts\video_templates.py'
 指定一个新建的输出目录编译：
 
 ```powershell
-$inJson = '<PROJECT_ROOT>/work\reel\template-input.json'
+$inJson = '<PROJECT_ROOT>\work\reel\template-input.json'
 $inSha  = (Get-FileHash -LiteralPath $inJson -Algorithm SHA256).Hash.ToLowerInvariant()
 
 & $py -B $tpl compile --template subtitle-readable `

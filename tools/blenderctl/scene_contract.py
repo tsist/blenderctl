@@ -41,8 +41,14 @@ operation('constraint.remove',{'object':NAME,'name':NAME})
 operation('camera.configure',{'object':NAME,'data_scope':enum('single_user','shared'),'type':enum('PERSP','ORTHO'),'lens':number(1,2500),'ortho_scale':number(.001,1e6),'clip_start':number(.001,1e5),'clip_end':number(.002,1e8)},['object','data_scope'])
 operation('light.configure',{'object':NAME,'data_scope':enum('single_user','shared'),'energy':number(0,1e9),'color':array(number(0,1),3,3),'size':number(.001,1e6),'radius':number(0,1e6),'spot_size_deg':number(1,180),'spot_blend':number(0,1),'angle_deg':number(0,180)},['object','data_scope'])
 operation('world.create',{'scene':NAME,'name':NAME,'color':array(number(0,1),3,3),'strength':number(0,10000)})
+LOCALIZATION = 'object.make_collection_local'
+SCENE_PREPARE_OPS = {**OPS, LOCALIZATION: obj({
+    'op': {'const': LOCALIZATION}, 'object': NAME, 'expected_collection': NAME,
+    'expected_library_file': {'type': 'string', 'minLength': 1},
+    'expected_library_sha256': {'type': 'string', 'pattern': '^[0-9a-f]{64}$'},
+}, ['op', 'object', 'expected_collection'])}
 CONTEXT=obj({'scene':NAME,'view_layer':NAME,'frame':integer(-1048574,1048574),'mode':{'const':'OBJECT'},'active_object':NULL_NAME,'selected_objects':{**array(NAME,maximum=1000),'uniqueItems':True}})
-MANIFEST=obj({'initial_scene':NAME,'context':CONTEXT,'operations':array({'oneOf':list(OPS.values())},1,1000)},['context','operations'])
+MANIFEST=obj({'initial_scene':NAME,'context':CONTEXT,'operations':array({'oneOf':list(SCENE_PREPARE_OPS.values())},1,1000)},['context','operations'])
 
 def validate(value,schema,path='$'):
     def fail(message):raise Failure('INVALID_REQUEST',path+': '+message)

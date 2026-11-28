@@ -10,6 +10,9 @@ from inspection import identity,key,all_ids
 from verification import resolve
 import rendering,scenes,assets,nodes,drivers,preview_framing
 
+SURFACE_TYPES = {'MESH', 'CURVE', 'SURFACE', 'FONT'}
+SCENE_OBJECT_TYPES = SURFACE_TYPES | {'ARMATURE', 'EMPTY', 'LIGHT', 'CAMERA'}
+
 def fingerprint(value):return hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 def implementation():return fingerprint({p.name:digest(p) for p in sorted(Path(__file__).parent.glob('*.py'))})
 def recipe(params):return {k:v for k,v in params.items() if k!='reuse_receipt'}
@@ -56,45 +59,112 @@ def fixture(spec,target):
 def targets(spec,target,scene,layer):
     if spec['fixture']!='NONE':return fixture(spec,target)
     selected=[target] if isinstance(target,bpy.types.Object) else list(target.all_objects)
-    if any(o.instance_type!='NONE' for o in selected):raise Failure('UNSUPPORTED','Collection/object instances require an instance-aware preview adapter')
-    if any(o.type not in ('MESH','CURVE','SURFACE','FONT','ARMATURE','EMPTY','LIGHT','CAMERA') for o in selected):raise Failure('UNSUPPORTED','Target contains an unsupported geometric object type')
-    selected=[o for o in selected if o.type in ('MESH','CURVE','SURFACE','FONT')]
+    if any(o.instance_type != 'NONE' and not (o.type == 'EMPTY' and o.instance_type == 'COLLECTION') for o in selected):
+        raise Failure('UNSUPPORTED','Preview supports only native Empty collection instances')
+    if any(o.type not in SCENE_OBJECT_TYPES for o in selected):raise Failure('UNSUPPORTED','Target contains an unsupported geometric object type')
+    selected=[o for o in selected if o.type in SURFACE_TYPES or o.instance_type == 'COLLECTION']
     if not selected:raise Failure('VALIDATION_FAILED','Preview target contains no surface objects')
+    if any(o.library for o in selected):
+        raise Failure('UNSUPPORTED','Select the local Empty that places the packed asset')
     if spec['visibility']=='REQUIRE_VISIBLE':
         if any(o.name not in layer.objects or o.hide_viewport or o.hide_render or not o.visible_get(view_layer=layer) for o in selected):raise Failure('UNSUPPORTED','Hidden target requires explicit INCLUDE_HIDDEN preview policy')
     else:
         def show(lc):
-            lc.exclude=False;lc.hide_viewport=False;lc.collection.hide_viewport=False
+            lc.exclude=False;lc.hide_viewport=False
+            if not lc.collection.library:
+                lc.collection.hide_viewport=False
             for child in lc.children:show(child)
         show(layer.layer_collection)
-        for o in scene.objects:o.hide_viewport=False;o.hide_set(False)
+        for o in scene.objects:
+            if not o.library:
+                o.hide_viewport=False;o.hide_set(False)
         if any(o.name not in scene.objects for o in selected):raise Failure('UNSUPPORTED','Preview targets must belong to selected scene')
     return sorted(selected,key=lambda x:x.name)
+
+def localize_archived_instances(selected):
+    # Use the native localization contract in this disposable worker. It verifies
+    # instance transforms and copies the modifier, material and packed image dependencies.
+    from collection_local import realize
+
+    surfaces = []
+    for item in selected:
+        backing = item.instance_collection if item.instance_type == 'COLLECTION' else None
+        if backing is None or not backing.library:
+            surfaces.append(item)
+            continue
+        if not backing.is_linked_packed or not backing.library.is_archive:
+            raise Failure('UNSUPPORTED', f'Preview requires a native packed asset archive: {item.name}')
+        result = realize(item, {'expected_collection': backing.name}, None)
+        surfaces.extend(bpy.data.objects[part['object']] for part in result['parts'].values() if part['mesh'] is not None)
+    return surfaces
+
+def collection_instance_parts(root):
+    # Match dependency-graph instances to a known collection membership.
+    # Nested instancers can otherwise introduce geometry not attributable to this root.
+    backing = root.instance_collection
+    if backing is None or backing.library or backing.override_library:
+        raise Failure('UNSUPPORTED', f'Preview needs a local backing collection: {root.name}')
+    parts = list(backing.all_objects)
+    for part in parts:
+        if (part.library or part.override_library or part.instance_type != 'NONE' or
+                part.type not in SCENE_OBJECT_TYPES or
+                any(m.show_render and m.type in {'NODES', 'PARTICLE_SYSTEM'} for m in part.modifiers)):
+            raise Failure('UNSUPPORTED', f'Preview cannot freeze nested or procedural instances: {root.name}/{part.name}')
+    return {part.as_pointer(): part for part in parts}
+
 def freeze_meshes(selected,spec):
     # Capture render-level geometry in the original scene. All edits are in the
     # disposable process; embedding later reopens the immutable original.
-    for o in bpy.context.scene.objects:
+    roots = {o.as_pointer(): collection_instance_parts(o) for o in selected if o.instance_type == 'COLLECTION'}
+    objects = {o.as_pointer(): o for o in bpy.context.scene.objects if not o.library}
+    for parts in roots.values():
+        objects.update(parts)
+    for o in objects.values():
         for m in o.modifiers:
             if m.type!='CLOTH':m.show_viewport=m.show_render
             if m.type=='SUBSURF':m.levels=m.render_levels
     bpy.context.scene.frame_set(spec['frame']);nodes.sequence_bindings(spec['frame']);bpy.context.view_layer.update();graph=bpy.context.evaluated_depsgraph_get();frozen=[];points=[];materials={}
-    selected_ids={o.original.as_pointer() for o in selected}
-    if any(i.is_instance and i.parent and i.parent.original.as_pointer() in selected_ids for i in graph.object_instances):
-        raise Failure('UNSUPPORTED','Evaluated instances require explicit realization before preview; mesh-only capture would omit geometry')
+    selected_ids={o.as_pointer() for o in selected}
     neutral=clay() if spec['appearance']=='CLAY' else None
-    for o in selected:
-        ev=o.evaluated_get(graph);mesh=bpy.data.meshes.new_from_object(ev,preserve_all_data_layers=True,depsgraph=graph)
-        if not mesh.polygons:raise Failure('VALIDATION_FAILED','Target has no evaluated surface: '+o.name)
-        matrix=ev.matrix_world.copy();world=[matrix@v.co for v in mesh.vertices];points+=world
-        if len(points)>500000:raise Failure('UNSUPPORTED','Preview exceeds 500000 evaluated vertices')
+
+    def freeze(name, evaluated, matrix):
+        mesh=bpy.data.meshes.new_from_object(evaluated,preserve_all_data_layers=True,depsgraph=graph)
+        if not mesh.polygons:raise Failure('VALIDATION_FAILED','Target has no evaluated surface: '+name)
+        if len(points)+len(mesh.vertices)>500000:raise Failure('UNSUPPORTED','Preview exceeds 500000 evaluated vertices')
+        world=[matrix@v.co for v in mesh.vertices]
         preview_framing.bounds(world)
+        points.extend(world)
         if neutral:
             mesh.materials.clear();mesh.materials.append(neutral)
             for p in mesh.polygons:p.material_index=0
         else:
             copied=[shader_copy(m,materials) for m in mesh.materials];mesh.materials.clear()
             for m in copied:mesh.materials.append(m)
-        frozen.append((o.name,mesh,matrix))
+        frozen.append((name,mesh,matrix))
+
+    seen = set()
+    for item in graph.object_instances:
+        if not item.is_instance or not item.parent:
+            continue
+        parent = item.parent.original
+        root_id = parent.as_pointer()
+        if root_id not in selected_ids:
+            continue
+        evaluated = item.object
+        part_id = evaluated.original.as_pointer()
+        if root_id not in roots or part_id not in roots[root_id]:
+            raise Failure('UNSUPPORTED','Evaluated instances require explicit realization before preview; mesh-only capture would omit geometry')
+        if evaluated.type in SURFACE_TYPES and item.show_self and not evaluated.hide_render:
+            freeze(f'{parent.name}/{evaluated.original.name}', evaluated, item.matrix_world.copy())
+            seen.add(root_id)
+    missing_roots = roots.keys() - seen
+    if missing_roots:
+        missing = next(o.name for o in selected if o.as_pointer() in missing_roots)
+        raise Failure('VALIDATION_FAILED', f'Collection instance has no visible evaluated surface: {missing}')
+    for o in selected:
+        if o.as_pointer() not in roots:
+            ev=o.evaluated_get(graph)
+            freeze(o.name,ev,ev.matrix_world.copy())
     preview_framing.bounds(points);return frozen,points
 def studio(frozen,points,spec):
     scene=bpy.data.scenes.new('AssetPreviewStudio');bpy.context.window.scene=scene;bpy.context.window.view_layer=scene.view_layers[0]
@@ -145,9 +215,15 @@ def prepare(params,job):
     bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
     if tuple(bpy.data.version[:2])!=tuple(bpy.app.version[:2]):raise Failure('UNSUPPORTED','Preview requires matching Blender major/minor')
     with ExitStack() as stack:
-        check_spec=render_spec(spec,spec['scene'],spec['view_layer'],'unused');hashes=rendering.preflight(params,job,check_spec,stack)
+        check_spec=render_spec(spec,spec['scene'],spec['view_layer'],'unused')
+        archive_preview = spec['fixture'] == 'NONE' and not spec['embed']
+        hashes=rendering.preflight(params,job,check_spec,stack,allow_embedded_asset_archives=archive_preview)
         scene=scenes.find(bpy.data.scenes,spec['scene']);layer=scenes.find(scene.view_layers,spec['view_layer']);bpy.context.window.scene=scene;bpy.context.window.view_layer=layer;scene.frame_set(spec['frame']);bpy.context.view_layer.update();drivers.evaluated(params.get('driver_profile'))
-        target=resolve_target(spec);selected=targets(spec,target,scene,layer);frozen,world_points=freeze_meshes(selected,spec);drivers.evaluated(params.get('driver_profile'))
+        target=resolve_target(spec);selected=targets(spec,target,scene,layer)
+        if bpy.data.libraries:
+            layer.update()
+            selected = localize_archived_instances(selected)
+        frozen,world_points=freeze_meshes(selected,spec);drivers.evaluated(params.get('driver_profile'))
         scene,camera,points,center=studio(frozen,world_points,spec);outputs=[];framing=[]
         for view in spec['views']:
             atomic_json(job/'preview-progress.json',{'state':'rendering','view':view,'completed':len(outputs),'total':len(spec['views'])})

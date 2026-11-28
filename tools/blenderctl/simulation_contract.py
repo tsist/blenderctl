@@ -18,10 +18,10 @@ operation('physics.remove',{'object':NAME,'modifier':NAME})
 operation('special.grease_pencil',{'name':NAME,'collection':NAME,'layer':NAME,'frame':integer(1,10000),'strokes':array(array(VEC,2,1000),1,100),'radius':number(.001,1)})
 operation('special.hair',{'name':NAME,'collection':NAME,'curves':array(array(VEC,2,1000),1,100),'radius':number(.001,1)})
 operation('special.points',{'name':NAME,'collection':NAME,'positions':array(VEC,1,10000),'radius':number(.001,1)})
-from hair_contract import OPS as HAIR_OPS,SAMPLES as HAIR_SAMPLES
-from hair_dynamics_contract import OPS as HAIR_DYNAMICS_OPS
-from hair_shape_contract import OPS as HAIR_SHAPE_OPS
-from hair_volume_contract import OPS as HAIR_VOLUME_OPS
+from hair_compat.hair_contract import OPS as HAIR_OPS,SAMPLES as HAIR_SAMPLES
+from hair_compat.hair_dynamics_contract import OPS as HAIR_DYNAMICS_OPS
+from hair_compat.hair_shape_contract import OPS as HAIR_SHAPE_OPS
+from hair_compat.hair_volume_contract import OPS as HAIR_VOLUME_OPS
 HAIR_NAMES=(*HAIR_OPS,*HAIR_DYNAMICS_OPS,*HAIR_SHAPE_OPS,*HAIR_VOLUME_OPS)
 OPS.update(HAIR_OPS);OPS.update(HAIR_DYNAMICS_OPS);OPS.update(HAIR_SHAPE_OPS);OPS.update(HAIR_VOLUME_OPS)
 MANIFEST=obj({'initial_scene':NAME,'context':CONTEXT,'operations':array({'oneOf':[*MODEL_MANIFEST['properties']['operations']['items']['oneOf'],*OPS.values()]},1,200)},['context','operations'])
@@ -65,8 +65,8 @@ RECEIPT['oneOf'].append(ZONE_RECEIPT)
 def normalize(manifest):
     validate(manifest,MANIFEST)
     if any(o['op'].startswith('hair.') for o in manifest['operations']) and any(o['op'] not in HAIR_NAMES for o in manifest['operations']):raise Failure('INVALID_REQUEST','Hair manifests may contain only explicit hair adapters')
-    from hair_shape_contract import normalize as shape_normalize
-    from hair_volume_contract import normalize as volume_normalize
+    from hair_compat.hair_shape_contract import normalize as shape_normalize
+    from hair_compat.hair_volume_contract import normalize as volume_normalize
     for op in manifest['operations']:
         if op['op']=='hair.shape':shape_normalize(op)
         if op['op'] in HAIR_VOLUME_OPS:volume_normalize(op)

@@ -17,7 +17,7 @@ from compositing_workflow_addon import core
 from compositing_workflow_addon.contract import WorkflowError
 from compositing_verifier import (near, runtime_identity, scene_configuration, resource_snapshot, decode_image,
                                  color_identity, output_color_space, color_file_descriptors,
-                                 image_file_snapshot, binding_snapshot, render_pass_snapshot)
+                                 image_file_snapshot, binding_file_snapshot, binding_snapshot, render_pass_snapshot)
 import compositing_media as media
 from compositing_temporal import project as project_temporal, inflate as inflate_temporal, TemporalProjectionError, fresh_verification_budget
 
@@ -858,7 +858,7 @@ def run(params, job, *, cancel_parent=None):
                         'seconds': now - started, **extra})
             last_progress[:] = [stage, now]
     try:
-        with ExitStack() as stack:
+        with core.managed_output_scope(job), ExitStack() as stack:
             progress('source_open')
             checked = _inputs(params, stack)
             provider = None
@@ -893,7 +893,8 @@ def run(params, job, *, cancel_parent=None):
                     if node.get('binding', {}).get('kind') == 'image':
                         required = [link['from_socket'] for link in graph.get('links', []) if link['from_node'] == node['id']]
                         report['binding_preflight'].append({'node_id': node['id'],
-                            'independent_file': image_file_snapshot(node['binding'], required)})
+                            'independent_file': binding_file_snapshot(node['type'], node['binding'], required,
+                                node.get('properties', {}).get('layer_name'))})
             if params.get('resume'):
                 old = read_json(params['resume']['file'])
                 if old.get('signature') != signature or old.get('original_request') != original_request or old.get('runtime') != params['_runtime'] or old.get('implementation_sha256') != params['implementation_sha256']:
@@ -1059,7 +1060,7 @@ def run(params, job, *, cancel_parent=None):
 def inspect(params, job):
     params = normalize_inspect_params(params)
     job = Path(job).resolve()
-    with ExitStack() as stack:
+    with core.managed_output_scope(job), ExitStack() as stack:
         runtime = runtime_identity()
         checked = _inputs(params, stack)
         bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)

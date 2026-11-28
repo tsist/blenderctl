@@ -1,4 +1,5 @@
 """Dispatch to verified 5.3 add-on functions and save an isolated candidate."""
+from host_compat import is_supported_host
 
 import importlib
 import sys
@@ -6,8 +7,7 @@ import sys
 import bpy
 
 from protocol import CODES, Failure, atomic_json, digest, read_json
-from production_contract import (HARD_SURFACE, PACKAGES, implementation_files, implementation_identity,
-                                 package_root, release_manifest)
+from production_contract import PACKAGES, implementation_files, implementation_identity, package_root
 from projects import canonical, file_paths
 
 
@@ -26,9 +26,6 @@ def _context(selector):
 
 def _apply(domain, context, request, job):
     package = PACKAGES[domain]
-    if domain == HARD_SURFACE:
-        from production_hard_surface import apply
-        return apply(context, request)
     if domain == 'animation':
         module = importlib.import_module(package + '.production_operations')
         result = module.apply(context, request)
@@ -69,14 +66,11 @@ def _dependencies():
 
 
 def run(params, job):
-    if tuple(bpy.app.version) != (5, 3, 0):
-        raise Failure('UNSUPPORTED', 'Production operations require Blender 5.3.0')
+    if not is_supported_host(bpy.app.version):
+        raise Failure('UNSUPPORTED', 'Production operations require Blender 5.3.0 or later')
     domain, request = params['domain'], params['request']
     launch = read_json(job / 'launch.json')
-    release = launch['production_release']
-    manifest = release_manifest(release)
-    if manifest['blender_build'] != bpy.app.build_hash.decode():
-        raise Failure('UNSUPPORTED', 'Packed production release requires its qualified Blender build')
+    release = launch.get('production_release', 'workspace')
     identity = implementation_identity(
         {path: digest(path) for path in implementation_files(domain, release)}, domain, release)
     if identity != launch.get('production_implementation_sha256'):
@@ -142,9 +136,6 @@ def run(params, job):
             if video_verify is not None:
                 video_resources['reopened'] = video_verify(
                     request, params['resources'], expected=video_resources['saved'], cache=video_cache)
-            if domain == HARD_SURFACE:
-                from production_hard_surface import check_reopen
-                report['sweep_reopened'] = check_reopen(_context(params.get('context')), result)
         except Exception as error:
             report['reopen'] = {'status': 'failed', 'message': str(error)}
             atomic_json(job / 'production-report.json', report)

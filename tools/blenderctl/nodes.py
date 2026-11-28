@@ -304,15 +304,24 @@ def execute(op,context,deformation_guard=False):
     node_zones.validate_all(False)
     scenes.update()
 
-def state():
+def state(snapshot_mode='full'):
     import node_zones
     node_zones.validate_all(False)
-    return {'node_report_version':'1.0','model':modeling.state(),'zones':node_zones.snapshot(),
+    if snapshot_mode=='material_only_v1':
+        from material_node_snapshot import model_state
+        model=model_state()
+    elif snapshot_mode=='full':model=modeling.state()
+    else:raise Failure('INVALID_REQUEST','Unknown node snapshot mode')
+    report={'node_report_version':'1.0','model':model,'zones':node_zones.snapshot(),
         'material_bindings':[{'object':o.name,'slots':[{'material':s.material.name if s.material else None,'link':s.link} for s in o.material_slots],'face_material_indices':[p.material_index for p in o.data.polygons]} for o in sorted(bpy.data.objects,key=lambda o:o.name) if o.type=='MESH'],
         'images':[{'name':i.name,'source':i.source,'colorspace':i.colorspace_settings.name,'alpha_mode':i.alpha_mode,'members':image_members(i),'tiles':sorted(t.number for t in i.tiles) if i.source=='TILED' else []} for i in sorted(bpy.data.images,key=lambda i:i.name) if i.type not in ('RENDER_RESULT','COMPOSITING')],
         'compositors':[{'scene':s.name,'group':s.compositing_node_group.name if s.compositing_node_group else None,'enabled':s.render.use_compositing} for s in sorted(bpy.data.scenes,key=lambda s:s.name)],
         'geometry_inputs':[{'object':o.name,'modifier':m.name,'group':m.node_group.name,'inputs':[{'identifier':s.identifier,'name':s.name,'value':value(getattr(m.properties.inputs,s.identifier).value),'mode':getattr(getattr(m.properties.inputs,s.identifier),'type',None)} for s in m.node_group.interface.items_tree if s.item_type=='SOCKET' and s.in_out=='INPUT' and hasattr(getattr(m.properties.inputs,s.identifier,None),'value')]} for o in sorted(bpy.data.objects,key=lambda o:o.name) for m in o.modifiers if m.type=='NODES' and m.node_group],
         'coverage':'declared_node_fields_and_interfaces_material_slots_images_and_active_view_layer_geometry; rendering/baking_separate'}
+    if snapshot_mode=='material_only_v1':
+        report['snapshot_mode']=snapshot_mode
+        report['coverage']='static material authoring with all existing scene-content records; geometry quality/evaluated meshes/rendering not run'
+    return report
 
 def inspect(params,job):
     bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
@@ -321,6 +330,9 @@ def inspect(params,job):
 
 def prepare(params,job):
     manifest=normalize(params['manifest'])
+    if manifest.get('snapshot_mode','full')=='material_only_v1':
+        from material_node_snapshot import prepare as material_prepare
+        return material_prepare(params,job,manifest)
     deformation=manifest.get('deformation_guard')
     uv_tolerance=deformation.get('evaluated_uv_tolerance',0) if deformation else 0
     if deformation and not params.get('file'):raise Failure('INVALID_REQUEST','deformation_guard requires an input file')

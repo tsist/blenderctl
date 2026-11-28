@@ -24,6 +24,6 @@
 - **当前分类台账入口**：`<PROJECT_ROOT>/runtime/asset-management/current-classification.json`
   - 读取现库历史文件级记录、外部包分组与最新治理指针时，先读这个入口文件，顺着指针查看对应记录。
   - 单件资产的正式卡片按需建在 `<PROJECT_ROOT>/runtime/asset-management/records/<asset_id>.json`。
-- **只读全库磁盘盘点脚本**：`tools/blender/audit_assets.py`
-  - 需要摸清 `<ASSET_LIBRARY>` 磁盘全貌时运行，会在独立审计目录输出文件列表、Catalog 列表与同名候选清单。
+- **只读全库磁盘盘点脚本**：`<PROJECT_ROOT>/tools/blender/audit_assets.py`
+  - 需要摸清 `<ASSET_LIBRARY_ROOT>` 磁盘全貌时运行，会在独立审计目录输出文件列表、Catalog 列表与同名候选清单。
   - 只处理少量明确目标，或需要核对数据块、材质槽与贴图依赖时，直接调 `./blenderctl.ps1` 做定点只读检查。

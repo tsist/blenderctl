@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg_compositing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222733"/>
+      <stop offset="100%" stop-color="#141820"/>
+    </linearGradient>
+    <radialGradient id="glow_compositing" cx="30%" cy="25%" r="72%">
+      <stop offset="0%" stop-color="#C084FC" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#581C87" stop-opacity="0.02"/>
+    </radialGradient>
+    <linearGradient id="badge_compositing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E9D5FF"/>
+      <stop offset="35%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13.5" fill="url(#bg_compositing)" stroke="#C084FC" stroke-width="2.4" stroke-opacity="0.92"/>
+  <rect x="3.8" y="3.8" width="56.4" height="56.4" rx="12.2" fill="url(#glow_compositing)"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+          <polygon points="14,29 28,21 42,29 28,37" fill="#C084FC" fill-opacity="0.28" stroke="#E9D5FF" stroke-width="2.2"/>
+          <polygon points="14,21 28,13 42,21 28,29" fill="#C084FC" fill-opacity="0.48" stroke="#FFFFFF" stroke-width="2.4"/>
+          <path d="M41,10 L42.8,14.2 L47,16 L42.8,17.8 L41,22 L39.2,17.8 L35,16 L39.2,14.2 Z" fill="#FFFFFF" stroke="#C084FC" stroke-width="1.2"/>
+        
+  </g>
+  <rect x="34" y="34" width="28" height="28" rx="8" fill="#11141B"/>
+  <rect x="36.2" y="36.2" width="23.6" height="23.6" rx="6.2" fill="url(#badge_compositing)"/>
+  <text x="48" y="53.6" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-weight="900" font-size="16.5" fill="#1E1B4B">F</text>
+</svg>

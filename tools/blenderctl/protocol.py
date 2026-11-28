@@ -7,15 +7,15 @@ from pathlib import Path
 import time
 import uuid
 
-VERSION = "0.65.0"
+VERSION = "1.0.0"
 SCHEMA = "1.0"
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_BLENDER = ROOT / "runtime/blender/releases/5.2.1/blender-5.2.1-windows-x64/blender.exe"
+DEFAULT_BLENDER = ROOT / "runtime/blender/releases/5.3.0/blender-5.3.0-windows-x64/blender.exe"
 DEFAULT_JOBS = ROOT / "runtime/blenderctl/jobs"
 DEFAULT_TRANSACTIONS = ROOT / "runtime/blenderctl/transactions"
 CODES = {"INVALID_REQUEST": 2, "NOT_FOUND": 3, "CONFLICT": 4,
          "WORKER_FAILED": 5, "TIMEOUT": 6, "CANCELLED": 7,
-         "VALIDATION_FAILED": 8, "IO_ERROR": 9, "UNSUPPORTED": 10, "RESOURCE_LIMIT":11}
+         "VALIDATION_FAILED": 8, "IO_ERROR": 9, "UNSUPPORTED": 10, "RESOURCE_LIMIT":11, "RATE_LIMITED":12, "ARTIFACT_UNAVAILABLE":13}
 HOST_COMMANDS = ("pipeline.plan", "pipeline.run", "pipeline.resume", "asset.plan", "project.plan_copy", "project.plan_batch", "project.plan_files", "transaction.apply", "transaction.recover", "transaction.rollback", "transaction.status")
 COMMANDS = ("doctor", "capabilities", "inspect", "query", "diff", "dependency.audit", "validate", "identity.prepare", "asset.prepare", "asset.index", "scene.prepare", "scene.inspect", "model.prepare", "model.inspect", "node.prepare", "node.inspect", "material.preview", "texture.bake", "rig.prepare", "rig.inspect", "rig.package", "animation.sample", "simulation.prepare", "simulation.inspect", "simulation.bake", "render.devices", "render.run", "media.prepare", "media.export", "exchange.formats", "exchange.analyze", "exchange.export", "exchange.import", "exchange.convert", "extension.inspect", "extension.prepare", "extension.run", "probe", *HOST_COMMANDS)
 
@@ -27,24 +27,53 @@ COMMANDS = (*COMMANDS, 'project.verify', 'project.prepare_copy')
 OPERATIONS=('resource.init','resource.status','cache.inspect','cache.plan_clean','project.package','doctor.verify_install')
 REVIEWS=('extension.review','extension.approve')
 HOST_COMMANDS=(*HOST_COMMANDS,*REVIEWS)
-COMMANDS=(*COMMANDS,*REVIEWS,'sculpt.review','sculpt.replay')
+COMMANDS=(*COMMANDS,*REVIEWS,'sculpt.review')
 HOST_COMMANDS=(*HOST_COMMANDS,*OPERATIONS)
 COMMANDS=(*COMMANDS,*OPERATIONS)
 COMMANDS=(*COMMANDS,'material.run','material.template-save','material.batch','material.study')
+COMMANDS=(*COMMANDS,'material.procedural-run','material.procedural-export')
+COMMANDS=(*COMMANDS,'material.projection-bake')
 HOST_COMMANDS=(*HOST_COMMANDS,'geometry.session')
 COMMANDS=(*COMMANDS,'geometry.run','geometry.inspect','geometry.session')
 COMMANDS=(*COMMANDS,'lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch')
-COMMANDS=(*COMMANDS,'video.run','video.inspect')
+COMMANDS=(*COMMANDS,'uv.run','uv.inspect','uv.grid-transfer')
+COMMANDS=(*COMMANDS,'uv.batch','uv.batch-resume')
+HOST_COMMANDS=(*HOST_COMMANDS,'uv.batch','uv.batch-resume')
 COMMANDS=(*COMMANDS,'compositing.run','compositing.inspect','compositing.encode','compositing.template-save','compositing.template-run','compositing.batch','compositing.study')
 HOST_COMMANDS=(*HOST_COMMANDS,'compositing.encode')
+DEPTH_COMMANDS=('compositing.depth-prepare','compositing.depth-inspect')
+COMMANDS=(*COMMANDS,*DEPTH_COMMANDS)
+HOST_COMMANDS=(*HOST_COMMANDS,*DEPTH_COMMANDS)
+RELIGHT_COMMANDS=('compositing.depth-relight',)
+COMMANDS=(*COMMANDS,*RELIGHT_COMMANDS)
+HOST_COMMANDS=(*HOST_COMMANDS,*RELIGHT_COMMANDS)
+SESSION_COMMANDS=('compositing.depth-session',)
+COMMANDS=(*COMMANDS,*SESSION_COMMANDS)
+HOST_COMMANDS=(*HOST_COMMANDS,*SESSION_COMMANDS)
+ESTIMATE_COMMANDS=('compositing.depth-estimate',)
+COMMANDS=(*COMMANDS,*ESTIMATE_COMMANDS)
+HOST_COMMANDS=(*HOST_COMMANDS,*ESTIMATE_COMMANDS)
+SEQUENCE_COMMANDS=('compositing.depth-sequence',)
+COMMANDS=(*COMMANDS,*SEQUENCE_COMMANDS)
+HOST_COMMANDS=(*HOST_COMMANDS,*SEQUENCE_COMMANDS)
 HOST_COMMANDS=(*HOST_COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
-COMMANDS=(*COMMANDS,'workflow.preflight','workflow.run','workflow.resume','production.run')
+COMMANDS=(*COMMANDS,'workflow.preflight','workflow.run','workflow.resume')
+COMMANDS=(*COMMANDS,'modeling.run')
+COMMANDS=(*COMMANDS,'toon.run','toon.inspect','toon.template-save','toon.template-edit','toon.template-apply')
+HOST_COMMANDS=(*HOST_COMMANDS,'modeling.run')
+COMMANDS=(*COMMANDS,'toon-image.run','toon-image.inspect')
+HOST_COMMANDS=(*HOST_COMMANDS,'toon-image.run','toon-image.inspect')
+COMMANDS=(*COMMANDS,'rigging-workflow.run','rigging-workflow.session')
+HOST_COMMANDS=(*HOST_COMMANDS,'rigging-workflow.session')
+COMMANDS=(*COMMANDS,'animation.inspect','animation.run')
+COMMANDS=(*COMMANDS,'animation.clip-apply')
+COMMANDS=(*COMMANDS,'production.run','qa.inspect','video.run','video.inspect','camera.inspect','modeling.import-local','hair.run')
 
 
 def resource_schema(command):
     """Single public resource-list shape shared by execution and preflight."""
     from node_contract import FILE, array
-    return array(FILE, 0, 100000 if command.startswith('video.') else 100)
+    return array(FILE, 0, 100)
 
 class Failure(Exception):
     def __init__(self, code, message):
@@ -52,7 +81,7 @@ class Failure(Exception):
         self.code = code
 
 
-def read_json(path):
+def read_json(path, *, expected_sha256=None):
     def pairs(items):
         out = {}
         for key, value in items:
@@ -63,10 +92,12 @@ def read_json(path):
     try:
         if os.name == "nt":
             from filesystem import read_shared_bytes
-            text = read_shared_bytes(path).decode("utf-8-sig")
+            data = read_shared_bytes(path)
         else:
-            text = Path(path).read_text(encoding="utf-8-sig")
-        return json.loads(text, object_pairs_hook=pairs)
+            data = Path(path).read_bytes()
+        if expected_sha256 is not None and hashlib.sha256(data).hexdigest() != expected_sha256:
+            raise Failure("CONFLICT", f"JSON file SHA-256 changed: {path}")
+        return json.loads(data.decode("utf-8-sig"), object_pairs_hook=pairs)
     except FileNotFoundError as exc:
         raise Failure("NOT_FOUND", f"JSON file not found: {path}") from exc
     except (ValueError, UnicodeError) as exc:
@@ -77,7 +108,7 @@ def atomic_json(path, value):
     path = Path(path)
     # Same-directory unique O_EXCL file preserves atomic replacement without
     # inflating a legal Windows destination by its entire basename plus UUID.
-    temp = path.with_name("." + uuid.uuid4().hex + ".tmp")
+    temp = path.with_name("." + uuid.uuid4().hex[:12] + ".tmp")
     with temp.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False)
         stream.write("\n")
@@ -86,7 +117,7 @@ def atomic_json(path, value):
     # Windows can briefly retain a delete-pending destination while shared
     # readers finish the old JSON generation. Retry only this metadata operation,
     # never a transaction publish or a failed worker. Keep a hard time bound.
-    deadline = time.monotonic() + .25
+    deadline = time.monotonic() + 2.0
     while True:
         try:
             os.replace(temp, path)
@@ -94,7 +125,7 @@ def atomic_json(path, value):
         except OSError as exc:
             if os.name != "nt" or getattr(exc, "winerror", None) not in (5, 32, 33) or time.monotonic() >= deadline:
                 raise
-            time.sleep(.005)
+            time.sleep(.015)
 
 
 def digest(path, checkpoint=None):
@@ -117,8 +148,47 @@ def validate(request):
     if not isinstance(command, str) or command not in COMMANDS:
         raise Failure("INVALID_REQUEST", f"Unknown command: {command}")
     params = request.get("params", {})
+    if command == 'hair.run':
+        from hair_public import normalize
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize(params)}
+    if command in ('video.run', 'video.inspect'):
+        from video_workflow_contract import normalize_command
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_command(command, params)}
+    if command == 'qa.inspect':
+        from qa_contract import normalize_params
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_params(params)}
     if command == 'production.run':
         from production_contract import normalize_params
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_params(params)}
+    if command == 'rigging-workflow.run':
+        from rigging_workflow_contract import normalize_params
+        return {'schema_version':SCHEMA,'command':command,'params':normalize_params(params)}
+    if command == 'rigging-workflow.session':
+        if not isinstance(params,dict):
+            raise Failure('INVALID_REQUEST','Session params must be an object')
+        return {'schema_version':SCHEMA,'command':command,'params':params}
+    if command in ('animation.inspect', 'animation.run'):
+        from animation_workflow_contract import normalize_params
+        return {'schema_version':SCHEMA,'command':command,
+                'params':normalize_params(params)}
+    if command == 'animation.clip-apply':
+        from animation_reuse_contract import normalize_params
+        return {'schema_version':SCHEMA,'command':command,
+                'params':normalize_params(params)}
+    if command == 'toon-image.run':
+        from toon_image_public import normalize
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize(params)}
+    if command == 'toon-image.inspect':
+        from toon_image_public import normalize_inspect
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize_inspect(params)}
+    if command == 'camera.inspect':
+        from pipeline_camera import normalize
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize(params)}
+    if command == 'modeling.import-local':
+        from pipeline_modeling_import import normalize
+        return {'schema_version': SCHEMA, 'command': command, 'params': normalize(params)}
+    if command == 'modeling.run':
+        from modeling_workflow_contract import normalize_params
         return {'schema_version': SCHEMA, 'command': command, 'params': normalize_params(params)}
     if command == 'workflow.preflight':
         if not isinstance(params, dict) or set(params) != {'requests'}:
@@ -131,18 +201,53 @@ def validate(request):
     if command in ('workflow.run', 'workflow.resume'):
         from workflow_contract import normalize_request
         return {'schema_version': SCHEMA, 'command': command, 'params': normalize_request(command, params)}
+    if command in SEQUENCE_COMMANDS:
+        from compositing_relight_sequence_contract import normalize_params,DepthError
+        try:normalized=normalize_params(params)
+        except DepthError as exc:raise Failure(exc.code if exc.code in CODES else 'INVALID_REQUEST',str(exc)) from exc
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in SESSION_COMMANDS:
+        from compositing_relight_session_contract import normalize_params,DepthError
+        try:normalized=normalize_params(params)
+        except DepthError as exc:raise Failure(exc.code if exc.code in CODES else 'INVALID_REQUEST',str(exc)) from exc
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in RELIGHT_COMMANDS:
+        from compositing_relight_contract import normalize_params,DepthError
+        try:normalized=normalize_params(params)
+        except DepthError as exc:raise Failure(exc.code if exc.code in CODES else 'INVALID_REQUEST',str(exc)) from exc
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in ESTIMATE_COMMANDS:
+        from compositing_depth_estimate_contract import normalize_params,DepthError
+        try:normalized=normalize_params(params)
+        except DepthError as exc:raise Failure(exc.code if exc.code in CODES else 'INVALID_REQUEST',str(exc)) from exc
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in DEPTH_COMMANDS:
+        from compositing_depth_contract import normalize_params,DepthError
+        try:normalized=normalize_params(params,command.split('.')[1])
+        except DepthError as exc:raise Failure(exc.code if exc.code in CODES else 'INVALID_REQUEST',str(exc)) from exc
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
     if command=='compositing.encode':
         from compositing_encode_public import normalize
         return {'schema_version':SCHEMA,'command':command,'params':normalize(params)}
-    if command.startswith('video.'):
-        from video_workflow_contract import normalize_command
-        return {'schema_version':SCHEMA,'command':command,'params':normalize_command(command,params)}
     if command.startswith('compositing.'):
         from compositing_workflow_contract import normalize_command
         return {'schema_version':SCHEMA,'command':command,'params':normalize_command(command,params)}
+    if command in ('uv.batch','uv.batch-resume'):
+        from uv_batch import normalize_request
+        return {'schema_version':SCHEMA,'command':command,'params':normalize_request(command,params)}
+    if command in ('uv.run','uv.inspect','uv.grid-transfer'):
+        from uv_workflow_contract import normalize_params
+        return {'schema_version':SCHEMA,'command':command,'params':normalize_params(params,command)}
     if command.startswith('lighting.'):
         from lighting_workflow_contract import normalize_command
         normalized = normalize_command(command, params)
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command in ('toon.template-save','toon.template-edit','toon.template-apply'):
+        from toon_template_contract import normalize
+        return {'schema_version':SCHEMA,'command':command,'params':normalize(command,params)}
+    if command in ('toon.run', 'toon.inspect'):
+        from toon_workflow_contract import normalize_params, normalize_inspect_params
+        normalized = normalize_params(params) if command == 'toon.run' else normalize_inspect_params(params)
         return {'schema_version':SCHEMA,'command':command,'params':normalized}
     if command in ('geometry.run', 'geometry.inspect'):
         from geometry_workflow_contract import normalize_params, normalize_inspect_params
@@ -152,6 +257,13 @@ def validate(request):
         if not isinstance(params, dict) or set(params) - {'session_dir','action','manifest','resources','baseline','candidate','report','request_id','wait_seconds','session_id'}:
             raise Failure('INVALID_REQUEST','Invalid geometry session request')
         return {'schema_version':SCHEMA,'command':command,'params':params}
+    if command in ('material.procedural-run','material.procedural-export'):
+        from material_procedural_contract import normalize_params, normalize_export_params
+        normalized = normalize_params(params) if command=='material.procedural-run' else normalize_export_params(params)
+        return {'schema_version':SCHEMA,'command':command,'params':normalized}
+    if command=='material.projection-bake':
+        from material_projection_contract import normalize_params
+        return {'schema_version':SCHEMA,'command':command,'params':normalize_params(params)}
     if command=='material.run':
         from material_workflow_contract import normalize_params
         return {'schema_version':SCHEMA,'command':command,'params':normalize_params(params)}
@@ -164,9 +276,6 @@ def validate(request):
     if command=='material.template-save':
         from material_workflow_contract import normalize_template_save_params
         return {'schema_version':SCHEMA,'command':command,'params':normalize_template_save_params(params)}
-    if command=='sculpt.replay':
-        from sculpt_contract import normalize
-        return {'schema_version':SCHEMA,'command':command,'params':normalize(params)}
     if command in (*REVIEWS,'sculpt.review'):
         from review_contract import normalize
         return {'schema_version':SCHEMA,'command':command,'params':normalize(params,command)}
@@ -183,25 +292,25 @@ def validate(request):
         from tracking_contract import normalize
         return {'schema_version':SCHEMA,'command':command,'params':normalize(params,command)}
     allowed = {"doctor": set(), "capabilities": set(), "inspect": {"file","expected_sha256"}, "probe": {"case"},
-               "pipeline.plan":{'manifest'}, "pipeline.run":{'manifest','reuse_job'}, "pipeline.resume":{'job_id'},
+               "pipeline.plan":{'manifest'}, "pipeline.run":{'manifest','reuse_job','strict_rehash'}, "pipeline.resume":{'job_id','strict_rehash'},
                "query": {"file", "selector", "expected_sha256", "profile"},
                "diff": {"file", "other", "expected_sha256", "other_sha256", "profile"},
                "dependency.audit": {"file", "expected_sha256", "profile"}, "validate": {"file", "expected_sha256", "profile"},
                "dependency.plan-relink": {"file", "expected_sha256", "manifest"}, "dependency.prepare": {"file", "expected_sha256", "plan"},
                "identity.prepare": {"file", "expected_sha256", "selectors"},
                "asset.prepare": {"file", "expected_sha256", "manifest"}, "asset.index": {"file", "expected_sha256", "manifest"},
-               "asset.plan": {"manifest"},
+               "asset.plan": {"manifest", "force"},
                "asset.preview.prepare": {'file','expected_sha256','manifest','resources','driver_profile','simulation_receipt','reuse_receipt'},
                "asset.preview.batch": {'manifest','reuse_job'},
                "scene.prepare": {"file","expected_sha256","manifest"}, "scene.inspect": {"file","expected_sha256","context"},
-               "model.prepare": {"file","expected_sha256","manifest"}, "model.inspect": {"file","expected_sha256","context"},
+               "model.prepare": {"file","expected_sha256","manifest","flow_selection"}, "model.inspect": {"file","expected_sha256","context","qa","flow_selection","review_grid","geometry_audit","face_flow","surface_sweep"},
                "node.prepare": {"file","expected_sha256","manifest","resources"}, "node.inspect": {"file","expected_sha256","context"},
                "rig.prepare": {"file","expected_sha256","manifest","driver_profile"}, "rig.inspect": {"file","expected_sha256","context","suggest_mapping"}, "animation.sample": {"file","expected_sha256","manifest","driver_profile"},
                "rig.package": {"file","expected_sha256","manifest","driver_profile","simulation_receipt"},
                "simulation.prepare": {"file","expected_sha256","manifest","driver_profile"}, "simulation.inspect": {"file","expected_sha256","context","hair_frames","driver_profile"}, "simulation.bake": {"file","expected_sha256","manifest","driver_profile","resources"},
                "material.preview": {"file","expected_sha256","material","resolution","samples","frame","resources"},
                "texture.bake": {"file","expected_sha256","object","scene","view_layer","uv_layer","type","resolution","samples","margin","frame","resources"},
-               "exchange.formats":set(), "exchange.analyze":{"file","expected_sha256","manifest","resources","driver_profile","simulation_receipt"}, "exchange.export":{"file","expected_sha256","manifest","resources","driver_profile","simulation_receipt"}, "exchange.import":{"file","expected_sha256","manifest"}, "exchange.convert":{"manifest"}, "extension.inspect":set(), "extension.prepare":{"manifest"}, "extension.run":{"manifest","resources","review_receipt"},
+               "exchange.formats":set(), "exchange.analyze":{"file","expected_sha256","manifest","resources","driver_profile","simulation_receipt"}, "exchange.export":{"file","expected_sha256","manifest","resources","driver_profile","simulation_receipt"}, "exchange.import":{"file","expected_sha256","manifest","resources"}, "exchange.convert":{"manifest"}, "extension.inspect":set(), "extension.prepare":{"manifest"}, "extension.run":{"manifest","resources","review_receipt"},
                "render.devices": set(), "render.run": {"file","expected_sha256","manifest","resources","simulation_receipt","driver_profile","cache_manifest"},
                "media.prepare": {"manifest"}, "media.export": {"file","expected_sha256","manifest","resources"},
                "project.plan_copy": {"file", "output"}, "project.plan_batch": {"items"}, "project.plan_files": {"items"},
@@ -239,7 +348,7 @@ def validate(request):
         from pipeline_contract import normalize_request
         return {'schema_version':SCHEMA,'command':command,'params':normalize_request(command,params)}
     if command in ('exchange.analyze','exchange.export','exchange.import','exchange.convert','extension.run','extension.prepare'):
-        from exchange_contract import normalize,descriptor
+        from exchange_contract import normalize,descriptor,SHARED_RIG_IMPORT_ADAPTER
         params['manifest']=normalize(params.get('manifest'),command.split('.')[1])
         if command in ('exchange.export','exchange.analyze'):
             adapter=command=='exchange.analyze' or params['manifest'].get('rig_adapter') or params['manifest'].get('geometry_adapter')
@@ -250,7 +359,9 @@ def validate(request):
         if command in ('exchange.export','exchange.import','exchange.analyze'):
             if 'file' not in params or 'expected_sha256' not in params:raise Failure('INVALID_REQUEST','Exchange requires input file and SHA256')
             native_cache=command=='exchange.import' and params['manifest'].get('geometry_adapter') in ('EVALUATED_MESH_CACHE_V1','FBX_NATIVE_CLOCK_V1','GLB_NATIVE_CLOCK_V1')
-            descriptor({k:params[k] for k in ('file','expected_sha256')},max_bytes=1024**3 if native_cache else 256*1024**2);params['file']=str(Path(params['file']).resolve())
+            shared_native=command=='exchange.import' and params['manifest'].get('rig_adapter')==SHARED_RIG_IMPORT_ADAPTER
+            input_limit=1024**3 if native_cache else 512*1024**2 if shared_native else 256*1024**2
+            descriptor({k:params[k] for k in ('file','expected_sha256')},max_bytes=input_limit);params['file']=str(Path(params['file']).resolve())
             if command in ('exchange.export','exchange.analyze') and Path(params['file']).suffix.lower()!='.blend':raise Failure('INVALID_REQUEST','Export source must be .blend')
             if command=='exchange.import':
                 from exchange_contract import SUFFIX
@@ -273,11 +384,36 @@ def validate(request):
     if command in ('scene.inspect','model.inspect','node.inspect','rig.inspect','simulation.inspect') and 'context' in params:
         from scene_contract import CONTEXT,validate as validate_scene
         validate_scene(params['context'],CONTEXT)
+    if command=='model.inspect' and 'qa' in params:
+        from model_contract import normalize_qa
+        params['qa']=normalize_qa(params['qa'])
+    if command in ('model.inspect', 'model.prepare') and 'flow_selection' in params:
+        from flow_contract import LOOKUP
+        from scene_contract import validate as validate_scene
+        validate_scene(params['flow_selection'], LOOKUP)
+    if command=='model.inspect' and 'review_grid' in params:
+        from flow_contract import normalize_review_grid
+        params['review_grid']=normalize_review_grid(params['review_grid'])
+    if command=='model.inspect' and 'face_flow' in params:
+        from flow_contract import normalize_face_flow
+        if not params.get('expected_sha256'):
+            raise Failure('INVALID_REQUEST', 'Face-flow inspection requires expected_sha256')
+        params['face_flow']=normalize_face_flow(params['face_flow'])
+    if command=='model.inspect' and 'surface_sweep' in params:
+        from flow_contract import SURFACE_SWEEP
+        from scene_contract import validate as validate_scene
+        if not params.get('expected_sha256'):
+            raise Failure('INVALID_REQUEST', 'Surface-sweep inspection requires expected_sha256')
+        validate_scene(params['surface_sweep'], SURFACE_SWEEP, '$.params.surface_sweep')
+    if command=='model.inspect' and 'geometry_audit' in params:
+        from flow_contract import GEOMETRY_AUDIT
+        from scene_contract import validate as validate_scene
+        validate_scene(params['geometry_audit'], GEOMETRY_AUDIT)
     if command=='rig.inspect' and 'suggest_mapping' in params:
         from scene_contract import obj,NAME,validate as validate_scene
         validate_scene(params['suggest_mapping'],obj({'source':NAME,'target':NAME}))
     if command=='simulation.inspect' and 'hair_frames' in params:
-        from hair_contract import FRAMES
+        from hair_compat.hair_contract import FRAMES
         from scene_contract import validate as validate_scene
         validate_scene(params['hair_frames'],FRAMES)
     if command in ('scene.prepare','model.prepare','node.prepare','rig.prepare','simulation.prepare'):
@@ -316,17 +452,22 @@ def validate(request):
         from node_contract import PREVIEW,BAKE,validate as validate_nodes
         validate_nodes(params,PREVIEW if command=='material.preview' else BAKE)
         params.update(validate({'schema_version':SCHEMA,'command':'query','params':{k:params[k] for k in ('file','expected_sha256')}})['params'])
-    if command in ('node.prepare','material.preview','texture.bake','render.run','media.export','exchange.export','exchange.analyze','extension.run','simulation.bake') and 'resources' in params:
+    if command in ('node.prepare','material.preview','texture.bake','render.run','media.export','exchange.export','exchange.import','exchange.analyze','extension.run','simulation.bake') and 'resources' in params:
         from node_contract import FILE,array,validate as validate_nodes,file_contract
         validate_nodes(params['resources'],resource_schema(command))
         for resource in params['resources']:
-            if command in ('render.run','media.export','exchange.export','exchange.analyze','extension.run'):
+            if command in ('render.run','media.export','exchange.export','exchange.import','exchange.analyze','extension.run'):
                 from render_contract import file_input
                 file_input(resource)
             else:file_contract(resource)
     if command=='asset.plan':
         from library import normalize
+        force = params.get('force', False)
+        if type(force) is not bool:
+            raise Failure('INVALID_REQUEST', 'force must be boolean')
         params={'manifest':normalize(params.get('manifest'))}
+        if force:
+            params['force'] = True
     if command.startswith("project.plan_"):
         from transactions import normalize_item
         if command == "project.plan_copy":

@@ -1,0 +1,691 @@
+{
+  "schema_version": "1.0",
+  "launcher": {
+    "lookups": {
+      "asset libraries": "tools/blenderctl/asset_libraries.py",
+      "uv capture-selection": "tools/blenderctl/uv_capture.py"
+    },
+    "handoffs": {
+      "model panel-controls": {
+        "entry": "tools/blenderctl/panel_controls.py"
+      },
+      "asset find-collections": {
+        "entry": "tools/asset_collection_place/find.py"
+      },
+      "asset find-assets": {
+        "entry": "tools/asset_collection_place/find.py"
+      },
+      "asset place-collection": {
+        "entry": "tools/asset_collection_place/cli.py"
+      },
+      "asset use-asset": {
+        "entry": "tools/asset_collection_place/cli.py"
+      },
+      "toon-workflow finish-slot": {
+        "entry": "tools/toon_finish_handoff/cli.py"
+      },
+      "toon-workflow sdf-face": {
+        "entry": "tools/toon_sdf_handoff/cli.py"
+      },
+      "toon-workflow omni-preview": {
+        "entry": "tools/blenderctl/toon_omni_handoff.py"
+      },
+      "toon-workflow sdf-hair": {
+        "entry": "tools/toon_sdf_handoff/cli.py"
+      },
+      "rigging-workflow rc-retarget-queue": {
+        "entry": "tools/retarget_queue_handoff/queue_host.py"
+      },
+      "rigging-workflow session-live": {
+        "entry": "tools/blenderctl/rigging_workflow_live_adapter.py"
+      },
+      "rigging-workflow candidate-entry": {
+        "entry": "tools/addons/rigging_workflow/cli/character_entry_candidate.py",
+        "forward_subcommand": false
+      },
+      "rigging-workflow candidate-selected-skin": {
+        "entry": "tools/addons/rigging_workflow/cli/selected_skinning_cli.py",
+        "forward_subcommand": false
+      },
+      "rigging-workflow candidate-repair": {
+        "entry": "tools/addons/rigging_workflow/cli/rigging_candidate.py",
+        "forward_subcommand": false
+      },
+      "rigging-workflow candidate-skinning-policy": {
+        "entry": "tools/addons/rigging_workflow/cli/skinning_policy_candidate.py",
+        "forward_subcommand": false
+      },
+      "geometry session-host": {
+        "entry": "tools/geometry_session_host/host.py"
+      },
+      "geometry session-live": {
+        "entry": "tools/geometry_session_host/live.py"
+      },
+      "camera session-live": {
+        "entry": "tools/camera_live_handoff/cli.py"
+      },
+      "camera framing-check": {
+        "entry": "tools/camera_live_handoff/framing.py"
+      },
+      "compositing preview-copy": {
+        "entry": "tools/blenderctl/relight_saved_handoff.py"
+      },
+      "compositing session-live": {
+        "entry": "tools/blenderctl/relight_live_session.py"
+      },
+      "video inspect-live": {
+        "entry": "tools/blenderctl/video_live_inspect.py"
+      },
+      "physics pin-selection": {
+        "entry": "tools/blenderctl/physics_pin.py"
+      },
+      "physics panel-copy": {
+        "entry": "tools/blenderctl/physics_panel_copy.py"
+      },
+      "animation event-store": {
+        "entry": "tools/blenderctl/animation_event_store.py"
+      },
+      "animation pose-edit": {
+        "entry": "tools/blenderctl/animation_pose_handoff.py"
+      },
+      "animation panel-events": {
+        "entry": "tools/blenderctl/animation_panel_events.py"
+      },
+      "animation record-live": {
+        "entry": "tools/blenderctl/animation_record_live.py"
+      },
+      "animation support": {
+        "entry": "tools/animation_support_handoff/cli.py"
+      },
+      "animation fk-character": {
+        "entry": "tools/blenderctl/animation_event_store.py"
+      },
+      "animation project-events": {
+        "entry": "tools/blenderctl/animation_project_events/project_events.py"
+      },
+      "render batch-artifact": {
+        "entry": "tools/render_batch_artifact/cli.py"
+      },
+      "render batch-panel": {
+        "entry": "tools/blenderctl/render_batch_panel.py"
+      },
+      "camera shot-table": {
+        "entry": "tools/blenderctl/camera_shot_table.py"
+      },
+      "rigging-workflow rc-pose": {
+        "entry": "tools/blenderctl/rig_rc_pose.py"
+      },
+      "toon-workflow component-slot": {
+        "entry": "tools/blenderctl/toon_component_slot.py"
+      },
+      "toon-workflow brush-settings": {
+        "entry": "tools/blenderctl/toon_brush_handoff.py"
+      },
+      "toon-workflow cel-recipe": {
+        "entry": "tools/blenderctl/toon_cel_recipe.py"
+      },
+      "uv capture-constraints": {
+        "entry": "tools/blenderctl/uv_constraint_capture.py"
+      },
+      "uv read-surface-report": {
+        "entry": "tools/blenderctl/uv_surface_report_handoff.py"
+      },
+      "uv job-progress": {
+        "entry": "tools/blenderctl/uv_job_progress.py"
+      },
+      "material projection-attach": {
+        "entry": "tools/blenderctl/material_projection_handoff.py"
+      },
+      "material projection-deliver": {
+        "entry": "tools/blenderctl/material_projection_handoff.py"
+      },
+      "material projection-effects": {
+        "entry": "tools/blenderctl/material_projection_handoff.py"
+      },
+      "material projection-suggest": {
+        "entry": "tools/blenderctl/material_projection_suggest.py"
+      },
+      "material projection-edit-pair": {
+        "entry": "tools/blenderctl/material_projection_suggest.py"
+      },
+      "material save-procedural-template": {
+        "entry": "tools/blenderctl/material_procedural_template.py"
+      },
+      "material load-procedural-template": {
+        "entry": "tools/blenderctl/material_procedural_template.py"
+      },
+      "material create-procedural": {
+        "entry": "tools/blenderctl/material_procedural_template.py"
+      },
+      "material update-procedural": {
+        "entry": "tools/blenderctl/material_procedural_template.py"
+      },
+      "material edit-layer-draft": {
+        "entry": "tools/blenderctl/material_procedural_template.py"
+      },
+      "material load-layer-template": {
+        "entry": "tools/blenderctl/material_procedural_template.py"
+      },
+      "lighting rig-handoff": {
+        "entry": "tools/lighting_panel_handoff/cli.py"
+      },
+      "toon-workflow surface-slot": {
+        "entry": "tools/blenderctl/toon_panel_handoff.py"
+      },
+      "toon-workflow shot-look": {
+        "entry": "tools/blenderctl/toon_panel_handoff.py"
+      },
+      "toon-workflow viewport-lines": {
+        "entry": "tools/blenderctl/toon_viewport_lines.py"
+      },
+      "toon-workflow viewport-session": {
+        "entry": "tools/blenderctl/toon_viewport_session.py"
+      },
+      "toon-workflow vector-output": {
+        "entry": "tools/blenderctl/toon_vector_output_handoff.py"
+      },
+      "toon-workflow lighting-author": {
+        "entry": "tools/blenderctl/toon_lighting_author.py"
+      },
+      "material export-batch-draft": {
+        "entry": "tools/blenderctl/material_batch_draft.py"
+      },
+      "material edit-batch-panel": {
+        "entry": "tools/blenderctl/material_batch_draft.py"
+      },
+      "material edit-batch-assignment": {
+        "entry": "tools/blenderctl/material_batch_draft.py"
+      },
+      "material commit-batch-assignment": {
+        "entry": "tools/blenderctl/material_batch_draft.py"
+      },
+      "material recover-submission": {
+        "entry": "tools/blenderctl/material_submission_recovery.py"
+      },
+      "material retry-submission": {
+        "entry": "tools/blenderctl/material_submission_recovery.py"
+      },
+      "material handoff-live": {
+        "entry": "tools/blenderctl/material_live_session.py"
+      },
+      "modeling review-candidate": {
+        "entry": "tools/blenderctl/modeling_adoption.py"
+      },
+      "modeling adopt-candidate": {
+        "entry": "tools/blenderctl/modeling_adoption.py"
+      },
+      "uv transfer-source": {
+        "entry": "tools/blenderctl/uv_transfer_handoff.py"
+      },
+      "uv transfer-prepare": {
+        "entry": "tools/blenderctl/uv_transfer_handoff.py"
+      },
+      "uv transfer-execute": {
+        "entry": "tools/blenderctl/uv_transfer_handoff.py"
+      },
+      "uv transfer-export": {
+        "entry": "tools/blenderctl/uv_transfer_handoff.py"
+      },
+      "uv transfer-import": {
+        "entry": "tools/blenderctl/uv_transfer_handoff.py"
+      },
+      "uv checker-preview": {
+        "entry": "tools/blenderctl/uv_checker_preview.py"
+      },
+      "uv export-policy": {
+        "entry": "tools/blenderctl/uv_policy_file.py"
+      },
+      "uv import-policy": {
+        "entry": "tools/blenderctl/uv_policy_file.py"
+      },
+      "material read-current": {
+        "entry": "tools/blenderctl/material_draft_handoff.py"
+      },
+      "material capture-faces": {
+        "entry": "tools/blenderctl/material_draft_handoff.py"
+      },
+      "asset upgrade-scan": {
+        "entry": "tools/asset_collection_place/cli.py"
+      },
+      "asset upgrade-apply": {
+        "entry": "tools/asset_collection_place/cli.py"
+      },
+      "animation production": {
+        "entry": "tools/blenderctl/animation_production.py"
+      },
+      "rigging-workflow v1": {
+        "entry": "tools/addons/rigging_workflow/cli/phase3/cli.py",
+        "edition_entries": {
+          "1.0.0-rc.1": "tools/addons/rigging_workflow/cli/phase3/cli.py"
+        }
+      },
+      "camera motion": {
+        "entry": "tools/blenderctl/c5_workflow_host.py"
+      },
+      "video finish": {
+        "entry": "tools/blenderctl/c5_workflow_host.py"
+      },
+      "compositing compose-c5": {
+        "entry": "tools/blenderctl/compose_c5.py",
+        "forward_subcommand": false,
+        "host_adapter": "c5_compositor"
+      },
+      "video master-audio": {
+        "entry": "tools/blenderctl/video_master_audio.py",
+        "forward_subcommand": false,
+        "host_adapter": "video_master_audio"
+      }
+    },
+    "domains": {
+      "toon-workflow": "tools/toon_workflow_addon/toon_workflow/toon_workflow_cli_v1/cli.py"
+    },
+    "toon_bundles": {
+      "0.52.1": {
+        "directory": "runtime/toon-workflow/0.52.1/toon_workflow",
+        "manifest_sha256": "ba9b3d5a91705c6a7c9c0b68fe71f3efd6cdfef888b8a3d004ab60d450cfb336"
+      },
+      "0.52.3": {
+        "directory": "runtime/toon-workflow/0.52.3/toon_workflow",
+        "manifest_sha256": "6db937aac6628c50006b92410c09505615191715e8794fea644d35d2edb7b8d0"
+      },
+      "1.0.1": {
+        "directory": "tools/toon_workflow_addon/toon_workflow",
+        "manifest_sha256": "d59e1c2327f6e9be30eac634dd9f67d67ba53eb316295f31a211490e7e518109"
+      }
+    },
+    "new_jobs": {
+      "toon-workflow": "1.0.1",
+      "render-batch": "1.0.0"
+    },
+    "editions": {
+      "video": [
+        "0.1.4",
+        "0.1.5",
+        "0.2.0",
+        "1.0.0"
+      ],
+      "render-batch": [
+        "0.3.0",
+        "0.3.1-dev",
+        "0.3.1-recovery-rc1",
+        "0.3.1-recovery-rc2",
+        "1.0.0-rc2",
+        "1.0.0"
+      ],
+      "rigging": [
+        "1.0.0-rc.1"
+      ],
+      "toon": [
+        "0.52.1",
+        "0.52.3",
+        "1.0.1"
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "domain": "compositing",
+      "version": "1.0.0",
+      "addon_dir": "tools/compositing_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "compositing.inspect",
+        "compositing.run"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "geometry",
+      "version": "0.2.0",
+      "addon_dir": "tools/geometry_nodes_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "node.prepare",
+        "node.inspect",
+        "geometry.inspect",
+        "geometry.run"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "hard-surface",
+      "version": "0.3.7",
+      "addon_dir": "tools/hard_surface_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "model.prepare",
+        "model.inspect"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "lighting",
+      "version": "1.1.0",
+      "addon_dir": "tools/lighting_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "lighting.inspect",
+        "lighting.run"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "material",
+      "version": "0.9.2",
+      "addon_dir": "tools/material_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "material.preview",
+        "texture.bake"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "modeling",
+      "version": "1.0.0-rc.1",
+      "addon_dir": "tools/modeling_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "modeling.import-local"
+      ],
+      "smoke_test": "tools/blenderctl/tests/modeling_cli_acceptance.py",
+      "qa_probes": []
+    },
+    {
+      "domain": "physics",
+      "version": "1.0.0-rc.1",
+      "addon_dir": "tools/physics_nodes_workflow_addon",
+      "cli_adapter": "tools/blenderctl/physics_dispatch.py",
+      "pipeline_allowed": [
+        "simulation.prepare",
+        "simulation.inspect",
+        "simulation.bake"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "uv",
+      "version": "0.8.8",
+      "addon_dir": "tools/uv_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "pipeline_allowed": [
+        "uv.inspect",
+        "uv.run"
+      ],
+      "smoke_test": null,
+      "qa_probes": []
+    },
+    {
+      "domain": "animation",
+      "version": "0.5.0",
+      "addon_dir": "tools/animation_curves_workflow_addon",
+      "offline_source_trees": [
+        "support_resources"
+      ],
+      "cli_adapter": "tools/blenderctl/animation_production.py",
+      "version_source": "bl_info",
+      "smoke_test": null,
+      "qa_probes": [
+        "qa_probe_animation"
+      ],
+      "pipeline_allowed": [
+        "animation.sample"
+      ],
+      "extension_metadata": {
+        "name": "动画曲线工作台",
+        "tagline": "编辑角色姿态、曲线、事件卡点与视口预览",
+        "license": [
+          "SPDX:LicenseRef-Upstream-Unspecified"
+        ],
+        "license_note": "The reviewed upstream archive does not declare a license. This local package preserves the existing terms and does not grant redistribution rights. Source: https://github.com/tsist/blender-animation-curves-workflow at v0.5.0.\n"
+      }
+    },
+    {
+      "domain": "rigging",
+      "version": "1.0.0-rc.1",
+      "addon_dir": "tools/addons/rigging_workflow",
+      "cli_adapter": "tools/addons/rigging_workflow/cli/character_entry_candidate.py",
+      "version_source": "manifest",
+      "smoke_test": null,
+      "qa_probes": [
+        "qa_probe_rigging"
+      ],
+      "pipeline_allowed": [
+        "rig.prepare",
+        "rig.inspect",
+        "rig.package"
+      ],
+      "extension_metadata": {
+        "name": "Rigging Workflow",
+        "tagline": "Build and inspect editable character rigs",
+        "license": [
+          "SPDX:GPL-3.0-only"
+        ]
+      }
+    },
+    {
+      "domain": "camera",
+      "version": "1.0.0",
+      "addon_dir": "tools/addons/camera_workflow/camera_windows_static",
+      "cli_adapter": "tools/blenderctl/c5_workflow_host.py",
+      "version_source": "manifest",
+      "smoke_test": null,
+      "qa_probes": [],
+      "pipeline_allowed": [
+        "camera.inspect"
+      ],
+      "extension_metadata": {
+        "name": "Camera Workflow",
+        "tagline": "Frame and inspect camera shots",
+        "license": [
+          "SPDX:GPL-3.0-only"
+        ]
+      }
+    },
+    {
+      "domain": "toon",
+      "version": "1.0.1",
+      "addon_dir": "tools/toon_workflow_addon/toon_workflow",
+      "cli_adapter": "tools/toon_workflow_addon/toon_workflow/toon_workflow_cli_v1/cli.py",
+      "version_source": "manifest",
+      "smoke_test": null,
+      "qa_probes": [],
+      "pipeline_allowed": [
+        "toon.inspect"
+      ],
+      "extension_metadata": {
+        "name": "Toon Workflow",
+        "tagline": "Author and inspect toon shading",
+        "license": [
+          "SPDX:GPL-3.0-or-later"
+        ]
+      }
+    },
+    {
+      "domain": "render-batch",
+      "version": "1.0.0",
+      "addon_dir": "tools/render_batch_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "version_source": "manifest",
+      "smoke_test": null,
+      "qa_probes": [],
+      "pipeline_allowed": [
+        "render.run"
+      ]
+    },
+    {
+      "domain": "video",
+      "version": "1.0.0",
+      "addon_dir": "tools/addons/video_editing_workflow/video_editing_workflow_addon",
+      "cli_adapter": "tools/blenderctl/cli.py",
+      "version_source": "manifest",
+      "smoke_test": null,
+      "qa_probes": [],
+      "pipeline_allowed": [
+        "video.inspect",
+        "video.run"
+      ]
+    }
+  ],
+  "pipeline": {
+    "core_allowed": [
+      "query",
+      "diff",
+      "dependency.audit",
+      "validate",
+      "identity.prepare",
+      "scene.prepare",
+      "scene.inspect",
+      "media.prepare",
+      "media.export",
+      "exchange.export",
+      "exchange.import",
+      "exchange.convert",
+      "extension.prepare",
+      "extension.run",
+      "dependency.plan-relink",
+      "dependency.prepare",
+      "tracking.prepare",
+      "tracking.inspect",
+      "tracking.solve",
+      "inspect",
+      "project.verify",
+      "project.prepare_copy",
+      "project.link.prepare",
+      "project.override.prepare",
+      "project.override.resync",
+      "exchange.analyze",
+      "production.run",
+      "asset.prepare",
+      "asset.index",
+      "asset.preview.prepare"
+    ]
+  },
+  "standalone_products": [
+    {
+      "id": "hair",
+      "name": "Blender Hair Curves",
+      "skill": "blender-cli",
+      "goals": [
+        "character",
+        "procedural",
+        "shot"
+      ],
+      "use_when": "在已有工程中制作 Hair Curves 或静态发卡候选。",
+      "blender_evidence": {
+        "5.3.0": "公共 CLI 生成 Hair Curves、导出静态发卡并独立重开。"
+      },
+      "scope_reference": "work/audit/<batch>/",
+      "action_group": "Hair Curves",
+      "editions": [
+        "1.0.0"
+      ],
+      "entry_points": [
+        {
+          "type": "public",
+          "path": "blenderctl.ps1",
+          "arguments": [
+            "hair",
+            "run"
+          ],
+          "context": "用 --request 提交完整参数。可在子命令前用 --jobs-dir 指定作业目录。"
+        }
+      ],
+      "additional_actions": [
+        {
+          "scope": "Windows Blender 5.3.0 及以上版本",
+          "product": "Hair Curves",
+          "version": "1.0.0",
+          "action_id": "hair.run",
+          "label": "生成 Hair Curves 与静态发卡",
+          "gui_source": "Blender Hair Curves",
+          "core": "tools/blenderctl/hair_essentials_job.py",
+          "cli_command": "hair run",
+          "cli_parameter": "--request FILE",
+          "status": "已实跑",
+          "input": "带场景及发根、表面和发卡设置的 Hair Curves 请求。",
+          "output": "生成候选和独立重开回执。发卡用于静态交接。",
+          "consumer": "角色制作、渲染及资产交接",
+          "recovery": "使用未经修改的源工程重新提交到新目录。",
+          "evidence": "公共 CLI 验证曲线生成、静态发卡与独立重开。静态卡片 352 个四边面，GLB 56,540 字节。曲线回执见同目录 groom-receipt.json。",
+          "evidence_file": "work/audit/<batch>/",
+          "gap_owner": "",
+          "reference_type": "公共 CLI 实跑与冷开"
+        }
+      ]
+    }
+  ],
+  "production": {
+    "animation": {
+      "workspace": "tools/animation_curves_workflow_addon",
+      "version": "0.5.0"
+    },
+    "compositing": {
+      "workspace": "tools/compositing_workflow_addon",
+      "version": "1.0.0"
+    },
+    "video": {
+      "workspace": "tools/addons/video_editing_workflow/video_editing_workflow_addon",
+      "version": "1.0.0"
+    },
+    "lighting": {
+      "workspace": "tools/lighting_workflow_addon",
+      "version": "1.1.0"
+    }
+  },
+  "package_trees": [
+    "docs/cli",
+    "tools/bridges/reference_stage",
+    "tools/viewport_preview",
+    "tools/camera_live_handoff",
+    "tools/physics_workflow_cli_v1",
+    "runtime/rigging-agent-v003",
+    "runtime/rigging-workflow",
+    "runtime/camera",
+    "runtime/toon-workflow",
+    "runtime/hard-surface",
+    "runtime/plugin-archives",
+    "runtime/physics/0.8.1-dev.2/tools",
+    "runtime/video-editing/0.1.4/tools",
+    "runtime/video-editing/0.1.5/tools",
+    "runtime/render-batch/0.3.1-dev/runtime",
+    "runtime/render-batch/0.3.1-recovery-rc1/runtime",
+    "runtime/render-batch/0.3.1-recovery-rc2/runtime",
+    "runtime/migrations/blender53/cli/tools/blenderctl",
+    "opensource/blender-render-batch/runtime",
+    "tools/geometry_nodes_workflow_addon",
+    "tools/toon_workflow_addon",
+    "tools/animation_curves_workflow_addon",
+    "tools/toon_viewport_preview",
+    "tools/physics_nodes_workflow_addon",
+    "tools/blenderctl/animation_project_events",
+    "tools/blenderctl/hair_compat",
+    "runtime/camera/table-cli-windows",
+    ".agents/skills/tripo-studio-opencli/scripts",
+    "opensource/tripo-studio-opencli/skills/tripo-studio-opencli/scripts",
+    "runtime/lighting-workflow/0.2.2/tools",
+    "runtime/rigging-agent-workflow-20261123-v001",
+    "runtime/rigging-agent-workflow-20261123-v002",
+    "runtime/render-batch/1.0.0-rc2/runtime",
+    "tools/addons/video_editing_workflow/video_editing_workflow_addon",
+    "runtime/video-editing/0.2.0",
+    "tools/toon_workflow_addon/toon_workflow",
+    "runtime/toon-workflow/1.0.1/toon_workflow"
+  ],
+  "package_files": [
+    "tools/package_blender53_production.py",
+    "runtime/rigging-workflow-product.json",
+    "runtime/render-batch/0.3.1-dev/batch_cli.py",
+    "runtime/render-batch/0.3.1-recovery-rc1/batch_cli.py",
+    "runtime/render-batch/0.3.1-recovery-rc2/batch_cli.py",
+    "opensource/blender-render-batch/batch_cli.py",
+    "runtime/render-batch/1.0.0-rc2/batch_cli.py",
+    "runtime/video-editing/0.1.5/SOURCE-MANIFEST.json"
+  ]
+}

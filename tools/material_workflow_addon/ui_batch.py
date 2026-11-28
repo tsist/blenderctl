@@ -2,7 +2,7 @@
 import copy, json, uuid
 from pathlib import Path
 import bpy, bmesh
-from bpy.props import StringProperty, IntProperty, FloatProperty, FloatVectorProperty, EnumProperty
+from bpy.props import BoolProperty, StringProperty, IntProperty, FloatProperty, FloatVectorProperty, EnumProperty
 from . import ui, batch, core
 from .batch_contract import normalize_manifest_batch, assignment_manifest, topological_order
 
@@ -61,20 +61,29 @@ class MW_OT_batch_context(BatchOperator,bpy.types.Operator):
 
 class MW_OT_batch_add(BatchOperator,bpy.types.Operator):
     bl_idname='material_workflow.batch_add'; bl_label='从单材质草稿＋活动网格添加'
+    selected_objects: BoolProperty(name='添加所选网格', default=False)
+
     def run(self,context):
-        scene=context.scene; source=ui.normalize_manifest(ui._flush(scene)); obj=context.object
+        scene=context.scene; source=ui.normalize_manifest(ui._flush(scene))
         if source['schema_version']!='1.1': raise ValueError('请先显式升级单材质草稿到 v2')
-        if obj is None or obj.type!='MESH' or not obj.data.uv_layers: raise ValueError('需要有 UV 的活动网格')
-        row={k:copy.deepcopy(source[k]) for k in ('target','material','layers')}
-        row.update(id='assignment_'+uuid.uuid4().hex[:12],faces=None,depends_on=[])
-        row['material']['id']='material_'+uuid.uuid4().hex[:12]
-        row['target'].update(object=obj.name,material_slot=obj.active_material_index,uv_layer=obj.data.uv_layers.active.name)
+        objects = context.selected_objects if self.selected_objects else [context.object]
+        if not objects or any(obj is None or obj.type != 'MESH' or not obj.data.uv_layers.active
+                              for obj in objects):
+            raise ValueError('请选择有 UV 的网格')
         if scene.mw_batch_json:
             value=get_manifest(scene); validate_context(context,value)
         else:
             value={'schema_version':'1.0','context':_context(context),'objects':[],'assignments':[],'preview':copy.deepcopy(source['preview'])}
-        if obj.name not in value['objects']: value['objects'].append(obj.name)
-        value['assignments'].append(row); _store(scene,value); scene.mw_batch_index=len(value['assignments'])-1; _load_target(scene); _load_view(scene)
+        for obj in sorted(objects, key=lambda item: item.name):
+            row = {key: copy.deepcopy(source[key]) for key in ('target', 'material', 'layers')}
+            row.update(id='assignment_' + uuid.uuid4().hex[:12], faces=None, depends_on=[])
+            row['material']['id'] = 'material_' + uuid.uuid4().hex[:12]
+            row['target'].update(object=obj.name, material_slot=obj.active_material_index,
+                                 uv_layer=obj.data.uv_layers.active.name)
+            if obj.name not in value['objects']:
+                value['objects'].append(obj.name)
+            value['assignments'].append(row)
+        _store(scene,value); scene.mw_batch_index=len(value['assignments'])-1; _load_target(scene); _load_view(scene)
 
 class MW_OT_batch_select(BatchOperator,bpy.types.Operator):
     bl_idname='material_workflow.batch_select'; bl_label='选择分配'
@@ -111,14 +120,38 @@ class MW_OT_batch_target(BatchOperator,bpy.types.Operator):
 
 class MW_OT_batch_faces(BatchOperator,bpy.types.Operator):
     bl_idname='material_workflow.batch_faces'; bl_label='从目标网格读取选面'
+    preserve: BoolProperty(default=False)
+
     def run(self,context):
+        if self.preserve:
+            context.scene.mw_batch_faces = 'null'
+            return
         scene=context.scene; row=_selected(scene,get_manifest(scene)); obj=context.object
         if obj is None or obj.type!='MESH' or obj.name!=row['target']['object']: raise ValueError('活动网格必须是此分配目标')
         if obj.mode=='EDIT':
             mesh=bmesh.from_edit_mesh(obj.data); mesh.faces.ensure_lookup_table(); mesh.faces.index_update(); faces=[f.index for f in mesh.faces if f.select]
         else: faces=[f.index for f in obj.data.polygons if f.select]
-        if not faces: raise ValueError('没有选面；全部保持原分配请把面索引设为 null')
+        if not faces: raise ValueError('没有选面，请选择面或点击「保留面分配」')
         scene.mw_batch_faces=json.dumps(faces)
+
+
+class MW_OT_batch_dependency(BatchOperator, bpy.types.Operator):
+    bl_idname = 'material_workflow.batch_dependency'
+    bl_label = '切换前置分配'
+    identity: StringProperty()
+
+    def run(self, context):
+        scene = context.scene
+        value = get_manifest(scene)
+        current = _selected(scene, value)
+        if self.identity not in {row['id'] for row in value['assignments'] if row != current}:
+            raise ValueError('请选择本批次其他分配')
+        dependencies = json.loads(scene.mw_batch_dependencies)
+        if self.identity in dependencies:
+            dependencies.remove(self.identity)
+        else:
+            dependencies.append(self.identity)
+        scene.mw_batch_dependencies = json.dumps(dependencies)
 
 class MW_OT_batch_delete(BatchOperator,bpy.types.Operator):
     bl_idname='material_workflow.batch_delete'; bl_label='删除分配'
@@ -166,7 +199,13 @@ class MW_OT_batch_apply(BatchOperator,bpy.types.Operator):
                     raise ValueError('旧 v1 材质须先通过单材质编辑器显式升级；批量不隐式升级')
                 manifest=assignment_manifest(value,row)
                 resources=core.existing_resource_paths(material,manifest)
-                reports[identity]={'status':'pass','result':batch.apply_assignment(value,row,resources)}
+                with ui.ensure_object_mode(context):
+                    result = batch.apply_assignment(value,row,resources)
+                material = context.scene.objects[row['target']['object']].material_slots[
+                    row['target']['material_slot']].material
+                for node in core._nodes(material).values():
+                    ui.apply_node_theme(node, ui.DOMAIN, accent=node.type == 'FRAME')
+                reports[identity]={'status':'pass','result':result}
             except Exception as error:
                 reports[identity]={'status':'fail','error':str(error),'code':getattr(error,'code',None)}
                 if getattr(error,'rollback_ok',True) is False:
@@ -186,40 +225,72 @@ class MW_OT_batch_preview(BatchOperator,bpy.types.Operator):
 
 class MW_PT_batch(bpy.types.Panel):
     bl_label='批量分配与机位'; bl_idname='MW_PT_batch'; bl_parent_id='MW_PT_panel'
-    bl_space_type='VIEW_3D'; bl_region_type='UI'; bl_category='Material Workflow'
+    bl_space_type='VIEW_3D'; bl_region_type='UI'; bl_category=ui.THEME.tab_label
     def draw(self,context):
-        l=self.layout; s=context.scene
-        l.prop(s,'mw_batch_path'); r=l.row(); r.operator('material_workflow.batch_load'); r.operator('material_workflow.batch_save')
-        l.operator('material_workflow.batch_add'); l.label(text='单材质改动须确认回写；选择分配不会提交草稿',icon='INFO')
+        MW_PT_batch.draw_contents(self.layout, context)
+
+    @staticmethod
+    def draw_contents(l, context):
+        s=context.scene
+        l.prop(s,'mw_batch_path',text='批量草稿文件')
+        r=l.row(align=True)
+        r.operator('material_workflow.batch_load',text='载入')
+        r.operator('material_workflow.batch_save',text='另存')
+        row = l.row()
+        row.enabled = bool(s.mw_manifest_json)
+        row.operator('material_workflow.batch_add', text='加入所选网格', icon='ADD').selected_objects = True
         if not s.mw_batch_json: return
-        try: m=get_manifest(s)
-        except Exception: return
-        l.label(text=str(m['context'])); l.operator('material_workflow.batch_context')
-        for i,a in enumerate(m['assignments']): l.operator('material_workflow.batch_select',text=a['material']['name']+' · '+a['target']['object']+' ['+str(a['target']['material_slot'])+'] · '+a['id'],depress=i==s.mw_batch_index).index=i
+        try:
+            m = get_manifest(s)
+            current = _selected(s, m)
+            faces = json.loads(s.mw_batch_faces)
+            dependencies = json.loads(s.mw_batch_dependencies)
+        except (ValueError, TypeError, KeyError):
+            l.label(text='批量草稿有待修正，请重新载入', icon='ERROR')
+            return
+        l.operator('material_workflow.batch_context', text='读取当前场景与视图层')
+        for i,a in enumerate(m['assignments']):
+            l.operator('material_workflow.batch_select', text=a['target']['object']+' · '+a['material']['name'],
+                       depress=i==s.mw_batch_index).index=i
         r=l.row(); r.operator('material_workflow.batch_edit_material'); r.operator('material_workflow.batch_commit_material')
         l.prop_search(s,'mw_batch_object',s,'objects'); l.prop(s,'mw_batch_slot')
         target=s.objects.get(s.mw_batch_object)
         if target and target.type=='MESH': l.prop_search(s,'mw_batch_uv',target.data,'uv_layers')
         else: l.prop(s,'mw_batch_uv')
-        for p in ('faces','dependencies'): l.prop(s,'mw_batch_'+p)
-        l.operator('material_workflow.batch_faces'); l.operator('material_workflow.batch_target'); l.operator('material_workflow.batch_delete')
+        row = l.row(align=True)
+        row.operator('material_workflow.batch_faces', text='读取选面')
+        row.operator('material_workflow.batch_faces', text='保留面分配').preserve = True
+        l.label(text='保留原网格面分配' if faces is None else f'待分配面 · {len(faces)}')
+        if len(m['assignments']) > 1:
+            box = l.box()
+            box.label(text='前置分配')
+            for assignment in m['assignments']:
+                identity = assignment['id']
+                if identity != current['id']:
+                    box.operator('material_workflow.batch_dependency', text=assignment['target']['object'],
+                                 depress=identity in dependencies).identity = identity
+        row = l.row(align=True)
+        row.operator('material_workflow.batch_target', text='保存目标设置')
+        row.operator('material_workflow.batch_delete', text='', icon='REMOVE')
         for p in ('engine','width','height','samples'): l.prop(s,'mw_batch_'+p)
-        l.label(text='切换引擎重置设备：Eevee GRAPHICS / Cycles CPU')
         l.operator('material_workflow.batch_preview')
         for i,v in enumerate(m['preview']['views']):
             op=l.operator('material_workflow.batch_view',text=v['id']+' · '+', '.join(v['objects']),depress=i==s.mw_batch_view_index); op.action='SELECT'; op.index=i
         for p in ('azimuth','elevation','lighting','focus','zoom'): l.prop(s,'mw_batch_'+p)
         for action,label in [('COMMIT','提交机位参数'),('OBJECTS','机位对象取当前选择'),('ADD','增加机位'),('DELETE','删除机位')]: l.operator('material_workflow.batch_view',text=label).action=action
-        l.label(text='当前场景应用与后台持久快照独立',icon='INFO'); l.operator('material_workflow.batch_apply')
+        l.operator('material_workflow.batch_apply', text='执行批量材质指派', icon='CHECKMARK')
         if s.mw_batch_report:
-            for key,row in json.loads(s.mw_batch_report).items(): l.label(text=key+': '+row['status']+' '+row.get('error',''))
+            labels = {'pass': '完成', 'fail': '失败', 'blocked': '依赖未满足'}
+            for key,row in json.loads(s.mw_batch_report).items():
+                label = next((a['target']['object'] for a in m['assignments'] if a['id'] == key), key)
+                l.label(text=label+' · '+labels.get(row['status'], row['status'])+' '+row.get('error',''))
 
-CLASSES=(MW_OT_batch_load,MW_OT_batch_save,MW_OT_batch_context,MW_OT_batch_add,MW_OT_batch_select,MW_OT_batch_edit_material,MW_OT_batch_commit_material,MW_OT_batch_target,MW_OT_batch_faces,MW_OT_batch_delete,MW_OT_batch_view,MW_OT_batch_apply,MW_OT_batch_preview,MW_PT_batch)
+CLASSES=(MW_OT_batch_load,MW_OT_batch_save,MW_OT_batch_context,MW_OT_batch_add,MW_OT_batch_select,MW_OT_batch_edit_material,MW_OT_batch_commit_material,MW_OT_batch_target,MW_OT_batch_faces,MW_OT_batch_dependency,MW_OT_batch_delete,MW_OT_batch_view,MW_OT_batch_apply,MW_OT_batch_preview)
 PROPS={
  'mw_batch_json':StringProperty(options={'HIDDEN'}),'mw_batch_report':StringProperty(options={'HIDDEN'}),'mw_batch_edit_id':StringProperty(options={'HIDDEN'}),
  'mw_batch_path':StringProperty(name='批量清单 JSON',subtype='FILE_PATH'),'mw_batch_index':IntProperty(min=0),'mw_batch_view_index':IntProperty(min=0),
  'mw_batch_object':StringProperty(name='目标对象'),'mw_batch_slot':IntProperty(name='材质槽',min=0),'mw_batch_uv':StringProperty(name='UV 层'),
- 'mw_batch_faces':StringProperty(name='面索引 JSON（null 保持）',default='null'),'mw_batch_dependencies':StringProperty(name='依赖 ID JSON',default='[]'),
+ 'mw_batch_faces':StringProperty(default='null', options={'HIDDEN'}),'mw_batch_dependencies':StringProperty(default='[]', options={'HIDDEN'}),
  'mw_batch_azimuth':FloatProperty(name='方位角',min=-360,max=360,default=45),'mw_batch_elevation':FloatProperty(name='仰角',min=-80,max=89,default=15),
  'mw_batch_lighting':EnumProperty(name='灯光',items=[('soft','柔光',''),('raking','掠射光','')]),
  'mw_batch_focus':FloatVectorProperty(name='局部焦点',size=3,min=0,max=1,default=(.5,.5,.5)),'mw_batch_zoom':FloatProperty(name='放大',min=.25,max=10,default=1)}

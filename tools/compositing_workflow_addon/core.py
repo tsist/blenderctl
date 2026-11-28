@@ -2,12 +2,14 @@
 import hashlib
 import json
 import math
+import re
 from array import array
 from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from copy import deepcopy
 import bpy
-from .contract import (WorkflowError, normalize_manifest, NODE_TYPES, COMPONENT_DEFINITIONS, BINDING_SCHEMA,
+from .contract import (WorkflowError, normalize_manifest, NODE_TYPES, C5_GRAPH_NODE_TYPES, COMPONENT_DEFINITIONS, BINDING_SCHEMA,
     validate, media_sources, ANIMATION_TRACK_SCHEMA, TRACKING_DOCUMENT_SCHEMA, _check_track, _target_key)
 from .runtime import supported
 
@@ -27,7 +29,38 @@ UI={'location','location_absolute','width','height','dimensions','label','select
     'bl_icon','bl_width_default','bl_width_min','bl_width_max','bl_height_default','bl_height_min',
     'bl_height_max','rna_type','type','inputs','outputs','internal_links','parent','name','bl_idname',
     'warning_propagation','color_tag'}
-FORBIDDEN={'CompositorNodeOutputFile','ShaderNodeScript'}
+FORBIDDEN={'ShaderNodeScript'}
+_output_root = ContextVar('compositor_output_root', default=None)
+
+
+@contextmanager
+def managed_output_scope(job):
+    root = Path(job).resolve(strict=True)
+    if not root.is_dir():
+        _fail('INVALID_REQUEST', 'Compositor output scope requires an existing job directory')
+    token = _output_root.set(root)
+    try:
+        yield
+    finally:
+        _output_root.reset(token)
+
+
+def guard_output_node(node):
+    if node.bl_idname in FORBIDDEN:
+        _fail('UNSUPPORTED', 'Script nodes cannot run in managed compositing')
+    if node.bl_idname != 'CompositorNodeOutputFile':
+        return
+    root = _output_root.get()
+    directory = Path(node.directory)
+    if (root is None or not directory.is_absolute() or directory.resolve() != root or
+            node.format.file_format != 'OPEN_EXR_MULTILAYER' or
+            not re.fullmatch(r'[A-Za-z0-9_-]+#{4}', node.file_name)):
+        _fail('UNSUPPORTED', 'File Output must use a simple four-digit multilayer EXR name in this job directory')
+    # Each permitted output has exactly one filesystem basename. Layer names
+    # remain EXR metadata. Reject existing output links before rendering.
+    for existing in root.glob(node.file_name[:-4] + '*.exr'):
+        if existing.is_symlink() or existing.resolve().parent != root:
+            _fail('UNSUPPORTED', 'File Output resolves outside the job')
 COMPONENTS={kind:(definition['node_type'],{key: spec['socket'] for key,spec in definition['parameters'].items()})
   for kind,definition in COMPONENT_DEFINITIONS.items()}
 
@@ -126,6 +159,9 @@ def _binding_observation(node):
     if node.bl_idname=='CompositorNodeImage':
         return {'kind':'image','layer':node.layer,'has_layers':node.has_layers,'view':node.view,
           'has_views':node.has_views,'image':_image(node.image) if node.image else None}
+    if node.bl_idname=='CompositorNodeCryptomatteV2':
+        return {'kind':'image','source':node.source,'layer':node.layer_name,
+                'image':_image(node.image) if node.image else None}
     _fail('UNSUPPORTED','Binding on unsupported node type: '+node.bl_idname)
 
 def _curves(mapping):
@@ -196,7 +232,8 @@ def _socket_state(socket):
     return {'identifier':socket.identifier,'name':socket.name,'rna':socket.bl_rna.identifier,
       'enabled':socket.enabled,'default':_plain(socket.default_value) if hasattr(socket,'default_value') else None}
 def _node_state(node,trail,enforce_safety):
-    if enforce_safety and node.bl_idname in FORBIDDEN:_fail('UNSUPPORTED','External write/script node is outside M1: '+node.bl_idname)
+    if enforce_safety:
+        guard_output_node(node)
     props={}
     for prop in node.bl_rna.properties:
         key=prop.identifier
@@ -290,6 +327,8 @@ def _patch(node,document,undo=None):
         if key in UI or not prop or prop.is_readonly or prop.type not in ('BOOLEAN','INT','FLOAT','STRING','ENUM'):
             _fail('UNSUPPORTED','Property is not a supported writable semantic scalar: '+key)
         if 'path' in key.lower() or key.startswith('bl_'):_fail('UNSUPPORTED','External path/type mutation is outside M1')
+        if node.bl_idname=='CompositorNodeCryptomatteV2' and key=='source':
+            _fail('UNSUPPORTED','Cryptomatte source is owned by its verified EXR binding')
         if BINDING in node and key in {'layer','view','frame_duration','frame_start','frame_offset','use_cyclic','use_auto_refresh'}:
             _fail('UNSUPPORTED','Input selection/time is binding-owned; use explicit replace_graph')
         if undo is not None:undo.append(('property',node,key,deepcopy(_plain(getattr(node,key)))))
@@ -335,6 +374,14 @@ def _bind_node(node,spec,manifest,scene,wid,resolved_media=None):
             except (TypeError,ValueError,RuntimeError) as exc:_fail('NOT_FOUND','EXR layer identifier unavailable',{'requested':spec['layer'],'error':str(exc)})
             if node.layer!=spec['layer']:_fail('CONFLICT','EXR layer selection differs from request')
         if node.has_views:_fail('UNSUPPORTED','Multiview image binding is outside static M2')
+    elif node.bl_idname=='CompositorNodeCryptomatteV2':
+        image=_load_bound_image(spec,scene,wid,'binding_image')
+        node.source='IMAGE'
+        node.image=image
+        node[BOUND_IMAGE]=image.name
+        tuple(image.size)
+        if image.type!='MULTILAYER':
+            _fail('INVALID_REQUEST','Cryptomatte requires a multilayer OpenEXR source')
     elif node.bl_idname=='CompositorNodeRLayers':
         if spec['scene']!=scene.name or spec['view_layer']!=manifest['view_layer']:
             _fail('UNSUPPORTED','Render Layers binding must match manifest context')
@@ -363,13 +410,17 @@ def _required_render_pass(node,identifier):
         cycles=getattr(layer,'cycles',None)
         if node.scene.render.engine!='CYCLES' or not cycles or not getattr(cycles,'denoising_store_passes',False):
             _fail('UNSUPPORTED','Denoising auxiliary Pass is not enabled',{'identifier':identifier,'required_switch':'cycles.denoising_store_passes'})
+    elif identifier.startswith('Combined_'):
+        group=identifier.removeprefix('Combined_')
+        if node.scene.render.engine!='CYCLES' or group not in {item.name for item in layer.lightgroups}:
+            _fail('UNSUPPORTED','Required Cycles Light Group is unavailable',{'identifier':identifier})
     else:_fail('UNSUPPORTED','Render Pass is outside the finite M2 binding scope',{'identifier':identifier})
 
 def _validate_bound_input(node,scene,view_layer,wid):
     if not _owned(node,scene,wid):_fail('CONFLICT','Managed input node ownership changed')
     spec=_binding_spec(node)
     if spec['kind'] in {'image_sequence','movie'}:return _validate_sequence_node(node,spec,scene,wid)
-    if node.bl_idname=='CompositorNodeImage':
+    if node.bl_idname in {'CompositorNodeImage','CompositorNodeCryptomatteV2'}:
         image=node.image
         if spec.get('kind')!='image' or not image or image.library or image.override_library or not _owned(image,scene,wid):
             _fail('CONFLICT','Bound Image reference/ownership changed')
@@ -382,6 +433,13 @@ def _validate_bound_input(node,scene,view_layer,wid):
         if image.packed_files:_fail('UNSUPPORTED','Bound file images must keep their declared external dependency')
         if not actual.is_file() or hashlib.sha256(actual.read_bytes()).hexdigest()!=spec['expected_sha256']:
             _fail('CONFLICT','Bound Image dependency SHA changed')
+        if node.bl_idname=='CompositorNodeCryptomatteV2':
+            tuple(image.size)
+            scene.view_layers[view_layer].update()
+            allowed={spec['layer']+'.Crypto'+kind for kind in ('Object','Material','Asset')}
+            if node.source!='IMAGE' or image.type!='MULTILAYER' or node.layer_name not in allowed:
+                _fail('CONFLICT','Cryptomatte source or EXR layer changed')
+            return image
         if image.type=='MULTILAYER' and not node.has_layers:
             # Cold open_mainfile keeps the saved layer index but its RNA enum is empty.
             # Reading the declared Image header and evaluating reveals the saved choice;
@@ -409,7 +467,7 @@ def _validate_bound_graph(group,scene,view_layer,wid):
     """M2 ownership/context check also runs before adoption of a hand-edited graph."""
     images=[]
     for node in group.nodes:
-        if node.bl_idname not in {'CompositorNodeImage','CompositorNodeRLayers'}:continue
+        if node.bl_idname not in {'CompositorNodeImage','CompositorNodeRLayers','CompositorNodeCryptomatteV2'}:continue
         image=_validate_bound_input(node,scene,view_layer,wid)
         if image:images.append(image)
     for link in group.links:
@@ -442,6 +500,8 @@ def _build_graph(manifest,scene,wid,resolved_media=None):
         else:
             graph=manifest['graph']
             for spec in graph['nodes']:
+                if spec['type'] in C5_GRAPH_NODE_TYPES and bpy.app.version < (5,3,0):
+                    _fail('UNSUPPORTED','This graph node requires Blender 5.3: '+spec['type'])
                 n=group.nodes.new(spec['type']);n.name=spec['id'];_mark(n,scene,wid,'managed_node',spec['id']);mapping[spec['id']]=n
                 if 'binding' in spec:_bind_node(n,spec['binding'],manifest,scene,wid,resolved_media)
                 if n.bl_idname=='CompositorNodeDefocus':n.scene=scene
@@ -790,11 +850,12 @@ def _input_bindings(root,group):
             if BINDING not in node:continue
             outputs=[{'identifier':s.identifier,'type':s.type,'enabled':s.enabled,
               'is_unavailable':getattr(s,'is_unavailable',False)} for s in node.outputs]
-            if node.bl_idname=='CompositorNodeImage':
+            if node.bl_idname in {'CompositorNodeImage','CompositorNodeCryptomatteV2'}:
                 image=node.image
+                layer=node.layer if node.bl_idname=='CompositorNodeImage' else node.layer_name
                 observed={'name':image.name,'file':str(Path(bpy.path.abspath(image.filepath)).resolve()),
                   'source':image.source,'type':image.type,'size':list(image.size),'colorspace':image.colorspace_settings.name,
-                  'alpha_mode':image.alpha_mode,'layer':node.layer,'outputs':outputs}
+                  'alpha_mode':image.alpha_mode,'layer':layer,'outputs':outputs}
             else:
                 observed={'scene':node.scene.name,'view_layer':node.layer,
                   'passes':_pass_settings(node.scene.view_layers[node.layer]),'outputs':outputs}

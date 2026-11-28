@@ -7,15 +7,11 @@ metadata:
 
 # Blender CLI 调用手册
 
-GitHub 公开版 blenderctl 0.65.0 通过 `production.run` 的 `hard-surface` 域调用 Hard Surface Workflow 0.3.7。先校验本地构建的扩展 ZIP，并用 `scripts/install_hard_surface.py` 安装 CLI 运行包。输入绑定 Windows Blender 5.3.0 `02f0899d78e3`、源 SHA、母壳、世界毫米站位及截面。用 `describe` 读配方字段，`preview` 查命中、宽厚与净空，再将 `preview_signature` 填入提交配方的 `expected_preview_signature` 并执行 `execute`。接续已保存的站位时，用 `inspect-sweep` 预检，再沿用返回的 `commit_request`。核对 `sweep_reopened`、保护区及候选 SHA。[公开安装和请求](https://github.com/tsist/blenderctl/blob/main/docs/HARD_SURFACE.md)
-
-本仓的 `production.run` 适用于 Blender 5.3.0 `02f0899d78e3` 的动画曲线、场景合成、灯光和 VSE。先按公开发行说明核验并解包 `blender53-production-1.0.0.zip`，再用 `--blender <实际程序> request <请求.json>` 提交。请求指定 `domain`、`release`、源文件和 SHA-256。独立步骤可交 `pipeline run` 并行。先读 `production-report.json` 的操作和保存后重开结果，再领用 `production-candidate.blend` 作独立核对。[四域请求说明](https://github.com/tsist/blenderctl/blob/main/docs/PRODUCTION.md)
-
 本技能管怎么调 `./blenderctl.ps1`。项目当前唯一支持与验收的宿主是 Windows Blender `5.3.0`，启动器默认使用工作区内置的这套环境。具体某一门工艺怎么做，读对应部门的专项技能；跨部门顺序见 [blender-work-methodology](../blender-work-methodology/SKILL.md)。
 
 ## 第一步：用 discover 找到准确入口
 
-现场工作区若提供 `discover`，先查公共目录并使用实际返回的入口。GitHub 公开版的贴面扫掠通过上面的 JSON 请求与 `describe` 获取契约。
+动手前先查公共目录，拿到经过核验的命令前缀和所需字段，省去猜子命令和参数名的麻烦。
 
 ```powershell
 $ctl = './blenderctl.ps1'
@@ -35,9 +31,39 @@ $item = $d.data.actions.items[0]
 2. **顺着 `command_argv` 拼输入**：把真实文件路径和业务参数接在 `command_argv` 后面。返回里带有 `request_fields` 就填进请求 JSON；带有 `session_open_fields` 就在开现场会话时带上。
 3. **专项细则用 `describe` 查**：像 `material`、`uv`、`geometry`、`toon-workflow` 都自带 `describe` 子命令（如 `& $ctl material describe --operation study --section study`），不启动 Blender 就能读到参数分节说明。
 
+### 贴面扫掠的只读预览与提交
+
+Hard Surface Workflow `0.3.7` 在 Windows Blender `5.3.0` build `02f0899d78e3` 上提供 `surface_sweep`。锁站、圆弯、斜接、矩形和空心管的世界毫米配方见 [硬表面扫掠实跑例](https://github.com/tsist/blender-hard-surface-workflow/blob/main/skills/blender-hard-surface-modeling/SKILL.md#用命名站位做贴面扫掠)。
+
+```powershell
+$ctl = './blenderctl.ps1'
+& $ctl discover --product hard-surface
+& $ctl model flow-tools --tool surface_sweep
+
+# $src 为源 .blend，$reqJson 为 {object, params} 请求，$manifest 为新的清单文件
+# $context 从model inspect 核对，含 scene、view_layer、frame、mode、active_object、selected_objects
+$sha = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
+$inspection = & $ctl model inspect $src --expected-sha256 $sha --surface-sweep $reqJson | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or -not $inspection.ok) { throw ($inspection.error | ConvertTo-Json -Compress) }
+$request = Get-Content -LiteralPath $reqJson -Raw | ConvertFrom-Json -AsHashtable
+$request.params.expected_preview_signature = $inspection.data.surface_sweep.preview_signature
+$null = $request.params.Remove('preview')
+@{context = $context; operations = @(@{
+    op = 'hard_surface.stack'
+    object = $request.object
+    tool = 'surface_sweep'
+    params = $request.params
+})} | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath $manifest -Encoding utf8
+& $ctl model prepare --file $src --expected-sha256 $sha --manifest $manifest
+```
+
+`model inspect` 预览回执给出 `preview_signature`，填入提交的 `params.expected_preview_signature`。更新已有扫掠时，预览请求还需在 `params.expected_signature` 带上该输出最近提交的 `signature`，保持站位名、顺序和锁定边界，每次只改单个未锁站；提交时仍须使用刚预览的签名。按 `artifacts` 打开候选，检查几何与新签名。预览后若母壳或配方变化，重新预览并核对差异。
+
+在已存盘的工程中接手续改，`model panel-controls --params $inspectJson` 使用 `operation: "inspect-sweep"`、`edition: "0.3.7"`、绝对 `file`、`expected_sha256` 和 `object`（受管网格或其命名 Empty）。可加 `station_positions_mm` 指定一个站名及世界毫米坐标，例如 `{"Editable elbow":[-4,-5,36]}`。审看 `data.sweep_preview`，将 `data.commit_request` 原样存为 JSON 后运行 `model panel-controls --params $commitJson --output $newBlend`。该请求带 `operation: "commit-sweep"` 和 `expected.preview_sha256`。`$newBlend` 使用尚不存在的绝对路径，核对 `data.sweep_execution` 与 `data.independent_reopen.sweep`。 已存盘交接请求样例（`work/audit/<batch>/`）
+
 ## 第二步：建批次目录，先读后改
 
-每次任务在 `work/audit/<batch>//` 下建独立的 `jobs` 和 `transactions` 目录，全局参数统一放在子命令前面。
+每次任务在 `work/audit/<batch>/>/` 下建独立的 `jobs` 和 `transactions` 目录，全局参数统一放在子命令前面。
 
 ```powershell
 $batch = 'work/audit/<batch>/'
@@ -45,7 +71,7 @@ $jobs  = Join-Path $batch 'jobs'
 $tx    = Join-Path $batch 'transactions'
 New-Item -ItemType Directory -Path $jobs, $tx -Force | Out-Null
 
-$src = '<PROJECT_ROOT>/work\lamp\source.blend'
+$src = '<PROJECT_ROOT>\work\lamp\source.blend'
 $sha = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
 
 # 先只读摸清对象名、材质槽与外部引用
@@ -97,7 +123,7 @@ $sha = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant(
 ## 第六步：中断续跑与正式发布
 
 - **续跑**：`pipeline` 或 `workflow` 中断后，用原 `--jobs-dir` 跑 `pipeline resume <job_id>` 或 `workflow resume` 重评未完步骤；单步命令修好输入后从源副本重新提交。
-- **发布到正式位置或资产库**：工作候选验收通过后，写新文件用 `project plan-copy`，覆盖已授权目标或发布进 `<ASSET_LIBRARY>` 走 `asset plan` 加 `transaction apply`（全程保持同一个 `--transactions-dir`）。细节见 [恢复与发布](references/recovery.md)。
+- **发布到正式位置或资产库**：工作候选验收通过后，写新文件用 `project plan-copy`，覆盖已授权目标或发布进 `<ASSET_LIBRARY_ROOT>` 走 `asset plan` 加 `transaction apply`（全程保持同一个 `--transactions-dir`）。细节见 [恢复与发布](references/recovery.md)。
 
 ## 例子：给一件道具做交付前体检并修好贴图色彩空间
 

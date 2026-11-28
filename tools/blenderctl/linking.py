@@ -14,8 +14,8 @@ from filesystem import FileGuard
 from inspection import all_ids, identity, record, path_value
 from link_contract import COMMANDS, receipt_contract, pathkey
 import typed_dependencies as typed
+import link_edit_values
 
-ADAPTER='LIBRARY_OVERRIDE_5_2_V1'
 PROFILE={'closure':{'adapter':'TYPED_FILES_V1','max_depth':8,'max_files':1000}}
 
 def ref(item):
@@ -45,7 +45,8 @@ def find(selector,overrides=False):
 
 def open_file(path):
     bpy.ops.wm.open_mainfile(filepath=str(path),load_ui=False,use_scripts=False)
-    if tuple(bpy.data.version[:2])!=(5,2):raise Failure('UNSUPPORTED','S05 supports saved Blender 5.2 files only; file subversion is recorded separately')
+    if tuple(bpy.data.version[:2]) != tuple(bpy.app.version[:2]):
+        raise Failure('UNSUPPORTED', 'Library Override requires a saved file from the selected Blender major.minor version')
 
 def activate(context):
     scene=bpy.data.scenes.get(context['scene'])
@@ -122,15 +123,14 @@ def check_edits(edits,root=None):
     for edit in edits:
         item=find(edit['target'],True)
         if root and item.override_library.hierarchy_root!=root:raise Failure('UNSUPPORTED','Edit target is outside the selected native override hierarchy')
-        for field,want in edit['values'].items():
-            got=getattr(item,field)
-            if isinstance(want,list):
-                if len(got)!=len(want) or any(abs(a-b)>max(1e-6,abs(b)*2e-7) for a,b in zip(got,want)):raise Failure('VALIDATION_FAILED','Local override edit was not preserved: '+field)
-            elif got!=want:raise Failure('VALIDATION_FAILED','Local override edit was not preserved: '+field)
+        link_edit_values.check(item, edit['values'])
 
 def preserve_local(before):
     """Native remapping to new overrides is expected; other local edits are not."""
-    mapped={refkey(r['reference']):r['identity'] for r in overrides()}
+    prior = {refkey(row['override']['reference']) for row in before
+             if row.get('override', {}).get('reference')}
+    mapped = {refkey(row['reference']): row['identity'] for row in overrides()
+              if refkey(row['reference']) not in prior}
     def remap(value):
         if isinstance(value,list):return [remap(v) for v in value]
         if not isinstance(value,dict):return value
@@ -182,7 +182,7 @@ def finalize(kind,params,job,resources,refs,root=None,edits=None,change=None):
     check_native()
     if edits:check_edits(edits)
     resolved=overrides()
-    report={'version':'1.0','adapter':ADAPTER,'kind':kind,'candidate':str(candidate),'candidate_sha256':typed.digest(candidate),'resources':resources,'references':refs,'context':params['manifest'].get('context') or params['_context'],'source':{k:params[k] for k in ('file','expected_sha256') if k in params},'blender_build':bpy.app.build_hash.decode(),'blender_version':list(bpy.app.version),'implementation_sha256':typed.implementation(),'reopen':'pass','source_saved':False,'publication':'working_candidate_only','upstream_changes':change or {'added':[],'removed':[],'changed':[]},'overrides':resolved,'scope':'Blender 5.2.1 build; finite typed closure <=8 levels; one native same-library override hierarchy per operation; Object transform and hide_render edits; cross-library descendants retain their linked identity'}
+    report={'version':'1.0','adapter':params['manifest']['adapter'],'kind':kind,'candidate':str(candidate),'candidate_sha256':typed.digest(candidate),'resources':resources,'references':refs,'context':params['manifest'].get('context') or params['_context'],'source':{k:params[k] for k in ('file','expected_sha256') if k in params},'blender_build':bpy.app.build_hash.decode(),'blender_version':list(bpy.app.version),'implementation_sha256':typed.implementation(),'reopen':'pass','source_saved':False,'publication':'working_candidate_only','upstream_changes':change or {'added':[],'removed':[],'changed':[]},'overrides':resolved,'scope':'Native override RNA; finite typed closure <=8 levels; one same-library hierarchy per operation; Object, pose-bone and material-slot edits; cross-library descendants retain linked identity'}
     report['local_content']=local_content()
     if root:report.update(root=root,edits=edits)
     if kind=='override':
@@ -251,24 +251,25 @@ def override_prepare(params,job,stack,held):
     before=state();atomic_json(job/'project-before.json',before)
     original=find(spec['root'])
     if not original.library or original.override_library:raise Failure('CONFLICT','Override root must be an ordinary linked data block')
-    if any(i.override_library for i in all_ids()):raise Failure('UNSUPPORTED','Create starts from a linked consumer without existing overrides; resync accepts an existing S05 receipt')
+    if any(item.override_library and item.override_library.reference == original for item in all_ids()):
+        raise Failure('CONFLICT','This linked root already has a local override')
     placements=root_placements(original)
     # Pre-resolve each edit before any native mutation. Cross-library children
     # are explicitly outside this native root, and remain linked on disk.
     for edit in spec['edits']:
         target=find(edit['target'])
         if target.library!=original.library:raise Failure('UNSUPPORTED','A native hierarchy does not recursively override foreign libraries; select that library root in a separate consumer')
-        if target.animation_data:raise Failure('UNSUPPORTED','Edits to animated transforms need a separate animation override adapter')
-        for field in edit['values']:
-            if not target.is_property_overridable_library(field):raise Failure('UNSUPPORTED','Property is not library-overridable: '+field)
-    root=original.override_hierarchy_create(scene,layer,do_fully_editable=True)
+        link_edit_values.preflight(target, edit['values'])
+    create = getattr(original, 'override_hierarchy_create', None)
+    if not callable(create):
+        raise Failure('UNSUPPORTED', 'Selected Blender lacks native Library Override hierarchy creation')
+    root = create(scene, layer, do_fully_editable=True)
     if not root or not root.override_library:raise Failure('VALIDATION_FAILED','Native override creation returned no hierarchy')
     replace_placements(original,root,placements)
     for edit in spec['edits']:
         target=find(edit['target'],True)
         if target.override_library.hierarchy_root!=root:raise Failure('CONFLICT','Edit reference is outside the created hierarchy')
-        if 'rotation_euler' in edit['values'] and target.rotation_mode in ('QUATERNION','AXIS_ANGLE'):raise Failure('UNSUPPORTED','Euler edits require an Euler rotation mode')
-        for field,value in edit['values'].items():setattr(target,field,value)
+        link_edit_values.apply(target, edit['values'])
         target.override_library.operations_update()
     layer.update();check_edits(spec['edits'],root);preserve_local(before)
     old_keys={refkey(row) for row in before}
@@ -297,7 +298,11 @@ def override_resync(params,job,stack,held):
     if local_content()!=receipt['local_content']:raise Failure('CONFLICT','Automatic resync changed unrelated local content; inspect the retained baseline')
     old_ids={refkey(ref(i)) for i in all_ids()}
     root=find(receipt['root'],True)
-    if not root.override_library.resync(scene,view_layer=layer,do_hierarchy_enforce=False):raise Failure('VALIDATION_FAILED','Native override resync reported failure')
+    resync = getattr(root.override_library, 'resync', None)
+    if not callable(resync):
+        raise Failure('UNSUPPORTED', 'Selected Blender lacks native Library Override resync')
+    if not resync(scene, view_layer=layer, do_hierarchy_enforce=False):
+        raise Failure('VALIDATION_FAILED', 'Native override resync reported failure')
     layer.update();check_edits(receipt['edits']);check_native()
     if local_content()!=receipt['local_content']:raise Failure('VALIDATION_FAILED','Resync changed unrelated local content')
     if any(refkey(ref(i)) not in old_ids and i.users==0 and not i.use_fake_user for i in all_ids()):raise Failure('VALIDATION_FAILED','Resync created orphan IDs')
@@ -309,7 +314,7 @@ def override_resync(params,job,stack,held):
     return finalize('override',{**params,'_context':receipt['context']},job,list(observed.values()),current_refs,receipt['root'],receipt['edits'],delta)
 
 def run(command,params,job):
-    if tuple(bpy.app.version)!=(5,2,1):raise Failure('UNSUPPORTED','S05 native adapter requires Blender 5.2.1; other versions are unverified')
+
     try:
         with ExitStack() as stack:
             held={}

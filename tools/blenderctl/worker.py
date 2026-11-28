@@ -6,6 +6,7 @@ import sys
 import time
 import traceback
 
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from protocol import Failure, atomic_json, read_json
 import bpy
@@ -16,8 +17,11 @@ def identity(item):
             "library": item.library.filepath if item.library else None}
 
 
-def doctor():
+def doctor(job):
     from projects import startup_profile
+    from doctor import media_tools, registry_health, plugin_registration, workstation_health
+    from plugin_registry import load_registry
+    from protocol import ROOT
     build = {key: getattr(bpy.app.build_options, key) for key in dir(bpy.app.build_options)
              if not key.startswith("_") and isinstance(getattr(bpy.app.build_options, key), bool)}
     paths = {key: bpy.utils.user_resource(key) for key in ("CONFIG", "SCRIPTS", "EXTENSIONS", "DATAFILES")}
@@ -42,12 +46,20 @@ def doctor():
                                 "id": entry.id, "status": "detected_not_render_verified"})
     except Exception as exc:
         device_error = str(exc)
-    return {"startup_profile":startup_profile(),"blender_version": bpy.app.version_string, "version": list(bpy.app.version),
+    registry = registry_health(ROOT)
+    registrations = plugin_registration(ROOT, bpy.app.binary_path, job, load_registry(ROOT)["plugins"])
+    registry.update(registrations=registrations, registration_test="passed" if all(row["ok"] for row in registrations) else "failed")
+    registry["ok"] = registry["ok"] and registry["registration_test"] == "passed"
+    station = workstation_health(ROOT, bpy, job, devices)
+    media = media_tools(ROOT)
+    return {"workstation": station, "health_ok": bool(registry["ok"] and media["ok"] and station["asset_library"]["ok"] and station["gpu"]["rtx_5080"] and station["gpu"].get("dlss_reported_by_cycles") and station["gpu"].get("render", {}).get("ok")),
+            "startup_profile":startup_profile(),"blender_version": bpy.app.version_string, "version": list(bpy.app.version),
             "build_hash": bpy.app.build_hash.decode(), "binary": bpy.app.binary_path,
             "python_version": sys.version, "background": bpy.app.background,
             "autoexec_enabled": bpy.context.preferences.filepaths.use_scripts_auto_execute,
             "online_access": bpy.app.online_access, "paths": paths,
             "enabled_addons": sorted(bpy.context.preferences.addons.keys()),
+            "registry": registry, "media_tools": media,
             "installed_candidates": candidates, "build_options": build,
             "cycles_devices": devices, "device_detection_error": device_error,
             "limitations": ["Factory configuration; user UI preferences and plug-ins are not enabled.",
@@ -71,7 +83,7 @@ def capabilities():
         except (AttributeError, RuntimeError):
             exists = False
         operators.append({"name": name, "registered": exists, "functional_status": "not_tested"})
-    from scene_contract import OPS
+    from scene_contract import SCENE_PREPARE_OPS
     from model_contract import OPS as MODEL_OPS
     from node_contract import OPS as NODE_OPS
     from rig_contract import OPS as RIG_OPS
@@ -80,24 +92,31 @@ def capabilities():
     from execution_contract import capabilities as execution_capabilities
     return {"blender_version": bpy.app.version_string, "operators": operators,
             "execution_contract":execution_capabilities(),
-            "scene_operations":sorted(OPS),
+            "scene_operations":sorted(SCENE_PREPARE_OPS),
             "model_operations":sorted(MODEL_OPS),"node_operations":sorted(NODE_OPS),"rig_operations":sorted(RIG_OPS),"simulation_operations":sorted(SIMULATION_OPS),
             "implemented_commands": [c.replace('.',' ').replace('_','-') for c in COMMANDS if c!='probe']+['job status','job result','job cancel'],
             "scene_commands":["scene prepare","scene inspect"],
+            "animation_commands":["animation sample","animation inspect","animation run","animation clip-apply"],
             "development_probes": ["scene", "geometry", "nodes", "animation", "render", "exchange"],
             "note": "Registration is not functional support. Inspect is a structural snapshot, not a publish validator."}
 
 
 def dependency(item, kind):
     raw = item.filepath
-    packed = bool(getattr(item, "packed_file", None)) or bool(getattr(item, "packed_files", []))
     linked_packed = bool(getattr(item, "is_linked_packed", False))
+    source = getattr(item, "source", None)
+    row = {"owner": identity(item), "kind": kind, "raw_path": raw, "source": source,
+           "users": item.users, "linked_content_packed": linked_packed, "usage_status": "requires_workflow_review"}
+    if kind == "image" and source == "TILED":
+        from dependencies import tiled_image_resource
+        observed = tiled_image_resource(item)
+        return {**row, **observed, "packed": observed["status"] == "packed"}
+    packed = bool(getattr(item, "packed_file", None)) or bool(getattr(item, "packed_files", []))
     if kind == "library":
         linked_ids = [block for prop in bpy.data.bl_rna.properties if prop.type == "COLLECTION"
                       for block in getattr(bpy.data, prop.identifier, ())
                       if isinstance(block, bpy.types.ID) and block.library == item]
         packed = bool(linked_ids) and all(getattr(block, "is_linked_packed", False) for block in linked_ids)
-    source = getattr(item, "source", None)
     sequence = source in ("TILED", "SEQUENCE") or "<UDIM>" in raw or "<UVTILE>" in raw or "#" in raw
     if kind == "font" and raw == "<builtin>":
         status, absolute = "builtin", None
@@ -108,9 +127,7 @@ def dependency(item, kind):
     else:
         absolute = bpy.path.abspath(raw, library=item.library)
         status = "pattern_needs_expansion" if sequence else "exists" if Path(absolute).is_file() else "missing"
-    return {"owner": identity(item), "kind": kind, "raw_path": raw, "resolved_path": absolute,
-            "source": source, "users": item.users, "packed": packed, "linked_content_packed": linked_packed,
-            "status": status, "usage_status": "requires_workflow_review"}
+    return {**row, "resolved_path": absolute, "packed": packed, "status": status}
 
 
 def inspect_file(path):
@@ -159,7 +176,7 @@ def inspect_file(path):
             "asset_count": sum(i["asset"] is not None for i in ids),
             "validation": {"open": "pass", "render": "not_run", "animation": "not_run",
                            "dependency_closure": "partial", "licensing": "not_run"},
-            "limitations": ["UDIM/sequences require frame/tile expansion.",
+            "limitations": ["Declared single-view UDIM tiles are enumerated. Other image patterns require workflow review.",
                             "Simulation directories, VSE strip files and arbitrary plug-in resources are not enumerated yet.",
                             "ID users are structural references, not proof of use in a specific render or animation.",
                             "Disabled auto-execution can affect scripted drivers; inspection does not validate animation.",
@@ -176,13 +193,29 @@ def main():
     request = read_json(job / "request.json")
     try:
         command = request["command"]
-        if command == "doctor":
-            data = doctor()
-        elif command == "capabilities":
-            data = capabilities()
+        if command == "hair.run":
+            from hair_essentials_job import execute
+            data = execute(request["params"], job)
+        elif command == "qa.inspect":
+            from qa import inspect as inspect_qa
+            data = inspect_qa(request["params"], job)
+        elif command in ("video.run", "video.inspect"):
+            import video_workflow
+            operation = video_workflow.run if command == "video.run" else video_workflow.inspect
+            data = operation(request["params"], job)
+        elif command == "doctor":
+            data = doctor(job)
+            atomic_json(job / "doctor-report.json", data)
+            if not data["health_ok"]:
+                raise Failure("VALIDATION_FAILED", "Workstation qualification failed; see " + str(job / "doctor-report.json"))
         elif command == 'production.run':
             from production_worker import run
             data = run(request['params'], job)
+        elif command == 'rigging-workflow.run':
+            import rigging_workflow_disk
+            data=rigging_workflow_disk.run(request['params'],job)
+        elif command == "capabilities":
+            data = capabilities()
         elif command=='sculpt.review':
             import sculpt_review
             data=sculpt_review.run(request['params'],job)
@@ -221,6 +254,12 @@ def main():
         elif command in ('rig.prepare','rig.inspect','animation.sample'):
             import rigging
             data=getattr(rigging,command.split('.')[1])(request['params'],job)
+        elif command in ('animation.inspect','animation.run'):
+            import animation_workflow
+            data=getattr(animation_workflow,command.split('.')[1])(request['params'],job)
+        elif command=='animation.clip-apply':
+            import animation_reuse
+            data=animation_reuse.run(request['params'],job)
         elif command in ('simulation.prepare','simulation.inspect','simulation.bake'):
             import simulation
             data=getattr(simulation,command.split('.')[1])(request['params'],job)
@@ -242,9 +281,6 @@ def main():
         elif command in ('media.prepare','media.export'):
             import media
             data=getattr(media,command.split('.')[1])(request['params'],job)
-        elif command in ('video.run','video.inspect'):
-            import video_workflow
-            data=getattr(video_workflow,command.split('.')[1])(request['params'],job)
         elif command in ('compositing.run','compositing.inspect'):
             import compositing_workflow
             data=getattr(compositing_workflow,command.split('.')[1])(request['params'],job)
@@ -260,6 +296,18 @@ def main():
         elif command=='compositing.study':
             import compositing_study
             data=compositing_study.run(request['params'],job,cancel_parent=job)
+        elif command == 'camera.inspect':
+            from pipeline_camera import inspect as inspect_camera
+            data = inspect_camera(request['params'], job)
+        elif command in ('modeling.run', 'modeling.import-local'):
+            import modeling_workflow
+            data=modeling_workflow.run(request['params'],job)
+        elif command == 'uv.grid-transfer':
+            from uv_grid_transfer import run
+            data = run(request['params'], job)
+        elif command in ('uv.run','uv.inspect'):
+            import uv_workflow
+            data=getattr(uv_workflow,command.split('.')[1])(request['params'],job)
         elif command in ('lighting.run','lighting.inspect'):
             import lighting_workflow
             data=getattr(lighting_workflow,command.split('.')[1])(request['params'],job)
@@ -269,9 +317,22 @@ def main():
         elif command=='lighting.batch':
             import lighting_batch
             data=lighting_batch.run(request['params'],job)
+        elif command in ('toon.template-save','toon.template-edit','toon.template-apply'):
+            import toon_templates
+            data=toon_templates.run(command,request['params'],job)
+        elif command in ('toon.run','toon.inspect'):
+            import toon_workflow
+            data=getattr(toon_workflow,command.split('.')[1])(request['params'],job)
         elif command in ('geometry.run','geometry.inspect'):
             import geometry_workflow
             data=getattr(geometry_workflow,command.split('.')[1])(request['params'],job)
+        elif command in ('material.procedural-run','material.procedural-export'):
+            import material_procedural
+            operation = material_procedural.run if command=='material.procedural-run' else material_procedural.export
+            data=operation(request['params'],job)
+        elif command=='material.projection-bake':
+            import material_projection
+            data=material_projection.run(request['params'],job)
         elif command=='material.run':
             import material_workflow
             data=material_workflow.run(request['params'],job)

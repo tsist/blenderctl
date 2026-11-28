@@ -1,13 +1,13 @@
 {
   "repository": "blenderctl",
-  "release": "0.65.0",
-  "cli": "0.65.0",
+  "release": "1.0.0",
+  "cli": "1.0.0",
   "distribution": "0.1.3",
-  "addon": "0.1.1",
+  "addon": "1.0.0",
   "template_library": "0.1.0",
   "skill_bundle": "0.9.0",
-  "runtime_identity": "af5ab12d9909cc4b27f4f8ad933a2ac11cf2d6851445f3f692814992baaaebb1",
-  "runtime_files": 192,
+  "runtime_identity": "473886b468f9fa6eb79804e4a74a56c69d59a7f94768df615e3feaa170a43b43",
+  "runtime_files": 433,
   "license": "GPL-3.0-or-later",
   "files": [
     {
@@ -957,8 +957,8 @@
     },
     {
       "file": "scripts/verify_release.py",
-      "sha256": "ae5ff8aba2497c32437e0965e7593b185a68adf8caf286396cf8b5f09514e4da",
-      "bytes": 4692
+      "sha256": "e90b72534a26a8f06bdc3a6e0ff1a5e7234f1f06721cea9b58f6c00aff64156a",
+      "bytes": 4934
     },
     {
       "file": "skills/LICENSE",
@@ -972,8 +972,8 @@
     },
     {
       "file": "skills/blender-asset-manager/SKILL.md",
-      "sha256": "8a98a421d3075ca40fbf4c225b986e6ae690dde780a7b9628ea1312f8be4a992",
-      "bytes": 10198
+      "sha256": "530533e5ce2800555314186851985f952208b6e8b7ac515fe476a7d5d193f8d3",
+      "bytes": 10199
     },
     {
       "file": "skills/blender-asset-manager/agents/openai.yaml",
@@ -982,8 +982,8 @@
     },
     {
       "file": "skills/blender-asset-manager/references/catalog-and-execution.md",
-      "sha256": "80cbafd5c1e10d4369a96f3373f3ec5513fa032e2d4bf25b95cd3c20d7cee34a",
-      "bytes": 9800
+      "sha256": "021b15d3a6eab1107bb24c2fabf0a8e0335f6e3b41c4811b2c1f8a03bbfb3914",
+      "bytes": 9801
     },
     {
       "file": "skills/blender-asset-manager/references/classification-and-naming.md",
@@ -992,18 +992,18 @@
     },
     {
       "file": "skills/blender-asset-manager/references/sources.md",
-      "sha256": "a54074e479aca4c543616041a8bc617e309e73ed96db7581414f68d30ffda1a0",
-      "bytes": 2212
+      "sha256": "4f8b5599327d9282dce19974c9d865c2b57ad56640cccd3e5db97af75a41302b",
+      "bytes": 2232
     },
     {
       "file": "skills/blender-asset-manager/scripts/check_names.py",
-      "sha256": "2fbeeee6d2c264dce267eb8d9297d1f3ef08f23dffcf2c3695b34f9da127b8eb",
-      "bytes": 5330
+      "sha256": "cd04b9a4a1afb686692bebfd5b2a6b1a5a4126beda069de3300e39bc717b20a6",
+      "bytes": 5286
     },
     {
       "file": "skills/blender-cli/SKILL.md",
-      "sha256": "9e952e45ae7062e7e5ca8e5644f80b42d422743dadfbc84924fe644e65fc9b60",
-      "bytes": 10696
+      "sha256": "5b14a04f5eb54846bb0ea9d2d2952d2b55dca9f4f394713e89dc57146370d7ba",
+      "bytes": 12105
     },
     {
       "file": "skills/blender-cli/agents/openai.yaml",
@@ -1017,7 +1017,7 @@
     },
     {
       "file": "skills/blender-cli/references/domains.md",
-      "sha256": "f7640d160ddde76913353b458b0dbf113139edae864d714ccd0d8499862f7857",
+      "sha256": "6620b66ba96fc56c39f629ede7b0f3d4cd10590de56955e28fc220be51825ee7",
       "bytes": 5480
     },
     {
@@ -1027,8 +1027,8 @@
     },
     {
       "file": "skills/blender-cli/references/recovery.md",
-      "sha256": "2a6512b7cd4bb3757a86bf1481782057abed9718d4c42016d0f51eeabfb61fed",
-      "bytes": 3598
+      "sha256": "c44cd70c1f02736736d6debc5641aad14aecdc723c22bc58581247dc0252b28f",
+      "bytes": 3603
     },
     {
       "file": "skills/blender-cli/references/sources.md",
@@ -1062,7 +1062,7 @@
     },
     {
       "file": "skills/blender-material-authoring/references/cli-projection-and-handoff.md",
-      "sha256": "41dddeb59d54edd9f2abe68e2429eab689d8108ebcd61460d0145f8847900fda",
+      "sha256": "7c5f2912ec3ff11da1f0ded4732d8705c1ab815885c31dd11537a2255723d148",
       "bytes": 8180
     },
     {
@@ -1082,8 +1082,8 @@
     },
     {
       "file": "skills/blender-material-authoring/references/sources.md",
-      "sha256": "95df45ffa51efa898e83908f12551fb0b7f29825170a850db350d134f4ed95f7",
-      "bytes": 4908
+      "sha256": "decfc290bc2d8e6b8a0ef18ddc1d4f48a24856680cc1f4ec9172f7d02237c9d3",
+      "bytes": 4953
     },
     {
       "file": "skills/blender-material-authoring/scripts/image_gate.py",
@@ -1092,8 +1092,8 @@
     },
     {
       "file": "skills/blender-rigging/SKILL.md",
-      "sha256": "dace090c728ff556ef0894dd88129b8fe536eb4738396a3e766a99d41dd1f73b",
-      "bytes": 12279
+      "sha256": "5327ad9c128afe58f04e1ea8505561205b6ba1765f0fe66896ff2b519cd65527",
+      "bytes": 14325
     },
     {
       "file": "skills/blender-rigging/agents/openai.yaml",
@@ -1122,18 +1122,18 @@
     },
     {
       "file": "skills/blender-rigging/references/retargeting-and-cli-operations.md",
-      "sha256": "b8879e25d14ad605518503ca791830c22021e6795ff40bf2e6701b61f4c0a1d7",
-      "bytes": 8926
+      "sha256": "859d8996ec9fe3986db670e26de08e493f04101d3e02b96673613d056ed6f09a",
+      "bytes": 9480
     },
     {
       "file": "skills/blender-rigging/references/rigging-posing-win53.md",
-      "sha256": "59fa4a7f2ada3993e695c448fa68b39cb11c95cb94b1023d7fb2d695963d4afa",
-      "bytes": 3831
+      "sha256": "ef54d2bbcb1321a2b47375561f9d788ee65357e6a5f61924824dca632b7b615b",
+      "bytes": 7640
     },
     {
       "file": "skills/blender-rigging/references/skeleton-gate-and-matching.md",
-      "sha256": "1c3163085005b78a32db7de648a376cc5da3f02982f2965fd20440f1749a2a01",
-      "bytes": 7373
+      "sha256": "235f8eb81124cf47ebb30839ac1b4a095cd3d797a572db4109d18437bcf7f02e",
+      "bytes": 7781
     },
     {
       "file": "skills/blender-rigging/references/sources-game-destruction-assemblies.json",
@@ -1172,18 +1172,18 @@
     },
     {
       "file": "skills/blender-rigging/references/sources.md",
-      "sha256": "2e62cd330253d1f79d9c3d4a3ccab707970a8a02fecfe97f759cb32dacc4969a",
-      "bytes": 8094
+      "sha256": "fdbd373d1cdf28a6709d8dc3b88cbdecec0854100be9fc22649a1447da9cea88",
+      "bytes": 8109
     },
     {
       "file": "skills/blender-rigging/references/voxel-skinning-and-local-repair.md",
-      "sha256": "62193c2a101b144cfdefff4753fc4ce470f959a71c24523366e5a8b511a73817",
-      "bytes": 9279
+      "sha256": "185e7569f451418821cb93babef9ce97e0223875f6efcbca2718489564aee78e",
+      "bytes": 9911
     },
     {
       "file": "skills/blender-video-editing/SKILL.md",
-      "sha256": "d8f5c74c17dee7653be8ff1c1e5551a5cf922953fcc84a6077b9d435a92d6988",
-      "bytes": 10668
+      "sha256": "98246d12e88fac36157fd6b909d239fe29616ef93f08e13d3b506d3a6b9724d7",
+      "bytes": 11578
     },
     {
       "file": "skills/blender-video-editing/agents/openai.yaml",
@@ -1192,8 +1192,8 @@
     },
     {
       "file": "skills/blender-video-editing/references/cli-and-roundtrip.md",
-      "sha256": "0e766240fc1e3009937ad8f36b90962971eb05004062bc69cebe57fb13b1fd20",
-      "bytes": 7597
+      "sha256": "c52b5db9c080171df7640b401ea93d2c2b0c4caefe81e25037723dd6b864fae5",
+      "bytes": 7599
     },
     {
       "file": "skills/blender-video-editing/references/editorial.md",
@@ -1207,7 +1207,7 @@
     },
     {
       "file": "skills/blender-video-editing/references/media-audio-subtitles.md",
-      "sha256": "1298e7c37c4ab911fe055b13ff7d56c69e5f5c3fdaf58e43a053fafc23a59239",
+      "sha256": "c42b27239031146c93625275168973ddcc63542a8da5a8f117a28b7fd5e8449b",
       "bytes": 7406
     },
     {
@@ -1217,28 +1217,33 @@
     },
     {
       "file": "skills/blender-video-editing/references/templates.md",
-      "sha256": "af65dbcb9384d6c8d49a1a38fcf0412aedc22f81e1c2c2d750c6c14de06df2b4",
+      "sha256": "76379f565074323c07bc2a5e30855b819944a430fa920fa9c8f87058afd1990a",
       "bytes": 4033
     },
     {
       "file": "skills/blender-video-editing/scripts/prepare_media.py",
-      "sha256": "844c557bce224a97866cce6868fe8e883e6854ede86652e64f0d4902e92de712",
-      "bytes": 19622
+      "sha256": "5872e637d49c3eff906671047693347d2a00c57325e75f69a4e416049d1e4624",
+      "bytes": 304
     },
     {
       "file": "skills/blender-video-editing/scripts/prepare_proxy.py",
-      "sha256": "59b4285370bb9a70903a2b6b6cb77b9706464e3512cbd6fb656638fc73ff4df9",
-      "bytes": 8207
+      "sha256": "2783fbe8ead00e8f6f23d6e3d6e4a9d5bf940e3f3563bcb46ee8c28421d85b84",
+      "bytes": 304
     },
     {
       "file": "skills/blender-video-editing/scripts/srt_to_clips.py",
-      "sha256": "d67793054af0ea5c25b8b04311eb9e64d2cce2aa6d5739e394f85613b04475c1",
-      "bytes": 1791
+      "sha256": "8eeee3f12b4e6e8045c70dffe270fa2e04e4102d99e0fb29f6e7ae4bc0a5917e",
+      "bytes": 303
+    },
+    {
+      "file": "skills/blender-video-editing/scripts/video_templates.py",
+      "sha256": "773a8bc81caeeb5efc53e444bad65929bf7bf33e6e195f47ef2e7a01df43a956",
+      "bytes": 1089
     },
     {
       "file": "skills/blender-work-methodology/SKILL.md",
-      "sha256": "6fbd4be1a9cef1216029f975397293b4b2b3102024170e7f3727b2f80e2a17f5",
-      "bytes": 10642
+      "sha256": "d95b0fba8bad395dc63f58091da92d5759c8642ddf1726f5bf4ba027e31a73b8",
+      "bytes": 10728
     },
     {
       "file": "skills/blender-work-methodology/agents/openai.yaml",
@@ -1252,13 +1257,13 @@
     },
     {
       "file": "skills/blender-work-methodology/references/departments/animation.md",
-      "sha256": "334dda4f625df504563641559bf1f9f6b46e1f7f1d9edd012ae4ea9a5dcbfb26",
-      "bytes": 3121
+      "sha256": "0e3e62d3096a33946951777e79685c94ea19fea0ba9e19ebccd15e7e6b2b657a",
+      "bytes": 3024
     },
     {
       "file": "skills/blender-work-methodology/references/departments/asset-library.md",
-      "sha256": "55245d68fd8afe74d3d9d9aa454e87711939ac46849d9b4e49069978492578b0",
-      "bytes": 2719
+      "sha256": "cd3d833f5e7896980a915512aaf8df16c5578fc3219131f193b3a8d926819c70",
+      "bytes": 2724
     },
     {
       "file": "skills/blender-work-methodology/references/departments/camera-lighting.md",
@@ -1292,8 +1297,8 @@
     },
     {
       "file": "skills/blender-work-methodology/references/departments/rigging.md",
-      "sha256": "c9b88ae123a7c8ea92b374b42dc15c809d061870918ee7cd8ed8ed42f58400a9",
-      "bytes": 2486
+      "sha256": "f1642feadeaeb9b082221d260cde4b31a58a985538d3115fdc83a09742ffe1aa",
+      "bytes": 2411
     },
     {
       "file": "skills/blender-work-methodology/references/departments/surfacing.md",
@@ -1307,13 +1312,13 @@
     },
     {
       "file": "skills/blender-work-methodology/references/efficient-work-units.md",
-      "sha256": "d0bebed91fc7969fbff61c89632922ddff37f42f130a79af3fb3f6044f096da9",
-      "bytes": 3161
+      "sha256": "7d35fe8b1d7a4f4af0d17f71d8011507c5b89c8f454d332fe26bd80003b3e04a",
+      "bytes": 3162
     },
     {
       "file": "skills/blender-work-methodology/references/knowledge-and-oss.md",
-      "sha256": "37a955701f22e475081ecb16e940c40739fac1b9f4788f8ba74bfe37c5c95d0f",
-      "bytes": 2600
+      "sha256": "e412593686af5f70fe9b5b20ac50e061cb5aa309ac55c29b8a30907f2e06f689",
+      "bytes": 2602
     },
     {
       "file": "skills/blender-work-methodology/references/mcp-and-blender-semantics.md",
@@ -1362,8 +1367,8 @@
     },
     {
       "file": "skills/blender-work-methodology/references/practice-record.md",
-      "sha256": "1268e89219e7104ee0b63aba2eb4c7cc92b67d2ba72e0e8697dca11f4b6efafc",
-      "bytes": 2711
+      "sha256": "1f4c50391052eac9bf51402ef17bb31f200a052f1f1117f4e589ac1dada6a725",
+      "bytes": 2712
     },
     {
       "file": "skills/blender-work-methodology/references/skill-writing-guide.md",
@@ -1377,8 +1382,8 @@
     },
     {
       "file": "skills/manifest.json",
-      "sha256": "06e37f238612da9987cfb4b2b92d7ecf458dec794880544b7292b6217ff472ba",
-      "bytes": 1729
+      "sha256": "6d833cfdf799708bd66d0c5233a3d3f300d424ceaf9e9e5334e093a8c4c2aa69",
+      "bytes": 1728
     },
     {
       "file": "skills/requirements-images.txt",
@@ -1407,7 +1412,7 @@
     },
     {
       "file": "templates/video/template_library.py",
-      "sha256": "987c6d69a8bbfef56bc69ab02567d84ccb000e713511fabee00761ee3ad6bc64",
+      "sha256": "bb5c1389dc7c89c8874b8026e6aaefb9b6b5df57f5b8cd8d70948f3f9c6fba7d",
       "bytes": 32601
     },
     {
@@ -1491,19 +1496,164 @@
       "bytes": 4950
     },
     {
+      "file": "tools/blenderctl/CURRENT-IMAGE-HOST.json",
+      "sha256": "f60a2b95be414698f6b3befef7d0e1f3869a417f15590066ffcf47c3551519e0",
+      "bytes": 3629
+    },
+    {
+      "file": "tools/blenderctl/_uv_m1_backup/README.txt",
+      "sha256": "b5e3f83162c36a81ed058dd2c7f4fe4c36a5599ec2d113c068a8c40d0d64358c",
+      "bytes": 2103
+    },
+    {
+      "file": "tools/blenderctl/_uv_m1_backup/execution_contract.py",
+      "sha256": "7f3c7bb7f2628074aae4132d3fcc83e2097903d34d5a59d9a26b7fba1551d5b4",
+      "bytes": 5405
+    },
+    {
+      "file": "tools/blenderctl/action_editions.py",
+      "sha256": "9a031ba8646c1a903fda7d7694687a932824bf3ffebcf5781329b0e0a8a2ab4d",
+      "bytes": 14750
+    },
+    {
+      "file": "tools/blenderctl/action_routes.py",
+      "sha256": "ceca7b308fafaa4d76423f4862f75cb79eb3c3c515cd5c13fa7814050e61b4ee",
+      "bytes": 24882
+    },
+    {
       "file": "tools/blenderctl/adaptive_sampling.py",
       "sha256": "f148577f5f771db1a6ccd2102382ecae2d4370882379285dfdfedf3fbd17b220",
       "bytes": 2710
     },
     {
+      "file": "tools/blenderctl/animation_author.py",
+      "sha256": "242d68b8bc8fae7bc8f8580d85f2ae62249247d700669e9a28ff9c2b91282559",
+      "bytes": 1146
+    },
+    {
+      "file": "tools/blenderctl/animation_event_cue.py",
+      "sha256": "2071838646111b6aa497a7765ee7398ac1620f57e5242b165dcf4ff33c18f92f",
+      "bytes": 2370
+    },
+    {
+      "file": "tools/blenderctl/animation_event_store.py",
+      "sha256": "210ca1448f407c0667d5ed9d6015e9e8d9c6e04e6febbcbe78e59f231428ccdd",
+      "bytes": 17734
+    },
+    {
+      "file": "tools/blenderctl/animation_fk_character.py",
+      "sha256": "8303049d63774191a8916d0a7f112a8b9df491453bdec50031ee0e432e34ee31",
+      "bytes": 7568
+    },
+    {
+      "file": "tools/blenderctl/animation_identity.py",
+      "sha256": "5a3b0164a297ae1bc5133cd0a6a96dda27d3f59ab04bc019c5e9bf11776b6e07",
+      "bytes": 2495
+    },
+    {
+      "file": "tools/blenderctl/animation_package.py",
+      "sha256": "586fb7e54e5af97bd068fcce845547c8272765900611890559b608d4c3790177",
+      "bytes": 3173
+    },
+    {
+      "file": "tools/blenderctl/animation_panel_events.py",
+      "sha256": "4d648590df21e404262b26fbd695276e39f2c67769499da46b9c561299c88b0b",
+      "bytes": 24282
+    },
+    {
+      "file": "tools/blenderctl/animation_panel_extras.py",
+      "sha256": "a2987d61b9cd272cd5609ec7071092e351fc8ec283a65ebe2bdb43fca3c9611b",
+      "bytes": 7906
+    },
+    {
+      "file": "tools/blenderctl/animation_pose_handoff.py",
+      "sha256": "5637bd8263cb8bc494d31cbfbe6127f1ea02bf75ba608ef3dbb8da7ab5a502ec",
+      "bytes": 25969
+    },
+    {
+      "file": "tools/blenderctl/animation_production.py",
+      "sha256": "c8a5324885bd90a1a95469ed9e3bccb8b13999b9e1948f33b606b83494748b14",
+      "bytes": 2977
+    },
+    {
+      "file": "tools/blenderctl/animation_project_events/paths.py",
+      "sha256": "7ac47bc9aeab0262ec1f0ad385728aa2fdae7dba1314a8b06a8e7dbe7be05238",
+      "bytes": 1740
+    },
+    {
+      "file": "tools/blenderctl/animation_project_events/project_events.py",
+      "sha256": "b0fdcbf4859ad1e4702bab70d00bcf3c7122e56249ee05c74a5ddfc17de48b68",
+      "bytes": 26263
+    },
+    {
+      "file": "tools/blenderctl/animation_project_events/project_events_worker.py",
+      "sha256": "d7d7dc9836a48fee46f159f756dc598e1128bd042d8c59abce0181922c5a50d3",
+      "bytes": 23081
+    },
+    {
+      "file": "tools/blenderctl/animation_project_events/project_probe.py",
+      "sha256": "9c09ed3de8261727f12845984118a7f328db7c6ebffeb3d1aadf35085bc92d54",
+      "bytes": 20588
+    },
+    {
+      "file": "tools/blenderctl/animation_record_live.py",
+      "sha256": "640e888d059de25d43c789ef92d7aa36d7e30d78463a8dd3da35f3e25514f3c2",
+      "bytes": 17433
+    },
+    {
+      "file": "tools/blenderctl/animation_reuse.py",
+      "sha256": "4355c23596df3b395f33ffab51539cfa84884904e9f209aef7030b002ba570ba",
+      "bytes": 64049
+    },
+    {
+      "file": "tools/blenderctl/animation_reuse_contract.py",
+      "sha256": "306e1e3d6e2cbe41b3ee5b595d6c96a8ac3528437230aad55da4f7a372d456d2",
+      "bytes": 15760
+    },
+    {
+      "file": "tools/blenderctl/animation_reuse_verifier.py",
+      "sha256": "f86235e83bf9d2c3c3a8288d8a5d1321d1bfcc5bfd4ec45eb54f884f6f7c97fa",
+      "bytes": 8362
+    },
+    {
+      "file": "tools/blenderctl/animation_verifier.py",
+      "sha256": "bd11a5548d194000e79a8183af750a047087392dccc9fa6699f28f2f427e01dd",
+      "bytes": 5443
+    },
+    {
+      "file": "tools/blenderctl/animation_workflow.py",
+      "sha256": "ab4d5e06cc7e5d0f98a1b5e4906844804ce2a5c9c229a77e69f57b3ccbfea107",
+      "bytes": 68021
+    },
+    {
+      "file": "tools/blenderctl/animation_workflow_contract.py",
+      "sha256": "a891c7c2742838fee4291c2e12d0b36aef392272dd36fb08727f899a1df81b39",
+      "bytes": 11183
+    },
+    {
+      "file": "tools/blenderctl/asset_catalog_resolution.py",
+      "sha256": "b7fa02f7892b6efc5012928e19c378ab27eab29ed39a45ca69b2adf8890d11c7",
+      "bytes": 3554
+    },
+    {
       "file": "tools/blenderctl/asset_contract.py",
-      "sha256": "e3a1273d94296a9afa791537ed0ccd40d98d2d42893b79459b27c916d12cf1d8",
-      "bytes": 5191
+      "sha256": "fe2fc51cebd391fc93a6760192eecc75e42e07f1f88685598dbb1005f596d8b7",
+      "bytes": 5536
+    },
+    {
+      "file": "tools/blenderctl/asset_libraries.py",
+      "sha256": "49a150716e188f0590c8561b5828f160153a622d975f83a1d7b263808cfac52d",
+      "bytes": 8713
     },
     {
       "file": "tools/blenderctl/asset_previews.py",
-      "sha256": "53b13bdc964935ff077631bd009923d3ec699cdc61968d5c69b4b3c010a0a51c",
-      "bytes": 14430
+      "sha256": "9ac6f39a8e9807e8ab5724b958ce4657a5dd9a62ffccf54e0adb356603028b21",
+      "bytes": 18040
+    },
+    {
+      "file": "tools/blenderctl/asset_thumbnail.py",
+      "sha256": "8485a2de1ed46acc15209f2f50ded1f2634e339b3eb97ef3b830bc825c8e9c9a",
+      "bytes": 6506
     },
     {
       "file": "tools/blenderctl/asset_validation.py",
@@ -1512,13 +1662,38 @@
     },
     {
       "file": "tools/blenderctl/assets.py",
-      "sha256": "15ce8e4f4c25688c1c861e7bedd0b7f48bfd5f67c2abf8995b300b441e70e1a1",
-      "bytes": 16796
+      "sha256": "378893d5b8b72d8904400fb2b66e3629a578df047a1a7c88702e2ca4ffce3aad",
+      "bytes": 20085
     },
     {
       "file": "tools/blenderctl/bootstrap.py",
-      "sha256": "e91f623858909bed006f70cbe0b09f25acd946dfad388aabe526b11f0d83366e",
-      "bytes": 676
+      "sha256": "f4dc2b56ef5509dc87d1494aa44e9d72e121d7ed011dee86823d5d40c22d1c02",
+      "bytes": 449
+    },
+    {
+      "file": "tools/blenderctl/c5_video_finish.py",
+      "sha256": "76ad2379db1238baacfcea0610a5f9f7ec88ca8749ce238dca44430527a6b3e0",
+      "bytes": 4640
+    },
+    {
+      "file": "tools/blenderctl/c5_workflow_host.py",
+      "sha256": "6fbfe33a0d1ab79007f285b0291a8ac7f8337316eaaeca106a0dfb7f317e36c8",
+      "bytes": 8434
+    },
+    {
+      "file": "tools/blenderctl/camera_copy.py",
+      "sha256": "b7a56ae582125c0538e40f2f737ee79b268f8b2ddaa8517e0e878550b5a40757",
+      "bytes": 10705
+    },
+    {
+      "file": "tools/blenderctl/camera_motion.py",
+      "sha256": "b49f48b888c1e0444ce4c42964b9b75b2fd0c9d065868e339ff5abc8040e7250",
+      "bytes": 5615
+    },
+    {
+      "file": "tools/blenderctl/camera_shot_table.py",
+      "sha256": "96eef3b85638e28da7059e8dbf3fe9e381544f3d4c6ccb58cc0cf73e2d66c10b",
+      "bytes": 25977
     },
     {
       "file": "tools/blenderctl/cli.py",
@@ -1526,39 +1701,94 @@
       "bytes": 52980
     },
     {
+      "file": "tools/blenderctl/collection_local.py",
+      "sha256": "f5810e5bfed02832b5b20cb4de3fbd0624b6fdc9337bcb3a6ce6587e2e309d36",
+      "bytes": 18338
+    },
+    {
+      "file": "tools/blenderctl/compose_c5.py",
+      "sha256": "dc2bc81d5dddf15fa9b06a586cd11c857b0ff9233c066f2ce47f82b08f35e115",
+      "bytes": 11754
+    },
+    {
       "file": "tools/blenderctl/compositing_batch.py",
-      "sha256": "fefa9aeaffae174284e9b68efca6cf410b94719509fa6f18dcd709cf99addb39",
-      "bytes": 19387
+      "sha256": "bc9d7194841faae586f93b6b869a3f1eb85e85030a1c5ee5a3cb51a0269b5f58",
+      "bytes": 19187
     },
     {
       "file": "tools/blenderctl/compositing_batch_contract.py",
-      "sha256": "f76cd6ab3c4f88afe26ec74f06923af0c71c250951214cbf790cf960b658fa1b",
-      "bytes": 8803
+      "sha256": "b923673b78598e54ef6d26504d4655b6823adb15a90e36e0d10f94c793e8d85b",
+      "bytes": 8674
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_contract.py",
+      "sha256": "70a64ede66bfeae4254a62dcf5658793e8c83d10563f2075eb82db0930d6d969",
+      "bytes": 2107
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_control.py",
+      "sha256": "35eb9ee950cf08490af129c858abc37b84e46b3c6f6e90bb8b6e5cbfd29e0814",
+      "bytes": 7008
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_estimate_contract.py",
+      "sha256": "64fa20b37a8d38c90f9698ddbc7122f5edabdeab55ea7538fb337a5e65ad9515",
+      "bytes": 1353
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_estimate_public.py",
+      "sha256": "de2da95ab3048543a720d57f3fa749b9016fe950fff563234c023b4446a30cdb",
+      "bytes": 22148
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_estimate_worker.py",
+      "sha256": "6108c21e318d239e5a3e34d481c4349f47a09da5b093b331b9f0aa45891dc6d9",
+      "bytes": 15667
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_io.py",
+      "sha256": "17369950ec14f33c08e32daaf06128faf9c8a3ee0d9bc0b6fa9090a3af299b8d",
+      "bytes": 16144
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_model_admission.py",
+      "sha256": "4ac20fb9985120c14e73b64e416b4a99109f0f5746b9f100df102d82ef3fcdd3",
+      "bytes": 7700
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_public.py",
+      "sha256": "22cb13fbe73676a6275ff2aef5d51fc1f175d57bdc2c2b7db4c7bdbc3abc810b",
+      "bytes": 33513
+    },
+    {
+      "file": "tools/blenderctl/compositing_depth_worker.py",
+      "sha256": "e748536832e380176aae599333c7fdbe5f53b881b151e975afe8e060dd1cd497",
+      "bytes": 19755
     },
     {
       "file": "tools/blenderctl/compositing_encode.py",
-      "sha256": "2183203d2d5cfd8fdfc81c1a8dc67a155f3987d561abcb9f9dcdcf49b3ddebce",
-      "bytes": 38253
+      "sha256": "ee05e38264970c235c95562e16f0a15688532feea4a4e7e540802e26b590a8ec",
+      "bytes": 39638
     },
     {
       "file": "tools/blenderctl/compositing_encode_contract.py",
-      "sha256": "1239827cf28674588349577eff2d511ac8b5b4eaef14211b647332df7f449bcd",
-      "bytes": 10147
+      "sha256": "98eebe1fe08ce335066d0c3d4802926a1056eab75f7fd9de5da0024518f0a46e",
+      "bytes": 11409
     },
     {
       "file": "tools/blenderctl/compositing_encode_public.py",
-      "sha256": "51ff18c290b30ce2d4a1b377c68aeb64dd492de014a99845e101ac79d2dafb3b",
-      "bytes": 24733
+      "sha256": "7aa208b25a52f993a616fc53800ccc9d2d7da566d6d5139279b36c4e19e5f119",
+      "bytes": 25670
     },
     {
       "file": "tools/blenderctl/compositing_identity.py",
-      "sha256": "48cbe5fd66634e1cabc25c1a39960e97182a303f4be0f3fd2c10702cd4492919",
-      "bytes": 812
+      "sha256": "cbcceb781a1503781a9b0241a9fbf2265c4b6bb439556ec4de57433f1c8584a2",
+      "bytes": 797
     },
     {
       "file": "tools/blenderctl/compositing_interface.py",
-      "sha256": "47c9d31101d49a3516dcb2ee0e80941b607c5c8fc0f819e4defa2fcb562145bc",
-      "bytes": 14648
+      "sha256": "e25682878845bc498fffa719f7173aa71ad04b5559ba4b8a37247860759502e0",
+      "bytes": 30391
     },
     {
       "file": "tools/blenderctl/compositing_m5_guards.py",
@@ -1577,8 +1807,8 @@
     },
     {
       "file": "tools/blenderctl/compositing_movie.py",
-      "sha256": "2018c0d937d6a2fd03d997b0b45a8da51d771ab3eb372795422f7c3d2457b8ec",
-      "bytes": 18907
+      "sha256": "ce5b213d32e4a40e15d116ea5588bf590d6787dc9503ea02e17e886340451c8a",
+      "bytes": 18596
     },
     {
       "file": "tools/blenderctl/compositing_orchestration_interface.py",
@@ -1586,24 +1816,109 @@
       "bytes": 4656
     },
     {
+      "file": "tools/blenderctl/compositing_relight_color_io.py",
+      "sha256": "f9e056076f9b14966ba10fa99d5b809ada460a12552adcf32ecb80cab6bb1709",
+      "bytes": 6900
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_contract.py",
+      "sha256": "b6560346fdaa090278bfc9fe197536ada50477c5dd6d07e4576aa31e61a4c543",
+      "bytes": 11513
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_gpu_worker.py",
+      "sha256": "0087f1a5487ec70a827dbd940be205aee128f5778a204f16505d23b16514447a",
+      "bytes": 8370
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_io_worker.py",
+      "sha256": "5eafae652f35d16e2f5f8365d3386328dc026fc6bf832165e51b2439f8200170",
+      "bytes": 9767
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_kernel.py",
+      "sha256": "06b2cf4daf1dfb6dfc2fd75a5679c8144490851af10f905a8a263c03b81f6276",
+      "bytes": 37073
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_local_edits.py",
+      "sha256": "cfe5be79d8fc201ff16d81e3715f1b1553fee6694f052b3a3bead2ddd1277a2a",
+      "bytes": 14976
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_public.py",
+      "sha256": "9bb828a9146f1bcc22a4a294b881a9175a92b378f13da14ed1ee5a340cf6f48e",
+      "bytes": 17999
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_revision.py",
+      "sha256": "3cd58f67a430c12621e8db7e1e47025729acf5a7fc9e17c992b8f37eb5811665",
+      "bytes": 11235
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_sequence_contract.py",
+      "sha256": "135649ffa2d10aa9e9cfea7b182d05407bb4b1526cdbd2e7345234240b1039f5",
+      "bytes": 9134
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_sequence_gpu_worker.py",
+      "sha256": "6aecc2be48b6255b8b403ac2d229168edadf351119cb4981ad6247da3bb4c277",
+      "bytes": 21175
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_sequence_public.py",
+      "sha256": "04885cdc977cc087bc638272eec1236fd0a2fd0527a6ac231b28d22153199df9",
+      "bytes": 28091
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_sequence_worker.py",
+      "sha256": "4ec4e21649951720d67c4ee5f391191e5799f8c0bb69c585c38cfa48ba3eff44",
+      "bytes": 21797
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_session_client.py",
+      "sha256": "94f80b84c7b29bbfa65152c9d645df8dc7c981e6321eda3043e4649aeaf064e3",
+      "bytes": 9212
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_session_contract.py",
+      "sha256": "302fbe63296a88c649763ca6e8d4456bf5a949e6a96825664fc65ba68066b4c8",
+      "bytes": 5512
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_session_gpu_worker.py",
+      "sha256": "e247f6a0ade6fba0f35ef631a03c74ba08cee781008479cb642bf8d2a95ff2c1",
+      "bytes": 19526
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_session_owned_worker.py",
+      "sha256": "ddfe11fe0f77df71c36ceb0c4e39e0d63d826c9c96b46cc6de6465b27427856c",
+      "bytes": 10732
+    },
+    {
+      "file": "tools/blenderctl/compositing_relight_session_public.py",
+      "sha256": "9d6591c277aa7474bc0ec42aef766ea33d8e2d1ba62f72e15e62bbad921f6374",
+      "bytes": 31925
+    },
+    {
       "file": "tools/blenderctl/compositing_study.py",
-      "sha256": "2591972a299012e098b5fc6e9c4c67c5fc4af8ffdb9e30200a45bb3eb612d8df",
-      "bytes": 9825
+      "sha256": "d05d8c2ec1a2468bddb3809717c5237c90bface5b2456c484b688ab7b30c1d42",
+      "bytes": 9728
     },
     {
       "file": "tools/blenderctl/compositing_template_run.py",
-      "sha256": "e4c43c53639894da490f3b1663bdaace066823a6fcf2bdcb351db29aee7bad75",
-      "bytes": 10078
+      "sha256": "9063246f171e644dcd9aa6f6aacfbfe1e79aace2e866951cf80403047e8c9340",
+      "bytes": 9925
     },
     {
       "file": "tools/blenderctl/compositing_template_run_contract.py",
-      "sha256": "2f8c09c8969a924016b8b347a3191a598fdfdbd9a1f7e9574dce5c33f475262c",
-      "bytes": 11645
+      "sha256": "fc43b7c5515f4c312f0a23ca9be5359a4452810fd644bcd2953783d04f36f3f4",
+      "bytes": 11474
     },
     {
       "file": "tools/blenderctl/compositing_templates.py",
-      "sha256": "3fd99e36ba0f929f26e8f508e1da03b4f77fa681db6af3a6152c6a432accfd5e",
-      "bytes": 8435
+      "sha256": "73cc0250562c92b43e260adda498ff23f775460bc6c275c7812798cc655f76fc",
+      "bytes": 8334
     },
     {
       "file": "tools/blenderctl/compositing_temporal.py",
@@ -1612,18 +1927,28 @@
     },
     {
       "file": "tools/blenderctl/compositing_verifier.py",
-      "sha256": "bccec7329b21038c0f11d1c3dd46a90d2cdbbf7e9033e9965d67041cdeccd2f2",
-      "bytes": 39481
+      "sha256": "47309406f3388cd762a401d76e2e93833aa9500cd1c67dd6c84c7dd8c3f58b68",
+      "bytes": 42387
     },
     {
       "file": "tools/blenderctl/compositing_workflow.py",
-      "sha256": "4cae17f53341515ec0776a1deb3ebe9f9260d1980fc49428b616b9d415bfafb7",
-      "bytes": 71334
+      "sha256": "e64689a7387af6699e62c9374d8c94b449e467689c1d48691f19d09196abb0fe",
+      "bytes": 71515
     },
     {
       "file": "tools/blenderctl/compositing_workflow_contract.py",
       "sha256": "a0f3929aa5578bfb3ae112d2b399ebb3738db34bdd8524f2cc143bbc312975ec",
       "bytes": 9089
+    },
+    {
+      "file": "tools/blenderctl/continuous_exchange_contract.py",
+      "sha256": "c68f5df92b82ccf87b61f0c16540c7ea8805febd60c08237c9ed585d58c8c241",
+      "bytes": 7765
+    },
+    {
+      "file": "tools/blenderctl/continuous_skin_exchange.py",
+      "sha256": "10cf9142576f7a9a41829890330243ccb016b428ae2ed0719650ba244fa76b9d",
+      "bytes": 635
     },
     {
       "file": "tools/blenderctl/curve_contract.py",
@@ -1632,8 +1957,8 @@
     },
     {
       "file": "tools/blenderctl/dependencies.py",
-      "sha256": "7bd212cf44e715edc8c693413dfce4ccc32fc2a83808fed3dd46475b137c8df5",
-      "bytes": 14670
+      "sha256": "b96d3a2ab5e20d7f947b8e1504767e077504a82de8065b13043de75e88fb6bb4",
+      "bytes": 17641
     },
     {
       "file": "tools/blenderctl/dependency_contract.py",
@@ -1651,6 +1976,21 @@
       "bytes": 5825
     },
     {
+      "file": "tools/blenderctl/dispatch.ps1",
+      "sha256": "df8b140d03613e45b0f19f54833ea46e275347bad360570ecf3653a27be14e25",
+      "bytes": 1799
+    },
+    {
+      "file": "tools/blenderctl/doctor.py",
+      "sha256": "c862a4e2e5c61ca8af04598c76cefdb2143180ac4f9479385bad6e0c681c1c4e",
+      "bytes": 11609
+    },
+    {
+      "file": "tools/blenderctl/doctor_registration.py",
+      "sha256": "0cd42dbab95dfeec9e0e69d5b58e9ea7deb24015af5a7ecfc0ca723d5474a40b",
+      "bytes": 1201
+    },
+    {
       "file": "tools/blenderctl/driver_contract.py",
       "sha256": "08848753f342e523e81c98bb133c1c876f4b1b4f72875c100a695fd29518405d",
       "bytes": 865
@@ -1662,23 +2002,28 @@
     },
     {
       "file": "tools/blenderctl/drivers.py",
-      "sha256": "bbda9d0b49ca76e2f8e09ba287669b6d6ea6ca45f9d93daecbb0b3cd7889c1f4",
-      "bytes": 9166
+      "sha256": "838762f7719954e12076845a97d71c1dc2eeba27af738dfb235f24423effadfe",
+      "bytes": 9216
     },
     {
       "file": "tools/blenderctl/exchange.py",
-      "sha256": "a259b5c1b1a9f308c94befe1781a5f20e839d21576c79b10408565fceb3a128f",
-      "bytes": 24035
+      "sha256": "80df4e1da7063bfdf796908e2457b56d89f9abed9f8fedb2ee194eabee04271a",
+      "bytes": 32575
     },
     {
       "file": "tools/blenderctl/exchange_contract.py",
-      "sha256": "4d420d2cac2d29303ab08c8e947f98bbcd40be62d618fa05fb8740adc70a4760",
-      "bytes": 11518
+      "sha256": "91258aecb739ed27edb293849c58315493dc48dba16b06bc62427b39cab3dc68",
+      "bytes": 15786
+    },
+    {
+      "file": "tools/blenderctl/exchange_pbr.py",
+      "sha256": "2c7285a5d0392b111b5c42c013a41623ff32080abf9c372b4d1a77c45b1ad09b",
+      "bytes": 14169
     },
     {
       "file": "tools/blenderctl/execution_contract.py",
-      "sha256": "c28e3040bed29bc2d72dfac124c2642b90bd71c3149a6f4a64c6ef49e6d1e50f",
-      "bytes": 3806
+      "sha256": "6effab6ba6a2115639f036845f0360fed3a4e330e85524b1a6c193e0de3bd966",
+      "bytes": 5764
     },
     {
       "file": "tools/blenderctl/extensions.py",
@@ -1692,13 +2037,18 @@
     },
     {
       "file": "tools/blenderctl/fbx_compat.py",
-      "sha256": "ffb28ff96538e492d1f5eb7d39b126ea46cfe871479b4f40f6aeec5bacb0af9e",
-      "bytes": 829
+      "sha256": "5c925e4fd5df1d4ac01ba797226acacc5295d3d780401f8fb3944cb6135ce70e",
+      "bytes": 141
     },
     {
       "file": "tools/blenderctl/filesystem.py",
-      "sha256": "d8cb1f07feb9dac590ea1103d7d6c0a8c0fcdca6377c49b57cce07e0369bed0e",
-      "bytes": 7642
+      "sha256": "342cec69fd92882b2a54be50dc976593ba4db2f161b1f93b26824ca80f96b68c",
+      "bytes": 7783
+    },
+    {
+      "file": "tools/blenderctl/flow_contract.py",
+      "sha256": "e252a072d98658a4c9ee6d9136799fab15f6ce020c4ab2fbac19aebd432e0547",
+      "bytes": 11060
     },
     {
       "file": "tools/blenderctl/font_binary.py",
@@ -1717,8 +2067,8 @@
     },
     {
       "file": "tools/blenderctl/geometry_cache_reader.py",
-      "sha256": "11ce7e66666d6eb9769fb12d3a7b4ccd3931cdd6ac7ff73e68aa35762a32d859",
-      "bytes": 5913
+      "sha256": "3abdcbe01207b5aa7f41b784266cb2be62306be25373286fb19ca8916c4454e9",
+      "bytes": 5819
     },
     {
       "file": "tools/blenderctl/geometry_identity.py",
@@ -1727,13 +2077,13 @@
     },
     {
       "file": "tools/blenderctl/geometry_interface.py",
-      "sha256": "9f26e67577f252b87ee78a52d56da41e480b84467a168b14b17187a4533e6ce9",
-      "bytes": 7333
+      "sha256": "c3c58a699296550410fb63fdc7d6defe78194cf5f005d4b80ee47ba8a0032e49",
+      "bytes": 7406
     },
     {
       "file": "tools/blenderctl/geometry_session.py",
-      "sha256": "09deebe731dd501c03af72f27e8d498bcf694c327f169f09ca0e0df3cd54e323",
-      "bytes": 2173
+      "sha256": "c54c900e60f1dd4656473015a86aeb4a84f15ea4c52806a18048fb804bd2f9cb",
+      "bytes": 5944
     },
     {
       "file": "tools/blenderctl/geometry_temporal.py",
@@ -1742,13 +2092,13 @@
     },
     {
       "file": "tools/blenderctl/geometry_verifier.py",
-      "sha256": "dc7c7b3048f133eab37681ed25ad2ee7b698232fb3e0566f87fc2c0b5277443a",
-      "bytes": 7093
+      "sha256": "964ea2c209aeaf2c82a67e559d14ef85b97a593e875eb39ae68f5215054c460e",
+      "bytes": 6974
     },
     {
       "file": "tools/blenderctl/geometry_workflow.py",
-      "sha256": "85d972479501f897afe1a41985b52bfaecb9b4a8871f01ef76c46d01c5cb25fd",
-      "bytes": 38094
+      "sha256": "4831aa26c1c3968ce9488e122743488c8f82c61aafe07831b920fae04f91c5ce",
+      "bytes": 39710
     },
     {
       "file": "tools/blenderctl/geometry_workflow_contract.py",
@@ -1771,6 +2121,76 @@
       "bytes": 9032
     },
     {
+      "file": "tools/blenderctl/hair_compat/__init__.py",
+      "sha256": "91b451cab7a9580b8e28230fd44267d1c01988f88e54d2ddbb10206170dff4e5",
+      "bytes": 92
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair.py",
+      "sha256": "f20c85990c40423f6e23200a663ffe0a5a3ca05e5707ceaf287c7617c9cf0c00",
+      "bytes": 12306
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_collision.py",
+      "sha256": "c33e0b5b47370552f0a6b640bba7f37fabef99cd68db4e3349864454be7a9aab",
+      "bytes": 9033
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_contract.py",
+      "sha256": "c349999bfc71e68f2f9d02cb9b7847d20caa895166872bb9c0efb50726cb2af2",
+      "bytes": 2577
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_density.py",
+      "sha256": "8f04d760f8b56ffad7a8cde34349d095b9caa3c9c26f5247ea24b11bd862b2ce",
+      "bytes": 11159
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_dynamics.py",
+      "sha256": "58f2dd544e9d98b52d62cb3ef6299ced57305f54476d602427540c25d18a64b8",
+      "bytes": 19401
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_dynamics_contract.py",
+      "sha256": "ffce203dfea964c028332f229f33473106624dfb8f310954f861bae8d16f1124",
+      "bytes": 1003
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_shape.py",
+      "sha256": "32761201efdcacc4a38824055107c743df4a9a2321845474e886a48dd1a1d500",
+      "bytes": 14395
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_shape_contract.py",
+      "sha256": "279e0891e57d65681d1f5b6ab9d7a0fc8369869f56214c56ff38e336b7d47195",
+      "bytes": 1733
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_shape_nodes.py",
+      "sha256": "276199582afddb5bc58657c96d1e9db05de689e43482941f07314c66d5d7cbeb",
+      "bytes": 2480
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_surface.py",
+      "sha256": "c5835dc1e68d07fd13e6b65ade46e03e4e6b399e31c5abcec0388a709f992548",
+      "bytes": 12835
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_volume.py",
+      "sha256": "776d947e20a5d476db7f4a2a6d831d150ccfacfda7af74cc69cba2b0999368c3",
+      "bytes": 9831
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_volume_contract.py",
+      "sha256": "f52a649220ff4371935d216a333db0190bff34b17dc9f2f678b43b8e06b97fd4",
+      "bytes": 1321
+    },
+    {
+      "file": "tools/blenderctl/hair_compat/hair_voxels.py",
+      "sha256": "606f49731099429e27a2f909942fc9deb31aadf59896db43d759353d10c385f4",
+      "bytes": 2174
+    },
+    {
       "file": "tools/blenderctl/hair_contract.py",
       "sha256": "c349999bfc71e68f2f9d02cb9b7847d20caa895166872bb9c0efb50726cb2af2",
       "bytes": 2577
@@ -1789,6 +2209,21 @@
       "file": "tools/blenderctl/hair_dynamics_contract.py",
       "sha256": "ffce203dfea964c028332f229f33473106624dfb8f310954f861bae8d16f1124",
       "bytes": 1003
+    },
+    {
+      "file": "tools/blenderctl/hair_essentials.py",
+      "sha256": "7d46840480fc060bcf2371075764f70d715505ee1650b68861e33737c3f292f6",
+      "bytes": 9573
+    },
+    {
+      "file": "tools/blenderctl/hair_essentials_job.py",
+      "sha256": "e569618cb296cfe4bbb99d7bf373df04156454d75babb7d88b8fa435f58c4808",
+      "bytes": 2895
+    },
+    {
+      "file": "tools/blenderctl/hair_public.py",
+      "sha256": "13e8a4add8b0f2cfde3ee8eab6056e27ad8dffe02c33bac9fdb382caaaa87cc0",
+      "bytes": 1619
     },
     {
       "file": "tools/blenderctl/hair_shape.py",
@@ -1826,14 +2261,19 @@
       "bytes": 2174
     },
     {
+      "file": "tools/blenderctl/host_compat.py",
+      "sha256": "f7415ada904b8b6c122fa2618738b897549c77c956175f1e563466827cb8dc6f",
+      "bytes": 1691
+    },
+    {
       "file": "tools/blenderctl/inspection.py",
-      "sha256": "6620586b037744e32662d1dcc6f40e0c57a5cf53341023ee05922316d8dac740",
-      "bytes": 24775
+      "sha256": "9920fefc5734d217c370aa9f418b94013295a64d12f4883e1edbcff72685f927",
+      "bytes": 32550
     },
     {
       "file": "tools/blenderctl/installation.py",
-      "sha256": "99c97dfe89663103492bd8024bed52399dcfcd9611043cf9608ff9eea8c39c1e",
-      "bytes": 1101
+      "sha256": "755a972fcd3804ce5ec94bf9addae9f7118df8301f149a9a44c7c9885783c17f",
+      "bytes": 5239
     },
     {
       "file": "tools/blenderctl/isolated_script_worker.py",
@@ -1846,9 +2286,19 @@
       "bytes": 8600
     },
     {
+      "file": "tools/blenderctl/key_library_exchange.py",
+      "sha256": "2261a800b02387605df9ff26ee770c99525ca5591f3c169c981fd76a85d8f9b7",
+      "bytes": 701
+    },
+    {
+      "file": "tools/blenderctl/launcher.py",
+      "sha256": "e069d422024bc8288a336d6f3670563ee4748dfc572d08d792182dc2a7a03159",
+      "bytes": 8610
+    },
+    {
       "file": "tools/blenderctl/library.py",
-      "sha256": "ba2056bb6946cfc69fc483ceeb74b393be031b77e03eb623f553d25e51c65687",
-      "bytes": 15298
+      "sha256": "f978d8908188c16845d755a6e2722eaea7bb60b3967b7b5033617f6d6a64accf",
+      "bytes": 20161
     },
     {
       "file": "tools/blenderctl/lighting_batch.py",
@@ -1862,8 +2312,8 @@
     },
     {
       "file": "tools/blenderctl/lighting_interface.py",
-      "sha256": "5be893198042f94950ebf1c72ae55a0ffd4395e1ec767edc062a1b7b7798edb7",
-      "bytes": 4354
+      "sha256": "e1ef249fdca523ea7822f6d79ddadae1c2662a238ff402dfd3fb89ea9ceee2b1",
+      "bytes": 4668
     },
     {
       "file": "tools/blenderctl/lighting_verifier.py",
@@ -1872,23 +2322,28 @@
     },
     {
       "file": "tools/blenderctl/lighting_workflow.py",
-      "sha256": "fad8f064cc6ab9667ebee0c6ef558c0d4e5c0948d989e736c6a036251bc03844",
-      "bytes": 17041
+      "sha256": "828b2c9a2f62c08fda888b54e4ff83a7bb581d908db998498225210e37e8a26b",
+      "bytes": 17898
     },
     {
       "file": "tools/blenderctl/lighting_workflow_contract.py",
-      "sha256": "7d83495ec04c7007769e5c77c20f821810e45d979297b21d82179bd6a9a77ed9",
-      "bytes": 11272
+      "sha256": "cdbe4f715245a87ecee765c27b7d06076fc8496bf0da7409c9703e671142c749",
+      "bytes": 11271
     },
     {
       "file": "tools/blenderctl/link_contract.py",
-      "sha256": "308dd0d146363ac04cc55f52467c5fcdbcc34f774b06fc3a43313f0933281a80",
-      "bytes": 7436
+      "sha256": "4c618bbb913333632ec37cd8efba5de7bcfba8da959ac77855862b99434d09ad",
+      "bytes": 8474
+    },
+    {
+      "file": "tools/blenderctl/link_edit_values.py",
+      "sha256": "b1c98e9be8ca910d7a733b38e1751470140fa63b580f02fc74ffa3a650391f2d",
+      "bytes": 3670
     },
     {
       "file": "tools/blenderctl/linking.py",
-      "sha256": "cf77b959a091c4cb1daf857aba87353435fa73ad96dfaa4529d403fa6b37389d",
-      "bytes": 23249
+      "sha256": "723bb0a5a5e3d3ac97e24e97b57f1f064b70ca85325b116619827f335ab0c103",
+      "bytes": 22858
     },
     {
       "file": "tools/blenderctl/liquid.py",
@@ -1906,14 +2361,24 @@
       "bytes": 662
     },
     {
+      "file": "tools/blenderctl/material_batch_draft.py",
+      "sha256": "98fc53b0e87bdb2ee7c117ff58ba6c1d8f9edf72534eb12b5cb59d3c62c0c06e",
+      "bytes": 31864
+    },
+    {
       "file": "tools/blenderctl/material_deformation.py",
       "sha256": "b5834d09d16a94a9548a957bea873bed1e9c2ab647e371fa01634b60ea1de57f",
       "bytes": 8002
     },
     {
+      "file": "tools/blenderctl/material_draft_handoff.py",
+      "sha256": "ddf2a1a5713e869a77b77bcd2edd242afd5b852ecf8d654766b0d0df59fe703f",
+      "bytes": 31053
+    },
+    {
       "file": "tools/blenderctl/material_interface.py",
-      "sha256": "a21412a713e95b8ea840d0b5d33e9f3326a7bc3e5782b93394791bb8f58179d4",
-      "bytes": 12310
+      "sha256": "d4c4b35092720cdf29a1557b9bea6643da6dc3dd1d205bedbddfaf74f3a0e4cb",
+      "bytes": 14534
     },
     {
       "file": "tools/blenderctl/material_interface_contract.py",
@@ -1921,14 +2386,69 @@
       "bytes": 3896
     },
     {
+      "file": "tools/blenderctl/material_layer_draft.py",
+      "sha256": "fd6e896c58739577a2581e1f537db9791871a1cceb46deafa9492dd9c5926feb",
+      "bytes": 15575
+    },
+    {
+      "file": "tools/blenderctl/material_live_session.py",
+      "sha256": "6dc92fcda25728fe151583cfa7d61c3eeeec9c3e1390572129a8f9bba072b51b",
+      "bytes": 13925
+    },
+    {
+      "file": "tools/blenderctl/material_node_snapshot.py",
+      "sha256": "2034891590b4ef97e0510bf0917206811025a7c8e767b0336132985b61796394",
+      "bytes": 18701
+    },
+    {
       "file": "tools/blenderctl/material_outputs.py",
       "sha256": "e38d623c2def39457205e3154ef1a57d20575e142223eebdc580662347bcee27",
       "bytes": 8951
     },
     {
+      "file": "tools/blenderctl/material_procedural.py",
+      "sha256": "484749c315362e4aef80894e372f9b3b7fccf83ffb33be811b1ec61bd948a3ca",
+      "bytes": 25120
+    },
+    {
+      "file": "tools/blenderctl/material_procedural_contract.py",
+      "sha256": "788733e143de69815e329ffa348ef4b11ac1d980e05a738e5a1d6d85e5eb8b06",
+      "bytes": 8802
+    },
+    {
+      "file": "tools/blenderctl/material_procedural_template.py",
+      "sha256": "58ad0cdb244c8a7c7e587dbe78109e44f98324d8a9fdfe7908a12d856c80d4c4",
+      "bytes": 43600
+    },
+    {
       "file": "tools/blenderctl/material_progress.py",
       "sha256": "87f9682655be53bca4a211f3734b6edb61a96435e2cf41b907c4294b92b27541",
       "bytes": 5445
+    },
+    {
+      "file": "tools/blenderctl/material_projection.py",
+      "sha256": "225048a202d88331e8767397358d6a795ab76e81a319116942cc4c7bbcb68bab",
+      "bytes": 8470
+    },
+    {
+      "file": "tools/blenderctl/material_projection_contract.py",
+      "sha256": "6f54d97a97a3ffaf9061a11756c1a78e77828d29dfe9c62a18732685ef36d546",
+      "bytes": 9418
+    },
+    {
+      "file": "tools/blenderctl/material_projection_handoff.py",
+      "sha256": "cd1b222c04de732ad0fa6f74dc9f170a98f6695a799b15d542ac9eff690ef984",
+      "bytes": 36361
+    },
+    {
+      "file": "tools/blenderctl/material_projection_pairs.py",
+      "sha256": "ed110d62f7169fad1ab4196a8567e5df68f87ef4715ac4f517a75de86f624592",
+      "bytes": 12891
+    },
+    {
+      "file": "tools/blenderctl/material_projection_suggest.py",
+      "sha256": "55df6aef3f1a32c1f47f53780f5c6e099a952fedeed8e1c3847d7f03616f202c",
+      "bytes": 11420
     },
     {
       "file": "tools/blenderctl/material_study.py",
@@ -1939,6 +2459,11 @@
       "file": "tools/blenderctl/material_study_contract.py",
       "sha256": "f35b8dc7358bfc3899e81b70cad23a221eea03bbd70bd62406e50e592b8423d7",
       "bytes": 3470
+    },
+    {
+      "file": "tools/blenderctl/material_submission_recovery.py",
+      "sha256": "769b59d3f4d1b004400cf884a064b7e1b4a96c881ee7c5f15a3713179c33b294",
+      "bytes": 16065
     },
     {
       "file": "tools/blenderctl/material_workflow.py",
@@ -1952,8 +2477,8 @@
     },
     {
       "file": "tools/blenderctl/media.py",
-      "sha256": "2fad9d525c5d36f746996caf1f5155beeae5d48993754f3ee9356d4d1cd593b0",
-      "bytes": 11763
+      "sha256": "6349e56f11fc7ae81e4239d99aa75a8d35a52fd0027ebbce802aebd8dbd87161",
+      "bytes": 11649
     },
     {
       "file": "tools/blenderctl/mesh_clip.py",
@@ -1966,14 +2491,64 @@
       "bytes": 5660
     },
     {
+      "file": "tools/blenderctl/mesh_qa.py",
+      "sha256": "23af9104c8555992681f95af0c6e3308f1d3df20ac6562ecb9a6dfad2695c197",
+      "bytes": 72102
+    },
+    {
+      "file": "tools/blenderctl/mesh_scale_absolute.py",
+      "sha256": "3ac5ea79236f8e37ffa0ff18907a2f7ae1be787a2b6475f21bc2312e2e799c26",
+      "bytes": 4111
+    },
+    {
       "file": "tools/blenderctl/model_contract.py",
-      "sha256": "bc9f9e13ae67f5335092b45465539a5d82b0e41e8c9fd8fd8fe199e43268637e",
-      "bytes": 5885
+      "sha256": "83a280162d8d96bed9a06c7c863af217d06dc22324b68e062d197de3a72ee04e",
+      "bytes": 9639
     },
     {
       "file": "tools/blenderctl/modeling.py",
-      "sha256": "b090bd6c13db381ec3c880c6de4153e3242a6019bb47818e25432d05eb4f7d47",
-      "bytes": 22186
+      "sha256": "4d4432170f0c41292690a0b33b1dd4133412ee64307cdf62a19475f2fa35895e",
+      "bytes": 34049
+    },
+    {
+      "file": "tools/blenderctl/modeling_adoption.py",
+      "sha256": "6356a1e537094e92e0bdd307ff0cbfdd92aa90e58df996607202c5a5ca1343e6",
+      "bytes": 46828
+    },
+    {
+      "file": "tools/blenderctl/modeling_bridge_review.py",
+      "sha256": "fe46856c4bb7a9b0effe2fc9710a6d94df1eec1595accf2e9ad096d224b8a09f",
+      "bytes": 10692
+    },
+    {
+      "file": "tools/blenderctl/modeling_host.py",
+      "sha256": "11e44959db29cc41757c652952279d8e3e00b461d31d13842bc12ec55456cc84",
+      "bytes": 8947
+    },
+    {
+      "file": "tools/blenderctl/modeling_identity.py",
+      "sha256": "71ce6130a069ee70cf61417de5815ace9c45b648d7b22a3834c58e5de0b0347e",
+      "bytes": 744
+    },
+    {
+      "file": "tools/blenderctl/modeling_interface.py",
+      "sha256": "92e26419482e419809f4b8b825e4b3a7a01b767263c9e5675c2f10838e3fbada",
+      "bytes": 9210
+    },
+    {
+      "file": "tools/blenderctl/modeling_verifier.py",
+      "sha256": "3761e3d256fa1fc68ed437079f62f45bbf754ad23a80e08ef964ceeeb5d9cc54",
+      "bytes": 2254
+    },
+    {
+      "file": "tools/blenderctl/modeling_workflow.py",
+      "sha256": "2c1fa27f4d9ea9f76057fccdcd170d74cedc6e4fa5667947bffdc76c8208f7ec",
+      "bytes": 4968
+    },
+    {
+      "file": "tools/blenderctl/modeling_workflow_contract.py",
+      "sha256": "fffa06938a4a94487380717591094d7acf6caa8558deb9fc7b780044a510de69",
+      "bytes": 9949
     },
     {
       "file": "tools/blenderctl/native_mesh_cache.py",
@@ -1982,8 +2557,8 @@
     },
     {
       "file": "tools/blenderctl/node_contract.py",
-      "sha256": "34326e9a2fb5b5fd842b4a54565554587272e54e35b9b848eb328084602d52b0",
-      "bytes": 8873
+      "sha256": "577cb6958c35676321ec8c6fd6da2edd260b46049d7e1f81ceee15a44c8d9325",
+      "bytes": 9159
     },
     {
       "file": "tools/blenderctl/node_zones.py",
@@ -1992,13 +2567,13 @@
     },
     {
       "file": "tools/blenderctl/nodes.py",
-      "sha256": "008104cd8113d98c5684181e2ac914d692bd80492cc8f939992d3dc867dc2448",
-      "bytes": 28281
+      "sha256": "cea65d87fd8cbefc6c37eed3b7b0de567bba1a3f18dcd535356ad55a27eccd33",
+      "bytes": 28983
     },
     {
       "file": "tools/blenderctl/operations.py",
-      "sha256": "1436b109e066abd3baa4652451864e379272d8ceaebce6a79a0695d71b585133",
-      "bytes": 8128
+      "sha256": "41d0d12091164b66b02de8cc37281eba83a743b515f55c8f230d725305461a37",
+      "bytes": 8751
     },
     {
       "file": "tools/blenderctl/operations_contract.py",
@@ -2006,14 +2581,114 @@
       "bytes": 1231
     },
     {
+      "file": "tools/blenderctl/package_files.py",
+      "sha256": "1d83f01db741e7930c3bc4f15d252770236e7b6af49322cecf9df20684310ae8",
+      "bytes": 2655
+    },
+    {
+      "file": "tools/blenderctl/painted_bundle_lease.py",
+      "sha256": "30ae6fd2db8e007e9a2a44a85c646f51c799c618a42e930e4ff7b15953ef64a5",
+      "bytes": 7379
+    },
+    {
+      "file": "tools/blenderctl/panel_controls.py",
+      "sha256": "bccf1f6feef1c300d5850a05858878c4611929b1aa2bc8737047f89e86666fea",
+      "bytes": 73707
+    },
+    {
+      "file": "tools/blenderctl/panel_execute.py",
+      "sha256": "338edfc532d69d0bf04404187ce60af9745fa80760eddf08634c1a728fa45716",
+      "bytes": 16908
+    },
+    {
+      "file": "tools/blenderctl/panel_mode_handoff.py",
+      "sha256": "bdeb8a93c207ed532640cc270c2482e8c1b19182606cbd0e3482c8b98a729b59",
+      "bytes": 11571
+    },
+    {
+      "file": "tools/blenderctl/panel_selection_direction.py",
+      "sha256": "26a840f64e6f3c6aa63648d86625b3453f2242fd5ae7ab91fe99534e3062fe4e",
+      "bytes": 11900
+    },
+    {
+      "file": "tools/blenderctl/panel_selection_preview.py",
+      "sha256": "6eee70205568cd26bdb1324cec2e229f265beb68fe26cfb1a24f7540071eef48",
+      "bytes": 6963
+    },
+    {
+      "file": "tools/blenderctl/panel_surface_sweep.py",
+      "sha256": "c08dc376485fd931bef8809f07ccf63f7554726ca053400f3d3be713f2e80841",
+      "bytes": 5835
+    },
+    {
+      "file": "tools/blenderctl/panel_tool_parameters.py",
+      "sha256": "0f48fb5f1da4cb9f5e28f49ae16892dc9725fb19c937f60cc0eb76a2daae3030",
+      "bytes": 6022
+    },
+    {
+      "file": "tools/blenderctl/panel_tool_target.py",
+      "sha256": "eab213b2939f51f04e46e024dbf385b623a3a79582a170b0dc4cf54cfc506df4",
+      "bytes": 3844
+    },
+    {
+      "file": "tools/blenderctl/physics_dispatch.py",
+      "sha256": "f2c6db234baa894ca3fb18ff7dccfc6c24c38e4edf05173379ed6c4d203fa242",
+      "bytes": 5211
+    },
+    {
+      "file": "tools/blenderctl/physics_native.py",
+      "sha256": "4c78ace25d7c4c019633b22c7e770acafb49f62a6f2e59e2f426b958f101f27b",
+      "bytes": 21423
+    },
+    {
+      "file": "tools/blenderctl/physics_native_resource.py",
+      "sha256": "6649cbd89b95291248277b861fbb26cdf466aa3e9a94bcc293af0fe9d676eb11",
+      "bytes": 9550
+    },
+    {
+      "file": "tools/blenderctl/physics_native_worker.py",
+      "sha256": "b297dba1f7f6e1d9bc82794f675ac719e133bbd63e23a22fbc48cfd432e593bc",
+      "bytes": 20312
+    },
+    {
+      "file": "tools/blenderctl/physics_panel_copy.py",
+      "sha256": "96f37858b96d659891b18f7f0e82261f203eca9ec42b6ba3766863f64d7c2858",
+      "bytes": 23826
+    },
+    {
+      "file": "tools/blenderctl/physics_pin.py",
+      "sha256": "5919c3e4cd0594fe921415ab792a8e28b514ea15abf40ad074c7116d9a4b90f7",
+      "bytes": 19666
+    },
+    {
       "file": "tools/blenderctl/pipeline.py",
-      "sha256": "932c3fa44213635810419988fe94a190c41e96acec771ce326e6e3e33eb5512c",
-      "bytes": 33568
+      "sha256": "1461e6c5491ad9d06df1fcfc322ec0f294c3a3ddf5e4d8a4671a6438aa451981",
+      "bytes": 40992
+    },
+    {
+      "file": "tools/blenderctl/pipeline_camera.py",
+      "sha256": "d74d86010f7acf68948ca0b9c771794c5700e188ec9a7e3d4cd34d7721886bfc",
+      "bytes": 4589
     },
     {
       "file": "tools/blenderctl/pipeline_contract.py",
-      "sha256": "69c8d75c551a7fc8aa8b9412bdf6867c6f547e03883525c6dc8a698d9dde045d",
-      "bytes": 5748
+      "sha256": "57c034d897b81b577b392e7212e4905ec5d2b925eccd4c6ace6ce6e862b6219e",
+      "bytes": 7348
+    },
+    {
+      "file": "tools/blenderctl/pipeline_lease.py",
+      "sha256": "f0aca53ea5a6258c51dfe7406c1db371c6ddb2d230a0dd70a39e5b9f3a9e8782",
+      "bytes": 23521
+    },
+    {
+      "file": "tools/blenderctl/pipeline_modeling_import.py",
+      "sha256": "783715a2371eb43ae211ca1d4a7f4651515baed19902377b383698feaf1c806e",
+      "bytes": 637
+    },
+    {
+      "file": "tools/blenderctl/plugin_registry.py",
+      "sha256": "9fae45cd198d66f4947c2a70370af82158b318bc2d2dc4f967292d080292b8e8",
+      "bytes": 1454
     },
     {
       "file": "tools/blenderctl/preview_contract.py",
@@ -2047,8 +2722,8 @@
     },
     {
       "file": "tools/blenderctl/production_worker.py",
-      "sha256": "c5d5b8fa45372d06cce289a2303b24fa7e02ae6b8a7fd7636a9ae7c69e88d581",
-      "bytes": 7791
+      "sha256": "111800e134b02eeb02ab144f560b9fdabcfa3bb79b3d567312f7d39bbf79f913",
+      "bytes": 7265
     },
     {
       "file": "tools/blenderctl/project_contract.py",
@@ -2057,23 +2732,113 @@
     },
     {
       "file": "tools/blenderctl/projects.py",
-      "sha256": "fa43c7b5a683121b71d57562915ce7f644efe1538086f1d8b7a145dfebb79666",
-      "bytes": 9341
+      "sha256": "cbbfc84ec13d217635f41ab724b359121afd1512f1409d1c87e9c071474d97fb",
+      "bytes": 9615
     },
     {
       "file": "tools/blenderctl/protocol.py",
-      "sha256": "1124ddd79423da819781944dbf20d93969ca37fc825be2aa4197ef21ff4c538f",
-      "bytes": 30881
+      "sha256": "91b4517145bb21368ffaad5dc8a9b91d4a80361a262e8672efa88c5122ee55b7",
+      "bytes": 40235
+    },
+    {
+      "file": "tools/blenderctl/qa.py",
+      "sha256": "5a655d8aeda3184cb661ec55d99348217d9ecc73267fdf4b816dd1dcc305c3eb",
+      "bytes": 20104
+    },
+    {
+      "file": "tools/blenderctl/qa_albedo.py",
+      "sha256": "d0e036e894c8bdb2bcb38c923f87d7d5182862342299e871d6834a0c643e161a",
+      "bytes": 8155
+    },
+    {
+      "file": "tools/blenderctl/qa_contract.py",
+      "sha256": "349c7269cda3c3dd5ea15943c4119d55555dd109e3baa4f29a18db77720406a7",
+      "bytes": 5882
+    },
+    {
+      "file": "tools/blenderctl/qa_probe_animation.py",
+      "sha256": "1f3c7edf4f411a9db0c22dd15a944312e298c4872b09c129bb3693daa97e964d",
+      "bytes": 981
+    },
+    {
+      "file": "tools/blenderctl/qa_probe_rigging.py",
+      "sha256": "ef7db85662658196e7a156811ac98cb77566a25b6412f995689fb24f991d758f",
+      "bytes": 2380
+    },
+    {
+      "file": "tools/blenderctl/qa_udim.py",
+      "sha256": "8221ef4c2a38ea1a561ca7e185c72f20d67826bd13afc5e4e6f778d1e91cc4c3",
+      "bytes": 12367
+    },
+    {
+      "file": "tools/blenderctl/registry.json",
+      "sha256": "b534cbb0a3c072e6cb7204024d26ff735eae5a182a0ae0699104647a9fc980bd",
+      "bytes": 22087
+    },
+    {
+      "file": "tools/blenderctl/relight_live_session.py",
+      "sha256": "afc6a464db352b764c7fabe0006998570303541652a7251c9a0424456f82e56b",
+      "bytes": 37767
+    },
+    {
+      "file": "tools/blenderctl/relight_saved_handoff.py",
+      "sha256": "0690ad3deaf57624c23e42a26d004387e74cccb67d22a655ef3c94a8a31edd6a",
+      "bytes": 29439
+    },
+    {
+      "file": "tools/blenderctl/render_batch.py",
+      "sha256": "eac220d4e8299443c584b6da5c9a88310c64ce338b164cb90467a8704e79d1ad",
+      "bytes": 50192
+    },
+    {
+      "file": "tools/blenderctl/render_batch_delivery.py",
+      "sha256": "c55276e54f8f95657dc066ce0361e8b279ad40f9779d0908b1e5d6d15315f79e",
+      "bytes": 5245
+    },
+    {
+      "file": "tools/blenderctl/render_batch_dispatch.py",
+      "sha256": "2a5f1dd63010762f1a8b599755c4c827c48dad833f4021cd8268046d0ffe556e",
+      "bytes": 15830
+    },
+    {
+      "file": "tools/blenderctl/render_batch_media.py",
+      "sha256": "918d2c7a18bac10733b673c515424260c02a2b6483254c53aac8f4f4f1e4efae",
+      "bytes": 9140
+    },
+    {
+      "file": "tools/blenderctl/render_batch_panel.py",
+      "sha256": "f0edd3f138dddb9b6e75edb6d31bcbd96f2086a8fb9db80b24f23c35587f804b",
+      "bytes": 10412
+    },
+    {
+      "file": "tools/blenderctl/render_batch_probe.py",
+      "sha256": "9438afbdf78d7ef1e62a8b2e3b52448ba3980118832f8be4bb1a679504ac1ffe",
+      "bytes": 3989
+    },
+    {
+      "file": "tools/blenderctl/render_batch_release.py",
+      "sha256": "1cd74d77660122e538138f7ae5387427e3608d398a96f8d9dcea7f19fc3289a4",
+      "bytes": 66
+    },
+    {
+      "file": "tools/blenderctl/render_batch_request.py",
+      "sha256": "d937fdc1a76d063776d31b70575be6fdfbc9e8fe411e6b07b19b5fb7e6b70015",
+      "bytes": 3049
+    },
+    {
+      "file": "tools/blenderctl/render_batch_resources.py",
+      "sha256": "b99dc5ddb0f2d247b4e4a65eba3cca08693154715b6718ed2cd8bc5d96df2cea",
+      "bytes": 6151
     },
     {
       "file": "tools/blenderctl/render_contract.py",
-      "sha256": "7bb62a297b5dec81eba752cd15bede472d66e89636160c05479130ed8f6e0335",
-      "bytes": 6802
+      "sha256": "bb0bd14b8fbf69b6666d27fd0b886c81db6475890dcf847616e7a2c4895c1ff5",
+      "bytes": 9612
     },
     {
       "file": "tools/blenderctl/rendering.py",
-      "sha256": "d5a6ce63f30f1016ab06a16d50f126a6d1bae883ef9623ee01a80cd42107fbb5",
-      "bytes": 26713
+      "sha256": "b90dd468b228de40b99820ce8a1b19fae281fa1e846c0cbfa34d7232ef852118",
+      "bytes": 35406
     },
     {
       "file": "tools/blenderctl/resource_leases.py",
@@ -2107,23 +2872,23 @@
     },
     {
       "file": "tools/blenderctl/retopology.py",
-      "sha256": "11c9d4a03879c6517f0b80a78b1975f2d4fee646c2c48576f024eb4721169295",
-      "bytes": 9341
+      "sha256": "78060d3efa9c5f95f7bfba043587e93c9a36ead7e390fe315b47dea46261ae36",
+      "bytes": 27431
     },
     {
       "file": "tools/blenderctl/retopology_contract.py",
-      "sha256": "848abbed8e0c55e2f34ab8ec9057275c7420925803820403458a6467fa30e651",
-      "bytes": 1956
+      "sha256": "14946973ec8da7d998da9a42a5734966d8815d8885275a717894ec809a529f8d",
+      "bytes": 5863
     },
     {
       "file": "tools/blenderctl/review_contract.py",
-      "sha256": "8e071da5bc0a600f10f61958791134c0b71a8384340e06160d9b4c1528f69bd8",
-      "bytes": 3816
+      "sha256": "a0b351f18e8bec9d676cb90dee875e07d7836812e3d65e8ef154a20f0ef66a88",
+      "bytes": 3954
     },
     {
       "file": "tools/blenderctl/reviews.py",
-      "sha256": "02c4993e57c36c0802535a78616bfef30b13d3d38d41e660b117e77f63044dc0",
-      "bytes": 5514
+      "sha256": "1bfbdeb076ab280d23902515541975f1a96d5a88263855a9c64b85174e00faf0",
+      "bytes": 5636
     },
     {
       "file": "tools/blenderctl/rig_adapter_contract.py",
@@ -2146,6 +2911,16 @@
       "bytes": 18124
     },
     {
+      "file": "tools/blenderctl/rig_exchange_bridge.py",
+      "sha256": "42a1ab460e55fc726e180f08f25f67b8ec2d6db2f5b74c099a703834dd3f4d1e",
+      "bytes": 8068
+    },
+    {
+      "file": "tools/blenderctl/rig_mouth_evaluation.py",
+      "sha256": "5dce36613b0cc2771c565336ef89602e569b614e7fa222fded16e87027136481",
+      "bytes": 373
+    },
+    {
       "file": "tools/blenderctl/rig_package.py",
       "sha256": "90012da4b41a547095158d8ec9caaa50b50fdfae951fb2c76a3cffa0f40b6e84",
       "bytes": 6971
@@ -2166,24 +2941,49 @@
       "bytes": 1445
     },
     {
+      "file": "tools/blenderctl/rig_rc_pose.py",
+      "sha256": "7ce8c6f910841fb906bcb0d92c0c2ed3a0bab98b08384d9c59a30824587bff3d",
+      "bytes": 20987
+    },
+    {
       "file": "tools/blenderctl/rigging.py",
       "sha256": "848a81f6da39296adb5a02e4a0ec331750d31a9dc6ac392e268fb2ed7fa0c842",
       "bytes": 37341
     },
     {
+      "file": "tools/blenderctl/rigging_workflow_contract.py",
+      "sha256": "27c290f2e907af5ca94c0d0505dcf820531ad6b434f3ce99d1f8b552662ed8bc",
+      "bytes": 15061
+    },
+    {
+      "file": "tools/blenderctl/rigging_workflow_disk.py",
+      "sha256": "8d903f7220c69cb80cdfdc78db406d40e16d2a0ed0cd04db742b41f603982cca",
+      "bytes": 11773
+    },
+    {
+      "file": "tools/blenderctl/rigging_workflow_live_adapter.py",
+      "sha256": "310d7ea8930499e8f63364f60234905c5ceb4427cacfd90624f3f210d4e17ff5",
+      "bytes": 30983
+    },
+    {
+      "file": "tools/blenderctl/rigging_workflow_session.py",
+      "sha256": "e08958023259b95e9526a1d0e0c35509a77efb26c01c9af8d2baf7843e99cb0c",
+      "bytes": 5626
+    },
+    {
       "file": "tools/blenderctl/runner.py",
-      "sha256": "5be2569e72bc8e0ad91057f67b9684999d3efe889f3656915b618890dcf8c27f",
-      "bytes": 44297
+      "sha256": "6b0e1b41792831de77c5714ecb8ce846e01ffdc7102721585855593103d44b27",
+      "bytes": 65670
     },
     {
       "file": "tools/blenderctl/scene_contract.py",
-      "sha256": "f46c9f0cc38d9cedc2e68d6cb5e249e9930bbc11e34e33f2960438d166700208",
-      "bytes": 8660
+      "sha256": "2b4cffc6646a09fba7949b567b61ff5e80333d597848dd2173958d1597d47773",
+      "bytes": 9038
     },
     {
       "file": "tools/blenderctl/scenes.py",
-      "sha256": "bfafcc63b5bfb38bf2d956b05de300aa16d5a210c26a0a770e386d36fde7b833",
-      "bytes": 23453
+      "sha256": "1572ec9ce8437fdc2ba3bcbc45235ce3fbe1fd7b881ef9670c07c4f2221a16cb",
+      "bytes": 25319
     },
     {
       "file": "tools/blenderctl/script_isolation.py",
@@ -2202,8 +3002,8 @@
     },
     {
       "file": "tools/blenderctl/sculpt_review.py",
-      "sha256": "e2f7cc01a33c7460fa3ce399c694f61e03255d697e3f8ab8364e7a58f9586db1",
-      "bytes": 5577
+      "sha256": "b0e95e1a64a1618f8e1693b3ed29072e47c5cdb511ddbd4d18e55960054c1764",
+      "bytes": 8888
     },
     {
       "file": "tools/blenderctl/sculpt_state.py",
@@ -2216,14 +3016,19 @@
       "bytes": 11673
     },
     {
+      "file": "tools/blenderctl/selected_bundle_lease.py",
+      "sha256": "d3d0e43468705ad786aaece5a99a070dd7de0178817231b54514b7c85cc62079",
+      "bytes": 7686
+    },
+    {
       "file": "tools/blenderctl/simulation.py",
-      "sha256": "0e815b29d659dfd09d03026ef1f2aec2de228421682ae0c6d2cb280d7f0efb8e",
-      "bytes": 27163
+      "sha256": "baf3c36f67d92f354323e6a2f86c9e67a262412200f271bc99d24bcf573317a8",
+      "bytes": 27248
     },
     {
       "file": "tools/blenderctl/simulation_contract.py",
-      "sha256": "ab6be266b41a5b6d59d76eb58c83e505f513b4590c8a4004ef8c7c689eddc17d",
-      "bytes": 9560
+      "sha256": "b75e67e516281df063ce478ca2fc817d26ac724b1477c39ab5981c71949d2771",
+      "bytes": 9632
     },
     {
       "file": "tools/blenderctl/skin_exchange.py",
@@ -2236,14 +3041,394 @@
       "bytes": 8241
     },
     {
+      "file": "tools/blenderctl/source_render_settings.py",
+      "sha256": "6c03621e6b2aa65580ce7957cbda7602a17d0d924e2adbe1fd10869b2de1a0a0",
+      "bytes": 14229
+    },
+    {
       "file": "tools/blenderctl/telemetry.py",
       "sha256": "d705892949f28c13dfc91e20072989a7e7537aa77407c9e6fed1abe4554cf452",
       "bytes": 2578
     },
     {
       "file": "tools/blenderctl/timing.py",
-      "sha256": "5738b873aaa8f0852ba4f0af595e57dd79b6e92752311bbb403736a025e516df",
-      "bytes": 6936
+      "sha256": "958f25cd8fbcaab119180c5cbfc6e67ca7eda5d839cfa35a24897cbf7017ff8d",
+      "bytes": 6777
+    },
+    {
+      "file": "tools/blenderctl/toon_author_file_handoff.py",
+      "sha256": "dfd22da1428d787797c341e70c6ca18eaf7d8769b2f3aad1edbc101efc426642",
+      "bytes": 16159
+    },
+    {
+      "file": "tools/blenderctl/toon_author_graph_handoff.py",
+      "sha256": "4b2a5918ba6cbc44fd6b30fb4b44cb80a2e094c0d7c77022d5478c3e41a33ac9",
+      "bytes": 13768
+    },
+    {
+      "file": "tools/blenderctl/toon_author_helpers_handoff.py",
+      "sha256": "5c8465e039bfaebfea2090dd7258de7c29431fe365ff3a241d79224bbd45a027",
+      "bytes": 7120
+    },
+    {
+      "file": "tools/blenderctl/toon_brush_controls.py",
+      "sha256": "4a8c11d7ccf84b2ff02172eac323812b288caeda396c68572b1373f5649cd3be",
+      "bytes": 15279
+    },
+    {
+      "file": "tools/blenderctl/toon_brush_handoff.py",
+      "sha256": "4e96638ceda34c9afb9a7c299c1d1365b174eb488ab74cd02d03d10b5cee135d",
+      "bytes": 24453
+    },
+    {
+      "file": "tools/blenderctl/toon_cel_recipe.py",
+      "sha256": "920d0d800a77c798f307c75b77ebdf0a236e932c89a7863babf9612cc11fef8f",
+      "bytes": 32383
+    },
+    {
+      "file": "tools/blenderctl/toon_component_slot.py",
+      "sha256": "dcfa2b833c3cf1aa0a2040ce84fbc12cae99ab2e5db184c58728ec9d1289f7af",
+      "bytes": 25607
+    },
+    {
+      "file": "tools/blenderctl/toon_cpu_image_contract.py",
+      "sha256": "15760b88b54bba7d2c6348635db31b56c97f395f8d70000860ed8c55cf9ff67b",
+      "bytes": 6568
+    },
+    {
+      "file": "tools/blenderctl/toon_cpu_image_evidence.py",
+      "sha256": "827e541241dcf98d4cea8f8e4e13d286c09f85cb66aaa424b168a4d991165437",
+      "bytes": 18230
+    },
+    {
+      "file": "tools/blenderctl/toon_cpu_image_host.py",
+      "sha256": "91c2916235ee04bba76224e9296c2e5d922e4dce36dc546c15b38e751fa7ef7f",
+      "bytes": 28544
+    },
+    {
+      "file": "tools/blenderctl/toon_cpu_image_stage_worker.py",
+      "sha256": "135ea1aca6c6c90ceb71b84dbbcbe632070448363e81f257a05bfe0e5d859d9e",
+      "bytes": 3873
+    },
+    {
+      "file": "tools/blenderctl/toon_directional_author.py",
+      "sha256": "4df41af72fe211768a1fcd81b5c7f9a7e064fbaa6baf8af85ed4cc4553545b66",
+      "bytes": 22560
+    },
+    {
+      "file": "tools/blenderctl/toon_file_output.py",
+      "sha256": "e2b4a7b90547254cec28baae49a7fcb7850c06b1a4146fde4e00e74b8325d989",
+      "bytes": 23973
+    },
+    {
+      "file": "tools/blenderctl/toon_hair_map_handoff.py",
+      "sha256": "5f7af51837343bf54d6a4ebcea772e80a736130cef9b9ee67937c2de41f9f925",
+      "bytes": 3876
+    },
+    {
+      "file": "tools/blenderctl/toon_head_normal_handoff.py",
+      "sha256": "3a08c1072464f8b914aa2aafa89e82ec4d6e87ec3571015dff14f82b41b23250",
+      "bytes": 59923
+    },
+    {
+      "file": "tools/blenderctl/toon_host.py",
+      "sha256": "ad290aba82423c6ad6fa14470de6bbf4f00e4b7b8c9498ef48ee873f685e79a6",
+      "bytes": 12727
+    },
+    {
+      "file": "tools/blenderctl/toon_identity.py",
+      "sha256": "029e6f1fdd166dd7ea30d9f79d50f4dadf33053e0946bc9d025992439b0805ef",
+      "bytes": 2024
+    },
+    {
+      "file": "tools/blenderctl/toon_image_bundle_lease.py",
+      "sha256": "dde795d94e7b8237359de1a4e3d10ef4c89f486ee8773296a482477805779584",
+      "bytes": 17221
+    },
+    {
+      "file": "tools/blenderctl/toon_image_contract.py",
+      "sha256": "702f5cf771fdd10b6053db396efd27443e092eba6954749cb6e9f6560fd974a5",
+      "bytes": 10764
+    },
+    {
+      "file": "tools/blenderctl/toon_image_host.py",
+      "sha256": "e84315240a6a5c48f7bd765d7d67359a40ec8da409e04421ad61629cf2763554",
+      "bytes": 14966
+    },
+    {
+      "file": "tools/blenderctl/toon_image_inspect.py",
+      "sha256": "fbaa1ca91619dee8b58f80d05a7ab05014f4031ca882cb2152fb2f99c0a2534c",
+      "bytes": 25589
+    },
+    {
+      "file": "tools/blenderctl/toon_image_owned_stage.py",
+      "sha256": "89b8bc3df07d4970da08faf341cead3ceba78077302622d00adcc94222eaaf0a",
+      "bytes": 13816
+    },
+    {
+      "file": "tools/blenderctl/toon_image_prepared_run.py",
+      "sha256": "be27367368fff433d24c372523e1dab6849e02d124630461f5ed44fd0358ba68",
+      "bytes": 18905
+    },
+    {
+      "file": "tools/blenderctl/toon_image_public.py",
+      "sha256": "bf959157baf51e9bcdea5f73f18fe7e25a9584b9a73e42e130f734fec143eff8",
+      "bytes": 13431
+    },
+    {
+      "file": "tools/blenderctl/toon_image_saved_export.py",
+      "sha256": "d4cabb940085baefd525652049d0e5ce023d6da4d7bb3609d4a38e11f4e418c2",
+      "bytes": 3320
+    },
+    {
+      "file": "tools/blenderctl/toon_image_saved_intake.py",
+      "sha256": "766d614900c94a2f9729add5be58cbff12a08b55738f5d2279da18405470614b",
+      "bytes": 11186
+    },
+    {
+      "file": "tools/blenderctl/toon_image_stage_worker.py",
+      "sha256": "8347d294390d7fcbf402cffad8cdc182629b01ebbeb27491beaacc09774abfa5",
+      "bytes": 2907
+    },
+    {
+      "file": "tools/blenderctl/toon_interface.py",
+      "sha256": "2efa3b260dbb8b1e194e0854c19ee1b0d9fe199fcfbee0f4592185466e55fc5b",
+      "bytes": 6672
+    },
+    {
+      "file": "tools/blenderctl/toon_lighting_author.py",
+      "sha256": "0a5f3da23403c42e2874f0c920b9a8218040ec5ece285efc3fa72e6d6139e1ef",
+      "bytes": 83458
+    },
+    {
+      "file": "tools/blenderctl/toon_omni_handoff.py",
+      "sha256": "b47953d6d648e1dec723cfe08e6a4feee3b6f7f98cfc112d07a542647a145160",
+      "bytes": 15210
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_contract.py",
+      "sha256": "ec152ee54503b700e2aaa908264bef1f6ca1057d680055e0dbe69638210224d2",
+      "bytes": 10700
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_evidence.py",
+      "sha256": "d55563c2855bc2feb175c22526ce14eb20414cfa0bc1955ad70fc2233894c07e",
+      "bytes": 9859
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_host.py",
+      "sha256": "a18667d3b1e23a57b1ffb05c56fea82e9b3ee4eccb2815da1d734ae7ba725578",
+      "bytes": 12437
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_inspect.py",
+      "sha256": "5ed9e6f00a21571522bbb91e0f1ee22a5bbee872df4dbd09d4ed6a5b998ddf16",
+      "bytes": 15000
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_prepared_run.py",
+      "sha256": "0fff0e6a83c1d708273eeb6d58ea8d3bb8ad4ef427219b1ff566d2c8c741b803",
+      "bytes": 21376
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_saved_export.py",
+      "sha256": "10135df48bc0b11fa5f36616745198b5a47c85858605a2d8180fd391b8d40848",
+      "bytes": 9083
+    },
+    {
+      "file": "tools/blenderctl/toon_painted_image_stage_worker.py",
+      "sha256": "bff958e52b508b617380d317a2fcb51ad889e4a5a7d6499335a53e88a13ca232",
+      "bytes": 2724
+    },
+    {
+      "file": "tools/blenderctl/toon_panel_handoff.py",
+      "sha256": "980856d2b8e492a558798c3d79bb33630a7f1c7729a23f99607515161870e2b7",
+      "bytes": 38260
+    },
+    {
+      "file": "tools/blenderctl/toon_pencil_dialog_bindings.py",
+      "sha256": "682d7b1be3dfa10695ee2c7fdbb531c36b6eca494069713c4ead59521843ee86",
+      "bytes": 5875
+    },
+    {
+      "file": "tools/blenderctl/toon_phase_worker.py",
+      "sha256": "6219b7383bfe000841f2cfc5ea93755ccc3acf1fedb2451768a2db06a356abaa",
+      "bytes": 3440
+    },
+    {
+      "file": "tools/blenderctl/toon_route.py",
+      "sha256": "ddb55c1b3f181ec5af7386b486290f1695423a3602cdcc08f1ff156bf68d37f1",
+      "bytes": 1112
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_export_contract.py",
+      "sha256": "63d90e30e14a548c95c311e05f899e42f89ef8df6d9552bfa0cd283fec7cfe0a",
+      "bytes": 7407
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_image_contract.py",
+      "sha256": "a227e2c67b5a6f2dc2d4706810642e04121ae99efb8e35051924c85e6ac63352",
+      "bytes": 8778
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_image_evidence.py",
+      "sha256": "4466c4eb21a9d4bad2479056678907102b43498d375c6c35ed077028a4bbc06b",
+      "bytes": 6802
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_image_host.py",
+      "sha256": "ba01b73dd83411ed974a4679b14cd3bdb61c205b88dcfac6c29f514adb4eb924",
+      "bytes": 12418
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_image_inspect.py",
+      "sha256": "fb1c3fecc374f6f3c8fadbaaa22d41ee7b6bbf418a1bcb41840947e09822a22e",
+      "bytes": 32856
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_image_prepared_run.py",
+      "sha256": "9795fab585561b0968deec92c91c75afdf2f02ff57d02f843b9f176e2a73edf5",
+      "bytes": 26953
+    },
+    {
+      "file": "tools/blenderctl/toon_selected_image_saved_export.py",
+      "sha256": "be0137edb26cc0db5f478bc82fec3832b5a2285df31eb512dfe95b417bae4e7d",
+      "bytes": 4870
+    },
+    {
+      "file": "tools/blenderctl/toon_selector_picker_handoff.py",
+      "sha256": "656372d7247e99567f24e74c6e201effea51038d1e0465d607fb476fbf21ee8d",
+      "bytes": 3784
+    },
+    {
+      "file": "tools/blenderctl/toon_shot_look.py",
+      "sha256": "26e32d50c5723adf9bc8cc90ff5fbed39378909a171f94ac50247c55b761c461",
+      "bytes": 11707
+    },
+    {
+      "file": "tools/blenderctl/toon_template_contract.py",
+      "sha256": "20868645fcba0d17905569e78d72b03b58c99abe1930d6a2e96b30fe485ff3cb",
+      "bytes": 6431
+    },
+    {
+      "file": "tools/blenderctl/toon_templates.py",
+      "sha256": "ed505bafbaf48e827c27f323f91b01e9be5d0f8604c354d96b37871130d8dc13",
+      "bytes": 7683
+    },
+    {
+      "file": "tools/blenderctl/toon_templates_host.py",
+      "sha256": "424fa3274b0bf7a15be0b8748dbe4b2fbd710df5226304d9cb6d5f7d47db81ef",
+      "bytes": 10265
+    },
+    {
+      "file": "tools/blenderctl/toon_vector_output_handoff.py",
+      "sha256": "b1bfee07898b606dfd40e439a3e60989d427f428782d4d864b42c15438e0b1be",
+      "bytes": 23663
+    },
+    {
+      "file": "tools/blenderctl/toon_verifier.py",
+      "sha256": "a03078d07b20ee2cc4b26b32b0cc0bf6d022926c3ced82e67404617ca7708a74",
+      "bytes": 27583
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_brush_session.py",
+      "sha256": "224ec53534a886204ccfd5b4deea5032da3f8b342dc9e0593f402239f068d49d",
+      "bytes": 22777
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_edge_settings.py",
+      "sha256": "20102f1cd0332974d3ef921a2d51add82a726eb9142978a3143048f9a7f33c0b",
+      "bytes": 17939
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_line_group_lifecycle.py",
+      "sha256": "3628c4f3d0caad180de616df65de61c1bdc17f63468487b8118755ead13bdda3",
+      "bytes": 11482
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_line_groups.py",
+      "sha256": "f945f77d313531ecdbaad4e407eb0c44af3d50c1c70dbb554da554e62ae223b6",
+      "bytes": 13222
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_line_hierarchy.py",
+      "sha256": "c893cd818d8236d652f6deb20e446c94e2455135040633c17242a1da9e193630",
+      "bytes": 10721
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_line_material.py",
+      "sha256": "cffc07e72c50acd2a77d2bfd1eca5373afc9497a398fb558258941c110235c13",
+      "bytes": 14092
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_line_template.py",
+      "sha256": "f01c2657b8fa92637df8405eed9348bd3dda0dadaccc8d0fd3f88842d39436e5",
+      "bytes": 12769
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_line_visibility.py",
+      "sha256": "3ae0bd78bc99849ff96f0352b093a1e2052e87ca29b2014d3b37c5236eec214f",
+      "bytes": 10171
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_lines.py",
+      "sha256": "edc85ed3611148be933fae5034e2be3fec4420893c063b7d4187adfea78eebcb",
+      "bytes": 89758
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_lines_contract.py",
+      "sha256": "669cee6d84df14247fdd6ed66710f149c04032c7ba250fc29537f4f3eb0ccc07",
+      "bytes": 19426
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_scene_controls.py",
+      "sha256": "061b443e9879f33a3f86d4ac0234943805a23428ee59a5ba3bd6d9f39317dc90",
+      "bytes": 9681
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_session.py",
+      "sha256": "f8f2e35696a5e43f0374008e556c05146716af107b0572f1b94a8539fddba924",
+      "bytes": 23178
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_shadow_session.py",
+      "sha256": "24bf13ffb72995314e3db079b911c9498da8959eec13204cfbcf4aba3c447a0b",
+      "bytes": 8290
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_style_family.py",
+      "sha256": "84a66fc8d0b2986046da7dd0402168c64852d33aee7cee4194bc44ae23f8b9d1",
+      "bytes": 20599
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_style_library.py",
+      "sha256": "5025e859de997d0753b922aaca6eaa3e9c28bef9fa5f580bd99f0a8e035589a3",
+      "bytes": 13815
+    },
+    {
+      "file": "tools/blenderctl/toon_viewport_style_pair.py",
+      "sha256": "0e92464dd82a81a385df3456aa2379e631ef6e97fb56539014a22bc236a4d873",
+      "bytes": 8858
+    },
+    {
+      "file": "tools/blenderctl/toon_workbench_correction.py",
+      "sha256": "3e0cac71560ee20cf33572f33283b3e3cf3fe86108072583af0a78630f1a7c81",
+      "bytes": 13219
+    },
+    {
+      "file": "tools/blenderctl/toon_workbench_jobs_handoff.py",
+      "sha256": "5f8b5534c9e0b46383892d6bebf19f3908437f6c35abee81435b1e4da9bc2665",
+      "bytes": 24558
+    },
+    {
+      "file": "tools/blenderctl/toon_workflow.py",
+      "sha256": "6218093c4b8b0161cd42f5845b14390d15ec03512fac5b8cbe95563ca930aa7a",
+      "bytes": 26794
+    },
+    {
+      "file": "tools/blenderctl/toon_workflow_contract.py",
+      "sha256": "06ba7402156bfb2c8b5c26a1b2f4657c875b79e0fecbc538133c9ff69d15d2dc",
+      "bytes": 2497
     },
     {
       "file": "tools/blenderctl/tracking.py",
@@ -2272,13 +3457,33 @@
     },
     {
       "file": "tools/blenderctl/transactions.py",
-      "sha256": "c411c2ea8c14853b6dac984bc10b40ea13b6fdf55805815483a0c7125b0274d0",
-      "bytes": 36002
+      "sha256": "6a9cd9086ddfc4e699e8662e24f74aa03422bb921d28301ce3f29bc8c0ccfda3",
+      "bytes": 38353
     },
     {
       "file": "tools/blenderctl/typed_dependencies.py",
-      "sha256": "b3147afa940771961ef944211230bb0275207620cf0b799088156a3d4dc80757",
-      "bytes": 17264
+      "sha256": "060d032427324ac79ec3100c38d4bfabb5baa0312fde1188d5107954d6a1f579",
+      "bytes": 17473
+    },
+    {
+      "file": "tools/blenderctl/uv_batch.py",
+      "sha256": "491e54234bee01599139d39f3da7c81a0180a1652990189f8fc53eea1dff0103",
+      "bytes": 17881
+    },
+    {
+      "file": "tools/blenderctl/uv_capture.py",
+      "sha256": "78c403b32517d94ae37cc58c76714c1c89c466f724a9eb127801aa318f5bf692",
+      "bytes": 15879
+    },
+    {
+      "file": "tools/blenderctl/uv_checker_preview.py",
+      "sha256": "cbad6088070e5a351ffe9079796c10e132d1508aee42a506a76b4be0f8a68d8c",
+      "bytes": 13592
+    },
+    {
+      "file": "tools/blenderctl/uv_constraint_capture.py",
+      "sha256": "acf590933ce463d366145dfa2046a16df288b953f461ca218fb8949bec6e4335",
+      "bytes": 7933
     },
     {
       "file": "tools/blenderctl/uv_contract.py",
@@ -2286,9 +3491,69 @@
       "bytes": 2504
     },
     {
+      "file": "tools/blenderctl/uv_grid_transfer.py",
+      "sha256": "21be0ca36dcf512e3ee69931e057b0b0e1dc4237a8839f196e37c9effdf44613",
+      "bytes": 14597
+    },
+    {
+      "file": "tools/blenderctl/uv_grid_transfer_contract.py",
+      "sha256": "25a9109b3600bef55b597a70886050e54e6253c39e45f7bc83f07392aa6a954d",
+      "bytes": 6140
+    },
+    {
+      "file": "tools/blenderctl/uv_job_progress.py",
+      "sha256": "329d0a587affa2de0c6ae8b237ebcdd83574bf963f01c9365b208b389d0e4efb",
+      "bytes": 6412
+    },
+    {
       "file": "tools/blenderctl/uv_layout.py",
       "sha256": "eab105932f3141bc93c36dec555caabe04c76e5be7e1bb656421e7b94ef1618a",
       "bytes": 18482
+    },
+    {
+      "file": "tools/blenderctl/uv_policy_file.py",
+      "sha256": "f74890b4decade1c2aeeee828fb8f9e1c0a1cc37007a32521d9cc3bf757f4bd8",
+      "bytes": 10360
+    },
+    {
+      "file": "tools/blenderctl/uv_resources.py",
+      "sha256": "85180c5e0f4b721bbef8a940f361808b307dcaa1fc27d02ca9add62087cbb993",
+      "bytes": 5095
+    },
+    {
+      "file": "tools/blenderctl/uv_saved_protection.py",
+      "sha256": "7ce821931b93dd8bdfcefcee194c490ccdebbdc05f7ecb877d807bb7db1dd0fe",
+      "bytes": 2571
+    },
+    {
+      "file": "tools/blenderctl/uv_saved_reader.py",
+      "sha256": "64d6ccb335d20431abf869f785ae26e14b4b3811d0bf9e2a149483801b5dfe91",
+      "bytes": 2668
+    },
+    {
+      "file": "tools/blenderctl/uv_surface_report_handoff.py",
+      "sha256": "2a0e8627a838fe36ed8d56dd65547123dc2b382f2399d1affdef00051c0ab56b",
+      "bytes": 11218
+    },
+    {
+      "file": "tools/blenderctl/uv_transfer_handoff.py",
+      "sha256": "6f626f1f660781d1808ce170b579fe45ae6ad5249c021fd95c88d609457761aa",
+      "bytes": 24421
+    },
+    {
+      "file": "tools/blenderctl/uv_verifier.py",
+      "sha256": "79125c8ff86d988fd3b99ad1f746bacdb6a852ceee503b87e72843064d57e944",
+      "bytes": 3430
+    },
+    {
+      "file": "tools/blenderctl/uv_workflow.py",
+      "sha256": "a5580f261bbe02891d0f4231d50aa977031e198d2df24921efd603e8800e235c",
+      "bytes": 23979
+    },
+    {
+      "file": "tools/blenderctl/uv_workflow_contract.py",
+      "sha256": "31dd3907ea3f8fb0edf45c92c9dbde9f443acdb62e47f432b866fc0b8cc60ab9",
+      "bytes": 21799
     },
     {
       "file": "tools/blenderctl/verification.py",
@@ -2301,6 +3566,11 @@
       "bytes": 5862
     },
     {
+      "file": "tools/blenderctl/video_dispatch.py",
+      "sha256": "ebe8e333c8a6187b2b47c93b26311d920c4665a7705b219cc00bf12609280b46",
+      "bytes": 9394
+    },
+    {
       "file": "tools/blenderctl/video_hdr.py",
       "sha256": "d1342e4512cbb7294759604ff61939cb03866a0b58aea3f51cbb6459ac8841bd",
       "bytes": 24610
@@ -2311,9 +3581,24 @@
       "bytes": 864
     },
     {
+      "file": "tools/blenderctl/video_integrated.py",
+      "sha256": "b07a6ac3bdc4eacaeb4c84ca3e90b93b206a80b20e2359f3f29fc7ffe2d16b95",
+      "bytes": 2338
+    },
+    {
       "file": "tools/blenderctl/video_interface.py",
-      "sha256": "415ead882c9cc3d576268bbe8f3d51c4a2bb4cc183a4ee83174154388ed735b3",
-      "bytes": 5327
+      "sha256": "9e772464950cc6dcd89a40cfd94e84187acc95dc757fb1f5b593d5e2f88a8805",
+      "bytes": 5414
+    },
+    {
+      "file": "tools/blenderctl/video_live_inspect.py",
+      "sha256": "3ea6bad2b7780cdc1962e41cb18f1ef244b81fd6863e8cc610a5c0672fa7993a",
+      "bytes": 10943
+    },
+    {
+      "file": "tools/blenderctl/video_master_audio.py",
+      "sha256": "9437b11c7d3b8f72a4885dfb5b1df8a6cbfccc2eea82303733bc05c86a627c3e",
+      "bytes": 7568
     },
     {
       "file": "tools/blenderctl/video_media.py",
@@ -2332,13 +3617,13 @@
     },
     {
       "file": "tools/blenderctl/video_verifier.py",
-      "sha256": "9a07da4a323f84c12212c1ad3d11c1d37948d025dd65b9f03927234ce3249e5b",
-      "bytes": 4593
+      "sha256": "fce01e67fb9eeff79133d2e51c8bf56842d729c1a264731925dd4cb0d4c08d63",
+      "bytes": 4626
     },
     {
       "file": "tools/blenderctl/video_workflow.py",
-      "sha256": "d45efe70949ac650e1008a260cab5988fe25cc0f402ecf16567e961b58a075c9",
-      "bytes": 16100
+      "sha256": "d0a443f600612c7bb9ba5936a0630bbe650b628a4429f87bc96d8acdda95ae41",
+      "bytes": 16657
     },
     {
       "file": "tools/blenderctl/video_workflow_contract.py",
@@ -2362,18 +3647,23 @@
     },
     {
       "file": "tools/blenderctl/worker.py",
-      "sha256": "e743d6758fcc2ad797fff76e566bde6241849d4bdc8526fc688430ae55d835c3",
-      "bytes": 18077
+      "sha256": "d13c3e044eb04dcc58440cfb871144185f149af4ed8db87a111074a82ab8ab36",
+      "bytes": 21944
     },
     {
       "file": "tools/blenderctl/workflow_contract.py",
-      "sha256": "2e4c1c0308608be996adcec88b4271612b3a72838f44ed26fd0fe67f7cfc7a84",
-      "bytes": 2452
+      "sha256": "b9714d192be59d7f04b11218b51d08af3084d69a3035b662d39ae8d656120941",
+      "bytes": 2415
+    },
+    {
+      "file": "tools/blenderctl/workflow_discovery.py",
+      "sha256": "66bf3d936ab3a7d956ce42203aa5b66aeb4373f37518c31ae1e31df67b231993",
+      "bytes": 27144
     },
     {
       "file": "tools/blenderctl/workflow_evidence.py",
-      "sha256": "40e028a3be718336d514e039740c89389701590297feb6dc746257df37c2e21f",
-      "bytes": 6741
+      "sha256": "92ad47b1dd5fb3ac0a8cf8a0c04e26bca582b5305e0985c179e1f34d6a3f8b39",
+      "bytes": 7340
     },
     {
       "file": "tools/blenderctl/workflow_identity.py",
@@ -2382,8 +3672,8 @@
     },
     {
       "file": "tools/blenderctl/workflow_preflight.py",
-      "sha256": "f057f7d9622e5d57b3159f04d91eae693af2105a214b82e6a7e7152737f582ac",
-      "bytes": 9795
+      "sha256": "12f16bfc72855271ae6dba19739e1ee10d6776c143db554ad4e4a2317dca6d96",
+      "bytes": 9636
     },
     {
       "file": "tools/blenderctl/workflow_runtime.py",
@@ -2412,63 +3702,323 @@
     },
     {
       "file": "tools/compositing_workflow_addon/__init__.py",
-      "sha256": "d9b318495d7edd2cf668b980acf472e34254f191c3b184886daeef364fffc9a2",
-      "bytes": 464
+      "sha256": "813e8efa899edbf82f69a90b0770a1c62d45b60b8caab1037adc69a4f5527683",
+      "bytes": 544
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/__init__.py",
+      "sha256": "45817192185bb89c37e55f05172d3a069dcea26815f0619c796aea1141dbb305",
+      "bytes": 1441
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/hud_overlay.py",
+      "sha256": "5c8c441cfe6b5486c458ed8787530ba43a7713f2323787c5f8ccb774e36fbebb",
+      "bytes": 10895
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons.py",
+      "sha256": "b0e9ff36dda9a13d932dbe84e0fbbd7f1ab7ed4b019483a5b7a75d3be1e95be2",
+      "bytes": 3111
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/brand_compositing_32.png",
+      "sha256": "9ab0bf85919b0b1b67a3eeddad50d5a57520a04ef7a2972984243213a73f7216",
+      "bytes": 2253
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/brand_compositing_64.png",
+      "sha256": "a2eb130c3a01b7943e56f42b23b8b8008846a0f632a2a8a8140ae9afa810c2ab",
+      "bytes": 6368
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/compositing_crypto_cdl_32.png",
+      "sha256": "a0b189eed9452f313b40c79db4986660e0d9e1e8a111a6f37c2b4180c3ffa5bd",
+      "bytes": 902
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/compositing_light_mix_32.png",
+      "sha256": "943f163e5e241eca70635e2e4af38ec92bae8c94b5c8ba387552604e14fbf7fb",
+      "bytes": 319
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/compositing_relight_preview_32.png",
+      "sha256": "a790df9afacb54b794ccd8aa1e70f3b4dfc42bd81887197d64428feb17b114f5",
+      "bytes": 477
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/compositing_scene_effects_32.png",
+      "sha256": "d097bab9914c97f1d927dd0d47a109412d25166b3ddd9a5af46644e5f348bcf7",
+      "bytes": 407
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/status_error_32.png",
+      "sha256": "0a9a87ad97c82a9729b59079ce67fbe3166611738619e4d4ec9ab70ba3132752",
+      "bytes": 704
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/status_info_32.png",
+      "sha256": "57e4325f1f045ac8414d00d308462d982d2c3571284f135ec72b234d4cf31149",
+      "bytes": 698
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/status_ok_32.png",
+      "sha256": "6af6193c52c8b4c2df5f9dbf38ed43d5680ce3ca567626ec10d7d9689074304c",
+      "bytes": 824
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/status_running_32.png",
+      "sha256": "f1c5d82ed8f87d8859c14da5d1b8f137801ae873f8b37b6ad52119645fe897cb",
+      "bytes": 821
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/status_safe_32.png",
+      "sha256": "a79fc1d8e65fdb0985b6397254e00323112905cbe4c56eda782c842b10d8dece",
+      "bytes": 723
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/icons/status_warn_32.png",
+      "sha256": "b0dd7fbf27eeffc90e31136b681193eae447a3da6f30dc2233dbbda0355d9e51",
+      "bytes": 577
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/job_runner.py",
+      "sha256": "c6444283c0db59297b051f7e2742b8cec4f2065eac37befa70ef1ecf1e3ed6e4",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/layout_kit.py",
+      "sha256": "8667077d9f6724a3f546fddf7a3e9b30dd867d8c5e91d92a3b7762760b7ea635",
+      "bytes": 8427
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/sidebar_dock.py",
+      "sha256": "2f7828bb48be41983dc75b32c60495fcf840b05b51484feea5e0970dc0266572",
+      "bytes": 25879
+    },
+    {
+      "file": "tools/compositing_workflow_addon/_ui_kit/theme_tokens.py",
+      "sha256": "2d3035966030d949629190a54c4a7eb60705487409bd6f31bd0652b976905900",
+      "bytes": 11791
     },
     {
       "file": "tools/compositing_workflow_addon/blender_manifest.toml",
-      "sha256": "14f9ae21085ce6a62e960df3ff5605c55ba0e88719e1b9142bb0f2c67746b66b",
+      "sha256": "75e4f66871d0170cf54dc3f16f90e9ed052f8c0f4f5bec5709575092a20e071c",
       "bytes": 286
     },
     {
+      "file": "tools/compositing_workflow_addon/c5.py",
+      "sha256": "da280d36838ca813eb4869f9173efed4f08c8567093302763e646db9a1333bfc",
+      "bytes": 8335
+    },
+    {
+      "file": "tools/compositing_workflow_addon/c5_ocio.py",
+      "sha256": "e94a70068a204f292f542321bd88075967acf6e61ae060ef743a04ddf3b93d4a",
+      "bytes": 3002
+    },
+    {
       "file": "tools/compositing_workflow_addon/contract.py",
-      "sha256": "1b51b7bef6aa4a02a2f05e5d28236d9de30e0e9c0c2fcc3d47c9a1d91899b80b",
-      "bytes": 40488
+      "sha256": "8408f42f109a79a46f9a46a202ffb81655c5934d62f31fff87801f10d4b3beb4",
+      "bytes": 41717
     },
     {
       "file": "tools/compositing_workflow_addon/core.py",
-      "sha256": "b554cc1c33f976c7686d3be4fd00a1bd7b49ed898884ef911bbaa579dc06f53f",
-      "bytes": 94158
+      "sha256": "61855fb20a5884c77be60b27a7afae74c8aed595edc1a89d477e54969273187a",
+      "bytes": 97306
+    },
+    {
+      "file": "tools/compositing_workflow_addon/depth_contract.py",
+      "sha256": "fa0b1b7bdeb96533a523181972e42dcecf4dcbf26030b55e008c5fa0c7e472cc",
+      "bytes": 16460
+    },
+    {
+      "file": "tools/compositing_workflow_addon/depth_estimate_contract.py",
+      "sha256": "730163fb09abb055e5f7f12eb76c1d6c79c6d13dd34ffdf2262ba3f91014a436",
+      "bytes": 7312
+    },
+    {
+      "file": "tools/compositing_workflow_addon/depth_math.py",
+      "sha256": "93ea6367c428c8afee171a2169d738e17413bd2e5597c4b18add150f74492a3d",
+      "bytes": 20633
+    },
+    {
+      "file": "tools/compositing_workflow_addon/host_compat.py",
+      "sha256": "ffc9c2ae9abf3aeaccf97be9730f5e1ca82a64748acb2827d3971a44f70f17b9",
+      "bytes": 587
     },
     {
       "file": "tools/compositing_workflow_addon/movie_contract.py",
-      "sha256": "46ea7b1159541c268a79c103a85505d1839fd4c572e867074870269b52e60172",
-      "bytes": 11711
+      "sha256": "dce6a7f0516e091c62c3e3ef5208677888a45ea71e2c25dc66c749808e236f46",
+      "bytes": 11540
+    },
+    {
+      "file": "tools/compositing_workflow_addon/relight_launch_worker.py",
+      "sha256": "c2002208da63a355f37a428acac73eaa56ef32cd12449a68ab2331c77257f754",
+      "bytes": 9707
+    },
+    {
+      "file": "tools/compositing_workflow_addon/relight_preview_ui.py",
+      "sha256": "9ac31477780d6f915b70cefa906755b15a22715bb166200529086c1393ac79d9",
+      "bytes": 84111
     },
     {
       "file": "tools/compositing_workflow_addon/runtime.py",
-      "sha256": "7adc8f71c4b65df99f9310a78c6df2e762b93a676f2e3217f0ee378fe7328791",
-      "bytes": 265
+      "sha256": "7211d30570d3abc9d648dbe34badd74b956dc1368ccc217fcb6ef67f6ced5761",
+      "bytes": 157
+    },
+    {
+      "file": "tools/compositing_workflow_addon/scene_effects.py",
+      "sha256": "6a74fe699d6a4e56525ba23c6df7846c1f1992b6f67f1c0b5ad9fcf47ea93097",
+      "bytes": 26969
+    },
+    {
+      "file": "tools/compositing_workflow_addon/workbench.py",
+      "sha256": "da4a52fca4f2550e0299e2ef1707b65eccfaa612307afe61296a80c8703113a3",
+      "bytes": 21475
+    },
+    {
+      "file": "tools/compositing_workflow_addon/workbench_render_worker.py",
+      "sha256": "531a96bf3ae2ab93f517a1ba45c8abced1d628f0a161eaa5da300ccb5d850529",
+      "bytes": 2047
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/__init__.py",
-      "sha256": "dbd2930497290e9e5d294674f7704d46b8c784b9e8e483493515c83e8f05e5f9",
-      "bytes": 545
+      "sha256": "d909b69d58b10987e17218e7ae1e0b24f95b645ff0f7bfe3597e61d111d772f8",
+      "bytes": 549
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/__init__.py",
+      "sha256": "45817192185bb89c37e55f05172d3a069dcea26815f0619c796aea1141dbb305",
+      "bytes": 1441
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/hud_overlay.py",
+      "sha256": "5c8c441cfe6b5486c458ed8787530ba43a7713f2323787c5f8ccb774e36fbebb",
+      "bytes": 10895
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons.py",
+      "sha256": "b0e9ff36dda9a13d932dbe84e0fbbd7f1ab7ed4b019483a5b7a75d3be1e95be2",
+      "bytes": 3111
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/brand_geometry_32.png",
+      "sha256": "4927c854782e640a80466dbad166b302daf07e46650d9fb5c935f30ebe0b5821",
+      "bytes": 2210
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/brand_geometry_64.png",
+      "sha256": "6e6290696d6978181a8c0a99679f6c116548b200caa135c8c076dff12f1b6f8a",
+      "bytes": 6129
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/geometry_bake_cache_32.png",
+      "sha256": "41c58b19069b42c0d5ea5343c2cc7298805b85c7a8aac07a80b0b2c4ade5a1e4",
+      "bytes": 703
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/geometry_biome_scatter_32.png",
+      "sha256": "5105cedbc9c7510019d72dc7f85edf9d4b11fa8ac5f5135931357e31fd1352ab",
+      "bytes": 705
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/geometry_hair_curves_32.png",
+      "sha256": "b1a1b0e9ef223ec9c8f17aa7ab19bc285d651be38f4e8e648b4ab240c40ef19a",
+      "bytes": 746
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/geometry_node_params_32.png",
+      "sha256": "c979c8c9b75a3d29d4924d536627b744c4d643656fdbe06fe534156e5059b33c",
+      "bytes": 410
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/status_error_32.png",
+      "sha256": "0a9a87ad97c82a9729b59079ce67fbe3166611738619e4d4ec9ab70ba3132752",
+      "bytes": 704
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/status_info_32.png",
+      "sha256": "57e4325f1f045ac8414d00d308462d982d2c3571284f135ec72b234d4cf31149",
+      "bytes": 698
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/status_ok_32.png",
+      "sha256": "6af6193c52c8b4c2df5f9dbf38ed43d5680ce3ca567626ec10d7d9689074304c",
+      "bytes": 824
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/status_running_32.png",
+      "sha256": "f1c5d82ed8f87d8859c14da5d1b8f137801ae873f8b37b6ad52119645fe897cb",
+      "bytes": 821
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/status_safe_32.png",
+      "sha256": "a79fc1d8e65fdb0985b6397254e00323112905cbe4c56eda782c842b10d8dece",
+      "bytes": 723
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/icons/status_warn_32.png",
+      "sha256": "b0dd7fbf27eeffc90e31136b681193eae447a3da6f30dc2233dbbda0355d9e51",
+      "bytes": 577
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/job_runner.py",
+      "sha256": "c6444283c0db59297b051f7e2742b8cec4f2065eac37befa70ef1ecf1e3ed6e4",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/layout_kit.py",
+      "sha256": "8667077d9f6724a3f546fddf7a3e9b30dd867d8c5e91d92a3b7762760b7ea635",
+      "bytes": 8427
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/sidebar_dock.py",
+      "sha256": "2f7828bb48be41983dc75b32c60495fcf840b05b51484feea5e0970dc0266572",
+      "bytes": 25879
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/_ui_kit/theme_tokens.py",
+      "sha256": "2d3035966030d949629190a54c4a7eb60705487409bd6f31bd0652b976905900",
+      "bytes": 11791
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/artist_recipes.py",
+      "sha256": "e06c302e2f8787c4d1ce12ea2efb2ab256a1a8a59a452921ecbbf3dd69ec4515",
+      "bytes": 4704
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/blender_manifest.toml",
-      "sha256": "8756dafda4f7367d15f5338ee7ac62f068b6d9c3bf64777b08e54d445070e2d7",
-      "bytes": 364
+      "sha256": "97864fd38917e94f2e070a5a6c6e238855b6b48b3fbcf6fc312a9e0c5b035d7e",
+      "bytes": 369
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/cache_worker.py",
+      "sha256": "4857da1809554e1245d43c95b60fde3b35732c81ba9df09b5ccda37d79503f33",
+      "bytes": 4574
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/contract.py",
-      "sha256": "e2c040e5dc26b0b85a97001cfee5d392b0d9a547590143caed02653f2cb4f85a",
-      "bytes": 25122
+      "sha256": "02c8a5f2109c42e7c45663cfa438804304b0bfd655a279f8cfd1425b0cea234b",
+      "bytes": 27659
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/core.py",
-      "sha256": "35e3ccb2fbabb13b7be10baad8738ac77af67a3fa7a18937234253c949f6470f",
-      "bytes": 45306
+      "sha256": "e7c6b8da9459713084a190e9835857ace1476aa57f751a09f88f3a7906a973a8",
+      "bytes": 52602
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/inspection.py",
-      "sha256": "5f3ce81d7a4f40bdf5350559e10e2e49e6f59348b5f354b84f73187eb5c45e7d",
-      "bytes": 30254
+      "sha256": "91d7e0bd550ddc7fd30bf1cb49a0cbab6db4fb7f204fbf55a82e3882ebe8d950",
+      "bytes": 36553
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/recipes.py",
-      "sha256": "d66733930ab900c66fb9fca0dd8ad3de8d273814d606eabc8476af71f1982dbb",
-      "bytes": 13716
+      "sha256": "208c16a2fd360725bf7c6157376798cbca8c1a76049d00896d8c217959ab7405",
+      "bytes": 23709
+    },
+    {
+      "file": "tools/geometry_nodes_workflow_addon/render_inspection.py",
+      "sha256": "c31b39b31536e47ce626feb1b37c1291f5b7cf00dfc7f7351bb0bb0a733b437b",
+      "bytes": 3643
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/session.py",
@@ -2477,33 +4027,168 @@
     },
     {
       "file": "tools/geometry_nodes_workflow_addon/ui.py",
-      "sha256": "a97ddb23158a2166700462f27089df81f4d467d149b64c4d08e7b5a687ccccfe",
-      "bytes": 3377
+      "sha256": "115f1d456e133b1a061f7a8bcb2c8746401375baf9f389667feb1ffd39f25a5f",
+      "bytes": 25419
+    },
+    {
+      "file": "tools/install_blender53_gui_suite.ps1",
+      "sha256": "79534b27bc2930b8ffcb6da31c2b2035fe63fdef571cc0869eaa67e80f9b41b4",
+      "bytes": 3092
     },
     {
       "file": "tools/lighting_workflow_addon/__init__.py",
-      "sha256": "09e725d3e52d09fff202a2a13567fdc0b97f525c99a5f2b9b19faa6e4a5dfa8f",
-      "bytes": 486
+      "sha256": "370a4cd7ab71f0fdb914fa6c6f1afcee642e4404b2bc02f3bc35ffe8c8d9e1fc",
+      "bytes": 575
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/__init__.py",
+      "sha256": "45817192185bb89c37e55f05172d3a069dcea26815f0619c796aea1141dbb305",
+      "bytes": 1441
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/hud_overlay.py",
+      "sha256": "5c8c441cfe6b5486c458ed8787530ba43a7713f2323787c5f8ccb774e36fbebb",
+      "bytes": 10895
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons.py",
+      "sha256": "b0e9ff36dda9a13d932dbe84e0fbbd7f1ab7ed4b019483a5b7a75d3be1e95be2",
+      "bytes": 3111
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/brand_lighting_32.png",
+      "sha256": "73763e221a1940be5231b5d4261bc9b7f1badfcf4ec3021bb29f3523cbcd0cff",
+      "bytes": 2221
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/brand_lighting_64.png",
+      "sha256": "aced330e2ba369d36e4516959e5a4426134c989090b26f0a97c498f71a475a42",
+      "bytes": 6482
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/lighting_create_rig_32.png",
+      "sha256": "3a6495270bfdf481afabd6be0bc9c5d0e10c5e8372f83ba21744643165469ce7",
+      "bytes": 522
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/lighting_gpu_solve_32.png",
+      "sha256": "a3b36b2152fa3fd7e8ac55cd594fac43d19230945e0d3154b5c9c5fa53ffd404",
+      "bytes": 629
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/lighting_kelvin_ies_32.png",
+      "sha256": "07ee188db7543c22349afeae83438a034ea2b596516f9e9186d6bc5bddc62acc",
+      "bytes": 619
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/lighting_light_groups_32.png",
+      "sha256": "7d67cd0a9619f37a0c0b64eb3777737dabe829a10df58d0892d883ef5abaa71b",
+      "bytes": 684
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/lighting_volume_hdri_32.png",
+      "sha256": "cb2c8473b2a71af9d1e11b1a41c1e99b1b9502b74551427c2fd6dff8ace9c275",
+      "bytes": 785
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/status_error_32.png",
+      "sha256": "0a9a87ad97c82a9729b59079ce67fbe3166611738619e4d4ec9ab70ba3132752",
+      "bytes": 704
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/status_info_32.png",
+      "sha256": "57e4325f1f045ac8414d00d308462d982d2c3571284f135ec72b234d4cf31149",
+      "bytes": 698
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/status_ok_32.png",
+      "sha256": "6af6193c52c8b4c2df5f9dbf38ed43d5680ce3ca567626ec10d7d9689074304c",
+      "bytes": 824
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/status_running_32.png",
+      "sha256": "f1c5d82ed8f87d8859c14da5d1b8f137801ae873f8b37b6ad52119645fe897cb",
+      "bytes": 821
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/status_safe_32.png",
+      "sha256": "a79fc1d8e65fdb0985b6397254e00323112905cbe4c56eda782c842b10d8dece",
+      "bytes": 723
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/icons/status_warn_32.png",
+      "sha256": "b0dd7fbf27eeffc90e31136b681193eae447a3da6f30dc2233dbbda0355d9e51",
+      "bytes": 577
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/job_runner.py",
+      "sha256": "c6444283c0db59297b051f7e2742b8cec4f2065eac37befa70ef1ecf1e3ed6e4",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/layout_kit.py",
+      "sha256": "8667077d9f6724a3f546fddf7a3e9b30dd867d8c5e91d92a3b7762760b7ea635",
+      "bytes": 8427
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/sidebar_dock.py",
+      "sha256": "2f7828bb48be41983dc75b32c60495fcf840b05b51484feea5e0970dc0266572",
+      "bytes": 25879
+    },
+    {
+      "file": "tools/lighting_workflow_addon/_ui_kit/theme_tokens.py",
+      "sha256": "2d3035966030d949629190a54c4a7eb60705487409bd6f31bd0652b976905900",
+      "bytes": 11791
     },
     {
       "file": "tools/lighting_workflow_addon/advanced.py",
-      "sha256": "c42222b43fe1edff7757992bd1fa5b7360e498a671f434c1b0b911b2fcc8a57c",
-      "bytes": 13446
+      "sha256": "6c4a5051cc7e1f7769e1f88d3ecd0a9ebc906e7c1b8c42e950ac13e719a243b0",
+      "bytes": 17698
     },
     {
       "file": "tools/lighting_workflow_addon/blender_manifest.toml",
-      "sha256": "672c5245e2adb74d3c014ea6d65bf5514cc67120c11c0409b59334b816e08697",
-      "bytes": 306
+      "sha256": "86dd2de56e27106646d8d2da764ab8fa975b70d3750050c575d3b9f89d50e698",
+      "bytes": 332
+    },
+    {
+      "file": "tools/lighting_workflow_addon/commercial.py",
+      "sha256": "8f498b684bfe5b2bb51cf56a6fbbf6f3abec3b79642be48ec076b79f0250c1c1",
+      "bytes": 8780
     },
     {
       "file": "tools/lighting_workflow_addon/contract.py",
-      "sha256": "e5d21ac63e1b3af292a6e0cb2f0c85751317f166a17aabd1b62893c41b680704",
-      "bytes": 14348
+      "sha256": "e443932dee4bf03f992a4e545eafa514cbc7d1738ca9c3256f295a06a4d7106e",
+      "bytes": 17059
     },
     {
       "file": "tools/lighting_workflow_addon/core.py",
-      "sha256": "d764e2a057a67f07d4cb797fc03d8f514c37926ab588463b7c7508ac6bfbb942",
-      "bytes": 57631
+      "sha256": "63b5f51de8dfe09ef8eb68bf1d3e5ed646fece6c975488e4493b4b065b4db7bf",
+      "bytes": 68484
+    },
+    {
+      "file": "tools/lighting_workflow_addon/goal_contract.py",
+      "sha256": "fed9f71c67ff1fd14245f0a752f8582d6b3fa70a7c2ba8e05108f763a7f49737",
+      "bytes": 5218
+    },
+    {
+      "file": "tools/lighting_workflow_addon/goal_measure.py",
+      "sha256": "d792b4982d404ea2d826e00c11c9a06a7fca66c9dc8f136bcdec7e8995d04e94",
+      "bytes": 8475
+    },
+    {
+      "file": "tools/lighting_workflow_addon/goal_solver.py",
+      "sha256": "8cc5a17545d6cb268089a6d724992016648819b868d965bc3a7af2cd31a558bf",
+      "bytes": 7273
+    },
+    {
+      "file": "tools/lighting_workflow_addon/goals.py",
+      "sha256": "fe19062c77c330d29291a58e9386b9237c7326e587cbcf84d87b221d39933f4c",
+      "bytes": 19712
+    },
+    {
+      "file": "tools/lighting_workflow_addon/gpu_solve_worker.py",
+      "sha256": "85946b6e124946f56106fc615cd85607206ba77e2069101d2b026c94485433ef",
+      "bytes": 3792
     },
     {
       "file": "tools/lighting_workflow_addon/presets.py",
@@ -2512,13 +4197,13 @@
     },
     {
       "file": "tools/lighting_workflow_addon/templates.py",
-      "sha256": "ece8b4789a84991adcaf96a29af7ac160dcf75b5fa7df9cdab92e19eb8725657",
-      "bytes": 17735
+      "sha256": "898e471d01e5a9fe5483c1c6582fa5773103954e26504e837835af6e87d8b2b9",
+      "bytes": 21185
     },
     {
       "file": "tools/lighting_workflow_addon/ui.py",
-      "sha256": "dfbf96b55207d7d260f9669dec6082c3e987784d4b13eb7b142aa59616eede71",
-      "bytes": 12133
+      "sha256": "6e3a851ad07c0395576933a3511e0f50a91a6684b2bb114cc5be7b0362b2cddb",
+      "bytes": 65228
     },
     {
       "file": "tools/material_workflow_addon/LICENSE",
@@ -2532,8 +4217,108 @@
     },
     {
       "file": "tools/material_workflow_addon/__init__.py",
-      "sha256": "e93090895be45a71dc79d68a64061d64a28bd6f2647306856c79ba61f52c707a",
-      "bytes": 528
+      "sha256": "0743f1ab98629cf6999c20977c28b1dd61326751e7597377c8bbbb0c07e243b4",
+      "bytes": 718
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/__init__.py",
+      "sha256": "45817192185bb89c37e55f05172d3a069dcea26815f0619c796aea1141dbb305",
+      "bytes": 1441
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/hud_overlay.py",
+      "sha256": "5c8c441cfe6b5486c458ed8787530ba43a7713f2323787c5f8ccb774e36fbebb",
+      "bytes": 10895
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons.py",
+      "sha256": "b0e9ff36dda9a13d932dbe84e0fbbd7f1ab7ed4b019483a5b7a75d3be1e95be2",
+      "bytes": 3111
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/brand_material_32.png",
+      "sha256": "10015dd60eac0ec08acfc246f37874ffd9ee68b2a761b3821b9ebe0f00301639",
+      "bytes": 2270
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/brand_material_64.png",
+      "sha256": "06d327d7ed20ea0e35dc11a8e52ffa44eabde4c677434ef3d9083445cafcfb8c",
+      "bytes": 6298
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/material_batch_assign_32.png",
+      "sha256": "85795a8d6269cb35c81e88098c54b11208de0f2e8c50b61ad203f93098061f8a",
+      "bytes": 676
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/material_gpu_bake_32.png",
+      "sha256": "e6bb1f1240ceba923f713d4dcd52848e8a77b1d1f917bf011a3529b18cfc406f",
+      "bytes": 592
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/material_layer_stack_32.png",
+      "sha256": "c1f60c247c743146c433029e40fe10323da2e72754144f9639f8f670302c5764",
+      "bytes": 650
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/material_procedural_pbr_32.png",
+      "sha256": "fde53d7a5905e5043ac62939628e9441d999516d87798f01e9df83ab8c74f0e9",
+      "bytes": 784
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/status_error_32.png",
+      "sha256": "0a9a87ad97c82a9729b59079ce67fbe3166611738619e4d4ec9ab70ba3132752",
+      "bytes": 704
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/status_info_32.png",
+      "sha256": "57e4325f1f045ac8414d00d308462d982d2c3571284f135ec72b234d4cf31149",
+      "bytes": 698
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/status_ok_32.png",
+      "sha256": "6af6193c52c8b4c2df5f9dbf38ed43d5680ce3ca567626ec10d7d9689074304c",
+      "bytes": 824
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/status_running_32.png",
+      "sha256": "f1c5d82ed8f87d8859c14da5d1b8f137801ae873f8b37b6ad52119645fe897cb",
+      "bytes": 821
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/status_safe_32.png",
+      "sha256": "a79fc1d8e65fdb0985b6397254e00323112905cbe4c56eda782c842b10d8dece",
+      "bytes": 723
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/icons/status_warn_32.png",
+      "sha256": "b0dd7fbf27eeffc90e31136b681193eae447a3da6f30dc2233dbbda0355d9e51",
+      "bytes": 577
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/job_runner.py",
+      "sha256": "c6444283c0db59297b051f7e2742b8cec4f2065eac37befa70ef1ecf1e3ed6e4",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/layout_kit.py",
+      "sha256": "8667077d9f6724a3f546fddf7a3e9b30dd867d8c5e91d92a3b7762760b7ea635",
+      "bytes": 8427
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/sidebar_dock.py",
+      "sha256": "2f7828bb48be41983dc75b32c60495fcf840b05b51484feea5e0970dc0266572",
+      "bytes": 25879
+    },
+    {
+      "file": "tools/material_workflow_addon/_ui_kit/theme_tokens.py",
+      "sha256": "2d3035966030d949629190a54c4a7eb60705487409bd6f31bd0652b976905900",
+      "bytes": 11791
+    },
+    {
+      "file": "tools/material_workflow_addon/background_worker.py",
+      "sha256": "dd9875420d87cde0561497b477d67a8fe1e491bb4a8e79359e0033ff12ae39ef",
+      "bytes": 3527
     },
     {
       "file": "tools/material_workflow_addon/batch.py",
@@ -2552,8 +4337,8 @@
     },
     {
       "file": "tools/material_workflow_addon/blender_manifest.toml",
-      "sha256": "20c7d97e6dd842fe819dc4f7411b4ab1e5c1006524152134a647cd41c7d1f942",
-      "bytes": 357
+      "sha256": "9b48dcf1a5834e8f632e6cdb2a1835f999538645c5fb16336143003882dc4071",
+      "bytes": 431
     },
     {
       "file": "tools/material_workflow_addon/contract.py",
@@ -2572,8 +4357,8 @@
     },
     {
       "file": "tools/material_workflow_addon/engine_compat.py",
-      "sha256": "c0ccdbdf5000c5f5abc96d10e6e54d6ff54f1d8bf1c894dafd3ed3b6214e385c",
-      "bytes": 5112
+      "sha256": "49a8a3b2ddf447d172031c43b1c9163cc1dfc60b23c11012d4ae28b179d01fdb",
+      "bytes": 10085
     },
     {
       "file": "tools/material_workflow_addon/handoff.py",
@@ -2587,8 +4372,58 @@
     },
     {
       "file": "tools/material_workflow_addon/preview.py",
-      "sha256": "8592e7db75c91ffcbb75cef0524211a6b760de540d46e5d722d16b5844d1f74f",
-      "bytes": 16845
+      "sha256": "2b519164135c8d6a784e9ffa3f6a8912b800ee885e0dcfbe983455b7cd4430d5",
+      "bytes": 17537
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_bake.py",
+      "sha256": "b066e21e4b1a6543c86aac7fe67617fc09b0fac60b81186b446f39ac53e790af",
+      "bytes": 52751
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_contract.py",
+      "sha256": "2f3bb8e25154b11dc3a6982414b4241a495699cfec8f2f73db71a70ac467b47e",
+      "bytes": 32240
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_core.py",
+      "sha256": "85080e0cdb1ea2d6d3dc6a93be71a298e7f5234ed4f930af9e41b3ac28f5e333",
+      "bytes": 34486
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_examples.py",
+      "sha256": "34011a2c48d5b1f3dd590fd623fa8b88734a0ef7116dd7a29221a173c227fdd5",
+      "bytes": 15194
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_mesh_maps.py",
+      "sha256": "c0e84fe6deb8446663e754329c33b85b1b3d55d0a93f6692906a482745079c3e",
+      "bytes": 18422
+    },
+    {
+      "file": "tools/material_workflow_addon/procedural_ui.py",
+      "sha256": "b8d56ac5f06ade7db7bf719549f75486ec47a522119879ec17db7581b5495ad8",
+      "bytes": 21974
+    },
+    {
+      "file": "tools/material_workflow_addon/projection_bake.py",
+      "sha256": "ca0f86de50a1b6f25c0e0719612b5f7c7b9dfa1ee58b53121e6156c6494d76cb",
+      "bytes": 14796
+    },
+    {
+      "file": "tools/material_workflow_addon/projection_delivery.py",
+      "sha256": "e088a17d38300b3ee9798645a0c4e0c47f7256e0d441f58ce2d0a28b22bad251",
+      "bytes": 5269
+    },
+    {
+      "file": "tools/material_workflow_addon/projection_material.py",
+      "sha256": "6d8e4312147f6cf7f5627c2eaae6a9028863f7b62f8a849f8ea6db84979da593",
+      "bytes": 16311
+    },
+    {
+      "file": "tools/material_workflow_addon/projection_ui.py",
+      "sha256": "e71e15a2dd8e1aff5a986da60de17dc6909b41281a62ef3145862cb5ddeb43fe",
+      "bytes": 21404
     },
     {
       "file": "tools/material_workflow_addon/templates.py",
@@ -2602,18 +4437,23 @@
     },
     {
       "file": "tools/material_workflow_addon/ui.py",
-      "sha256": "9226d7d8a47cf97aa3de2b91b6ed89b0b50316d7089605dfcad62a32340e3e79",
-      "bytes": 19996
+      "sha256": "d2f68eadeaadd7544a93297e89ba66c26569d093033939e73ca4481117bb52fe",
+      "bytes": 34158
     },
     {
       "file": "tools/material_workflow_addon/ui_batch.py",
-      "sha256": "7c80b6de07109a79b7bce32719e915684c9d632cd7ad33cdc4c3ab58ff7d0c94",
-      "bytes": 16741
+      "sha256": "95031a553cbcafe7f329dccc48527001d0b2172da141d4161ac208cff8921c34",
+      "bytes": 19776
     },
     {
       "file": "tools/material_workflow_addon/ui_handoff.py",
-      "sha256": "5e6b95881e0b3a0f0d52eee3f2dbcd5cc1f82c718d1bcbcd3241d13055fc43bd",
-      "bytes": 6514
+      "sha256": "c6985405ccffa78fa05c0ea881d39a285afac44ec0b550164dcbaebb95ade287",
+      "bytes": 6717
+    },
+    {
+      "file": "tools/material_workflow_addon/workbench_jobs.py",
+      "sha256": "c270692c06308278373b84a19a890bbed1833989e238f009aec97667e20c62e7",
+      "bytes": 3405
     },
     {
       "file": "tools/rig_phase3_handoff/cli.py",
@@ -2651,34 +4491,1094 @@
       "bytes": 4685
     },
     {
+      "file": "tools/ui_kit/README.md",
+      "sha256": "3adec819babdfe0b3dd3e5da237a0f9e8b4188faec98f6c83561c3822b547e90",
+      "bytes": 6742
+    },
+    {
+      "file": "tools/ui_kit/__init__.py",
+      "sha256": "45817192185bb89c37e55f05172d3a069dcea26815f0619c796aea1141dbb305",
+      "bytes": 1441
+    },
+    {
+      "file": "tools/ui_kit/hud_overlay.py",
+      "sha256": "5c8c441cfe6b5486c458ed8787530ba43a7713f2323787c5f8ccb774e36fbebb",
+      "bytes": 10895
+    },
+    {
+      "file": "tools/ui_kit/icons.py",
+      "sha256": "b0e9ff36dda9a13d932dbe84e0fbbd7f1ab7ed4b019483a5b7a75d3be1e95be2",
+      "bytes": 3111
+    },
+    {
+      "file": "tools/ui_kit/icons_manifest.json",
+      "sha256": "56413a54502b5e0e1a3da43b75cc7e06422526d434000d7e1dc7d2b92b17b759",
+      "bytes": 3402
+    },
+    {
+      "file": "tools/ui_kit/icons_png/animation_additive_layer_32.png",
+      "sha256": "30403ee47d088c2c7cdf2163a082394d22748abebe807bbf0b615897e78418ee",
+      "bytes": 310
+    },
+    {
+      "file": "tools/ui_kit/icons_png/animation_cascadeur_bridge_32.png",
+      "sha256": "735536df8e329e48ac53ede67333ed3413f2d72062c5085844bcca4779ac21a2",
+      "bytes": 489
+    },
+    {
+      "file": "tools/ui_kit/icons_png/animation_curve_filter_32.png",
+      "sha256": "b1fe41d8f40d1f11e61ea1c8d923bd6f16ca12fa043e564d87483196703859e8",
+      "bytes": 479
+    },
+    {
+      "file": "tools/ui_kit/icons_png/animation_event_beat_32.png",
+      "sha256": "1dbc9344ba27f2b2bad20fcfea0736bb832512d38a919008b7dfd717eb9573a9",
+      "bytes": 230
+    },
+    {
+      "file": "tools/ui_kit/icons_png/animation_foot_support_32.png",
+      "sha256": "14fdf96dbe9de512187f84fc436a5144c47017527f705add6e31fc8ea4e15bf9",
+      "bytes": 319
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_animation_32.png",
+      "sha256": "abde3029563e1748793559847dda4dd6472fe527f809346ac1d6d52c6e43524a",
+      "bytes": 2205
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_animation_64.png",
+      "sha256": "aa02c5eebe3fdf7e5079ea3603884b373bda8edef0c8f5ec0bc48f3e629b278e",
+      "bytes": 6012
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_camera_32.png",
+      "sha256": "f95f17b0c0025023209fbc67bd7dbbfb8ff9cd907ca27377b6d1d4449b31cf81",
+      "bytes": 2262
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_camera_64.png",
+      "sha256": "33f17b7ce6fe7ad292bff7341dedf303affcbf3505748ff9b3a9dd36a28a8c36",
+      "bytes": 6312
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_compositing_32.png",
+      "sha256": "9ab0bf85919b0b1b67a3eeddad50d5a57520a04ef7a2972984243213a73f7216",
+      "bytes": 2253
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_compositing_64.png",
+      "sha256": "a2eb130c3a01b7943e56f42b23b8b8008846a0f632a2a8a8140ae9afa810c2ab",
+      "bytes": 6368
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_geometry_32.png",
+      "sha256": "4927c854782e640a80466dbad166b302daf07e46650d9fb5c935f30ebe0b5821",
+      "bytes": 2210
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_geometry_64.png",
+      "sha256": "6e6290696d6978181a8c0a99679f6c116548b200caa135c8c076dff12f1b6f8a",
+      "bytes": 6129
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_hard_surface_32.png",
+      "sha256": "1700fd53b4838e8d7db9b7294e59c74185b7a8598012d49dc632aae7ecadf4bf",
+      "bytes": 2110
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_hard_surface_64.png",
+      "sha256": "de08ef515ceeed7e966748377a44f21fca1489fb1689f092d258375f2235ca41",
+      "bytes": 5686
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_lighting_32.png",
+      "sha256": "73763e221a1940be5231b5d4261bc9b7f1badfcf4ec3021bb29f3523cbcd0cff",
+      "bytes": 2221
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_lighting_64.png",
+      "sha256": "aced330e2ba369d36e4516959e5a4426134c989090b26f0a97c498f71a475a42",
+      "bytes": 6482
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_material_32.png",
+      "sha256": "10015dd60eac0ec08acfc246f37874ffd9ee68b2a761b3821b9ebe0f00301639",
+      "bytes": 2270
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_material_64.png",
+      "sha256": "06d327d7ed20ea0e35dc11a8e52ffa44eabde4c677434ef3d9083445cafcfb8c",
+      "bytes": 6298
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_modeling_32.png",
+      "sha256": "97ffa34c8b49b2fca3d0a69a9a801e6f1c6f11b07c27e4b654d16a8916281cf2",
+      "bytes": 2291
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_modeling_64.png",
+      "sha256": "998cdb076b7b0b64d7253b5d89845cd4237929e51798beab378b91b27c5e54a6",
+      "bytes": 6394
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_physics_32.png",
+      "sha256": "003b194310ee92cd02853cf065b8f3dd5e871b7ee52876a8681575c01725e045",
+      "bytes": 2272
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_physics_64.png",
+      "sha256": "5edd6bc888cd4ebbe7d70da26228c21f231c19a44f85f42b81923eba8446500a",
+      "bytes": 6301
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_render_batch_32.png",
+      "sha256": "78ecb31115fd58ad45dc638c1ca41cf8832fe2ad0a375de8169df0eace5c2a23",
+      "bytes": 2043
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_render_batch_64.png",
+      "sha256": "a24cfc27205fa5a3fd1fa99312ed21f1232e5b93b8f44b4e52636c958bb2782a",
+      "bytes": 5449
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_rigging_32.png",
+      "sha256": "31b1cf0e263ca06e924c8f7f94acfbbbda4e9ae71ca4901b221e374bd9a29a2c",
+      "bytes": 2245
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_rigging_64.png",
+      "sha256": "f7e52ebd1788fe5ad02c9befe37ce8dd564b2b523cb964fe0930b2ab4d3fa063",
+      "bytes": 6124
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_toon_32.png",
+      "sha256": "b8d74b1949dfc3d16363f146009b58bceef8983c50f26f0c8f517c23e6745cfc",
+      "bytes": 2100
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_toon_64.png",
+      "sha256": "3e70ffb33247196d4b89c54f6a1d47b3eb507af5f77153922d525a3d9c3be3a3",
+      "bytes": 5627
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_uv_32.png",
+      "sha256": "d58e6b7a1b28d5a7341229cc41e6c94b74ede187dc4c76cf33cb04647b8d83e4",
+      "bytes": 1944
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_uv_64.png",
+      "sha256": "464434a710812309348c83e003852da6001b16b68a7379c1330a3b23bbe6fdd0",
+      "bytes": 5109
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_video_32.png",
+      "sha256": "5c2cf1b5c3013f79e0fb43e207f29826e703062bd563cf80d1760b727a0d63cb",
+      "bytes": 2162
+    },
+    {
+      "file": "tools/ui_kit/icons_png/brand_video_64.png",
+      "sha256": "ed4a49b89fd345bd09bc5b840cfbcca2d2996b876fe968345772fcbca85d4250",
+      "bytes": 5822
+    },
+    {
+      "file": "tools/ui_kit/icons_png/camera_focus_dof_32.png",
+      "sha256": "4bccc5849d23e343aa67b857abc66da658fb89c144cd43e089be5fe6b134a540",
+      "bytes": 682
+    },
+    {
+      "file": "tools/ui_kit/icons_png/camera_framing_guides_32.png",
+      "sha256": "d9d7ea4893d7682864b4bccc5517cdfc596c726cef1e3438685eae3b8a59d4e8",
+      "bytes": 291
+    },
+    {
+      "file": "tools/ui_kit/icons_png/camera_proc_motion_32.png",
+      "sha256": "d1982c341450171f6a538781b1ce1179a250e62404ea9df0c00a57c581ce5d84",
+      "bytes": 530
+    },
+    {
+      "file": "tools/ui_kit/icons_png/camera_shot_table_32.png",
+      "sha256": "b0b94727da84646041c51362410553b7d9a5a92ae148d0a6193ec04d998ec28b",
+      "bytes": 405
+    },
+    {
+      "file": "tools/ui_kit/icons_png/compositing_crypto_cdl_32.png",
+      "sha256": "a0b189eed9452f313b40c79db4986660e0d9e1e8a111a6f37c2b4180c3ffa5bd",
+      "bytes": 902
+    },
+    {
+      "file": "tools/ui_kit/icons_png/compositing_light_mix_32.png",
+      "sha256": "943f163e5e241eca70635e2e4af38ec92bae8c94b5c8ba387552604e14fbf7fb",
+      "bytes": 319
+    },
+    {
+      "file": "tools/ui_kit/icons_png/compositing_relight_preview_32.png",
+      "sha256": "a790df9afacb54b794ccd8aa1e70f3b4dfc42bd81887197d64428feb17b114f5",
+      "bytes": 477
+    },
+    {
+      "file": "tools/ui_kit/icons_png/compositing_scene_effects_32.png",
+      "sha256": "d097bab9914c97f1d927dd0d47a109412d25166b3ddd9a5af46644e5f348bcf7",
+      "bytes": 407
+    },
+    {
+      "file": "tools/ui_kit/icons_png/geometry_bake_cache_32.png",
+      "sha256": "41c58b19069b42c0d5ea5343c2cc7298805b85c7a8aac07a80b0b2c4ade5a1e4",
+      "bytes": 703
+    },
+    {
+      "file": "tools/ui_kit/icons_png/geometry_biome_scatter_32.png",
+      "sha256": "5105cedbc9c7510019d72dc7f85edf9d4b11fa8ac5f5135931357e31fd1352ab",
+      "bytes": 705
+    },
+    {
+      "file": "tools/ui_kit/icons_png/geometry_hair_curves_32.png",
+      "sha256": "b1a1b0e9ef223ec9c8f17aa7ab19bc285d651be38f4e8e648b4ab240c40ef19a",
+      "bytes": 746
+    },
+    {
+      "file": "tools/ui_kit/icons_png/geometry_node_params_32.png",
+      "sha256": "c979c8c9b75a3d29d4924d536627b744c4d643656fdbe06fe534156e5059b33c",
+      "bytes": 410
+    },
+    {
+      "file": "tools/ui_kit/icons_png/hard_surface_cutter_bool_32.png",
+      "sha256": "f6f2a9ae2b31c1c283198b886a216ce29a4e54eece999c285aaddbc68aff796a",
+      "bytes": 476
+    },
+    {
+      "file": "tools/ui_kit/icons_png/hard_surface_face_flow_32.png",
+      "sha256": "7d830ca5b32fcada4aa5ce854ed90238e5e26429a297f6201bcdc35147e32d0a",
+      "bytes": 556
+    },
+    {
+      "file": "tools/ui_kit/icons_png/hard_surface_modifier_stack_32.png",
+      "sha256": "17f632e32f8ff7a8d31bb2e9caeec02c43c1f846bcbb8343c1a0694c618bcb33",
+      "bytes": 470
+    },
+    {
+      "file": "tools/ui_kit/icons_png/hard_surface_review_grid_32.png",
+      "sha256": "2390ca670e4ceabe4e3d96a2374c781db1db4aa0dfa2d2d9204acb210a178cd4",
+      "bytes": 576
+    },
+    {
+      "file": "tools/ui_kit/icons_png/hard_surface_surface_sweep_32.png",
+      "sha256": "e1077ed57facc461121b2dc935257f742f7427c7f9089b9ae2f0882f13fc6728",
+      "bytes": 527
+    },
+    {
+      "file": "tools/ui_kit/icons_png/lighting_create_rig_32.png",
+      "sha256": "3a6495270bfdf481afabd6be0bc9c5d0e10c5e8372f83ba21744643165469ce7",
+      "bytes": 522
+    },
+    {
+      "file": "tools/ui_kit/icons_png/lighting_gpu_solve_32.png",
+      "sha256": "a3b36b2152fa3fd7e8ac55cd594fac43d19230945e0d3154b5c9c5fa53ffd404",
+      "bytes": 629
+    },
+    {
+      "file": "tools/ui_kit/icons_png/lighting_kelvin_ies_32.png",
+      "sha256": "07ee188db7543c22349afeae83438a034ea2b596516f9e9186d6bc5bddc62acc",
+      "bytes": 619
+    },
+    {
+      "file": "tools/ui_kit/icons_png/lighting_light_groups_32.png",
+      "sha256": "7d67cd0a9619f37a0c0b64eb3777737dabe829a10df58d0892d883ef5abaa71b",
+      "bytes": 684
+    },
+    {
+      "file": "tools/ui_kit/icons_png/lighting_volume_hdri_32.png",
+      "sha256": "cb2c8473b2a71af9d1e11b1a41c1e99b1b9502b74551427c2fd6dff8ace9c275",
+      "bytes": 785
+    },
+    {
+      "file": "tools/ui_kit/icons_png/material_batch_assign_32.png",
+      "sha256": "85795a8d6269cb35c81e88098c54b11208de0f2e8c50b61ad203f93098061f8a",
+      "bytes": 676
+    },
+    {
+      "file": "tools/ui_kit/icons_png/material_gpu_bake_32.png",
+      "sha256": "e6bb1f1240ceba923f713d4dcd52848e8a77b1d1f917bf011a3529b18cfc406f",
+      "bytes": 592
+    },
+    {
+      "file": "tools/ui_kit/icons_png/material_layer_stack_32.png",
+      "sha256": "c1f60c247c743146c433029e40fe10323da2e72754144f9639f8f670302c5764",
+      "bytes": 650
+    },
+    {
+      "file": "tools/ui_kit/icons_png/material_procedural_pbr_32.png",
+      "sha256": "fde53d7a5905e5043ac62939628e9441d999516d87798f01e9df83ab8c74f0e9",
+      "bytes": 784
+    },
+    {
+      "file": "tools/ui_kit/icons_png/modeling_export_exchange_32.png",
+      "sha256": "f4e49edf9237ea387912339373dd91e6ce276fb61bf8c753145f1f8680ac5550",
+      "bytes": 435
+    },
+    {
+      "file": "tools/ui_kit/icons_png/modeling_import_mesh_32.png",
+      "sha256": "e8b47c7b1fa46efd48f49207c0960abe8634d9b62305ed549937fee027c32b10",
+      "bytes": 537
+    },
+    {
+      "file": "tools/ui_kit/icons_png/modeling_ref_stage_32.png",
+      "sha256": "1176d16a9c75527e9bf4112a93f03ba042273a9b69b71fb0915d14427361e6ff",
+      "bytes": 422
+    },
+    {
+      "file": "tools/ui_kit/icons_png/modeling_retopo_32.png",
+      "sha256": "4b4be39931bfaf6eac5d86f5b4eb8ef9921c6d4dbe3ed4f037a3c4f35ca11f89",
+      "bytes": 467
+    },
+    {
+      "file": "tools/ui_kit/icons_png/physics_bullet_fracture_32.png",
+      "sha256": "1fda34bcaaa28af14a15937c1ce8052ad3f99020f19ce77469b95450351be90f",
+      "bytes": 937
+    },
+    {
+      "file": "tools/ui_kit/icons_png/physics_cloth_sim_32.png",
+      "sha256": "73c235b8ddf3ac03c5efe67f99c422db4f7bb56916ab7adf29ea17bf4248ad81",
+      "bytes": 975
+    },
+    {
+      "file": "tools/ui_kit/icons_png/physics_fluid_domain_32.png",
+      "sha256": "16a6f491f96f8eeafd8d2cbb248a625983fb57aff179c679acaf4d95c4a19a78",
+      "bytes": 621
+    },
+    {
+      "file": "tools/ui_kit/icons_png/physics_gn_physics_32.png",
+      "sha256": "71907cb6e2058ff83c95be40b4afe0388637fba2e890cbed59d125c0892a5d8f",
+      "bytes": 886
+    },
+    {
+      "file": "tools/ui_kit/icons_png/render_batch_batch_monitor_32.png",
+      "sha256": "1be520ccb21cdb61ce29fbddb5337abb2eba2d0a0bdf7fc51e1dc8bd227ec170",
+      "bytes": 478
+    },
+    {
+      "file": "tools/ui_kit/icons_png/render_batch_batch_resume_32.png",
+      "sha256": "cc10bc4180820ecb46c2fdb530751895af86c813ec71fb550e6e4fcc8dda9289",
+      "bytes": 546
+    },
+    {
+      "file": "tools/ui_kit/icons_png/render_batch_batch_submit_32.png",
+      "sha256": "3cdc35cc7055bb8139da32cd7235db59a9c507cc04ecc9cf1035e57f0f26511d",
+      "bytes": 340
+    },
+    {
+      "file": "tools/ui_kit/icons_png/render_batch_exr_passes_32.png",
+      "sha256": "7272c7c14fed0e2341b17443fd7c72be9648879f9ac6d4ac96c47bee0966b521",
+      "bytes": 703
+    },
+    {
+      "file": "tools/ui_kit/icons_png/rigging_face_rig_32.png",
+      "sha256": "bf0baf0b218006c6251ac38f43a439946ba397fe22d09c0939f1de3b9e8738ec",
+      "bytes": 803
+    },
+    {
+      "file": "tools/ui_kit/icons_png/rigging_ik_fk_control_32.png",
+      "sha256": "04a59458aa87f1eb0df1c519df3927c6172e6ea6c5783508b18f6a232016e59b",
+      "bytes": 483
+    },
+    {
+      "file": "tools/ui_kit/icons_png/rigging_retarget_motion_32.png",
+      "sha256": "d37ba884e50403365391f94112a543cb6934835e84e07989079dec94e3d690b6",
+      "bytes": 471
+    },
+    {
+      "file": "tools/ui_kit/icons_png/rigging_rig_prepare_32.png",
+      "sha256": "63dbe3dca5039ace58a88018ca47f61a85b91ec4cea1d66e35f033087cc09a8a",
+      "bytes": 328
+    },
+    {
+      "file": "tools/ui_kit/icons_png/rigging_voxel_skin_32.png",
+      "sha256": "86b2a9cc89ad7085271fbd0cf80aa282d5bddc7f578eecac2bd4f354e17d8b92",
+      "bytes": 711
+    },
+    {
+      "file": "tools/ui_kit/icons_png/status_error_32.png",
+      "sha256": "0a9a87ad97c82a9729b59079ce67fbe3166611738619e4d4ec9ab70ba3132752",
+      "bytes": 704
+    },
+    {
+      "file": "tools/ui_kit/icons_png/status_info_32.png",
+      "sha256": "57e4325f1f045ac8414d00d308462d982d2c3571284f135ec72b234d4cf31149",
+      "bytes": 698
+    },
+    {
+      "file": "tools/ui_kit/icons_png/status_ok_32.png",
+      "sha256": "6af6193c52c8b4c2df5f9dbf38ed43d5680ce3ca567626ec10d7d9689074304c",
+      "bytes": 824
+    },
+    {
+      "file": "tools/ui_kit/icons_png/status_running_32.png",
+      "sha256": "f1c5d82ed8f87d8859c14da5d1b8f137801ae873f8b37b6ad52119645fe897cb",
+      "bytes": 821
+    },
+    {
+      "file": "tools/ui_kit/icons_png/status_safe_32.png",
+      "sha256": "a79fc1d8e65fdb0985b6397254e00323112905cbe4c56eda782c842b10d8dece",
+      "bytes": 723
+    },
+    {
+      "file": "tools/ui_kit/icons_png/status_warn_32.png",
+      "sha256": "b0dd7fbf27eeffc90e31136b681193eae447a3da6f30dc2233dbbda0355d9e51",
+      "bytes": 577
+    },
+    {
+      "file": "tools/ui_kit/icons_png/toon_cel_shader_32.png",
+      "sha256": "25f1c0fd67bc68b55d51d33567e974c5813a535c0a83823610ce1461f554ffd8",
+      "bytes": 729
+    },
+    {
+      "file": "tools/ui_kit/icons_png/toon_face_sdf_32.png",
+      "sha256": "f6a6cffda1703910b9ad7f141643214da1349d37c97a2b5cc501634a95ef4f7e",
+      "bytes": 844
+    },
+    {
+      "file": "tools/ui_kit/icons_png/toon_line_viewport_32.png",
+      "sha256": "fab55beb3a1de9740211fc64c47de9f57392686e27148e6b8e0f9e2db09e5864",
+      "bytes": 592
+    },
+    {
+      "file": "tools/ui_kit/icons_png/toon_toon_output_32.png",
+      "sha256": "77c9fa432aa5e111eb1dec3a75e1b1d974fee55a10488c7a9f69355b367c1907",
+      "bytes": 472
+    },
+    {
+      "file": "tools/ui_kit/icons_png/uv_checker_preview_32.png",
+      "sha256": "6e950df3b6f9e9cb3677192f18756ca4a83095a63bc2be72fe5a8773618d4b26",
+      "bytes": 255
+    },
+    {
+      "file": "tools/ui_kit/icons_png/uv_texel_rectify_32.png",
+      "sha256": "8d4e45635938d69c2d4af55d8b0c7f01b5e504a60dfd09cf41619c4922809a04",
+      "bytes": 275
+    },
+    {
+      "file": "tools/ui_kit/icons_png/uv_udim_pack_32.png",
+      "sha256": "b273f85645cfb7cda65129bb2690ad92c7bc4210b8f9b98988e8c99b3e66181e",
+      "bytes": 415
+    },
+    {
+      "file": "tools/ui_kit/icons_png/uv_unwrap_seam_32.png",
+      "sha256": "77643c6d1d06ea8f585158712d87b9b15126c13191d8aeab3ff206c1e5124624",
+      "bytes": 348
+    },
+    {
+      "file": "tools/ui_kit/icons_png/video_lufs_export_32.png",
+      "sha256": "8d191b4c040e9894350531c899812b593342b289da2daea14383754b904b2f9f",
+      "bytes": 230
+    },
+    {
+      "file": "tools/ui_kit/icons_png/video_shot_replace_32.png",
+      "sha256": "e788d9f0fa033941c86b80b727d9a791f6432eaa3244b6c367b48b7585ef2992",
+      "bytes": 458
+    },
+    {
+      "file": "tools/ui_kit/icons_png/video_strip_comp_32.png",
+      "sha256": "7b1e0a9b5d106ca5dd9075f4286c1230711fe2cf27b398c361b33875b395e83e",
+      "bytes": 379
+    },
+    {
+      "file": "tools/ui_kit/icons_png/video_subtitle_style_32.png",
+      "sha256": "ad62088a38c37727d608588ce2a85e0d4be9877c4ec97586b4f3a7c8c522accd",
+      "bytes": 315
+    },
+    {
+      "file": "tools/ui_kit/job_runner.py",
+      "sha256": "c6444283c0db59297b051f7e2742b8cec4f2065eac37befa70ef1ecf1e3ed6e4",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/ui_kit/layout_kit.py",
+      "sha256": "8667077d9f6724a3f546fddf7a3e9b30dd867d8c5e91d92a3b7762760b7ea635",
+      "bytes": 8427
+    },
+    {
+      "file": "tools/ui_kit/package_extensions.py",
+      "sha256": "b40e5cfd8b1ea5c3146376a5af5dcb721a99381e55218d76031f53417769c4b4",
+      "bytes": 6029
+    },
+    {
+      "file": "tools/ui_kit/sidebar_dock.py",
+      "sha256": "2f7828bb48be41983dc75b32c60495fcf840b05b51484feea5e0970dc0266572",
+      "bytes": 25879
+    },
+    {
+      "file": "tools/ui_kit/svg_builder.py",
+      "sha256": "58a31d0922db0357c8a1cc72555b0a741e652a25839d17c9aa8f9a84f06e52b5",
+      "bytes": 53429
+    },
+    {
+      "file": "tools/ui_kit/svg_master/animation_additive_layer.svg",
+      "sha256": "c5370ebaac2cc35590d21048182e2381d3618e7bf2bcb8d3cc281963a665ff0b",
+      "bytes": 438
+    },
+    {
+      "file": "tools/ui_kit/svg_master/animation_cascadeur_bridge.svg",
+      "sha256": "c4b6186df5e79caddbc007a2c7d7ca71b1be41a2feb6a02d272d1d220e013dbc",
+      "bytes": 430
+    },
+    {
+      "file": "tools/ui_kit/svg_master/animation_curve_filter.svg",
+      "sha256": "619a15925b63340698f74a1c66f1245fbbdd327bc2095fc519be5c903f0cb930",
+      "bytes": 352
+    },
+    {
+      "file": "tools/ui_kit/svg_master/animation_event_beat.svg",
+      "sha256": "2bfdbc30ed84f254f9371e3adfff53875040311de0031616649cf3316d7e9c6f",
+      "bytes": 515
+    },
+    {
+      "file": "tools/ui_kit/svg_master/animation_foot_support.svg",
+      "sha256": "661ed37d31b9dd64d4a7969f4f60dce52b8031b6fedaef19990702dec7366076",
+      "bytes": 354
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_animation.svg",
+      "sha256": "1dc3b0c41a61f6dceefe494bbac9d35556dbd37a43f7ea6ace9060386488ccf3",
+      "bytes": 1962
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_camera.svg",
+      "sha256": "93a7605fc80732198c71aa9ea94ae52db991d969e7e5e29b93bbd7429978a0f1",
+      "bytes": 1884
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_compositing.svg",
+      "sha256": "53e6c9870b3b9d6e728a332506a235d0fdf4b1594f034249169ac22cde3bb072",
+      "bytes": 1802
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_geometry.svg",
+      "sha256": "add9f396cdd7276503126d1b0c95df3b9002fdc7e55b69771199cb2d10325a4b",
+      "bytes": 2034
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_hard_surface.svg",
+      "sha256": "949eb53696686c1f43eb0669c4386e7488d3c0c7d2c1422ba5bf59b9d8b71891",
+      "bytes": 1855
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_lighting.svg",
+      "sha256": "03a17fec2ed99fb8c7e427be511cedae321e43bd415944e74813d8e3f0762626",
+      "bytes": 2093
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_material.svg",
+      "sha256": "e971bea3ee7bf448d2b9451128dcb86fb111fce92e36c15a2a00e4df2f9311ef",
+      "bytes": 1875
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_modeling.svg",
+      "sha256": "71044fdc702a27c85ae581e8e05e134d6b12e0c057e7fc224c6d77b8260a33e3",
+      "bytes": 1951
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_physics.svg",
+      "sha256": "80c89b3fe2f3cd6e919b0526ef0e432532a6c71d8ca7ef29699fa066c039ab15",
+      "bytes": 1943
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_render_batch.svg",
+      "sha256": "7783282af8509dfcc8041295ba2fab3fc6f4bcf797b8c2d2d8ea2f20a840e735",
+      "bytes": 1921
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_rigging.svg",
+      "sha256": "c6287907f6459e79fa355e5cf306e1b19c429c680be8808986e05ee58eced63c",
+      "bytes": 1924
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_toon.svg",
+      "sha256": "34287746c0f038241725bf77d66cc29d243e6e80797f4c7c4cc327a52fc54a74",
+      "bytes": 1820
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_uv.svg",
+      "sha256": "e58854c670e2e7308aea81efb0752ecc809610cfaaac2ace1b7de0660ffe78f9",
+      "bytes": 1954
+    },
+    {
+      "file": "tools/ui_kit/svg_master/brand_video.svg",
+      "sha256": "9feba9bedb8d4b268b616ff9333101a975dade77349ec423a5b632b5c6206dec",
+      "bytes": 2127
+    },
+    {
+      "file": "tools/ui_kit/svg_master/camera_focus_dof.svg",
+      "sha256": "98c620e57fcf5e66f3d07c679c2f10c2e40d1abdc798a7cef06edac985664846",
+      "bytes": 486
+    },
+    {
+      "file": "tools/ui_kit/svg_master/camera_framing_guides.svg",
+      "sha256": "04e653de629f78bf62e2fdaf86573670e292afc4e363d431adcfd5e25044452f",
+      "bytes": 562
+    },
+    {
+      "file": "tools/ui_kit/svg_master/camera_proc_motion.svg",
+      "sha256": "980d67861a9b3cde06e199ae252e8987534734bc83e453f24463c6d203a56e38",
+      "bytes": 396
+    },
+    {
+      "file": "tools/ui_kit/svg_master/camera_shot_table.svg",
+      "sha256": "953aa54c1e1bd534bf2515acb26de8cd4c423d93d61f2b495b8811f834db1ded",
+      "bytes": 514
+    },
+    {
+      "file": "tools/ui_kit/svg_master/compositing_crypto_cdl.svg",
+      "sha256": "14b7726ca102add8e9fcee9e2f53951de87899ac537c77ef33cd2196bb4b3678",
+      "bytes": 475
+    },
+    {
+      "file": "tools/ui_kit/svg_master/compositing_light_mix.svg",
+      "sha256": "4a7ff2bdcea638c8fd9e927e0f693e4678c40f9dc89bf99f0ef6714e7b73bd6f",
+      "bytes": 530
+    },
+    {
+      "file": "tools/ui_kit/svg_master/compositing_relight_preview.svg",
+      "sha256": "831d947e2f7e39caf1d48a5536e669b59e7d0503c877f64f4b48bdfbd443789e",
+      "bytes": 568
+    },
+    {
+      "file": "tools/ui_kit/svg_master/compositing_scene_effects.svg",
+      "sha256": "8e6ba2ef3980b75982c4013045a9719a19758ed3c3818d29e3ec66de2b5bf156",
+      "bytes": 307
+    },
+    {
+      "file": "tools/ui_kit/svg_master/geometry_bake_cache.svg",
+      "sha256": "a3c9297d86ff7152f69ecbdd84fd3ecffbc0468c7eb0c97b5ae6d5962e01ed50",
+      "bytes": 436
+    },
+    {
+      "file": "tools/ui_kit/svg_master/geometry_biome_scatter.svg",
+      "sha256": "5ca945c5df5746c8eb1c699df1e33243640440089f06e7cdca92ad6c94ac3ee8",
+      "bytes": 496
+    },
+    {
+      "file": "tools/ui_kit/svg_master/geometry_hair_curves.svg",
+      "sha256": "6d9eff979d8f155b9e5f748cf5f4ed45b772e555f219fd1d8b8ce3cd74194dbc",
+      "bytes": 386
+    },
+    {
+      "file": "tools/ui_kit/svg_master/geometry_node_params.svg",
+      "sha256": "50c942f5a21855976329fc9a6c674d30f66e3414d13390028247d217429b4316",
+      "bytes": 556
+    },
+    {
+      "file": "tools/ui_kit/svg_master/hard_surface_cutter_bool.svg",
+      "sha256": "a5823b493ded05017d63d6235dd9e3d148e19682f1da40dff2e3e51f23f84930",
+      "bytes": 414
+    },
+    {
+      "file": "tools/ui_kit/svg_master/hard_surface_face_flow.svg",
+      "sha256": "784fa015c7b69baa1b13145c58844a0ac0c25f5323c8ab15562db8bf5e1d72ef",
+      "bytes": 367
+    },
+    {
+      "file": "tools/ui_kit/svg_master/hard_surface_modifier_stack.svg",
+      "sha256": "0404eab647620e64bb3b4d12ce8941343621d6d93cd87e41e064a07e5b01fd34",
+      "bytes": 541
+    },
+    {
+      "file": "tools/ui_kit/svg_master/hard_surface_review_grid.svg",
+      "sha256": "1586c47bd4637ce361b62ac9431c82591c967f5d08f4d5ce338314042a7adab7",
+      "bytes": 585
+    },
+    {
+      "file": "tools/ui_kit/svg_master/hard_surface_surface_sweep.svg",
+      "sha256": "e9c8fca2d4afdc1091d2d80b0ee93a8b6a9bb7a3b807d61e5db6a11fa7a3d492",
+      "bytes": 457
+    },
+    {
+      "file": "tools/ui_kit/svg_master/lighting_create_rig.svg",
+      "sha256": "5c7871dc9e66a22ff1f281f64465982c82f6d54a6d5e17516fa6adbb29f0f0af",
+      "bytes": 498
+    },
+    {
+      "file": "tools/ui_kit/svg_master/lighting_gpu_solve.svg",
+      "sha256": "ceb1d5bf516da43ae0fe14aa5b85b624010fde072bbad51dafc7ff14f31ed181",
+      "bytes": 395
+    },
+    {
+      "file": "tools/ui_kit/svg_master/lighting_kelvin_ies.svg",
+      "sha256": "b24d8caef838d8ea5c0c182c2797e66d9bc6e9724e10241e9d9d17c0356281e8",
+      "bytes": 595
+    },
+    {
+      "file": "tools/ui_kit/svg_master/lighting_light_groups.svg",
+      "sha256": "b0669443be0503eb49f229af3f4ad0ef07cba49d88dbea0ae39f9a9237953aff",
+      "bytes": 622
+    },
+    {
+      "file": "tools/ui_kit/svg_master/lighting_volume_hdri.svg",
+      "sha256": "a129af91c3f9a1f59cd0dbee9253535a3d72dfdd53cfcc99c47ad2a20b609a77",
+      "bytes": 418
+    },
+    {
+      "file": "tools/ui_kit/svg_master/material_batch_assign.svg",
+      "sha256": "4b462cb2ea4bff16df98cc4a3eca73c6f013036980850e08fd31f05f4a68c7da",
+      "bytes": 503
+    },
+    {
+      "file": "tools/ui_kit/svg_master/material_gpu_bake.svg",
+      "sha256": "d88767a068632883a97ac498c70317149e8d0b759503eab40683a0ea19f265ef",
+      "bytes": 395
+    },
+    {
+      "file": "tools/ui_kit/svg_master/material_layer_stack.svg",
+      "sha256": "3df53ffb5d1e3cd93647b0f8efb76433c4adb37c5a0d03e8caa5f6a3e0c5a131",
+      "bytes": 428
+    },
+    {
+      "file": "tools/ui_kit/svg_master/material_procedural_pbr.svg",
+      "sha256": "7b95c0fcc513988c7cb846fe7476ab4542176996e07c1cdcde7dff00d83afc15",
+      "bytes": 391
+    },
+    {
+      "file": "tools/ui_kit/svg_master/modeling_export_exchange.svg",
+      "sha256": "04d7ab1c28d5ef41ab1c1bbcd4dfb717c24eb7b20cd7cba873294e52f9d2c628",
+      "bytes": 438
+    },
+    {
+      "file": "tools/ui_kit/svg_master/modeling_import_mesh.svg",
+      "sha256": "d1ff7b3902019e9fc4bee18895587e6a0c173a8ee2e91bd7e6e015ca547a699e",
+      "bytes": 515
+    },
+    {
+      "file": "tools/ui_kit/svg_master/modeling_ref_stage.svg",
+      "sha256": "980fc34a9aecf342196947c68d83964a3c71c2aebbd16011fb12c58da5803948",
+      "bytes": 544
+    },
+    {
+      "file": "tools/ui_kit/svg_master/modeling_retopo.svg",
+      "sha256": "29c6f29aa6407ff4b69f69689f7f82b92b335ea01167ef9b8da81c3d7673804c",
+      "bytes": 588
+    },
+    {
+      "file": "tools/ui_kit/svg_master/physics_bullet_fracture.svg",
+      "sha256": "ae59fe377c8e66be7dbf5a138c44852cbd81337d14612fc18f1f0d5888596113",
+      "bytes": 509
+    },
+    {
+      "file": "tools/ui_kit/svg_master/physics_cloth_sim.svg",
+      "sha256": "62cea3a093b214891b76133faae264a5003eaeebe937457f1182894e847613b1",
+      "bytes": 425
+    },
+    {
+      "file": "tools/ui_kit/svg_master/physics_fluid_domain.svg",
+      "sha256": "aa0e3feee3d1018180858d97502ea1c6eb03c0b7904784299184e9531cb6aa9b",
+      "bytes": 402
+    },
+    {
+      "file": "tools/ui_kit/svg_master/physics_gn_physics.svg",
+      "sha256": "6fb6dfc6b10d17f9e52243d24383d34705ebfeab3df56d6a0379e8a5535eeb79",
+      "bytes": 360
+    },
+    {
+      "file": "tools/ui_kit/svg_master/render_batch_batch_monitor.svg",
+      "sha256": "cae26f020b9578866c18b3dbe9c0a3688c103fc61f723fa31372fa89044bdb4f",
+      "bytes": 369
+    },
+    {
+      "file": "tools/ui_kit/svg_master/render_batch_batch_resume.svg",
+      "sha256": "ad97b18dae7f57d1b352bf1a21989477cc82799dd9fdfc6a422c46c169d677b3",
+      "bytes": 314
+    },
+    {
+      "file": "tools/ui_kit/svg_master/render_batch_batch_submit.svg",
+      "sha256": "e6dc81a2912c969d8d307cb8159c19109872abf336697ce7af1f041fbb233016",
+      "bytes": 275
+    },
+    {
+      "file": "tools/ui_kit/svg_master/render_batch_exr_passes.svg",
+      "sha256": "4fe1d3bbf0ffe79636f8d3f8dfd432790fb239643dfd64d73d500e9d0b0302a5",
+      "bytes": 428
+    },
+    {
+      "file": "tools/ui_kit/svg_master/rigging_face_rig.svg",
+      "sha256": "b78c79d2874cb115c277a63bf21a481ef65cee22b0d6333645f3b65cc9842d59",
+      "bytes": 428
+    },
+    {
+      "file": "tools/ui_kit/svg_master/rigging_ik_fk_control.svg",
+      "sha256": "7f1945c0a50b737ae5eb94e8ca7ce851f6f98a84a16e0af3e47ce8a7dd6bed97",
+      "bytes": 473
+    },
+    {
+      "file": "tools/ui_kit/svg_master/rigging_retarget_motion.svg",
+      "sha256": "046d2e607252c046ebcceb00a5b548240912de790b3f6dbc7dc6747db9d1a48c",
+      "bytes": 360
+    },
+    {
+      "file": "tools/ui_kit/svg_master/rigging_rig_prepare.svg",
+      "sha256": "bf61567b5c8e6edbdb530169a756b46b1f6fac8cbc4f6886e11e3bb97a237524",
+      "bytes": 549
+    },
+    {
+      "file": "tools/ui_kit/svg_master/rigging_voxel_skin.svg",
+      "sha256": "33d834a4a5d016a629a9566cbe8550e5b60ce2d02d3a45e412b78d3342c36781",
+      "bytes": 394
+    },
+    {
+      "file": "tools/ui_kit/svg_master/status_error.svg",
+      "sha256": "a43b9948a6d580fc5919144a8f9803cea570b3ce90fb3393761ac8a2374083ee",
+      "bytes": 420
+    },
+    {
+      "file": "tools/ui_kit/svg_master/status_info.svg",
+      "sha256": "c1de1064e50d22610b9ffda8f7cc4c9a43419ac9ebeb8ef718f731a45a1e9966",
+      "bytes": 393
+    },
+    {
+      "file": "tools/ui_kit/svg_master/status_ok.svg",
+      "sha256": "49b9359e95a330277a893a39deb521fb97d756bd270b77fb87ef62e6d9f0f060",
+      "bytes": 344
+    },
+    {
+      "file": "tools/ui_kit/svg_master/status_running.svg",
+      "sha256": "26caa83da8b24abcb89eed4f6f35835c2ced8ae0a6b32ead24b94c163366156d",
+      "bytes": 375
+    },
+    {
+      "file": "tools/ui_kit/svg_master/status_safe.svg",
+      "sha256": "ee1bd487190dd63a3f9c414b5bb496917ca10719d39463a3f467e970100e41fe",
+      "bytes": 391
+    },
+    {
+      "file": "tools/ui_kit/svg_master/status_warn.svg",
+      "sha256": "462cd11b9e77091a3f7a1ec811fa5cf39b5de63238a9d4d3d021b924be4a5d22",
+      "bytes": 398
+    },
+    {
+      "file": "tools/ui_kit/svg_master/toon_cel_shader.svg",
+      "sha256": "0aebab3b89eb03391ed56c2c477c872524cdf4aae6206673cba27bda20ea1484",
+      "bytes": 410
+    },
+    {
+      "file": "tools/ui_kit/svg_master/toon_face_sdf.svg",
+      "sha256": "d31869548e85570dc25d5a1a718468c54e5b36620a59a1ec497c453e19879778",
+      "bytes": 435
+    },
+    {
+      "file": "tools/ui_kit/svg_master/toon_line_viewport.svg",
+      "sha256": "53cd843cb2812c7020dfa4bdd0288ac45204f5c30e7fcebee9b7276807aafcd5",
+      "bytes": 313
+    },
+    {
+      "file": "tools/ui_kit/svg_master/toon_toon_output.svg",
+      "sha256": "2e0af80f534b50f6008baa9dc864c86786654306fb045b2d26e20675572a039d",
+      "bytes": 368
+    },
+    {
+      "file": "tools/ui_kit/svg_master/uv_checker_preview.svg",
+      "sha256": "6d983817e052774592f8cf281eb9947bd2bdec1725cb6c9724eb270d9ba4cc6d",
+      "bytes": 392
+    },
+    {
+      "file": "tools/ui_kit/svg_master/uv_texel_rectify.svg",
+      "sha256": "da362af6b7621bd0bedbf9eaebc6b9ef97dafda40513b8189e25ef7491a19631",
+      "bytes": 554
+    },
+    {
+      "file": "tools/ui_kit/svg_master/uv_udim_pack.svg",
+      "sha256": "6659d01caebdfa9156666e751b0ae371a2055e4b03b4bb92fad346c8e912034f",
+      "bytes": 564
+    },
+    {
+      "file": "tools/ui_kit/svg_master/uv_unwrap_seam.svg",
+      "sha256": "0b46779365929ef4a479acc2aa9d97993ea5cd7c4fe3a51594e9384e149317ba",
+      "bytes": 483
+    },
+    {
+      "file": "tools/ui_kit/svg_master/video_lufs_export.svg",
+      "sha256": "19a2e7caef188b443bacc92ec5e1d26556489925be09a2601ff45a5dac5a0be1",
+      "bytes": 542
+    },
+    {
+      "file": "tools/ui_kit/svg_master/video_shot_replace.svg",
+      "sha256": "5a214ec3f10666ee54346e2605ea507c83c2fc824ce1bad4a25756d9b0eb4e11",
+      "bytes": 484
+    },
+    {
+      "file": "tools/ui_kit/svg_master/video_strip_comp.svg",
+      "sha256": "259bdd52068b335b1cb80be8c0fcc4572403959fe0b5a754b7ea6dbbb0942e61",
+      "bytes": 373
+    },
+    {
+      "file": "tools/ui_kit/svg_master/video_subtitle_style.svg",
+      "sha256": "ea06dc90cbe6fa78f2ca5d8e4e2808f59572770637e008870ca03f4cd3602d0a",
+      "bytes": 438
+    },
+    {
+      "file": "tools/ui_kit/sync_ui_kit.py",
+      "sha256": "5142d2e51672d99e123087279c38a8bf38f904e4cc1f14dfff2fd05a3fb83eb7",
+      "bytes": 5702
+    },
+    {
+      "file": "tools/ui_kit/theme_tokens.py",
+      "sha256": "2d3035966030d949629190a54c4a7eb60705487409bd6f31bd0652b976905900",
+      "bytes": 11791
+    },
+    {
       "file": "tools/video_editing_workflow_addon/LICENSE.txt",
       "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b",
       "bytes": 35821
     },
     {
       "file": "tools/video_editing_workflow_addon/__init__.py",
-      "sha256": "b658367c1d536662462a021efaded2cd162194192f38e4472e4557e6bad2c751",
-      "bytes": 487
+      "sha256": "590f33c0d455f4d74f517f602b3a42119bf40e4052d852bc5849a98948c70f57",
+      "bytes": 474
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/__init__.py",
+      "sha256": "45817192185bb89c37e55f05172d3a069dcea26815f0619c796aea1141dbb305",
+      "bytes": 1441
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/hud_overlay.py",
+      "sha256": "5c8c441cfe6b5486c458ed8787530ba43a7713f2323787c5f8ccb774e36fbebb",
+      "bytes": 10895
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons.py",
+      "sha256": "b0e9ff36dda9a13d932dbe84e0fbbd7f1ab7ed4b019483a5b7a75d3be1e95be2",
+      "bytes": 3111
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/brand_video_32.png",
+      "sha256": "5c2cf1b5c3013f79e0fb43e207f29826e703062bd563cf80d1760b727a0d63cb",
+      "bytes": 2162
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/brand_video_64.png",
+      "sha256": "ed4a49b89fd345bd09bc5b840cfbcca2d2996b876fe968345772fcbca85d4250",
+      "bytes": 5822
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/status_error_32.png",
+      "sha256": "0a9a87ad97c82a9729b59079ce67fbe3166611738619e4d4ec9ab70ba3132752",
+      "bytes": 704
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/status_info_32.png",
+      "sha256": "57e4325f1f045ac8414d00d308462d982d2c3571284f135ec72b234d4cf31149",
+      "bytes": 698
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/status_ok_32.png",
+      "sha256": "6af6193c52c8b4c2df5f9dbf38ed43d5680ce3ca567626ec10d7d9689074304c",
+      "bytes": 824
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/status_running_32.png",
+      "sha256": "f1c5d82ed8f87d8859c14da5d1b8f137801ae873f8b37b6ad52119645fe897cb",
+      "bytes": 821
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/status_safe_32.png",
+      "sha256": "a79fc1d8e65fdb0985b6397254e00323112905cbe4c56eda782c842b10d8dece",
+      "bytes": 723
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/status_warn_32.png",
+      "sha256": "b0dd7fbf27eeffc90e31136b681193eae447a3da6f30dc2233dbbda0355d9e51",
+      "bytes": 577
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/video_lufs_export_32.png",
+      "sha256": "8d191b4c040e9894350531c899812b593342b289da2daea14383754b904b2f9f",
+      "bytes": 230
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/video_shot_replace_32.png",
+      "sha256": "e788d9f0fa033941c86b80b727d9a791f6432eaa3244b6c367b48b7585ef2992",
+      "bytes": 458
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/video_strip_comp_32.png",
+      "sha256": "7b1e0a9b5d106ca5dd9075f4286c1230711fe2cf27b398c361b33875b395e83e",
+      "bytes": 379
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/icons/video_subtitle_style_32.png",
+      "sha256": "ad62088a38c37727d608588ce2a85e0d4be9877c4ec97586b4f3a7c8c522accd",
+      "bytes": 315
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/job_runner.py",
+      "sha256": "c6444283c0db59297b051f7e2742b8cec4f2065eac37befa70ef1ecf1e3ed6e4",
+      "bytes": 8128
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/layout_kit.py",
+      "sha256": "8667077d9f6724a3f546fddf7a3e9b30dd867d8c5e91d92a3b7762760b7ea635",
+      "bytes": 8427
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/sidebar_dock.py",
+      "sha256": "2f7828bb48be41983dc75b32c60495fcf840b05b51484feea5e0970dc0266572",
+      "bytes": 25879
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/_ui_kit/theme_tokens.py",
+      "sha256": "2d3035966030d949629190a54c4a7eb60705487409bd6f31bd0652b976905900",
+      "bytes": 11791
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/artist_ops.py",
+      "sha256": "ff187ddb76bea7790c151f8eb2e4f87e4f92d36b704c118a1935e293dbb34661",
+      "bytes": 19110
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/batch_contract.py",
+      "sha256": "f2f08918d70654c8c29647decbae9fb8751c635b2e6560e51e7bc0a6db3181b9",
+      "bytes": 2347
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/batch_edit.py",
+      "sha256": "42bfa82fbf61fd510375e2b176dd7cf55f8d2f6500ddc9ee75534173299b4cb3",
+      "bytes": 24800
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/batch_plan.py",
+      "sha256": "0190913990529c2107a264bc97804640fb0514b821a94ea4fce77f7463dcd64d",
+      "bytes": 7006
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/batch_resources.py",
+      "sha256": "1c8a7434000ec20fe52771ef88040902e9592cfa68605c3ce74ecf01ccf5d06b",
+      "bytes": 11760
     },
     {
       "file": "tools/video_editing_workflow_addon/blender_manifest.toml",
-      "sha256": "9f33b597940fdc034c0bde1388e821dcc35599b8a6e880ce44ce8795b92be1c2",
-      "bytes": 294
+      "sha256": "2d383d632dc00bdee10b14457ecce40d776114f4d606d3de816a94829f903353",
+      "bytes": 303
     },
     {
       "file": "tools/video_editing_workflow_addon/contract.py",
-      "sha256": "00bbfa6b8e0b02f46408c299144481baa74f7c4b0ce0623c5693f58efa2f5997",
-      "bytes": 26994
+      "sha256": "2bac117e6ae9f2fd42b162096aea8f684010a18627d3227e962440818c3f3e8f",
+      "bytes": 28880
     },
     {
       "file": "tools/video_editing_workflow_addon/core.py",
-      "sha256": "7be01d8d9b4b18709b573e5984c9ce7a4b164e8802c284673d728874ac21e7d2",
-      "bytes": 31507
+      "sha256": "5ab9e1269f3543fbd98368850562d289ca788273ba6d058ff8ea1cf6a877e187",
+      "bytes": 45204
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/export_worker.py",
+      "sha256": "258d6499d30ce6cd851380b739cbcf373bf59bf2af76105db93bf4f764c7cab7",
+      "bytes": 10089
+    },
+    {
+      "file": "tools/video_editing_workflow_addon/finishing.py",
+      "sha256": "b00e45ae8221a2112c67b9fdbe706a7776bfa7a001d356203114ab567a36a948",
+      "bytes": 8511
     },
     {
       "file": "tools/video_editing_workflow_addon/protection.py",
-      "sha256": "e3bac01875e66f9a6081fa1f49b698bfffee9c5b6c525d473ad2d15c4cbd92d8",
-      "bytes": 23951
+      "sha256": "a5fa354d7e46a181edb0dc8b6547c7540950b5d5a52ab778e3c8752983ec484d",
+      "bytes": 25385
     },
     {
       "file": "tools/video_editing_workflow_addon/retiming.py",
@@ -2692,23 +5592,23 @@
     },
     {
       "file": "tools/video_editing_workflow_addon/ui.py",
-      "sha256": "89372ec259925925997199baa76aacd8f57910f482e373f28fedf5fa97876bf1",
-      "bytes": 2359
+      "sha256": "75d232aa2fd2a1c72f5be2495a75053d57f09eb21001b6941e4dd1cc1ec07e80",
+      "bytes": 12316
     },
     {
       "file": "tools/viewport_preview/__init__.py",
-      "sha256": "b2864053d043e4e8c3a7a74f39418ef673ea98163002fdc3e5560b36b6494170",
-      "bytes": 270
+      "sha256": "d9c3e94daa7d8dc5225d26b510efeb0bc61c3cbe8420295bee4e8bfd84f04911",
+      "bytes": 325
     },
     {
       "file": "tools/viewport_preview/cli.py",
-      "sha256": "827e529b57987eaa0518965ae64e34eaa7ba1a3dbcaeed802f27a6d375519e94",
-      "bytes": 24532
+      "sha256": "5ed963045f71ea5147085971a3edcfbe87f4bc9e1a880107cfcc3146234f941d",
+      "bytes": 30142
     },
     {
       "file": "tools/viewport_preview/compositor_board.py",
-      "sha256": "32379302c0386182bfadd2af3bed6cf4021e8ece6a734f3d0b604b47c82dbb5b",
-      "bytes": 8534
+      "sha256": "19858e228696cc80f6277daeedc08e258d4339dbac025c05eec9728317da6121",
+      "bytes": 7775
     },
     {
       "file": "tools/viewport_preview/desktop_runner.py",
@@ -2717,8 +5617,13 @@
     },
     {
       "file": "tools/viewport_preview/framing.py",
-      "sha256": "2fb8b05504c4fff609880d7a299df43e4485b8dde8f0f346ee6efc510a554897",
-      "bytes": 14822
+      "sha256": "d935bef94496e977d0048895bc990f1390efc6b65afeb5e348f58e45f42dd205",
+      "bytes": 14883
+    },
+    {
+      "file": "tools/viewport_preview/inspection_modes.py",
+      "sha256": "be5b5b1250cc9593ff1532022d5183701d002beb47b3ed3799e88ad5c495e822",
+      "bytes": 5997
     },
     {
       "file": "tools/viewport_preview/session_manager.py",
@@ -2727,8 +5632,8 @@
     },
     {
       "file": "tools/viewport_preview/viewport_worker.py",
-      "sha256": "474460d10410fd644dfe51e23b21032d6f34ba6a5f5e48f11d6f89f48169848f",
-      "bytes": 41274
+      "sha256": "64ca9d4a452611efdcedcd530c0be70f7fbb3894f4e6d6a2b78e33f9fd225ff0",
+      "bytes": 48277
     }
   ],
   "rigging_adapter": {

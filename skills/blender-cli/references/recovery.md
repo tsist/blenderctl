@@ -44,4 +44,4 @@
 工作目录里的候选确认过关后，再通过事务落到正式目标路径：
 
 - **写入全新的目标路径**：确保父目录已创建，运行 `project plan-copy <源> --output <新目标>` 生成事务计划，再用 `transaction apply <transaction_id>` 提交。
-- **替换已获授权的目标文件或发布进 `<ASSET_LIBRARY>`**：先按资产规范跑 `asset prepare`、`asset index`、`asset plan` 检查 Catalog UUID、外部依赖闭包（连同序列帧、VDB、USD、物理缓存成组保留）与影响面，确认目标自接手以来未被外部修改后，运行 `transaction apply` 并用 `transaction status` 读回核实。`recover` 会顺着事务日志完成既定提交或回滚；`rollback` 在目标文件仍等于本事务输出时将其安全退回原状。
+- **替换已获授权的目标文件或发布进 `<ASSET_LIBRARY_ROOT>`**：先按资产规范跑 `asset prepare`、`asset index`、`asset plan` 检查 Catalog UUID、外部依赖闭包（连同序列帧、VDB、USD、物理缓存成组保留）与影响面，确认目标自接手以来未被外部修改后，运行 `transaction apply` 并用 `transaction status` 读回核实。`recover` 会顺着事务日志完成既定提交或回滚；`rollback` 在目标文件仍等于本事务输出时将其安全退回原状。

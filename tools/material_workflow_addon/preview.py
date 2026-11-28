@@ -16,9 +16,9 @@ def _sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def validate_materials(objects, engine):
+def validate_materials(objects, engine, *, channel_material=None, uv_layer=None):
     """Check actual face materials, including retained slots, before studio copies."""
-    from .engine_compat import validate_material
+    from .engine_compat import validate_channel_material, validate_material
     results = []
     for obj in objects:
         used = {face.material_index for face in obj.data.polygons}
@@ -26,12 +26,15 @@ def validate_materials(objects, engine):
             if index < len(obj.material_slots):
                 material = obj.material_slots[index].material
                 if material:
+                    source = material.original
+                    checked = (validate_channel_material(source, engine, obj.data, uv_layer) if source == channel_material
+                               else validate_material(material, engine))
                     results.append({'object': obj.name, 'slot': index,
-                                    **validate_material(material, engine)})
+                                    **checked})
     return results
 
 
-def build_preview(manifest, target_obj):
+def build_preview(manifest, target_obj, *, channel_material=None):
     import bpy
     from mathutils import Vector
     context = manifest['context']
@@ -53,13 +56,18 @@ def build_preview(manifest, target_obj):
     if any(i.is_instance and i.parent and i.parent.original == target_obj for i in graph.object_instances):
         raise ValueError('M1 evaluated instances need explicit realization')
     evaluated = target_obj.evaluated_get(graph)
-    validate_materials([evaluated], manifest['preview']['engine'])
+    validate_materials([evaluated], manifest['preview']['engine'], channel_material=channel_material,
+                       uv_layer=manifest['target'].get('uv_layer'))
     mesh = bpy.data.meshes.new_from_object(evaluated, preserve_all_data_layers=True, depsgraph=graph)
     if not mesh.polygons:
         bpy.data.meshes.remove(mesh)
         raise ValueError('Preview mesh contains no surface')
     # Object material overrides are preserved, including empty slots.
-    materials = [slot.material for slot in evaluated.material_slots]
+    # Evaluated IDs belong to the depsgraph. Binding those temporary Materials
+    # into a persistent mesh leaves dangling node-group interfaces when the
+    # next view rebuilds that graph. Keep the actual source ID instead.
+    materials = [slot.material.original if slot.material else None
+                 for slot in evaluated.material_slots]
     for index, material in enumerate(materials):
         mesh.materials[index] = material
     uv = manifest['target'].get('uv_layer')

@@ -20,6 +20,10 @@ SESSION = {'rna_type', 'id_data', 'tag', 'is_updated', 'is_updated_data',
            'frame_current', 'frame_subframe', 'animation_data', 'sequence_editor'}
 TIMELINE_FIELDS = {'frame_start', 'frame_end'}
 RENDER_FIELDS = {'fps', 'fps_base', 'resolution_x', 'resolution_y', 'resolution_percentage'}
+DEFAULT_ANIMATION = {'action_extrapolation': 'HOLD', 'action_blend_type': 'REPLACE',
+                     'action_influence': 1.0, 'action_slot_handle_tweak_storage': 0,
+                     'use_nla': True, 'use_tweak_mode': False, 'use_pin': False,
+                     'action_slot_handle': 0, 'last_slot_identifier': ''}
 
 
 def _bpy():
@@ -230,10 +234,11 @@ def _record(item, target=None, excluded=(), excluded_paths=()):
     private_action = target and getattr(getattr(target, 'animation_data', None), 'action', None)
     action_paths = excluded_paths if item == private_action and item.users == 1 else ()
     if isinstance(item, bpy.types.Action):
-        if action_paths and not item.use_frame_range:
-            # Without an explicit range this is derived from all FCurves,
-            # including the authored targets excluded from this witness.
-            # Retained curves and explicit frame_start/end remain protected.
+        if not item.use_frame_range:
+            # Derived from all FCurves. A newly inserted or removed strip can
+            # change the set of excluded paths between the two snapshots.
+            # Keep both witnesses comparable. Curves and explicit ranges are
+            # still recorded below.
             row['settings'].pop('frame_range', None)
         row['action'] = _action(item, action_paths)
     animation = getattr(item, 'animation_data', None)
@@ -249,8 +254,17 @@ def _record(item, target=None, excluded=(), excluded_paths=()):
                         if item != target or not any(c.data_path.startswith(p + '.') for p in excluded_paths)],
             'nla': [_rna(t, 4) for t in animation.nla_tracks]}
         if hidden_action:
-            row['animation']['settings'].pop('action', None)
-            row['animation']['settings'].pop('action_slot', None)
+            settings = row['animation']['settings']
+            settings.pop('action', None)
+            settings.pop('action_slot', None)
+            settings.update(action_slot_handle=0, last_slot_identifier='')
+        # Keying a first private VSE curve allocates a default AnimData shell.
+        # Omit only that empty shell in the target-scoped witness; full reopen
+        # expectations still cover it and all nondefault settings are retained.
+        if (item == target and excluded and (not action or hidden_action) and
+                not row['animation']['drivers'] and not row['animation']['nla'] and
+                row['animation']['settings'] == DEFAULT_ANIMATION):
+            row.pop('animation')
     if isinstance(item, bpy.types.Scene):
         partial = item == target and bool(excluded)
         row['settings'] = _rna(item, 2, TIMELINE_FIELDS if partial else ())
@@ -412,12 +426,20 @@ def resource_paths():
                         dynamic('Enabled custom proxy has unresolved filepath: ' + strip.name)
                     add(filename, scene.library)
                 if strip.type == 'IMAGE':
+                    if not len(strip.elements) or any(not e.filename for e in strip.elements):
+                        dynamic('VSE IMAGE has unresolved members: ' + strip.name)
                     for element in strip.elements:
                         add(os.path.join(strip.directory, element.filename), scene.library)
                 elif strip.type == 'MOVIE':
+                    if not strip.filepath:
+                        dynamic('VSE MOVIE has no source path: ' + strip.name)
                     add(strip.filepath, scene.library)
-                elif strip.type == 'SOUND' and strip.sound and not strip.sound.packed_file:
-                    add(strip.sound.filepath, strip.sound.library)
+                elif strip.type == 'SOUND':
+                    sound = strip.sound
+                    if sound is None or (not sound.packed_file and not sound.filepath):
+                        dynamic('VSE SOUND has no source path: ' + strip.name)
+                    if not sound.packed_file:
+                        add(sound.filepath, sound.library)
     trees = {t.as_pointer(): t for t in bpy.data.node_groups}
     for collection in (bpy.data.materials, bpy.data.worlds, bpy.data.lights, bpy.data.scenes):
         for item in collection:

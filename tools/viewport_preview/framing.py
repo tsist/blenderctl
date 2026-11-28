@@ -247,9 +247,10 @@ def compute_shared_ortho_extent(points, center, views) -> float:
     """Compute one common orthographic half-extent across all ORTHO preset views."""
     max_half = 0.0
     for view in views:
-        if view.get("projection") != "ORTHO" or "preset" not in view:
+        if view.get("projection") != "ORTHO":
             continue
-        rot = rotation_for_direction(DIRECTION_VECTORS[view["preset"]])
+        direction = view.get("direction") or DIRECTION_VECTORS[view["preset"]]
+        rot = rotation_for_direction(direction)
         right = rot.col[0].to_3d()
         up = rot.col[1].to_3d()
         for pt in points:
@@ -300,7 +301,7 @@ def apply_viewport_view(
 
     preset = view_spec["preset"]
     proj = view_spec["projection"]
-    rot = rotation_for_direction(DIRECTION_VECTORS[preset])
+    rot = rotation_for_direction(view_spec.get("direction") or DIRECTION_VECTORS[preset])
     quat = rot.to_quaternion()
 
     space.use_local_camera = False

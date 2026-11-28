@@ -25,11 +25,39 @@ def previews():
     return result
 
 
+def collection_memberships_to_remove(selected):
+    """Predict only the indirect scene memberships lost with the selected collections."""
+    removed_collections = {item for item, _ in selected if isinstance(item, bpy.types.Collection)}
+    if not removed_collections:
+        return {}
+    removed_objects = {item for item, _ in selected if isinstance(item, bpy.types.Object)}
+    memberships = {}
+    for scene in bpy.data.scenes:
+        visited = set()
+        remaining = set()
+        pending = [scene.collection]
+        while pending:
+            collection = pending.pop()
+            if collection in visited or collection in removed_collections:
+                continue
+            visited.add(collection)
+            remaining.update(collection.objects)
+            pending.extend(collection.children)
+        lost_objects = set(scene.collection.all_objects) - remaining - removed_objects
+        lost_collections = set(scene.collection.children_recursive) - visited - removed_collections
+        for target in lost_objects | lost_collections:
+            edge = {"user": identity(scene), "target": identity(target)}
+            memberships[key(edge)] = (scene, target)
+    return memberships
+
+
 def prepare(params, job):
     source = snapshot(params["file"])
     atomic_json(job / "before.snapshot.json", source)
-    manifest = params["manifest"]
+    manifest = copy.deepcopy(params["manifest"])
     operation = manifest["operation"]
+    from asset_thumbnail import generate
+    automatic_thumbnails = generate(params["file"], manifest["targets"], job)
     items = list(all_ids())
     before_previews = previews()
     requested_previews = {}
@@ -116,6 +144,7 @@ def prepare(params, job):
             item.use_fake_user = True
         changes.append({"before": before, "after_identity": identity(item), "asset_id": item.get("asset_id"), "operation": operation})
     retention = []
+    removed_memberships = {}
     if operation == "extract":
         if not manifest.get("keep_dependency_assets", False):
             for item in items:
@@ -134,7 +163,18 @@ def prepare(params, job):
                 if target in by_identity and target not in visited:
                     visited.add(target);pending.append(target);export.add(by_identity[target])
     elif operation == "remove":
+        memberships = collection_memberships_to_remove(selected)
         bpy.data.batch_remove(ids={i for i, _ in selected})
+        if memberships:
+            # Scene also owns view-layer bases. A camera, ID property, another
+            # collection or another scene can still reference the same object.
+            for scene in {scene for scene, _ in memberships.values()}:
+                for layer in scene.view_layers:
+                    layer.update()
+            direct_users = bpy.data.user_map(subset={target for _, target in memberships.values()})
+            for edge, (scene, target) in memberships.items():
+                if scene not in direct_users.get(target, ()):
+                    removed_memberships[edge] = {"user": identity(scene), "target": identity(target)}
         export = set(all_ids())
     else:
         export = set(all_ids())
@@ -209,7 +249,8 @@ def prepare(params, job):
             preview_key = key({k:block[k] for k in ('type','name','library')})
             if after_previews.get(preview_key) != before_previews.get(preview_key):
                 raise Failure('VALIDATION_FAILED', 'A non-target preview changed')
-        expected_edges = [remap(e) for e in source['edges'] if operation != 'remove' or not ({key(e['user']),key(e['target'])} & selected_keys)]
+        expected_edges = [remap(e) for e in source['edges'] if operation != 'remove' or (
+            key(e) not in removed_memberships and not ({key(e['user']),key(e['target'])} & selected_keys))]
         if sorted(expected_edges, key=key) != sorted(after['edges'], key=key):
             raise Failure('VALIDATION_FAILED', 'Unexpected reference graph change')
     if operation == "extract" and not manifest.get("keep_dependency_assets", False):
@@ -220,7 +261,9 @@ def prepare(params, job):
     result = {"candidate": str(candidate), "candidate_sha256": digest(candidate), "operation": operation,
               "changes": changes, "difference": difference, "asset_count": sum(bool(b["asset"]) for b in after["datablocks"]),
               "source_version": source_version, "reader_version":list(bpy.app.version), "version_converted":conversion,
-              "previews": after_previews, "retained_orphans": retention, "source_unchanged": True, "publication": "not_run", "next_step": "project plan-files with kind=blend_exact; then independent validate"}
+              "previews": after_previews, "automatic_thumbnails": automatic_thumbnails, "retained_orphans": retention, "source_unchanged": True, "publication": "not_run", "next_step": "project plan-files with kind=blend_exact; then independent validate"}
+    if operation == "remove":
+        result["removed_scene_memberships"] = [removed_memberships[k] for k in sorted(removed_memberships)]
     atomic_json(job / "asset-change.json", result)
     return result
 
@@ -253,6 +296,23 @@ def index(params, job):
                         "blender":{"datablocks":[{"type":block["type"],"name":block["name"]}],"validated_version":bpy.app.version_string},
                         "catalog":{"library_root":manifest["library_root"],"uuid":catalog_id,"path":definitions[catalog_id]["path"]},
                         "source":spec["source"],"dependencies":[{"path":p} for p in paths],"validation":{"status":"not_run"}})
+    embedded = previews()
+    for rec in records:
+        rec["asset_uuid"] = rec["asset_id"]
+        for dep in rec["dependencies"]:
+            path = Path(dep["path"])
+            if path.is_file():
+                dep["sha256"] = digest(path)
+        thumbnail = specs[rec["asset_id"]].get("thumbnail")
+        if thumbnail:
+            block, = rec["blender"]["datablocks"]
+            asset_preview = embedded.get(key({**block, "library": None}))
+            path = Path(thumbnail["file"])
+            if asset_preview is None or digest(path) != thumbnail["expected_sha256"]:
+                raise Failure("VALIDATION_FAILED", "Indexed thumbnail requires embedded preview and verified PNG")
+            rec["files"].append({"path": str(path), "path_base": None, "role": "preview",
+                                 "bytes": path.stat().st_size, "sha256": thumbnail["expected_sha256"]})
+            rec["blender"]["embedded_preview"] = asset_preview
     schema = read_json(ROOT / "docs/cli/schemas/asset-record.schema.json")
     for record in records:
         errors = list(schema_errors(record, schema))

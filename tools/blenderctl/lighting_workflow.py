@@ -36,15 +36,34 @@ def _absolute_paths(closure):
     for r in closure['rows']:
         item=getattr(bpy.data,r['kind']).get(r['name'])
         if item and not item.library:item.filepath=r['file']
-def _reopen(candidate,params,inspection,protection,excluded,job):
+def _reopen_timeout(job, parent_job=None):
+    owner = Path(parent_job) if parent_job is not None else Path(job)
+    launch = owner / 'launch.json'
+    if not launch.is_file():
+        return 120
+    timeout = float(read_json(launch)['timeout_seconds'])
+    status = read_json(owner / 'status.json')
+    started = status.get('started_at')
+    remaining = timeout if started is None else timeout - max(0, time.time() - started)
+    if remaining <= 0:
+        raise Failure('TIMEOUT', 'Lighting job deadline elapsed before independent reopen')
+    return remaining
+
+
+def _reopen(candidate,params,inspection,protection,excluded,job,parent_job=None):
     manifest=params['manifest'];cfg={'candidate':candidate,'implementation_sha256':params['implementation_sha256'],
         'scene':manifest['scene'],'view_layer':manifest['view_layer'],'frame':params['_effective_frame'],
         'rig_id':manifest['rig_id'],'inspection':inspection,'protection':protection,'excluded_names':excluded,
         'output':str(job/'lighting-reopen.json'),'runtime':params['_runtime']}
     path=job/'lighting-verification-request.json';atomic_json(path,cfg)
     args=[bpy.app.binary_path,'--background','--factory-startup','--disable-autoexec','--offline-mode','--python',str(Path(__file__).with_name('lighting_verifier.py')),'--',str(path)]
+    timeout = _reopen_timeout(job, parent_job)
     with (job/'lighting-reopen.log').open('wb') as log:
-        proc=subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,timeout=120,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+        try:
+            proc = subprocess.run(args, stdout=log, stderr=subprocess.STDOUT, timeout=timeout,
+                                  creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        except subprocess.TimeoutExpired as exc:
+            raise Failure('TIMEOUT', 'Independent lighting reopen exceeded the job deadline') from exc
     result=read_json(cfg['output']) if Path(cfg['output']).is_file() else {'status':'failed','error':'No independent reader result'}
     if proc.returncode or result['status']!='passed':raise Failure('VALIDATION_FAILED','Independent lighting reopen: '+str(result.get('error')))
     return result
@@ -143,7 +162,7 @@ def run(params,job,*,cancel_parent=None):
             protection=core.snapshot_protection(m['scene'],excluded_names=excluded)
             report['saved_expectation']={'inspection':expected,'protection':protection}
         progress('independent_reopen')
-        report['verification']=_reopen(candidate,params,expected,protection,excluded,job)
+        report['verification']=_reopen(candidate,params,expected,protection,excluded,job,cancel_parent)
         atomic_json(job/'lighting-manifest.json',m)
         progress('preview')
         _previews(params,candidate,job,progress,report)

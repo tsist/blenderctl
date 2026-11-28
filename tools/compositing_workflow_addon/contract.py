@@ -56,7 +56,11 @@ M2_NODE_TYPES = (
     'CompositorNodeEllipseMask', 'CompositorNodeKeying', 'CompositorNodeColorSpill',
     'CompositorNodeTransform', 'CompositorNodeScale', 'CompositorNodeLensdist',
 )
-NODE_TYPES = M1_NODE_TYPES + M2_NODE_TYPES
+C5_GRAPH_NODE_TYPES = (
+    'CompositorNodeCryptomatteV2', 'CompositorNodeColorBalance',
+    'CompositorNodeLevels', 'CompositorNodeConvertColorSpace',
+)
+NODE_TYPES = M1_NODE_TYPES + M2_NODE_TYPES + C5_GRAPH_NODE_TYPES
 M1_NODE_SCHEMA = obj({'id': ID, 'type': {'enum': list(M1_NODE_TYPES)},
     'inputs': FIELDS, 'properties': FIELDS, 'outputs': FIELDS}, ('id', 'type'))
 IMAGE_BINDING_SCHEMA = obj({'kind': {'const': 'image'}, 'file': TEXT, 'expected_sha256': SHA,
@@ -72,7 +76,10 @@ NODE_SCHEMA['allOf'] = [
      'then': {'required': ['binding'], 'properties': {'binding': IMAGE_BINDING_SCHEMA}}},
     {'if': {'properties': {'type': {'const': 'CompositorNodeRLayers'}}},
      'then': {'required': ['binding'], 'properties': {'binding': RLAYERS_BINDING_SCHEMA}}},
-    {'if': {'properties': {'type': {'enum': ['CompositorNodeImage', 'CompositorNodeRLayers']}}},
+    {'if': {'properties': {'type': {'const': 'CompositorNodeCryptomatteV2'}}},
+     'then': {'required': ['binding'], 'properties': {'binding': IMAGE_BINDING_SCHEMA}}},
+    {'if': {'properties': {'type': {'enum': ['CompositorNodeImage', 'CompositorNodeRLayers',
+                                            'CompositorNodeCryptomatteV2']}}},
      'else': {'not': {'required': ['binding']}}},
 ]
 LINK_SCHEMA = obj({'from_node': NAME, 'from_socket': NAME, 'to_node': NAME, 'to_socket': NAME},
@@ -275,7 +282,8 @@ def normalize_manifest(value):
         for node in graph['nodes']:
             if value['workflow_version'] == '1.0' and (node['type'] not in M1_NODE_TYPES or 'binding' in node):
                 raise WorkflowError('INVALID_REQUEST', 'New node types/bindings require workflow_version 1.1')
-            required_binding = {'CompositorNodeImage': 'image', 'CompositorNodeRLayers': 'render_layers'}.get(node['type'])
+            required_binding = {'CompositorNodeImage': 'image', 'CompositorNodeRLayers': 'render_layers',
+                                'CompositorNodeCryptomatteV2': 'image'}.get(node['type'])
             if required_binding:
                 if node.get('binding', {}).get('kind') != required_binding:
                     raise WorkflowError('INVALID_REQUEST', node['type'] + ' requires an exact matching binding')
@@ -284,8 +292,16 @@ def normalize_manifest(value):
                     raise WorkflowError('INVALID_REQUEST', 'Bound image file must be absolute')
                 if required_binding == 'render_layers' and (binding['scene'] != value['scene'] or binding['view_layer'] != value['view_layer']):
                     raise WorkflowError('UNSUPPORTED', 'Render Layers binding must match manifest scene/view_layer')
+                if node['type'] == 'CompositorNodeCryptomatteV2':
+                    properties = node.get('properties', {})
+                    if set(properties) != {'layer_name', 'matte_id'} or 'layer' not in binding:
+                        raise WorkflowError('INVALID_REQUEST', 'Cryptomatte needs a bound EXR layer, layer_name and matte_id')
+                    if properties['layer_name'] not in [binding['layer'] + '.Crypto' + name
+                                                        for name in ('Object', 'Material', 'Asset')]:
+                        raise WorkflowError('INVALID_REQUEST', 'Cryptomatte layer must belong to the bound EXR layer')
+                    validate(properties['matte_id'], NAME, '$/graph/cryptomatte/matte_id')
             elif 'binding' in node:
-                raise WorkflowError('INVALID_REQUEST', 'Binding is only supported on Image and Render Layers nodes')
+                raise WorkflowError('INVALID_REQUEST', 'This node does not accept a source binding')
         targets = set(ids) | {'$input', '$output'}
         for link in graph['links']:
             if link['from_node'] not in targets - {'$output'} or link['to_node'] not in targets - {'$input'}:

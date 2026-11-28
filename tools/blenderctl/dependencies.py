@@ -10,6 +10,31 @@ from inspection import identity, key, path_value
 LIMIT = 10000
 
 
+def asset_archive_libraries(items):
+    """Library records whose paths only identify packed asset origins in this Main."""
+    archives = {lib for lib in bpy.data.libraries if getattr(lib, "is_archive", False)}
+    if not archives:
+        return set()
+    packed, ordinary = set(), set()
+    for item in items:
+        if item.library is None:
+            continue
+        if getattr(item, "is_linked_packed", False) and not item.is_missing:
+            packed.add(item.library)
+        else:
+            ordinary.add(item.library)
+    internal = archives & (packed - ordinary)
+    parents = {lib.archive_parent_library for lib in internal if lib.archive_parent_library is not None}
+    # A logical source can also own normal linked IDs. In that case its file
+    # is still needed even if it shares a path with a self-contained archive.
+    parents.difference_update(ordinary | packed)
+    for lib in bpy.data.libraries:
+        if lib not in internal:
+            parents.discard(lib.parent)
+            parents.discard(getattr(lib, "archive_parent_library", None))
+    return internal | parents
+
+
 def pattern_candidates(absolute):
     path = Path(absolute)
     name = path.name
@@ -36,14 +61,55 @@ def pattern_candidates(absolute):
     return sorted(found), False
 
 
+def tiled_image_resource(image, *, include_packed_paths=False):
+    """Observe declared single-view tiles without treating packed origins as external files."""
+    raw = image.filepath
+    observed = {"resolved_path": path_value(raw, image.library) if raw else None,
+                "status": "pattern_unresolved", "completeness": "tiled_image_layout_unverified"}
+    if any(getattr(image, flag, False) for flag in ("use_multiview", "is_multiview", "is_stereo_3d")):
+        return observed
+    declared = sorted(tile.number for tile in image.tiles)
+    packed = [entry.tile_number for entry in image.packed_files
+              if entry.packed_file is not None and entry.packed_file.size > 0]
+    if not declared or len(set(packed)) != len(packed):
+        return observed
+    packed_tiles = set(declared).intersection(packed)
+    observed["packed_tiles"] = sorted(packed_tiles)
+    if len(packed_tiles) == len(declared):
+        return {**observed, "status": "packed", "resolved_path": None,
+                "completeness": "declared_members_only"}
+    udim_count = raw.count("<UDIM>")
+    token = "<UDIM>" if udim_count else "<UVTILE>"
+    # Blender's // prefix means blend-relative, while Windows pathlib treats it as UNC.
+    filename = Path(raw[2:] if raw.startswith("//") else raw).name
+    if udim_count + raw.count("<UVTILE>") != 1 or token not in filename:
+        return observed
+    paths = {}
+    for number in declared:
+        if number in packed_tiles and not include_packed_paths:
+            continue
+        index = number - 1001
+        replacement = str(number) if token == "<UDIM>" else f"u{index % 10 + 1}_v{index // 10 + 1}"
+        paths[number] = path_value(raw.replace(token, replacement), image.library)
+    missing = [path for number, path in paths.items() if number not in packed_tiles and not Path(path).is_file()]
+    observed.update(status="incomplete" if missing else "exists", expected_files=list(paths.values()),
+                    missing_files=missing, completeness="declared_members_only")
+    if include_packed_paths:
+        observed["packed_members"] = sorted(paths[number] for number in packed_tiles)
+    return observed
+
+
 def resource(owner, kind, raw, library=None, *, packed=False, source=None, directory=False,
-             expected=None, packed_members=None, reachability="retained_unreferenced", binding=None):
+             expected=None, packed_members=None, reachability="retained_unreferenced", binding=None,
+             tiled_image=None):
     absolute = path_value(raw, library) if raw and raw != "<builtin>" else None
     result = {"owner": owner, "kind": kind, "raw_path": raw, "resolved_path": absolute,
               "source": source, "reachability": reachability, "status": None,
               "role": "cache" if directory else "input", "binding": binding,
               "usage_evidence": "structural reachability is not proof of render/playback use"}
-    if packed:
+    if tiled_image is not None:
+        result.update(tiled_image_resource(tiled_image, include_packed_paths=True))
+    elif packed:
         result["status"] = "packed"
     elif raw == "<builtin>":
         result["status"] = "builtin"
@@ -126,6 +192,7 @@ def audit(items, reachable, profile=None):
     scene, frames = timeline(profile)
     result = []
     user_map = bpy.data.user_map()
+    asset_archives = asset_archive_libraries(user_map)
     def usage(item):
         return "scene_or_asset" if key(identity(item)) in reachable else "referenced" if user_map.get(item) else "retained_unreferenced"
     def add(item, kind, raw, path_library=..., **kwargs):
@@ -133,21 +200,16 @@ def audit(items, reachable, profile=None):
     for collection, kind in (("images", "image"), ("libraries", "library"), ("sounds", "sound"),
                              ("fonts", "font"), ("movieclips", "movieclip"), ("cache_files", "cache_file"), ("volumes", "volume")):
         for item in getattr(bpy.data, collection, ()):
+            source = "SEQUENCE" if getattr(item, "is_sequence", False) else getattr(item, "source", None)
+            if kind == "image" and source == "TILED":
+                add(item, kind, item.filepath, source=source, tiled_image=item)
+                continue
             packed = bool(getattr(item, "packed_file", None)) or bool(getattr(item, "packed_files", [])) or bool(getattr(item, "is_linked_packed", False))
             if kind == "library":
                 linked = [i for i in items if i.library == item]
-                packed = bool(linked) and all(getattr(i, "is_linked_packed", False) for i in linked)
-            source = getattr(item, "source", None)
-            if getattr(item, "is_sequence", False):
-                source = "SEQUENCE"
-            kwargs = {"packed": packed, "source": source}
-            if source == "TILED" and ("<UDIM>" in item.filepath or "<UVTILE>" in item.filepath):
-                tile_paths = {tile.number: item.filepath.replace("<UDIM>", str(tile.number)).replace("<UVTILE>", f"u{(tile.number-1001)%10+1}_v{(tile.number-1001)//10+1}") for tile in item.tiles}
-                packed_tiles = {p.tile_number for p in item.packed_files if p.packed_file}
-                kwargs["packed"] = False  # One packed tile does not establish the whole image is packed.
-                kwargs["expected"] = list(tile_paths.values())
-                kwargs["packed_members"] = [path for number, path in tile_paths.items() if number in packed_tiles]
-            add(item, kind, item.filepath, **kwargs)
+                packed = packed or item in asset_archives or (
+                    bool(linked) and all(getattr(i, "is_linked_packed", False) and not i.is_missing for i in linked))
+            add(item, kind, item.filepath, packed=packed, source=source)
     for item in items:
         tree = item if isinstance(item, bpy.types.NodeTree) else getattr(item, "node_tree", None)
         if tree:

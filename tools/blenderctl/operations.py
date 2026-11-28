@@ -62,10 +62,12 @@ def cache_plan(spec,checkpoint):
     return {'version':'1.0','root':str(root),'rows':rows,'unknown':unknown,'dry_run':True,'deleted':[],'scope':'Plan only; pins/references explicit plus observed cross-job references. No deletion authority or complete external-reference claim.'}
 
 def package(spec,blender,job,checkpoint):
-    out=Path(native_path(job/'package'));out.mkdir();files=[*sorted((ROOT/'tools/blenderctl').glob('*.py')),ROOT/'blenderctl.ps1']
-    files += [p for p in (ROOT/'docs/cli').rglob('*') if p.is_file()]
-    mapping=[(p,p.relative_to(ROOT)) for p in files]
+    out=Path(native_path(job/'package'));out.mkdir()
+    from contextlib import ExitStack
+    from package_files import package_files
     runtime=content_inventory(blender,checkpoint);runtime_root=Path(native_path(Path(blender).resolve().parent))
+    files = package_files(ROOT)
+    mapping=[(p,p.relative_to(ROOT)) for p in files]
     if spec['include_runtime']:
         for p in runtime_files(blender):mapping.append((p,DEFAULT_BLENDER.relative_to(ROOT).parent/p.relative_to(runtime_root)))
     total=sum(p.stat().st_size for p,_ in mapping)
@@ -77,6 +79,16 @@ def package(spec,blender,job,checkpoint):
             sha=g.sha256(checkpoint);shutil.copyfile(p,target)
             if digest(target,checkpoint)!=sha:raise Failure('CONFLICT','Package copy hash differs')
         entries.append({'path':relative.as_posix(),'sha256':sha,'bytes':target.stat().st_size})
+    # Freeze the final source generation, including members added since enumeration.
+    # This prevents a concurrent edit from publishing a package whose CLI imports a missing module.
+    with ExitStack() as stack:
+        for file, entry in zip(files, entries):
+            checkpoint()
+            guard = stack.enter_context(FileGuard(file))
+            if guard.sha256(checkpoint) != entry['sha256']:
+                raise Failure('CONFLICT', 'Source changed during packaging: ' + entry['path'])
+        if package_files(ROOT) != files:
+            raise Failure('CONFLICT', 'Package membership changed during packaging; retry on a stable source tree')
     report={'version':'1.0','cli_version':VERSION,'files':entries,'runtime':{'included':spec['include_runtime'],'blender_relative':DEFAULT_BLENDER.relative_to(ROOT).as_posix(),'files':runtime},'excluded':['portable user configuration and extensions','assets','audit and cache history'],'requirements':['Windows local disk','PowerShell 7 for wrapper','matching Blender runtime; explicit --blender when external'],'environment_validation':{'local_relocation':'not_run','clean_windows':'not_run','other_os':'not_run','network_storage':'not_run','power_loss':'not_run'}}
     atomic_json(out/'package-manifest.json',report)
     return {'directory':str(job/'package'),'manifest':str(job/'package/package-manifest.json'),'manifest_sha256':digest(out/'package-manifest.json'),'bytes':total,'files':len(entries),'runtime_included':spec['include_runtime']}

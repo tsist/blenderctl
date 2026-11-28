@@ -45,27 +45,32 @@ def opened(params):
     return snap
 
 def file_paths():
+    from dependencies import asset_archive_libraries
     raw = bpy.utils.blend_paths(absolute=False, packed=False, local=False)
     absolute = bpy.utils.blend_paths(absolute=True, packed=False, local=False)
     if len(raw) != len(absolute):
         raise Failure('VALIDATION_FAILED', 'Native dependency traversal changed during path classification')
     # The two traversals use the same native occurrence order. Pair them to
     # avoid resolving historical POSIX append provenance on the wrong drive.
-    weak = Counter()
-    for item in bpy.data.user_map():
+    ids = bpy.data.user_map()
+    archives = asset_archive_libraries(ids)
+    provenance = Counter(os.path.normcase(lib.filepath) for lib in archives if lib.filepath)
+    for item in ids:
         reference = getattr(item, 'library_weak_reference', None)
         if reference and reference.filepath:
-            weak[os.path.normcase(reference.filepath)] += 1
+            provenance[os.path.normcase(reference.filepath)] += 1
     occurrences = Counter(os.path.normcase(path) for path in raw if path)
     native = set()
     for original, path in zip(raw, absolute):
         name = os.path.normcase(original)
-        if path and (not name or occurrences[name] != weak[name]):
+        if path and (not name or occurrences[name] != provenance[name]):
             native.add(canonical(path))
     # Keep explicit runtime resources even if they share a provenance path.
     strong=set()
     for name in ('images','libraries','sounds','fonts','movieclips','cache_files','volumes'):
         for x in getattr(bpy.data,name,()):
+            if name == 'libraries' and x in archives:
+                continue
             raw=getattr(x,'filepath','')
             if raw and raw!='<builtin>' and not getattr(x,'packed_file',None) and not getattr(x,'packed_files',[]):
                 strong.add(canonical(bpy.path.abspath(raw,library=None if name=='libraries' else x.library)))

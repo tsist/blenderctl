@@ -24,7 +24,7 @@
 
 ## 四足四段爪：禁伸缩与支撑核查
 
-制作犬猫四段爪（如 Rigify `limbs.front_paw` / `limbs.rear_paw`）时，重点核查下面四件事：
+制作犬猫/羊兔等四足四段爪骨架时，**优先通过自研 `rigging_workflow` v003 的 `modular_rig.prepare_reference(kind='QUADRUPED')` → `modular_positioning` → `confirm_reference` → `generate` 流程生成**（其底层由插件合规调用 Rigify `limbs.front_paw` / `limbs.rear_paw`，自动锁定 `segments=1, bbones=1` 并写入 `rigging_modular_v1` 元数据与 `modular_neutral` 中立基线），不要绕开自研封装直接手写裸 Rigify 脚本。生成后重点核查下面四件事：
 
 1. **逐链关闭真实伸缩**：除了把主控制 `IK_Stretch` 滑杆设为 0，还要逐一检查主链、IK2、IK3 上每条 IK 约束的 `use_stretch` 以及链上 PoseBone 的 `ik_stretch`。确认真实消费分支后，再逐态核验长骨 DEF 长度和弯曲平面。
 2. **把刚性长骨与弹性脊柱分开看**：脊柱变形骨常通过 `STRETCH_TO` 连接相邻 tweak，骨盆横移带来微小拉伸属于设计预期；验收时把四肢刚性长骨的定长指标与脊柱弹性段分开统计。

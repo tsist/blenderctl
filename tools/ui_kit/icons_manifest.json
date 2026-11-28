@@ -1,0 +1,167 @@
+{
+  "schema_version": "1.0",
+  "svg_count": 80,
+  "png_count": 94,
+  "browser": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "gallery_png": "<PROJECT_ROOT>\\tools\\ui_kit\\ui_kit_identity_gallery.png",
+  "domains": {
+    "modeling": {
+      "code": "M",
+      "tab_label": "M·建模",
+      "hex": "#38BDF8",
+      "actions": [
+        "import_mesh",
+        "ref_stage",
+        "retopo",
+        "export_exchange"
+      ]
+    },
+    "hard-surface": {
+      "code": "H",
+      "tab_label": "H·硬面",
+      "hex": "#4F8BFF",
+      "actions": [
+        "cutter_bool",
+        "surface_sweep",
+        "modifier_stack",
+        "face_flow",
+        "review_grid"
+      ]
+    },
+    "geometry": {
+      "code": "G",
+      "tab_label": "G·几何",
+      "hex": "#10B981",
+      "actions": [
+        "biome_scatter",
+        "hair_curves",
+        "node_params",
+        "bake_cache"
+      ]
+    },
+    "uv": {
+      "code": "U",
+      "tab_label": "U·UV",
+      "hex": "#F59E0B",
+      "actions": [
+        "unwrap_seam",
+        "udim_pack",
+        "texel_rectify",
+        "checker_preview"
+      ]
+    },
+    "material": {
+      "code": "S",
+      "tab_label": "S·材质",
+      "hex": "#F43F5E",
+      "actions": [
+        "layer_stack",
+        "procedural_pbr",
+        "gpu_bake",
+        "batch_assign"
+      ]
+    },
+    "rigging": {
+      "code": "R",
+      "tab_label": "R·绑定",
+      "hex": "#2DD4BF",
+      "actions": [
+        "rig_prepare",
+        "voxel_skin",
+        "ik_fk_control",
+        "face_rig",
+        "retarget_motion"
+      ]
+    },
+    "animation": {
+      "code": "A",
+      "tab_label": "A·动画",
+      "hex": "#FB923C",
+      "actions": [
+        "curve_filter",
+        "additive_layer",
+        "event_beat",
+        "foot_support",
+        "cascadeur_bridge"
+      ]
+    },
+    "physics": {
+      "code": "P",
+      "tab_label": "P·物理",
+      "hex": "#8B5CF6",
+      "actions": [
+        "gn_physics",
+        "cloth_sim",
+        "bullet_fracture",
+        "fluid_domain"
+      ]
+    },
+    "camera": {
+      "code": "C",
+      "tab_label": "C·镜头",
+      "hex": "#67E8F9",
+      "actions": [
+        "shot_table",
+        "proc_motion",
+        "framing_guides",
+        "focus_dof"
+      ]
+    },
+    "lighting": {
+      "code": "L",
+      "tab_label": "L·灯光",
+      "hex": "#FACC15",
+      "actions": [
+        "create_rig",
+        "kelvin_ies",
+        "light_groups",
+        "volume_hdri",
+        "gpu_solve"
+      ]
+    },
+    "toon": {
+      "code": "T",
+      "tab_label": "T·三渲二",
+      "hex": "#EC4899",
+      "actions": [
+        "cel_shader",
+        "face_sdf",
+        "line_viewport",
+        "toon_output"
+      ]
+    },
+    "render-batch": {
+      "code": "B",
+      "tab_label": "B·批渲",
+      "hex": "#EF4444",
+      "actions": [
+        "batch_submit",
+        "exr_passes",
+        "batch_monitor",
+        "batch_resume"
+      ]
+    },
+    "compositing": {
+      "code": "F",
+      "tab_label": "F·合成",
+      "hex": "#C084FC",
+      "actions": [
+        "scene_effects",
+        "crypto_cdl",
+        "light_mix",
+        "relight_preview"
+      ]
+    },
+    "video": {
+      "code": "V",
+      "tab_label": "V·剪辑",
+      "hex": "#06B6D4",
+      "actions": [
+        "shot_replace",
+        "subtitle_style",
+        "strip_comp",
+        "lufs_export"
+      ]
+    }
+  }
+}

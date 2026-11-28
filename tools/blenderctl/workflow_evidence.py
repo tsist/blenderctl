@@ -14,13 +14,23 @@ def descriptor(path, checkpoint=None):
 FIELDS = ('status', 'state', 'health', 'error', 'reason', 'limitations',
           'source_saved', 'source_unchanged', 'source_sha256', 'source_sha256_before',
           'candidate_sha256', 'runtime_executed', 'seconds', 'elapsed_seconds',
-          'cancel_requested', 'closed_inputs', 'reuse', 'timing', 'checks')
+          'cancel_requested', 'closed_inputs', 'reuse', 'timing', 'checks', 'qa', 'review_grid', 'geometry_audit', 'qa_fix')
 
 
 def projection(data):
     if not isinstance(data, dict):
         return {'value_type': type(data).__name__}
     out = {k: deepcopy(data[k]) for k in FIELDS if k in data}
+    face_flow = data.get('face_flow')
+    if isinstance(face_flow, dict):
+        identity = face_flow.get('identity', {})
+        out['face_flow'] = {
+            'identity': {key: identity.get(key) for key in ('object', 'layer', 'mesh_sha256', 'counts')},
+            'reference': face_flow.get('reference'),
+        }
+        for key, fields in (('trace', ('status', 'closed', 'stops')), ('scan', ('status', 'coverage'))):
+            if key in face_flow:
+                out['face_flow'][key] = {field: face_flow[key][field] for field in fields}
     failures=[]
     def walk(value, path=''):
         if isinstance(value, dict):

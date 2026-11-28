@@ -55,6 +55,9 @@ def validate_links(scene, row, new_boards=()):
     bpy = c._bpy()
     properties = bpy.types.ObjectLightLinking.bl_rna.properties if hasattr(bpy.types, 'ObjectLightLinking') else {}
     for key, prop in LINK_PROPERTIES.items():
+        if key + '_members' in row:
+            _validate_members(scene, row[key + '_members'], new_boards)
+            continue
         if key not in row and key + '_mode' not in row: continue
         if prop not in properties or properties[prop].is_readonly:
             c._fail('UNSUPPORTED', 'Native light linking unavailable: ' + key)
@@ -73,11 +76,43 @@ def validate_links(scene, row, new_boards=()):
             c._fail('UNSUPPORTED', 'Native INCLUDE member linking unavailable')
 
 
+def _validate_members(scene, members, new_boards):
+    c = _core()
+    bpy = c._bpy()
+    scene_collections = {scene.collection, *scene.collection.children_recursive}
+    for member in members:
+        name = member['name']
+        if member['kind'] == 'OBJECT':
+            validate_links(scene, {'receivers': [name], 'receivers_mode': member['state']}, new_boards)
+            continue
+        collection = bpy.data.collections.get(name)
+        if collection is None or collection not in scene_collections:
+            c._fail('NOT_FOUND', 'Light-link collection must be in this scene: ' + name)
+        if collection.get(c.OWNER):
+            c._fail('CONFLICT', 'Light-link target collection is owned by another rig: ' + name)
+        if any(collection in other.collection.children_recursive for other in bpy.data.scenes if other != scene):
+            c._fail('CONFLICT', 'Light-link collection is shared across Scenes: ' + name)
+
+
+def _member_values(collection):
+    rows = []
+    for kind, items, metadata in (('OBJECT', collection.objects, collection.collection_objects),
+                                  ('COLLECTION', collection.children, collection.collection_children)):
+        rows.extend({'name': item.name, 'kind': kind, 'state': settings.light_linking.link_state}
+                    for item, settings in zip(items, metadata, strict=True))
+    return sorted(rows, key=lambda row: (row['kind'], row['name']))
+
+
 def link_values(obj):
     c = _core()
     values = {}
     for key, prop in LINK_PROPERTIES.items():
         collection = getattr(obj.light_linking, prop)
+        if collection and collection.get('lw_member_links'):
+            values[key + '_members'] = _member_values(collection)
+            values[key] = []
+            values[key + '_mode'] = 'INCLUDE'
+            continue
         values[key] = sorted(o.name for o in collection.objects) if collection else []
         modes = {member.light_linking.link_state for member in collection.collection_objects} if collection else set()
         if len(modes) > 1: c._fail('CONFLICT', 'Mixed member link states cannot be represented safely: ' + obj.name + '.' + key)
@@ -87,7 +122,7 @@ def link_values(obj):
 
 def _link_witness(collection):
     c = _core()
-    return {'id': c._record(collection), 'members': sorted([
+    witness = {'id': c._record(collection), 'members': sorted([
         {'name': item.name, 'type': item.type,
          'data': item.data.name if item.data else None,
          'library': item.library.filepath if item.library else None,
@@ -96,6 +131,9 @@ def _link_witness(collection):
         'children': sorted(child.name for child in collection.children),
         'visibility': [collection.hide_render, collection.hide_viewport, collection.hide_select],
         'offset': list(collection.instance_offset), 'exporters': len(collection.exporters)}
+    if collection.get('lw_member_links'):
+        witness['explicit_members'] = _member_values(collection)
+    return witness
 
 
 def _check_consumers(collection, emitter):
@@ -135,6 +173,11 @@ def check_links(scene, state):
             if actual != collection: c._fail('CONFLICT', 'Manual link collection binding changed: ' + obj.name + '.' + key)
             _check_consumers(collection, obj)
             witness = _link_witness(collection)
+            if collection.get('lw_member_links'):
+                _validate_members(scene, witness['explicit_members'], ())
+                if not c._close(witness, row['witness']):
+                    c._fail('CONFLICT', 'Explicit light-link members or settings changed: ' + collection.name)
+                continue
             validate_links(scene, {key: [m['name'] for m in witness['members']]})
             expected = deepcopy(row['witness'])
             # Membership is an editable field; settings, INCLUDE state and surviving
@@ -159,7 +202,31 @@ def configure_links(scene, state, light_id, values):
     current = link_values(obj)
     fields = state.setdefault('links', {}).setdefault(light_id, {})
     for key, prop in LINK_PROPERTIES.items():
+        if key + '_members' in values:
+            name = link_name(state['rig_id'], light_id, key)
+            c._fresh(bpy.data.collections, name)
+            collection = c._mark(bpy.data.collections.new(name), state['rig_id'])
+            collection.use_fake_user = True
+            collection['lw_member_links'] = True
+            requested = values[key + '_members']
+            states = {(m['kind'], m['name']): m['state'] for m in requested}
+            for member in requested:
+                if member['kind'] == 'OBJECT':
+                    collection.objects.link(scene.objects[member['name']])
+                else:
+                    collection.children.link(bpy.data.collections[member['name']])
+            for kind, items, metadata in (('OBJECT', collection.objects, collection.collection_objects),
+                                          ('COLLECTION', collection.children, collection.collection_children)):
+                for item, settings in zip(items, metadata, strict=True):
+                    settings.light_linking.link_state = states[kind, item.name]
+            setattr(obj.light_linking, prop, collection)
+            _check_consumers(collection, obj)
+            fields[key] = {'collection': collection.name, 'refs': [], 'mode': 'INCLUDE',
+                           'witness': _link_witness(collection)}
+            continue
         if key not in values and key + '_mode' not in values: continue
+        if key + '_members' in current:
+            c._fail('UNSUPPORTED', 'Legacy link patch cannot replace explicit object/collection members: ' + obj.name)
         refs = values.get(key, current[key])
         mode = values.get(key + '_mode', current[key + '_mode'])
         name = link_name(state['rig_id'], light_id, key)
@@ -167,12 +234,9 @@ def configure_links(scene, state, light_id, values):
         collection = bpy.data.collections.get(prior['collection']) if prior and prior['collection'] else None
         if refs:
             if collection is None:
-                c._fresh(bpy.data.collections, name)
-                collection = c._mark(bpy.data.collections.new(name), state['rig_id'])
-                collection.use_fake_user = True
-            for member in list(collection.objects): collection.objects.unlink(member)
-            for ref in refs: collection.objects.link(scene.objects[ref])
-            for member in collection.collection_objects: member.light_linking.link_state = mode
+                collection = new_link_collection(scene, name, refs, mode, state['rig_id'])
+            else:
+                _populate_link_collection(scene, collection, refs, mode)
             setattr(obj.light_linking, prop, collection)
             fields[key] = {'collection': collection.name, 'refs': sorted(refs), 'mode': mode,
                            'witness': _link_witness(collection)}
@@ -180,6 +244,28 @@ def configure_links(scene, state, light_id, values):
             setattr(obj.light_linking, prop, None)
             if collection is not None: bpy.data.collections.remove(collection)
             fields[key] = {'collection': None, 'refs': [], 'mode': 'INCLUDE', 'witness': None}
+
+
+def _populate_link_collection(scene, collection, refs, mode):
+    for member in list(collection.objects): collection.objects.unlink(member)
+    for ref in refs: collection.objects.link(scene.objects[ref])
+    for member in collection.collection_objects: member.light_linking.link_state = mode
+
+
+def new_link_collection(scene, name, refs, mode, owner=None):
+    c = _core()
+    collections = c._bpy().data.collections
+    c._fresh(collections, name)
+    collection = collections.new(name)
+    try:
+        if owner:
+            c._mark(collection, owner)
+            collection.use_fake_user = True
+        _populate_link_collection(scene, collection, refs, mode)
+    except Exception:
+        collections.remove(collection)
+        raise
+    return collection
 
 
 def cleanup_links(state):

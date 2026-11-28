@@ -19,6 +19,8 @@ def signature(value):return hashlib.sha256(json.dumps(value,sort_keys=True,separ
 
 AGX_CONFIG_SHA='df5714c85d5afb5e9762281503a0c48a9f65dadb22d32a3aee50c454a0821f62'
 AGX_VIEW='AgX - HDR 1000 nits'
+PROJECT_VIEW='PROJECT_OCIO_DISPLAY_VIEW'
+PQ_VIEWS={'OCIO_DISPLAY_VIEW',PROJECT_VIEW}
 def mapping_policy(p):
     c=p['encode_color']
     return c.get('mapping_policy',{'kind':'LINEAR_RETAIN_REFERENCE'})
@@ -36,17 +38,30 @@ def normalize_params(params):
     require(isinstance(p['fps'],list) and len(p['fps'])==2 and all(type(x)==int and 1<=x<=120000 for x in p['fps']) and 1<=p['fps'][0]/p['fps'][1]<=120,'Explicit rational fps1..120 required')
     c=p['encode_color'];policy=mapping_policy(p)
     shared=['view','source_display_policy','look','white_balance','curves','gamma','exposure','gamut_policy']
-    require(policy.get('kind') in ['LINEAR_RETAIN_REFERENCE','OCIO_DISPLAY_VIEW'],'Explicit supported mapping policy required')
-    hdr=policy['kind']=='OCIO_DISPLAY_VIEW'
+    require(policy.get('kind') in {'LINEAR_RETAIN_REFERENCE',*PQ_VIEWS},'Explicit supported mapping policy required')
+    hdr=policy['kind'] in PQ_VIEWS
+    custom=policy['kind']==PROJECT_VIEW
     if hdr:
-        exact(c,shared+['mapping_policy'],'AgX encode_color')
-        exact(policy,['kind','display','view','ocio_config_sha256','declared_display_reference_white_nits','extra_gain'],'OCIO mapping policy')
-        require(policy=={'kind':'OCIO_DISPLAY_VIEW','display':'Rec.2100-PQ','view':AGX_VIEW,'ocio_config_sha256':AGX_CONFIG_SHA,'declared_display_reference_white_nits':100,'extra_gain':'NONE'},'Only exact SHA-bound AgXHDR view, no extra gain qualified')
+        exact(c,shared+['mapping_policy'],'OCIO encode_color')
+        fields=['kind','display','view','ocio_config_sha256','declared_display_reference_white_nits','extra_gain']
+        if custom:
+            exact(policy,fields+['sdr_preview'],'Project OCIO mapping policy')
+            exact(policy['sdr_preview'],['display','view'],'Project SDR preview')
+            for name in (policy['display'],policy['view'],*policy['sdr_preview'].values()):
+                require(isinstance(name,str) and name.strip() and len(name)<=128,'Explicit project display/view required')
+            require(isinstance(policy['ocio_config_sha256'],str) and re.fullmatch('[0-9a-f]{64}',policy['ocio_config_sha256']),
+                    'Project OCIO configuration requires a SHA-256')
+            require(policy['declared_display_reference_white_nits'] in (100,203) and policy['extra_gain']=='NONE',
+                    'Explicit 100/203 nit reference white and no extra gain required')
+        else:
+            exact(policy,fields,'OCIO mapping policy')
+            require(policy=={'kind':'OCIO_DISPLAY_VIEW','display':'Rec.2100-PQ','view':AGX_VIEW,'ocio_config_sha256':AGX_CONFIG_SHA,
+                    'declared_display_reference_white_nits':100,'extra_gain':'NONE'},'Legacy AgX HDR view requires its original configuration SHA')
     else:
         exact(c,shared+['reference_white_nits']+(['mapping_policy'] if 'mapping_policy' in c else []),'Standard encode_color')
         exact(policy,['kind'],'Linear mapping policy')
         require(c['reference_white_nits'] in [100,203],'Reference white must be explicit100 or203')
-    require(c['view']==(AGX_VIEW if hdr else 'Standard') and c['source_display_policy']=='EXPLICIT_OVERRIDE' and c['look']=='None' and c['white_balance'] is False and c['curves'] is False and type(c['gamma']) in [int,float] and c['gamma']==1 and c['gamut_policy']==('OCIO_VIEW' if hdr else 'RETAIN_REFERENCE'),'Only explicit profile/no look/WB/curves/gamma1 qualified')
+    require(c['view']==(policy['view'] if hdr else 'Standard') and c['source_display_policy']=='EXPLICIT_OVERRIDE' and c['look']=='None' and c['white_balance'] is False and c['curves'] is False and type(c['gamma']) in [int,float] and c['gamma']==1 and c['gamut_policy']==('OCIO_VIEW' if hdr else 'RETAIN_REFERENCE'),'Only explicit profile/no look/WB/curves/gamma1 qualified')
     require(type(c['exposure']) in [int,float] and math.isfinite(c['exposure']) and -20<=c['exposure']<=20,'Bounded finite exposure required')
     a=p['alpha'];require(a.get('mode') in ['require_opaque','composite_matte'],'Alpha policy required')
     exact(a,['mode'] if a['mode']=='require_opaque' else ['mode','association','matte_rgb_output_linear'],'alpha')
@@ -54,7 +69,7 @@ def normalize_params(params):
         require(a['association']=='PREMUL','Only explicitly declared premultiplied compositing qualified')
         require(isinstance(a['matte_rgb_output_linear'],list) and len(a['matte_rgb_output_linear'])==3 and all(type(x) in [int,float] and math.isfinite(x) and x>=0 for x in a['matte_rgb_output_linear']),'Finite nonnegative linear matte required')
     m=p['mastering'];exact(m,['kind','primaries','white_point','min_nits','max_nits','statement_source'],'mastering')
-    require(m['kind']=='technical_target' and m['primaries']==('P3D65' if hdr else 'BT2020') and m['white_point']==[.3127,.329] and m['min_nits']==.0001 and m['max_nits']==(1000 if hdr else 10000) and isinstance(m['statement_source'],str) and bool(m['statement_source'].strip()),'Profile-matched explicit virtual technical target required; no measured Master claim')
+    require(m['kind']=='technical_target' and m['primaries']==('P3D65' if hdr and not custom else 'BT2020') and m['white_point']==[.3127,.329] and m['min_nits']==.0001 and m['max_nits']==(1000 if hdr else 10000) and isinstance(m['statement_source'],str) and bool(m['statement_source'].strip()),'Profile-matched explicit virtual technical target required; no measured Master claim')
     r=p['runtime'];exact(r,['python','ffmpeg','ffprobe','modules'],'runtime')
     for k in ['python','ffmpeg','ffprobe']:descriptor(r[k])
     exact(r['modules'],['PyOpenColorIO','OpenImageIO','numpy','python_native'],'runtime.modules')
@@ -81,11 +96,18 @@ def producer_documents(report,p):
     require(report.get('verification',{}).get('status')=='passed' and report.get('output_verification',{}).get('status')=='passed','Independent saved and output verification required')
     require(report['verification'].get('candidate_sha256')==report['candidate']['sha256'] and report['output_verification'].get('candidate_sha256')==report['candidate']['sha256'],'Producer candidate verifier identity differs')
     color=report['source_color_identity'];view=color['view']
-    if mapping_policy(p)['kind']=='OCIO_DISPLAY_VIEW':require(color['ocio']['sha256']==mapping_policy(p)['ocio_config_sha256'],'AgX producer OCIO SHA differs from explicit mapping policy','CONFLICT')
+    policy=mapping_policy(p)
+    if policy['kind'] in PQ_VIEWS:
+        require(color['ocio']['sha256']==policy['ocio_config_sha256'],'Producer OCIO SHA differs from explicit mapping policy','CONFLICT')
     require(view.get('look') in ['None','NONE',''] and not view.get('use_white_balance') and not view.get('use_curve_mapping') and view.get('gamma')==1,'Unsupported source look/WB/curves/gamma; no implicit approximation')
     require(color['ocio'].get('file_transform_scan')=='complete' and not color['ocio'].get('unresolved_file_transforms'),'Producer OCIO closure unknown')
     files=report['color_immutable_inputs']['files'];declared=[{'file':color['ocio']['file'],'sha256':color['ocio']['sha256']},*color['ocio']['luts']]
-    require(report['color_immutable_inputs'].get('status')=='guarded' and len(files)==17 and {(x['file'],x['sha256']) for x in files}=={(x['file'],x['sha256']) for x in declared},'Matched configured OCIO+16LUT guarded closure required')
+    require(report['color_immutable_inputs'].get('status')=='guarded' and
+            len(files)==len(declared) and len({(x['file'],x['sha256']) for x in files})==len(files) and
+            {(x['file'],x['sha256']) for x in files}=={(x['file'],x['sha256']) for x in declared},
+            'Configuration and resolved transforms must match the complete guarded producer closure')
+    if policy['kind']!=PROJECT_VIEW:
+        require(len(files)==17,'Legacy profile requires the original OCIO+16 LUT closure')
     outputs=report['outputs'];selected=[]
     for frame in p['select']['frames']:
         matches=[o for o in outputs if o.get('role')=='result' and o.get('frame')==frame and o.get('format')=='OPEN_EXR']

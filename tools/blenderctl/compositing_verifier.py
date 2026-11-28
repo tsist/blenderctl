@@ -1,4 +1,5 @@
 """Fresh-process compositor reader and independent PNG/EXR decoder; never saves."""
+import hashlib
 import json
 import math
 import os
@@ -247,6 +248,22 @@ def _image_file_snapshot_uncached(binding, required_outputs=(), *, inventory_onl
                     'channel_precision': [str(value) for value in spec.channelformats],
                     'metadata_colorspace': spec.get_string_attribute('oiio:ColorSpace') or None,
                     'color_interop_id': spec.get_string_attribute('colorInteropID') or None}
+            cryptomatte = {}
+            for attr in spec.extra_attribs:
+                match = re.fullmatch(r'cryptomatte/([0-9a-f]+)/name', attr.name)
+                if match:
+                    prefix = 'cryptomatte/' + match[1]
+                    name = spec.get_string_attribute(prefix + '/name')
+                    try:
+                        manifest = json.loads(spec.get_string_attribute(prefix + '/manifest'))
+                    except ValueError:
+                        continue
+                    if isinstance(manifest, dict) and manifest:
+                        cryptomatte[name] = {'id': match[1], 'entries': len(manifest),
+                                             'manifest_sha256': hashlib.sha256(
+                                                 spec.get_string_attribute(prefix + '/manifest').encode()).hexdigest()}
+            if cryptomatte:
+                part['cryptomatte'] = cryptomatte
             alpha_index = next((i for i, channel in enumerate(channels) if channel.rsplit('.', 1)[-1] == 'A'), None)
             if alpha_index is not None:
                 alpha = values[:, :, alpha_index]
@@ -278,8 +295,10 @@ def _image_file_snapshot_uncached(binding, required_outputs=(), *, inventory_onl
                     raise Failure('UNSUPPORTED', 'Independent EXR required Pass/channels unavailable: ' + layer + '/' + output)
                 wanted = ({'R', 'G', 'B'} if output in ('Combined', 'Noisy Image', 'Denoising Albedo', 'Denoising Specular Albedo') else
                           {'X', 'Y', 'Z'} if output in ('Normal', 'Denoising Normal') else
-                          {'Z'} if output in ('Depth', 'Denoising Depth') else {'A'} if output == 'Alpha' else set())
-                if not wanted.issubset({channel.rsplit('.', 1)[-1] for channel in channels}):
+                          {'Z'} if output in ('Depth', 'Denoising Depth') else {'A'} if output == 'Alpha' else
+                          {'R','G','B'} if output.startswith('Combined_') else
+                          {'R','G','B','A'} if output.startswith('Crypto') else set())
+                if not wanted.issubset({channel.rsplit('.', 1)[-1].upper() for channel in channels}):
                     raise Failure('UNSUPPORTED', 'Independent EXR required Pass components missing: ' + layer + '/' + output)
         else:
             if len(parts) != 1 or any(part['name'] for part in parts):
@@ -296,6 +315,22 @@ def _image_file_snapshot_uncached(binding, required_outputs=(), *, inventory_onl
                                    'scope': 'File metadata and declared Blender interpretation are separate; no implicit input resize or colorspace conversion here'}}
     finally:
         reader.close()
+
+
+def binding_file_snapshot(node_type, binding, required_outputs, cryptomatte_layer=None):
+    if node_type != 'CompositorNodeCryptomatteV2':
+        return image_file_snapshot(binding, required_outputs)
+    if not cryptomatte_layer or cryptomatte_layer not in {
+        binding['layer'] + '.Crypto' + kind for kind in ('Object', 'Material', 'Asset')
+    }:
+        raise Failure('CONFLICT', 'Cryptomatte layer is outside the declared EXR view layer')
+    first_pass = cryptomatte_layer.rsplit('.', 1)[1] + '00'
+    verified = image_file_snapshot(binding, [first_pass])
+    manifests = [part['cryptomatte'][cryptomatte_layer] for part in verified['subimages']
+                 if cryptomatte_layer in part.get('cryptomatte', {})]
+    if not manifests or any(manifest != manifests[0] for manifest in manifests[1:]):
+        raise Failure('UNSUPPORTED', 'Cryptomatte layer has no consistent embedded manifest: ' + cryptomatte_layer)
+    return {**verified, 'cryptomatte_layer': cryptomatte_layer, 'cryptomatte_manifest': manifests[0]}
 
 
 def render_pass_snapshot(scene, layer, required_outputs):
@@ -319,6 +354,10 @@ def render_pass_snapshot(scene, layer, required_outputs):
         elif output in denoising:
             switch = 'cycles.denoising_store_passes'
             enabled = scene.render.engine == 'CYCLES' and settings.get('cycles', {}).get('denoising_store_passes', False)
+        elif output.startswith('Combined_'):
+            group = output.removeprefix('Combined_')
+            switch = 'lightgroups/' + group
+            enabled = scene.render.engine == 'CYCLES' and group in {item.name for item in layer.lightgroups}
         else:
             raise Failure('UNSUPPORTED', 'Render Pass is outside finite static M2 scope: ' + output)
         if not enabled:
@@ -358,14 +397,19 @@ def binding_snapshot(inspection):
             actual = str(Path(bpy.path.abspath(image.filepath)).resolve())
             if actual != str(Path(spec['file']).resolve()) or image.colorspace_settings.name != spec['colorspace'] or image.alpha_mode != spec['alpha_mode']:
                 raise Failure('CONFLICT', 'Bound Image actual file/interpretation differs')
-            if image.type == 'MULTILAYER' and node.layer != spec.get('layer'):
+            crypto = node.bl_idname == 'CompositorNodeCryptomatteV2'
+            selected_layer = node.layer_name if crypto else node.layer
+            if crypto:
+                if node.source != 'IMAGE' or image.type != 'MULTILAYER':
+                    raise Failure('CONFLICT', 'Cryptomatte requires the declared still multilayer EXR')
+            elif image.type == 'MULTILAYER' and selected_layer != spec.get('layer'):
                 raise Failure('CONFLICT', 'Actual EXR layer differs from declared binding')
             if node.has_views:
                 raise Failure('UNSUPPORTED', 'Multiview input is outside static M2')
-            row['independent_file'] = image_file_snapshot(spec, required)
+            row['independent_file'] = binding_file_snapshot(node.bl_idname, spec, required, selected_layer)
             row['actual_interpretation'] = {'image': image.name, 'type': image.type,
                 'colorspace': image.colorspace_settings.name, 'alpha_mode': image.alpha_mode,
-                'layer': node.layer if image.type == 'MULTILAYER' else None,
+                'layer': selected_layer if image.type == 'MULTILAYER' else None,
                 'rna_size': list(image.size), 'size_scope': 'Multilayer RNA size may be zero; independent subimage dimensions are authoritative'}
         elif spec['kind'] in ('image_sequence', 'movie'):
             import compositing_media as media
@@ -517,7 +561,7 @@ def verify(config_path):
             except TemporalProjectionError as exc:
                 raise Failure('CONFLICT', 'Fresh reader declared work budget differs from complete verification request: ' + str(exc)) from exc
             report['verification_budget'] = actual_budget
-        with ExitStack() as stack:
+        with core.managed_output_scope(Path(config_path).resolve().parent), ExitStack() as stack:
             report['runtime'] = runtime_identity()
             if report['runtime'] != config['runtime'] or implementation_sha256() != config['implementation_sha256']:
                 raise Failure('CONFLICT', 'Runtime or compositor implementation differs in fresh reader')
@@ -554,7 +598,8 @@ def verify(config_path):
             bpy.context.view_layer.update()
             report['resources'] = resource_snapshot(config.get('resources', []), require_canonical=True)
             report['input_file_preflight'] = [
-                {'node_id': row['node_id'], 'independent_file': image_file_snapshot(row['binding'], row['required_outputs'])}
+                {'node_id': row['node_id'], 'independent_file': binding_file_snapshot(
+                    row['type'], row['binding'], row['required_outputs'], row['observed'].get('layer'))}
                 for row in (config.get('input_bindings') or {}).get('inputs', []) if row['binding']['kind'] == 'image']
             inspection = json.loads(json.dumps(core.inspect(config['scene'], config['workflow_id'])))
             protection = json.loads(json.dumps(core.snapshot_protection(config['scene'], config['workflow_id'])))

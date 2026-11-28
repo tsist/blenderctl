@@ -35,6 +35,8 @@ def normalize(manifest, command, file):
                 require(isinstance(t["tags"],list) and len(t["tags"])<=100 and all(isinstance(v,str) and 0<len(v)<=63 and "\0" not in v for v in t["tags"]), "Invalid tags")
                 require(len(set(t["tags"]))==len(t["tags"]), "Duplicate tags")
             if "preview" in t:
+                if t['preview'] == {'automatic': True}:
+                    continue
                 fields(t['preview'], ('file','expected_sha256'), ('file','expected_sha256'))
                 p = t['preview']
                 require(isinstance(p['file'],str) and '\0' not in p['file'] and Path(p['file']).is_absolute(), 'Preview requires an absolute file path')
@@ -50,7 +52,11 @@ def normalize(manifest, command, file):
         require(Path(manifest["output_file"]).suffix.lower()==".blend" and Path(manifest["output_file"]).is_relative_to(Path(manifest["library_root"])), "Output blend must stay in library root")
         require(isinstance(manifest["assets"],list) and len(manifest["assets"])<=1000, "Invalid asset index descriptors")
         for spec in manifest["assets"]:
-            fields(spec,("asset_id","type","category","version","source"),("asset_id","type","category","version","source"))
+            fields(spec,("asset_id","type","category","version","source","thumbnail"),("asset_id","type","category","version","source"))
+            if "thumbnail" in spec:
+                from library import descriptor
+                descriptor(spec["thumbnail"])
+                require(Path(spec["thumbnail"]["file"]).suffix.lower() == ".png", "Thumbnail must be an existing PNG")
             require(all(isinstance(spec[k],str) for k in ("asset_id","type","category","version")) and isinstance(spec["source"],dict), "Invalid asset index descriptor")
         require(isinstance(manifest["catalogs"],list) and len(manifest["catalogs"])<=1000, "Invalid Catalog entries")
         ids=set()

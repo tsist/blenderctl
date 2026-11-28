@@ -1,8 +1,8 @@
 schema_version = "1.0.0"
 id = "material_workflow_addon"
-version = "0.7.0"
-name = "Material Workflow"
-tagline = "Layered materials with Cycles and Eevee previews"
+version = "0.9.2"
+name = "PBR 材质工作台"
+tagline = "分层材质、程序化 PBR 与高低模烘焙"
 maintainer = "Blender AI"
 type = "add-on"
 blender_version_min = "5.2.0"
@@ -10,3 +10,6 @@ license = ["SPDX:GPL-3.0-or-later"]
 
 [permissions]
 files = "Read textures and manifests; write snapshots and job receipts"
+
+[build]
+paths_exclude_pattern = ["__pycache__/", "*.pyc", "tests_*.py"]

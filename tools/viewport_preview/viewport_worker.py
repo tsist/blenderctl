@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import sys
@@ -26,10 +27,11 @@ if str(THIS_DIR) not in sys.path:
 
 import compositor_board
 import framing
+import inspection_modes
+from __init__ import VALID_MODES
 
 
 GEOMETRY_TYPES = {"MESH", "CURVE", "SURFACE", "FONT", "META", "GPENCIL", "GREASEPENCIL", "POINTCLOUD", "VOLUME"}
-VALID_MODES = ("wireframe", "solid", "solid_wire", "matcap", "face_orientation", "material", "rendered")
 DEFAULT_MATCAP = "metal_carpaint.exr"
 DEFAULT_STUDIO_WORLD = "studio.exr"
 
@@ -323,7 +325,8 @@ def _configure_eevee_preview(scene, spec: dict[str, Any]) -> dict[str, Any]:
 
 def _clean_viewport_chrome(space) -> None:
     """Hide all distracting UI panels, gizmos, axes, origins and text overlays."""
-    for attr in ("show_region_toolbar", "show_region_ui", "show_region_header", "show_gizmo"):
+    for attr in ("show_region_toolbar", "show_region_ui", "show_region_header",
+                 "show_region_asset_shelf", "show_region_asset_shelf_header", "show_gizmo"):
         try:
             setattr(space, attr, False)
         except Exception:
@@ -347,6 +350,8 @@ def _clean_viewport_chrome(space) -> None:
         "show_outline_selected",
         "show_face_orientation",
         "show_wireframes",
+        "show_weight",
+        "show_camera_guides",
     ):
         try:
             setattr(ov, attr, False)
@@ -463,6 +468,14 @@ def _apply_display_mode(
         ov.show_overlays = False
         mode_meta.update(use_scene_lights=use_scene_lights, use_scene_world=use_scene_world)
 
+    elif mode in ("render_pass", "uv_checker", "uv_stretch"):
+        scene.render.engine = "BLENDER_EEVEE"
+        sh.type = "RENDERED"
+        sh.use_scene_world_render = False
+        sh.use_scene_lights_render = False
+        ov.show_overlays = False
+        mode_meta["render_engine"] = "BLENDER_EEVEE"
+
     elif mode == "rendered":
         engine_choice = str(spec.get("render_engine", "cycles")).lower()
         if engine_choice == "eevee":
@@ -492,6 +505,7 @@ def _apply_display_mode(
     else:
         raise ValueError(f"Unsupported display mode {mode!r}; expected one of {VALID_MODES}")
 
+    sh.render_pass = "COMBINED"
     # Orthogonal semi-transparent wireframe overlay for ANY mode (except pure wireframe)
     if wire_overlay is not None and mode != "wireframe":
         opacity = max(0.0, min(1.0, float(wire_overlay)))
@@ -520,6 +534,8 @@ class CaptureTask:
         self.source_path = Path(spec["file"]).resolve()
         self.source_sha = ""
         self.temp_created: list[Any] = []
+        self.restore_scene = []
+        self.inspection_meta = {}
         self.hidden_backup: list[tuple[Any, bool]] = []
         self.render_info_cache: dict[str, Any] = {}
         self.tiles_plan: list[dict[str, Any]] = []
@@ -552,6 +568,12 @@ class CaptureTask:
         self.cur_badge_bg: tuple[int, int, int] | None = None
 
     def _cleanup_scene_overrides(self) -> None:
+        while self.restore_scene:
+            callback = self.restore_scene.pop()
+            try:
+                callback()
+            except (ReferenceError, RuntimeError) as exc:
+                print(f"Could not restore an isolated preview setting: {exc}")
         for obj, orig_hide in self.hidden_backup:
             try:
                 obj.hide_viewport = orig_hide
@@ -672,8 +694,47 @@ class CaptureTask:
         self.points, self.lo, self.hi, self.span = framing.collect_target_points(targets, depsgraph)
         self.center = (self.lo + self.hi) * 0.5
 
+        mode = str(self.spec.get("mode", "solid_wire")).lower()
         compare_modes = self.spec.get("compare_modes")
-        if compare_modes:
+        if mode == "render_pass":
+            view = framing.parse_view_token(self.spec.get("view") or "FRONT_3Q", self.spec.get("projection"))
+            aovs, unmeasured = inspection_modes.prepare_passes(view_layer, targets, self.restore_scene)
+            pass_default = view_layer.use_pass_ambient_occlusion
+            view_layer.use_pass_ambient_occlusion = True
+            self.restore_scene.append(lambda: setattr(view_layer, "use_pass_ambient_occlusion", pass_default))
+            self.inspection_meta["unmeasured_materials"] = unmeasured
+            self.tiles_plan = [{"view": view, "mode": mode, "channel": channel, "pass": render_pass,
+                                "aov": aovs.get(channel)} for channel, render_pass in inspection_modes.PASSES]
+        elif self.spec.get("turntable"):
+            count = int(self.spec["turntable"])
+            self.rows, self.cols = 2, 2
+            self.tiles_plan = []
+            for index in range(count):
+                fraction = index / count
+                angle = 2.0 * math.pi * fraction
+                view = {"projection": "ORTHO", "preset": "ORBIT", "label": f"{360 * fraction:.1f}°",
+                        "direction": (math.sin(angle), -math.cos(angle), 0.42)}
+                self.tiles_plan.append({"view": view, "mode": mode, "turntable_index": index})
+        elif self.spec.get("frames"):
+            frames = self.spec["frames"]
+            view = framing.parse_view_token(self.spec.get("view") or "FRONT_3Q", self.spec.get("projection"))
+            self.cols = min(3, len(frames))
+            self.rows = math.ceil(len(frames) / self.cols)
+            self.tiles_plan = [{"view": view, "mode": mode, "frame": frame} for frame in frames]
+            prior_frame = scene.frame_current
+            self.restore_scene.append(lambda: scene.frame_set(prior_frame))
+            all_points = []
+            for frame in frames:
+                scene.frame_set(frame)
+                points, _, _, _ = framing.collect_target_points(targets, bpy.context.evaluated_depsgraph_get())
+                all_points.extend(points)
+            scene.frame_set(prior_frame)
+            self.points = all_points
+            self.lo = Vector(tuple(min(v[i] for v in all_points) for i in range(3)))
+            self.hi = Vector(tuple(max(v[i] for v in all_points) for i in range(3)))
+            self.span = max(1e-4, (self.hi - self.lo).length)
+            self.center = (self.lo + self.hi) * 0.5
+        elif compare_modes:
             modes_list = [m.strip().lower() for m in compare_modes]
             if not 1 <= len(modes_list) <= 9:
                 raise ValueError("compare_modes accepts 1..9 display modes")
@@ -694,7 +755,6 @@ class CaptureTask:
                 self.rows, self.cols = 3, 3
             self.tiles_plan = [{"view": view_spec, "mode": m} for m in modes_list]
         else:
-            mode = str(self.spec.get("mode", "solid_wire")).lower()
             if mode not in VALID_MODES:
                 raise ValueError(f"Unsupported display mode {mode!r}; expected one of {VALID_MODES}")
             layout = str(self.spec.get("layout", "quad")).lower()
@@ -706,6 +766,20 @@ class CaptureTask:
                 layout, custom_views, self.spec.get("projection")
             )
             self.tiles_plan = [{"view": vs, "mode": mode} for vs in resolved_views]
+
+        if mode in ("uv_checker", "uv_stretch"):
+            self.inspection_meta.update(
+                inspection_modes.prepare_uv(scene, view_layer, targets, mode, self.restore_scene)
+            )
+        if "weights" in self.spec.get("overlays", []):
+            target = next((obj for obj in targets if obj.type == "MESH" and obj.vertex_groups and obj.is_editable), None)
+            if target is None:
+                raise ValueError("The weights overlay requires an editable focused mesh with vertex groups")
+            view_layer.objects.active = target
+            target.select_set(True)
+            if bpy.ops.object.mode_set(mode="WEIGHT_PAINT") != {"FINISHED"}:
+                raise ValueError("Unable to activate weight paint for the focused mesh")
+            self.restore_scene.append(lambda: bpy.ops.object.mode_set(mode="OBJECT"))
 
         self.shared_ortho_half = framing.compute_shared_ortho_extent(
             self.points, self.center, [t["view"] for t in self.tiles_plan]
@@ -741,11 +815,16 @@ class CaptureTask:
         item = self.tiles_plan[self.tile_index]
         view_spec = item["view"]
         mode = item["mode"]
+        if "frame" in item:
+            scene.frame_set(item["frame"])
 
         # Configure display mode first, then apply exact framing
         self.cur_mode_meta, self.cur_badge, self.cur_badge_bg = _apply_display_mode(
             scene, sp, mode, self.spec, render_info_cache=self.render_info_cache
         )
+        if item.get("pass"):
+            sp.shading.render_pass = item.get("aov") or item["pass"]
+            self.cur_mode_meta.update(channel=item["channel"], render_pass=sp.shading.render_pass, aov=item.get("aov"))
 
         self.cur_view_meta = framing.apply_viewport_view(
             sp,
@@ -770,6 +849,20 @@ class CaptureTask:
                 self.framing_out["ortho_view_distance"] = self.cur_view_meta["view_distance"]
             elif self.cur_view_meta.get("projection") == "PERSP":
                 self.framing_out["persp_view_distance"] = self.cur_view_meta["view_distance"]
+        overlays = self.spec.get("overlays", [])
+        if "camera_guides" in overlays and view_spec.get("projection") == "CAMERA":
+            camera = sp.camera.data
+            previous = camera.show_safe_areas
+            camera.show_safe_areas = True
+            self.restore_scene.append(lambda: setattr(camera, "show_safe_areas", previous))
+            sp.overlay.show_camera_guides = True
+            sp.overlay.show_overlays = True
+        if "bones" in overlays:
+            sp.overlay.show_bones = True
+            sp.overlay.show_overlays = True
+        if "weights" in overlays:
+            sp.overlay.show_weight = True
+            sp.overlay.show_overlays = True
 
         a.tag_redraw()
         self.tile_start_t = time.monotonic()
@@ -780,7 +873,7 @@ class CaptureTask:
         self.phase = "poll_tile"
 
         # Initial settle delay depends on rendering weight
-        if mode == "rendered":
+        if mode in ("rendered", "render_pass", "uv_checker", "uv_stretch"):
             return 0.35
         if mode == "material":
             return 0.25
@@ -846,15 +939,33 @@ class CaptureTask:
             a.tag_redraw()
             return 0.15 if mode == "rendered" else 0.10
 
+        if "scale_bar" in self.spec.get("overlays", []):
+            meters_per_unit = bpy.context.scene.unit_settings.scale_length
+            center_meters = self.span * meters_per_unit * 0.22
+            base = 10 ** math.floor(math.log10(max(1e-9, center_meters)))
+            value = max(n * base for n in (1, 2, 5) if n * base <= max(1e-9, center_meters))
+            direction = sp.region_3d.view_rotation @ Vector((1, 0, 0))
+            from bpy_extras.view3d_utils import location_3d_to_region_2d
+            first = location_3d_to_region_2d(r, sp.region_3d, self.center)
+            last = location_3d_to_region_2d(r, sp.region_3d, self.center + direction * (value / meters_per_unit))
+            if first is not None and last is not None:
+                width = max(1, round((last - first).length))
+                if compositor_board.draw_scale_bar(cur_rgb, width, f"{value:g} m"):
+                    self.cur_mode_meta["scale_bar_meters"] = value
+
         # Build concise tile header
         vlabel = self.cur_view_meta.get("label", f"VIEW {self.tile_index + 1}")
         vproj = self.cur_view_meta.get("projection", "")
-        if self.spec.get("compare_modes"):
+        if item.get("channel"):
+            header = f"{item['channel']} | {vlabel}"
+        elif "frame" in item:
+            header = f"Frame {item['frame']} | {vlabel}"
+        elif self.spec.get("compare_modes"):
             header = f"{mode.upper()} | {vlabel}"
         else:
             header = f"{vlabel} ({vproj})" if vproj and vproj != "CAMERA" else vlabel
 
-        self.captured_tiles.append({
+        tile = {
             "rgb": cur_rgb,
             "header": header,
             "badge": self.cur_badge,
@@ -865,8 +976,19 @@ class CaptureTask:
                 "settle_seconds": round(elapsed, 3),
                 "frame_std": round(frame_std, 2),
                 "has_content": has_content,
+                "frame": int(bpy.context.scene.frame_current),
             },
-        })
+        }
+        if "turntable_index" in item:
+            frames = Path(self.spec["report_path"]).parent / "turntable-frames"
+            number = item["turntable_index"]
+            size = self.cell_size - self.cell_size % 2
+            image = compositor_board.fit_tile_square(cur_rgb, size)
+            compositor_board.save_rgb_png(image, frames / f"frame-{number:03d}.png")
+            if number % max(1, self.spec["turntable"] // 4) == 0 and len(self.captured_tiles) < 4:
+                self.captured_tiles.append(tile)
+        else:
+            self.captured_tiles.append(tile)
         self.prev_tile_rgb = cur_rgb
         self.tile_index += 1
         self.phase = "setup_tile"
@@ -936,6 +1058,9 @@ class CaptureTask:
             "framing": self.framing_out,
             "tiles": tile_rects,
             "elapsed_seconds": round(time.monotonic() - self.t0, 3),
+            "font": compositor_board.board_font()[1],
+            "overlays": self.spec.get("overlays", []),
+            "inspection": self.inspection_meta,
         }
         _atomic_json(out_json, report)
         self.on_done(report, self.loaded_file, self.loaded_sha)

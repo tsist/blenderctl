@@ -17,6 +17,7 @@ REVIEW=obj({'version':{'const':'1.0'},'kind':{'const':'script_review'},'spec':RE
 RECEIPT=obj({'version':{'const':'1.0'},'kind':{'const':'script_trust_receipt'},'review':FILE,'binding_sha256':SHA,'reviewer':NAME,'acknowledgment':{'enum':[ACK,ACK_ISOLATED]},'created_at':{'type':'number'},'reuse':{'const':'exact_request_only'},'limitations':{'const':LIMITS}})
 APPROVE=obj({'review':FILE,'reviewer':NAME,'acknowledgment':{'enum':[ACK,ACK_ISOLATED]}})
 SCULPT=obj({'before':FILE,'after':FILE,'object':NAME,'artistic_intent':TEXT})
+SCULPT['properties']['mode']={'enum': ['MULTIRES_PAINT']}
 AUTHORIZATION={'oneOf':[obj({'mode':{'const':'trust_literal'},'limitations':{'const':LIMITS}}),obj({'mode':{'const':'review_receipt'},'receipt':FILE,'review':FILE,'binding_sha256':SHA,'reviewer':NAME,'reuse':{'const':'exact_request_only'},'limitations':{'const':LIMITS}})]}
 CONTRACTS={'extension.review':obj({'manifest':REVIEW_SPEC}),'extension.approve':obj({'manifest':APPROVE}),'sculpt.review':obj({'manifest':SCULPT})}
 
@@ -31,10 +32,10 @@ def key(value):return hashlib.sha256(canonical(value)).hexdigest()
 
 def normalized_execution(execution,resources):
     script_normalize(execution,'run')
-    def norm(d):
-        descriptor(d)
+    def norm(d,max_bytes=256*1024**2):
+        descriptor(d,max_bytes)
         return {'file':os.path.normcase(str(Path(d['file']).resolve())),'expected_sha256':d['expected_sha256']}
-    inputs=[norm(d) for d in resources]
+    inputs=[norm(d,execution.get('resource_max_bytes',256*1024**2)) for d in resources]
     if len({d['file'] for d in inputs})!=len(inputs):raise Failure('INVALID_REQUEST','Duplicate reviewed input path')
     return {'execution':{**execution,'script':norm(execution['script'])},'resources':sorted(inputs,key=lambda d:d['file'])}
 

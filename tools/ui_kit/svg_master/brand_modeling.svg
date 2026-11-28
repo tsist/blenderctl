@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg_modeling" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222733"/>
+      <stop offset="100%" stop-color="#141820"/>
+    </linearGradient>
+    <radialGradient id="glow_modeling" cx="30%" cy="25%" r="72%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#0C4A6E" stop-opacity="0.02"/>
+    </radialGradient>
+    <linearGradient id="badge_modeling" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="35%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13.5" fill="url(#bg_modeling)" stroke="#38BDF8" stroke-width="2.4" stroke-opacity="0.92"/>
+  <rect x="3.8" y="3.8" width="56.4" height="56.4" rx="12.2" fill="url(#glow_modeling)"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+          <polygon points="27,13 43,21 27,29 11,21" fill="#38BDF8" fill-opacity="0.32" stroke="#BAE6FD" stroke-width="2.4"/>
+          <polygon points="11,21 27,29 27,46 11,38" fill="#38BDF8" fill-opacity="0.16" stroke="#E2E8F0" stroke-width="2.4"/>
+          <polyline points="27,46 43,38 43,21" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-dasharray="3,2.5"/>
+          <line x1="27" y1="8" x2="27" y2="22" stroke="#38BDF8" stroke-width="3.0"/>
+          <polyline points="22.5,17.5 27,22.5 31.5,17.5" fill="none" stroke="#BAE6FD" stroke-width="2.6"/>
+        
+  </g>
+  <rect x="34" y="34" width="28" height="28" rx="8" fill="#11141B"/>
+  <rect x="36.2" y="36.2" width="23.6" height="23.6" rx="6.2" fill="url(#badge_modeling)"/>
+  <text x="48" y="53.6" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-weight="900" font-size="16.5" fill="#082F49">M</text>
+</svg>

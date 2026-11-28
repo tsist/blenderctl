@@ -1,7 +1,7 @@
 """S05 bounded library workflows, shared by host validation and schema export."""
 from pathlib import Path
 from protocol import Failure, read_json
-from scene_contract import obj, array, enum, NAME, BOOL, VEC, validate
+from scene_contract import obj, array, enum, integer, number, NAME, NULL_NAME, BOOL, VEC, validate
 from node_contract import FILE
 
 COMMANDS=('project.link.prepare','project.override.prepare','project.override.resync')
@@ -10,12 +10,21 @@ UUID={'type':'string','pattern':'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[
 SELECT=obj({'type':enum('Object','Collection'),'name':NAME,'asset_id':UUID},['type','name'])
 REFERENCE=obj({**SELECT['properties'],'library':TEXT},['type','name','library'])
 CONTEXT=obj({'scene':NAME,'view_layer':NAME})
-VALUES=obj({'location':VEC,'rotation_euler':VEC,'scale':VEC,'hide_render':BOOL},[])
+TRANSFORMS = {'location': VEC, 'rotation_euler': VEC, 'scale': VEC,
+              'rotation_quaternion': array(number(-1e6, 1e6), 4, 4),
+              'rotation_axis_angle': array(number(-1e6, 1e6), 4, 4)}
+POSE = obj({'name': NAME, 'values': obj(TRANSFORMS, [])})
+SLOT = obj({'slot': integer(0, 65535), 'material': NULL_NAME})
+VALUES = obj({**TRANSFORMS, 'delta_location': VEC, 'delta_scale': VEC,
+              'hide_render': BOOL, 'hide_viewport': BOOL, 'show_in_front': BOOL,
+              'color': array(number(0, 1), 4, 4),
+              'pose_bones': array(POSE, 1, 4096), 'material_slots': array(SLOT, 1, 4096)}, [])
+ADAPTERS = enum('LIBRARY_OVERRIDE_5_2_V1', 'LIBRARY_OVERRIDE_5_3_V1')
 EDIT=obj({'target':REFERENCE,'values':VALUES})
-BASE={'version':{'const':'1.0'},'adapter':{'const':'LIBRARY_OVERRIDE_5_2_V1'},'context':CONTEXT}
+BASE={'version':{'const':'1.0'},'adapter':ADAPTERS,'context':CONTEXT}
 LINK=obj({**BASE,'library':FILE,'selections':array(SELECT,1,32),'placement':enum('ATTACH','INSTANCE'),'instance_name':NAME},[*BASE,'library','selections','placement'])
 OVERRIDE=obj({**BASE,'root':REFERENCE,'edits':array(EDIT,1,128)})
-RESYNC=obj({'version':{'const':'1.0'},'adapter':{'const':'LIBRARY_OVERRIDE_5_2_V1'},'receipt':FILE,'updates':array(FILE,0,1000)})
+RESYNC=obj({'version':{'const':'1.0'},'adapter':ADAPTERS,'receipt':FILE,'updates':array(FILE,0,1000)})
 MANIFESTS=dict(zip(COMMANDS,(LINK,OVERRIDE,RESYNC)))
 
 # Receipt shapes are shared by the runtime reader and published JSON Schema.
@@ -33,10 +42,10 @@ OVERRIDE_RECORD=obj({'identity':IDENTITY,'reference':IDENTITY,'root':IDENTITY,'s
 RECEIPT_REFERENCE=obj({**REFERENCE['properties'],'library':ABSOLUTE},['type','name','library'])
 RECEIPT_EDIT=obj({'target':obj({**RECEIPT_REFERENCE['properties'],'type':{'const':'Object'}},['type','name','library']),'values':{**VALUES,'minProperties':1}})
 REPORT_COMMON={
-    'version':{'const':'1.0'},'adapter':{'const':'LIBRARY_OVERRIDE_5_2_V1'},
+    'version':{'const':'1.0'},'adapter':ADAPTERS,
     'candidate':ABSOLUTE,'candidate_sha256':HASH,'resources':DOCUMENTS,
     'references':many(INVENTORY),'context':CONTEXT,'source':{'oneOf':[obj({}),DOCUMENT]},
-    'blender_build':TEXT,'blender_version':{'type':'array','const':[5,2,1]},
+    'blender_build':TEXT,'blender_version':array(integer(0, 1000), 3, 3),
     'implementation_sha256':HASH,'reopen':{'const':'pass'},
     'source_saved':{'type':'boolean','const':False},'publication':{'const':'working_candidate_only'},
     'upstream_changes':CHANGES,'overrides':many(OVERRIDE_RECORD),'scope':TEXT,
@@ -48,6 +57,19 @@ RECEIPT=obj({**REPORT_COMMON,'kind':{'const':'override'},'source':DOCUMENT,'root
 OVERRIDE_REPORT=obj({**RECEIPT['properties'],'receipt':ABSOLUTE,'receipt_sha256':HASH,'transaction_item':TRANSACTION_TEMPLATE})
 
 def pathkey(path):return str(Path(path).resolve()).casefold()
+
+def validate_edit(values):
+    bones = values.get('pose_bones', [])
+    slots = values.get('material_slots', [])
+    if (len({entry['name'] for entry in bones}) != len(bones)
+        or len({entry['slot'] for entry in slots}) != len(slots)
+        or any(not entry['values'] for entry in bones)):
+        raise Failure('INVALID_REQUEST', 'Pose-bone and material-slot edits must be bounded, unique and nonempty')
+    for row in [values, *(entry['values'] for entry in bones)]:
+        for key in ('scale', 'delta_scale'):
+            if any(abs(value) < 1e-8 for value in row.get(key, [])):
+                raise Failure('INVALID_REQUEST', 'Singular scale is unsupported')
+
 
 def normalize(params,command):
     from protocol import validate as validate_request
@@ -70,7 +92,7 @@ def normalize(params,command):
             t=e['target'];key=(t['type'],t['name'],pathkey(t['library']))
             if t['type']!='Object' or key in seen or not e['values']:raise Failure('INVALID_REQUEST','Edits require unique Object targets and nonempty values')
             seen.add(key)
-            if any(abs(v)<1e-8 for v in e['values'].get('scale',[])):raise Failure('INVALID_REQUEST','Singular scale is unsupported')
+            validate_edit(e['values'])
     for ref in ([spec['root']]+[e['target'] for e in spec['edits']] if command==COMMANDS[1] else []):
         if not Path(ref['library']).is_absolute():raise Failure('INVALID_REQUEST','Library identity needs an absolute owner path')
     docs=([spec['library']] if command==COMMANDS[0] else [spec['receipt'],*spec['updates']] if command==COMMANDS[2] else [])
@@ -86,7 +108,7 @@ def receipt_contract(value):
     for edit in value['edits']:
         target=edit['target'];key=(target['type'],target['name'],pathkey(target['library']))
         if not edit['values'] or key in seen:raise Failure('INVALID_REQUEST','Override receipt edits require unique targets and nonempty values')
-        if any(abs(v)<1e-8 for v in edit['values'].get('scale',[])):raise Failure('INVALID_REQUEST','Singular scale is unsupported')
+        validate_edit(edit['values'])
         seen.add(key)
     for document in [value['source'],*value['resources']]:
         if not Path(document['file']).is_absolute():raise Failure('INVALID_REQUEST','Override receipt needs absolute document paths')

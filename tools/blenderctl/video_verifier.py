@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from protocol import atomic_json, digest
-from video_identity import implementation_sha256
+from video_identity import bind_package, implementation_sha256
 
 
 def mismatch(expected, actual, path='$'):
@@ -46,6 +46,7 @@ def runtime_identity(bpy):
 
 def verify(path):
     import bpy
+    bind_package()
     from video_editing_workflow_addon import core
     config = json.loads(Path(path).read_text(encoding='utf-8-sig'))
     report = {'status': 'failed', 'blender': bpy.app.version_string,

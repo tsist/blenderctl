@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import time
 import uuid
@@ -98,6 +100,10 @@ def _add_capture_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--scene", help="scene name (defaults to active saved scene)")
     p.add_argument("--view-layer", help="view layer name (defaults to active view layer)")
     p.add_argument("--frame", type=int, help="timeline frame to evaluate before capture")
+    p.add_argument("--frames", nargs="+", action="extend", help="capture 1 to 9 timeline frames in one contact sheet")
+    p.add_argument("--turntable", type=int, help="capture 4 to 120 angles as a 24 fps 360-degree MP4")
+    p.add_argument("--overlays", nargs="+", action="extend",
+                   help="add camera_guides, bones, weights, or scale_bar (comma or space separated)")
 
     # Focus & isolation
     p.add_argument("--objects", nargs="+", action="extend", help="object names to focus (comma or space separated)")
@@ -153,7 +159,7 @@ def _add_capture_args(p: argparse.ArgumentParser) -> None:
 
     # Output & session reuse
     p.add_argument("--cell-size", type=int, default=None, help="tile pixel size 256..1024 (default 640, auto-capped <=2048px total)")
-    p.add_argument("--output", "-o", type=Path, help="output PNG path (default: <jobs-dir>/<job_id>/preview.png)")
+    p.add_argument("--output", "-o", type=Path, help="output PNG path, or MP4 for --turntable")
     p.add_argument("--save-tiles", action="store_true", default=None, help="also write individual per-view PNG files")
     p.add_argument("--session", help="reuse an active hot preview session ID instead of spawning one-shot Blender")
     p.add_argument("--sessions-dir", type=Path, default=session_manager.DEFAULT_SESSIONS_ROOT)
@@ -238,6 +244,12 @@ def _build_spec(ns: argparse.Namespace, job_dir: Path) -> dict[str, Any]:
         spec["view_layer"] = ns.view_layer
     if ns.frame is not None:
         spec["frame"] = ns.frame
+    if ns.frames:
+        spec["frames"] = [int(value) for value in _split_csv(ns.frames)]
+    if ns.turntable is not None:
+        spec["turntable"] = ns.turntable
+    if ns.overlays:
+        spec["overlays"] = _split_csv(ns.overlays)
 
     objs = _split_csv(ns.objects)
     if objs:
@@ -329,14 +341,47 @@ def _build_spec(ns: argparse.Namespace, job_dir: Path) -> dict[str, Any]:
     spec.setdefault("dlss_quality", "balanced")
     spec.setdefault("samples", 8)
 
+    mode = spec["mode"].lower()
+    special_modes = {"render_pass", "uv_checker", "uv_stretch"}
+    if spec.get("compare_modes") and (
+        mode in special_modes or spec.get("frames") or spec.get("turntable") is not None
+        or any(m.lower() in special_modes for m in spec["compare_modes"])
+    ):
+        raise ValueError("Use one inspection mode, filmstrip, or turntable per command")
+    if "frames" in spec:
+        frames = spec["frames"]
+        if not isinstance(frames, list) or not (1 <= len(frames) <= 9) or any(type(f) is not int for f in frames):
+            raise ValueError("Filmstrip requires 1 to 9 integer frames")
+        if len(set(frames)) != len(frames) or mode in special_modes or "frame" in spec or "turntable" in spec:
+            raise ValueError("Filmstrip requires unique frames and one standard display mode")
+    if "turntable" in spec:
+        count = spec["turntable"]
+        if type(count) is not int or not 4 <= count <= 120 or mode in special_modes:
+            raise ValueError("Turntable requires 4 to 120 frames and one standard display mode")
+    overlays = spec.get("overlays", [])
+    if not isinstance(overlays, list) or any(item not in {"camera_guides", "bones", "weights", "scale_bar"} for item in overlays):
+        raise ValueError("Unsupported preview overlay")
+    if "camera_guides" in overlays and not any(
+        view.lower().startswith("camera:") for view in [spec.get("view") or "", *(spec.get("views") or [])]
+    ):
+        raise ValueError("Camera guides require a camera:<Name> view")
+
     if ns.output:
         out_png = ns.output.resolve()
     elif "output" in spec:
         out_png = Path(spec["output"]).resolve()
     else:
-        out_png = (job_dir / "preview.png").resolve()
+        out_png = (job_dir / ("preview.mp4" if "turntable" in spec else "preview.png")).resolve()
+    if "turntable" in spec:
+        if out_png.suffix.lower() != ".mp4" or out_png.exists():
+            raise ValueError("Turntable requires a new .mp4 output")
+        spec["turntable_output"] = str(out_png)
+        out_png = job_dir / "preview.png"
     if out_png.suffix.lower() != ".png":
         raise ValueError("Output path must end with .png")
+    if mode in special_modes or "frames" in spec:
+        if out_png.exists() or out_png.with_suffix(".json").exists():
+            raise ValueError("Inspection and filmstrip require a new output path")
     out_png.parent.mkdir(parents=True, exist_ok=True)
     spec["output"] = str(out_png)
     spec["report_path"] = str(out_png.with_suffix(".json"))
@@ -362,10 +407,17 @@ def _build_spec(ns: argparse.Namespace, job_dir: Path) -> dict[str, Any]:
 
 
 def _emit(payload: dict[str, Any], ns: argparse.Namespace) -> int:
+    payload.setdefault("schema_version", "1.0")
+    payload.setdefault("data", {})
+    payload.setdefault("artifacts", {})
+    payload.setdefault("error", None)
     if getattr(ns, "human", False):
         if payload.get("ok"):
             data = payload.get("data", {})
-            if "output_png" in data:
+            if "output_mp4" in data:
+                video = data["output_mp4"]
+                print(f"OK {video['file']} ({video['frame_count']} frames at {video['fps']} fps)")
+            elif "output_png" in data:
                 png = data["output_png"]
                 print(f"OK {png['file']} ({png['width']}x{png['height']}, {data.get('elapsed_seconds')}s)")
             else:
@@ -398,6 +450,8 @@ def _emit(payload: dict[str, Any], ns: argparse.Namespace) -> int:
                 ],
                 "elapsed_seconds": data.get("elapsed_seconds"),
             }
+            if "output_mp4" in data:
+                summary["output_mp4"] = data["output_mp4"]
             print(json.dumps(summary, ensure_ascii=False))
         else:
             print(json.dumps(payload, ensure_ascii=False))
@@ -433,6 +487,43 @@ def _handle_session(ns: argparse.Namespace) -> int:
             {"ok": False, "command": cmd, "version": VERSION, "error": {"code": type(exc).__name__, "message": str(exc)}},
             ns,
         )
+
+
+def _encode_turntable(spec, job_dir):
+    sys.path.insert(0, str(ROOT / "tools/blenderctl"))
+    from doctor import media_tools
+
+    tools = media_tools(ROOT)
+    if not tools["ok"]:
+        raise RuntimeError("An FFmpeg/FFprobe pair is required to encode a turntable")
+    dest = Path(spec["turntable_output"])
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    frames = job_dir / "turntable-frames"
+    temporary = dest.with_name(f".{dest.stem}-{job_dir.name}.mp4")
+    try:
+        subprocess.run([
+            tools["ffmpeg"]["path"], "-hide_banner", "-nostdin", "-loglevel", "error", "-n",
+            "-framerate", "24", "-i", str(frames / "frame-%03d.png"),
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(temporary),
+        ], check=True, timeout=60, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0), capture_output=True)
+        probe = subprocess.run([
+            tools["ffprobe"]["path"], "-v", "error", "-select_streams", "v:0", "-count_frames",
+            "-show_entries", "stream=codec_name,width,height,nb_read_frames,r_frame_rate", "-of", "json",
+            str(temporary),
+        ], check=True, timeout=60, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0), capture_output=True)
+        details = json.loads(probe.stdout)["streams"][0]
+        if details["codec_name"] != "h264" or int(details["nb_read_frames"]) != spec["turntable"]:
+            raise RuntimeError("Turntable codec or decoded frame count differs from the request")
+        with temporary.open("rb") as stream:
+            sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
+        # A Windows rename fails if another process creates the destination first.
+        temporary.rename(dest)
+        return {"file": str(dest), "sha256": sha256, "bytes": dest.stat().st_size,
+                "fps": 24, "frame_count": int(details["nb_read_frames"]), "degrees": 360,
+                "width": details["width"], "height": details["height"], "codec": details["codec_name"]}
+    finally:
+        if temporary.exists():
+            temporary.unlink()
 
 
 def _handle_capture(ns: argparse.Namespace) -> int:
@@ -507,9 +598,13 @@ def _handle_capture(ns: argparse.Namespace) -> int:
 
         worker_res["wall_seconds"] = round(time.monotonic() - t0, 3)
         worker_res["runner"] = runner_info
+        if spec.get("turntable"):
+            worker_res["output_mp4"] = _encode_turntable(spec, job_dir)
+            Path(worker_res["report_file"]).write_text(json.dumps(worker_res, indent=2, ensure_ascii=False), encoding="utf-8")
         payload = {
             "ok": True,
             "command": "preview",
+            "schema_version": "1.0",
             "version": VERSION,
             "job_id": job_id,
             "data": worker_res,
@@ -519,6 +614,8 @@ def _handle_capture(ns: argparse.Namespace) -> int:
                 "preview_report": worker_res["report_file"],
             },
         }
+        if "output_mp4" in worker_res:
+            payload["artifacts"]["preview_mp4"] = worker_res["output_mp4"]["file"]
         (job_dir / "result.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         return _emit(payload, ns)
     except Exception as exc:

@@ -26,26 +26,38 @@ def num(lo=-1e6, hi=1e6):
 
 
 NAME = {'type': 'string', 'minLength': 1, 'maxLength': 160}
+PATH = {'type': 'string', 'minLength': 1, 'maxLength': 2048}
 ID = {'type': 'string', 'pattern': r'^[A-Za-z][A-Za-z0-9_-]{0,63}$'}
 SHA = {'type': 'string', 'pattern': r'^[0-9a-f]{64}$'}
 BOOL = {'type': 'boolean'}
 VEC = arr(num(-1000, 1000), 3, 3)
 COLOR = arr(num(0, 1), 3, 3)
-FILE = obj({'file': NAME, 'expected_sha256': SHA}, ('file', 'expected_sha256'))
+FILE = obj({'file': PATH, 'expected_sha256': SHA}, ('file', 'expected_sha256'))
 LINK_FIELDS = {'receivers': arr(NAME, 0, 256), 'blockers': arr(NAME, 0, 256),
                'receivers_mode': {'enum': ['INCLUDE', 'EXCLUDE']},
                'blockers_mode': {'enum': ['INCLUDE', 'EXCLUDE']}}
+LINK_MEMBER = obj({'name': NAME, 'kind': {'enum': ['OBJECT', 'COLLECTION']},
+                   'state': {'enum': ['INCLUDE', 'EXCLUDE']}}, ('name', 'kind', 'state'))
+LINK_MEMBERS = {key + '_members': arr(LINK_MEMBER, 1, 256) for key in ('receivers', 'blockers')}
+VOLUME = obj({'density': num(.000001, 100), 'color': COLOR, 'anisotropy': num(-.99, .99)}, ('density',))
+FOG = obj({**VOLUME['properties'], 'location': VEC, 'size': arr(num(.00001, 10000), 3, 3)},
+          ('density', 'location', 'size'))
+COMMERCIAL_FIELDS = {'kelvin': num(800, 20000), 'light_group': NAME, 'ies': FILE, 'gobo': FILE,
+                     'follow_bone': obj({'armature': NAME, 'bone': NAME}, ('armature', 'bone')),
+                     'align_to_hdri': BOOL, **LINK_MEMBERS}
 NATIVE_CREATE_FIELDS = {'normalize': BOOL, 'spread_deg': num(0, 180),
                         'diffuse_factor': num(0, 1), 'specular_factor': num(0, 1)}
 LIGHT_FIELDS = {'energy': num(0, 1e8), 'color': COLOR, 'location': VEC,
                 'size': num(.00001, 10000), 'size_y': num(.00001, 10000),
                 'enabled': BOOL, 'use_shadow': BOOL, **LINK_FIELDS}
 LIGHT = obj({'id': ID, 'role': NAME, 'type': {'enum': ['AREA', 'POINT', 'SPOT', 'SUN']},
-             **LIGHT_FIELDS, **NATIVE_CREATE_FIELDS, 'shape': {'enum': ['SQUARE', 'DISK', 'RECTANGLE', 'ELLIPSE']},
+             **LIGHT_FIELDS, **NATIVE_CREATE_FIELDS, **COMMERCIAL_FIELDS,
+             'shape': {'enum': ['SQUARE', 'DISK', 'RECTANGLE', 'ELLIPSE']},
              'aim': VEC, 'angle_deg': num(.001, 180), 'spot_size_deg': num(.001, 179.9),
              'spot_blend': num(0, 1)}, ('id', 'role', 'type', 'location', 'energy', 'color'))
 WORLD = obj({'kind': {'enum': ['constant', 'sky', 'hdri']}, 'color': COLOR,
-             'strength': num(0, 10000), 'file': NAME, 'rotation_deg': num(-36000, 36000),
+             'strength': num(0, 10000), 'file': PATH, 'rotation_deg': num(-36000, 36000),
+             'volume': VOLUME,
              'sky_type': NAME, 'sun_rotation_deg': num(-36000, 36000),
              'sun_elevation_deg': num(-90, 90),
              'sun_disc': {**BOOL, 'description': 'Native Sky sun disc is Cycles-only; Eevee does not support this sun-disc control. Use an explicit SUN light for direct light.'}}, ('kind',))
@@ -60,7 +72,7 @@ MANIFEST_SCHEMA = obj({'version': {'const': SCHEMA_VERSION}, 'scene': NAME, 'vie
     'frame': {'type': 'integer', 'minimum': 1, 'maximum': 100000}, 'rig_id': ID,
     'action': {'enum': ['create', 'patch', 'restore']}, 'targets': arr(NAME, 0, 64),
     'mode': {'enum': ['relight', 'adapt']}, 'anchor': {'enum': ['world', 'target', 'camera']},
-    'lights': arr(LIGHT, 0, 32), 'world': WORLD, 'exposure': num(-10, 10),
+    'lights': arr(LIGHT, 0, 32), 'world': WORLD, 'fog': FOG, 'exposure': num(-10, 10),
     'eevee': obj({'use_raytracing': BOOL}, ('use_raytracing',)),
     'background': obj({'color': COLOR, 'roughness': num(0, 1), 'size': num(.1, 1000)}, ('color',)),
     'keep_lights': arr(NAME, 0, 256), 'patches': arr(PATCH, 0, 32),
@@ -73,9 +85,9 @@ PREVIEW_SCHEMA = obj({'engines': arr({'enum': ['CYCLES', 'BLENDER_EEVEE']}, 1, 2
     'samples': {'type': 'integer', 'minimum': 1, 'maximum': 256},
     'frames': arr({'type': 'integer', 'minimum': 1, 'maximum': 100000}, 1, 24),
     'cameras': arr(NAME, 1, 24), 'denoise': BOOL}, ('engines', 'device', 'width', 'height', 'samples'))
-RUN_PARAMS_SCHEMA = obj({'file': NAME, 'expected_sha256': SHA, 'resources': arr(FILE, 0, 256),
+RUN_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(FILE, 0, 256),
     'manifest': MANIFEST_SCHEMA, 'preview': PREVIEW_SCHEMA}, ('file', 'expected_sha256', 'resources', 'manifest'))
-INSPECT_PARAMS_SCHEMA = obj({'file': NAME, 'expected_sha256': SHA, 'resources': arr(FILE, 0, 256),
+INSPECT_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(FILE, 0, 256),
     'scene': NAME, 'rig_id': ID}, ('file', 'expected_sha256', 'resources', 'scene'))
 
 
@@ -131,7 +143,7 @@ def normalize_manifest(value):
             raise WorkflowError('INVALID_REQUEST', 'create requires targets, lights, mode and anchor')
         if value.get('patches') or value.get('board_patches'): raise WorkflowError('INVALID_REQUEST', 'create does not accept patches')
     else:
-        forbidden = {'lights', 'boards', 'world', 'exposure', 'background', 'keep_lights', 'mode', 'anchor', 'eevee'} & set(value)
+        forbidden = {'lights', 'boards', 'world', 'fog', 'exposure', 'background', 'keep_lights', 'mode', 'anchor', 'eevee'} & set(value)
         if forbidden: raise WorkflowError('INVALID_REQUEST', action + ' cannot change: ' + ', '.join(sorted(forbidden)))
         if action == 'patch' and not (value.get('patches') or value.get('board_patches')): raise WorkflowError('INVALID_REQUEST', 'patch requires nonempty patches or board_patches')
         if action == 'restore' and (value.get('patches') or value.get('board_patches')): raise WorkflowError('INVALID_REQUEST', 'restore does not accept patches')
@@ -153,6 +165,24 @@ def normalize_manifest(value):
         if 'angle_deg' in light and light['type'] != 'SUN': raise WorkflowError('INVALID_REQUEST', 'angle_deg requires SUN')
         if {'spot_size_deg', 'spot_blend'} & set(light) and light['type'] != 'SPOT': raise WorkflowError('INVALID_REQUEST', 'spot controls require SPOT')
         if 'size' in light and light['type'] == 'SUN': raise WorkflowError('INVALID_REQUEST', 'SUN uses angle_deg, not size')
+        if 'gobo' in light and light['type'] != 'SPOT':
+            raise WorkflowError('INVALID_REQUEST', 'Gobo projection requires SPOT')
+        if 'ies' in light and light['type'] not in ('POINT', 'SPOT'):
+            raise WorkflowError('INVALID_REQUEST', 'IES requires POINT or SPOT')
+        if light.get('align_to_hdri') and (light['type'] != 'SUN' or value.get('world', {}).get('kind') != 'hdri'):
+            raise WorkflowError('INVALID_REQUEST', 'HDRI alignment requires SUN and an HDRI world in the same rig')
+        if 'follow_bone' in light and value['anchor'] != 'world':
+            raise WorkflowError('INVALID_REQUEST', 'Bone-following lights require the world rig anchor')
+        if 'light_group' in light and (len(light['light_group'].encode()) > 55 or '.' in light['light_group'] or not light['light_group'].strip()):
+            raise WorkflowError('INVALID_REQUEST', 'Light Group requires a nonblank name without periods and up to 55 UTF-8 bytes')
+        for key in ('ies', 'gobo'):
+            if key in light:
+                light[key]['file'] = _absolute(light[key]['file'])
+        for key in ('receivers', 'blockers'):
+            if key + '_members' in light:
+                if key in light or key + '_mode' in light:
+                    raise WorkflowError('INVALID_REQUEST', 'Choose one link representation for ' + key)
+                _unique([(m['kind'], m['name']) for m in light[key + '_members']], key + ' member')
     for patch in value.get('patches', []):
         if not patch['values']: raise WorkflowError('INVALID_REQUEST', 'Empty patch values')
     for row in [*value.get('lights', []), *[p['values'] for p in value.get('patches', [])]]:
@@ -226,8 +256,13 @@ def normalize_params(value):
     value['manifest'] = normalize_manifest(value['manifest'])
     if 'preview' in value: value['preview'] = normalize_preview(value['preview'])
     world = value['manifest'].get('world', {})
-    if world.get('kind') == 'hdri' and world['file'].casefold() not in {r['file'].casefold() for r in value['resources']}:
+    declared = {row['file'].casefold(): row['expected_sha256'] for row in value['resources']}
+    if world.get('kind') == 'hdri' and world['file'].casefold() not in declared:
         raise WorkflowError('INVALID_REQUEST', 'HDRI must be declared with resource SHA')
+    for row in value['manifest'].get('lights', []):
+        for key in ('ies', 'gobo'):
+            if key in row and declared.get(row[key]['file'].casefold()) != row[key]['expected_sha256']:
+                raise WorkflowError('INVALID_REQUEST', key.upper() + ' must match a declared resource SHA')
     return value
 
 

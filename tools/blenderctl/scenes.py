@@ -1,11 +1,12 @@
 """Scene candidates using explicit data APIs, bounded operations and reopen verification."""
 import math
+from contextlib import ExitStack
 from pathlib import Path
 import bpy,bmesh
 from mathutils import Matrix,Vector,Euler
 from protocol import Failure,atomic_json,digest
 from inspection import all_ids,record,key,identity,value
-from scene_contract import normalize
+from scene_contract import LOCALIZATION,normalize
 
 def find(collection,name,write=False):
     matches=[x for x in collection if x.name==name]
@@ -113,8 +114,9 @@ def configure_data(op):
         actual=getattr(data,attr)
         if isinstance(v,(int,float)) and not math.isclose(actual,v,rel_tol=1e-5,abs_tol=1e-6):raise Failure('INVALID_REQUEST','Blender clamped '+name)
 
-def execute(op):
+def execute(op, *, verified_library=None):
     kind=op['op']
+    evidence=None
     if kind=='scene.create':fresh(bpy.data.scenes,op['name']);named(bpy.data.scenes.new(op['name']),op['name'])
     elif kind=='scene.remove':
         scene=find(bpy.data.scenes,op['scene'],True)
@@ -184,6 +186,9 @@ def execute(op):
             group={'MESH':bpy.data.meshes,'CAMERA':bpy.data.cameras,'LIGHT':bpy.data.lights}[source.type]
             name=op['name']+'.Data';fresh(group,name);item.data=named(source.data.copy(),name)
         collection.objects.link(item)
+    elif kind==LOCALIZATION:
+        from collection_local import realize
+        evidence=realize(find(bpy.data.objects,op['object'],True),op,verified_library)
     elif kind=='object.transform':
         item=find(bpy.data.objects,op['object'],True);static_transform(item)
         if op['space']=='local':
@@ -230,6 +235,7 @@ def execute(op):
         node=world.node_tree.nodes.get('Background');node.inputs['Color'].default_value=(*op['color'],1);node.inputs['Strength'].default_value=op['strength'];scene.world=world
     else:raise Failure('INVALID_REQUEST','Unsupported scene operation')
     acyclic();update()
+    return evidence
 
 def activate(context):
     scene=find(bpy.data.scenes,context['scene']);layer=find(scene.view_layers,context['view_layer']);bpy.context.window.scene=scene;bpy.context.window.view_layer=layer;scene.frame_set(context['frame']);layer.update()
@@ -252,8 +258,8 @@ def prepare_context(context):
         if layers:bpy.context.window.view_layer=layers[0]
         matches[0].frame_set(context['frame'])
 
-def state():
-    update();blocks=sorted((record(i) for i in all_ids()),key=lambda r:key({k:r[k] for k in ('type','name','library')}))
+def state(record_fn=None, *, absolute_library_paths=False):
+    update();blocks=sorted(((record_fn or record)(i) for i in all_ids()),key=lambda r:key({k:r[k] for k in ('type','name','library')}))
     scenes=[]
     for scene in sorted(bpy.data.scenes,key=lambda s:s.name):
         layers=[]
@@ -265,9 +271,16 @@ def state():
             walk(layer.layer_collection,[])
             layers.append({'name':layer.name,'use':layer.use,'active':layer.objects.active.name if layer.objects.active else None,'selected_objects':sorted(o.name for o in layer.objects if o.select_get(view_layer=layer)),'objects':sorted(o.name for o in layer.objects),'collections':flags})
         scenes.append({'name':scene.name,'root_collections':sorted(c.name for c in scene.collection.children),'root_objects':sorted(o.name for o in scene.collection.objects),'world':identity(scene.world) if scene.world else None,'camera':scene.camera.name if scene.camera else None,'frame':scene.frame_current,'timeline':[scene.frame_start,scene.frame_end,scene.render.fps,scene.render.fps_base],'units':{p:getattr(scene.unit_settings,p) for p in ('system','length_unit','scale_length')},'view_layers':layers})
-    collections=[{'name':c.name,'library':c.library.filepath if c.library else None,'children':sorted(n.name for n in c.children),'objects':sorted(o.name for o in c.objects),'instance_offset':list(c.instance_offset)} for c in sorted(bpy.data.collections,key=lambda c:c.name)]
+    def library_path(item):
+        return identity(item)['library'] if absolute_library_paths else item.library.filepath if item.library else None
+    collections=[{'name':c.name,'library':library_path(c),'children':sorted(n.name for n in c.children),'objects':sorted(o.name for o in c.objects),'instance_offset':list(c.instance_offset)} for c in sorted(bpy.data.collections,key=lambda c:c.name)]
     layer=bpy.context.view_layer;layer.update();graph=bpy.context.evaluated_depsgraph_get()
-    objects=[{'name':o.name,'library':o.library.filepath if o.library else None,'matrix_world':value(o.evaluated_get(graph).matrix_world if o.name in layer.objects else o.matrix_world),'evaluated_in_active_view_layer':o.name in layer.objects,'parent_type':o.parent_type,'parent_bone':o.parent_bone,'instance_type':o.instance_type,'instance_collection':identity(o.instance_collection) if o.instance_collection else None,'hide_viewport':o.hide_viewport,'collections':sorted(c.name for c in o.users_collection)} for o in sorted(bpy.data.objects,key=lambda o:o.name)]
+    def world_matrix(item):
+        if item.name in layer.objects and layer.objects.get(item.name)==item:
+            return value(item.evaluated_get(graph).matrix_world)
+        # Detached source objects do not have a persistent world matrix.
+        return None if absolute_library_paths else value(item.matrix_world)
+    objects=[{'name':o.name,'library':library_path(o),'matrix_world':world_matrix(o),'evaluated_in_active_view_layer':layer.objects.get(o.name)==o,'parent_type':o.parent_type,'parent_bone':o.parent_bone,'instance_type':o.instance_type,'instance_collection':identity(o.instance_collection) if o.instance_collection else None,'hide_viewport':o.hide_viewport,'collections':sorted(c.name for c in o.users_collection)} for o in sorted(bpy.data.objects,key=lambda o:o.name)]
     return {'scene_report_version':'1.0','scenes':scenes,'collections':collections,'objects':objects,'datablocks':blocks,'evaluation_context':{'scene':bpy.context.scene.name,'view_layer':layer.name,'frame':bpy.context.scene.frame_current,'mode':bpy.context.mode},'coverage':'declared_scene_fields_and_existing_content_snapshot; not_all_plugin_or_render_state'}
 
 def compare(a,b,path='$'):
@@ -293,6 +306,17 @@ def inspect(params,job):
 
 def prepare(params,job):
     manifest=normalize(params['manifest'])
+    with ExitStack() as guards:
+        verified_libraries={}
+        localizations=[(index,op) for index,op in enumerate(manifest['operations']) if op['op']==LOCALIZATION]
+        if localizations:
+            if 'file' not in params:raise Failure('INVALID_REQUEST','Collection localization requires an existing hashed project')
+            from collection_local import guard_library
+            for index,op in localizations:
+                verified_libraries[index]=guard_library(op,guards)
+        return _prepare(params,job,manifest,verified_libraries)
+
+def _prepare(params,job,manifest,verified_libraries):
     if params.get('file'):
         bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
         if tuple(bpy.data.version[:2])!=tuple(bpy.app.version[:2]):raise Failure('UNSUPPORTED','Scene edits require matching Blender major/minor')
@@ -303,23 +327,31 @@ def prepare(params,job):
     actions=[]
     for index,op in enumerate(manifest['operations']):
         prepare_context(manifest['context'])
-        try:execute(op)
+        try:evidence=execute(op,verified_library=verified_libraries.get(index))
         except Failure as exc:raise Failure(exc.code,f'Operation {index} ({op["op"]}): {exc}') from exc
         actions.append({'index':index,'op':op['op'],'status':'applied_in_candidate_memory'})
+        if evidence is not None:actions[-1]['result']=evidence
         atomic_json(job/'scene-actions.json',actions)
     activate(manifest['context'])
     retained=[]
     for item in all_ids():
         if not item.library and not item.is_embedded_data and item.users==0 and not item.use_fake_user:
             item.use_fake_user=True;retained.append(identity(item))
-    expected=state();atomic_json(job/'scene-expected.json',expected)
+    local_edit=[a['result'] for a in actions if a['op']==LOCALIZATION]
+    expected=state(absolute_library_paths=bool(local_edit));atomic_json(job/'scene-expected.json',expected)
     candidate=job/'scene-candidate.blend'
     if candidate.exists():raise Failure('CONFLICT','Candidate already exists')
     bpy.context.preferences.filepaths.save_version=0
     bpy.ops.wm.save_as_mainfile(filepath=str(candidate),copy=True,relative_remap=True,check_existing=False)
-    bpy.ops.wm.open_mainfile(filepath=str(candidate),load_ui=False,use_scripts=False);activate(manifest['context']);observed=state()
+    bpy.ops.wm.open_mainfile(filepath=str(candidate),load_ui=False,use_scripts=False);activate(manifest['context']);observed=state(absolute_library_paths=bool(local_edit))
     atomic_json(job/'scene-report.json',observed)
+    if local_edit:
+        from collection_local import allow_unused_link_pruning,verify_reopened
+        allow_unused_link_pruning(expected,observed,local_edit)
+        for result in local_edit:verify_reopened(result)
     mismatch=compare(expected,observed)
     if mismatch:raise Failure('VALIDATION_FAILED','Candidate reopen mismatch at '+mismatch)
     atomic_json(job/'scene-change.json',{'operations':manifest['operations'],'context':manifest['context'],'retained_orphans':retained,'reopen':'pass'})
-    return {'candidate':str(candidate),'candidate_sha256':digest(candidate),'operations':len(actions),'context':manifest['context'],'reopen':'pass','retained_orphans':retained,'report':str(job/'scene-report.json'),'next_step':'project plan-copy or plan-files; transaction apply; scene inspect/validate final path','publication':'working_candidate_only'}
+    summary={'candidate':str(candidate),'candidate_sha256':digest(candidate),'operations':len(actions),'context':manifest['context'],'reopen':'pass','retained_orphans':retained,'report':str(job/'scene-report.json'),'next_step':'project plan-copy or plan-files; transaction apply; scene inspect/validate final path','publication':'working_candidate_only'}
+    if local_edit:summary['collection_localizations']=local_edit
+    return summary

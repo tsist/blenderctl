@@ -44,8 +44,9 @@ def _resource_check(resources):
             if not raw or raw == '<builtin>' or packed: continue
             if getattr(item, 'source', '') in ('TILED', 'SEQUENCE', 'MOVIE') or any(x in raw for x in ('<UDIM>', '####')):
                 raise Failure('UNSUPPORTED', 'Dynamic resource needs an explicit member workflow: ' + item.name)
-            path = str(Path(bpy.path.abspath(raw, library=getattr(item, 'library', None))).resolve())
-            checked(path, collection, item.name, stored_path_before=raw)
+            owner_library = item.parent if collection == 'libraries' else item.library
+            path = str(Path(bpy.path.abspath(raw, library=owner_library)).resolve())
+            checked(path, collection, item.name, stored_path_before=raw, library_owned=owner_library is not None)
     for tree in bpy.data.node_groups:
         if tree.bl_idname != 'GeometryNodeTree': continue
         for node in tree.nodes:
@@ -65,10 +66,12 @@ def _resource_check(resources):
 
 def _restore_resource_paths(closure):
     for row in closure.get('external', []):
-        if row['kind'] == 'node_filepath': continue  # Absolute strings need no save-copy remapping.
+        if row['kind'] == 'node_filepath' or row.get('library_owned'):
+            continue  # Linked IDs keep the paths authored in their own file.
         collection = getattr(bpy.data, row['kind'], ())
         item = collection.get(row['owner']) if hasattr(collection, 'get') else None
-        if item is not None: item.filepath = row['file']
+        if item is not None and item.filepath != row['file']:
+            item.filepath = row['file']
 
 
 def _loaded_cache_check(params):
@@ -157,7 +160,7 @@ def _check_recipe(target):
             try:
                 recipe = json.loads(modifier.node_group.get(core.STATE, '{}')).get('recipe')
             except (WorkflowError,ValueError,TypeError): pass
-    if recipe in ('spiral_stair','curve_fence','surface_scatter'):
+    if recipe in ('spiral_stair','curve_fence','surface_scatter','biome_scatter'):
         from geometry_nodes_workflow_addon.recipes import recipe_defaults
         values = recipe_defaults(recipe)
         values.update({key:value for key,value in current.items() if key in values})
@@ -173,10 +176,26 @@ def _check_recipe(target):
                 raise WorkflowError('INVALID_REQUEST', 'tread_thickness must be smaller than per-step rise')
         elif recipe == 'curve_fence' and values.get('use_external_path'):
             reference = values.get('path_object')
-            name = reference.get('name') if isinstance(reference, dict) else reference
-            obj = bpy.data.objects.get(name or '')
+            obj = core._resource(reference) if isinstance(reference, dict) else None
             if obj is None or obj.type != 'CURVE' or obj.name == target['object']:
                 raise WorkflowError('INVALID_REQUEST', 'External fence path must be an explicit non-self Curve object')
+        elif recipe == 'biome_scatter':
+            from mathutils import Matrix
+            terrain = core._resource(values['terrain']) if values['terrain'] else None
+            species = core._resource(values['species']) if values['species'] else None
+            carrier = bpy.data.objects.get(target['object'])
+            if not isinstance(terrain, bpy.types.Object) or terrain.type != 'MESH' or terrain == carrier:
+                raise WorkflowError('INVALID_REQUEST', 'Biome terrain must reference a separate mesh object')
+            if not isinstance(species, bpy.types.Collection) or not species.all_objects or carrier in species.all_objects[:]:
+                raise WorkflowError('INVALID_REQUEST', 'Biome species must reference a nonempty separate collection')
+            if carrier and carrier.matrix_world != Matrix.Identity(4):
+                raise WorkflowError('INVALID_REQUEST', 'Biome carrier must use identity world transform for world-metre masks and spacing')
+            if values['min_height'] > values['max_height'] or values['min_scale'] > values['max_scale']:
+                raise WorkflowError('INVALID_REQUEST', 'Biome height and scale bounds must be ordered')
+            if values['camera_frustum'] or values['camera_distance']:
+                camera = core._resource(values['camera']) if values['camera'] else None
+                if not isinstance(camera, bpy.types.Object) or camera.type != 'CAMERA' or (values['camera_frustum'] and camera.data.type == 'PANO'):
+                    raise WorkflowError('INVALID_REQUEST', 'Biome culling needs a camera, with perspective or orthographic projection for frustum culling')
 
 
 def _outside_consumers(targets):
@@ -327,11 +346,17 @@ def inspect(params, job):
     reader_witness=None
     targets = params.get('targets') or [{'object': o.name, 'modifier': m.name} for o in bpy.context.scene.objects for m in o.modifiers if m.type == 'NODES']
     rows = [inspection.inspect_target(t['object'], t.get('modifier'), params.get('observations')) for t in targets]
+    render_comparison = None
+    if params.get('compare_render'):
+        if cache:
+            raise Failure('UNSUPPORTED', 'Dual-mode inspection does not admit managed temporal caches')
+        from geometry_nodes_workflow_addon.render_inspection import compare
+        render_comparison = compare(rows)
     report = {'geometry_report_version': '1.0', 'report_version': '1.0', 'operation': 'inspect', 'status': 'passed',
               'source': {'file': params['file'], 'sha256': params['expected_sha256']}, 'targets': rows,
               'blender': {'version': bpy.app.version_string, 'version_tuple': list(bpy.app.version), 'build_hash': bpy.app.build_hash.decode()},
               'implementation_sha256': params['implementation_sha256'],
-              'resources': closure, 'checks': {'read_only': 'passed'},
+              'resources': closure, 'checks': {'read_only': 'passed'}, 'render_comparison': render_comparison,
               'cache_validation': {'status': 'passed', 'manifest': params['cache_manifest']} if cache else None,
               'cache_replay': replay, 'cache_read_snapshot':reader_witness,
               'discovery': inspection.discover_native_nodes() if params.get('discover') else None}

@@ -1,12 +1,42 @@
 """Bounded DAG and resource declarations; candidate production only, no publication."""
 import copy,os,re
 from pathlib import Path
-from protocol import Failure
+from protocol import COMMANDS, HOST_COMMANDS, Failure, digest, read_json
 from scene_contract import obj,array,enum,integer,number,validate
-ALLOWED=('query','diff','dependency.audit','validate','identity.prepare','asset.prepare','asset.index','scene.prepare','scene.inspect','model.prepare','model.inspect','node.prepare','node.inspect','material.preview','texture.bake','rig.prepare','rig.inspect','animation.sample','simulation.prepare','simulation.inspect','simulation.bake','render.run','media.prepare','media.export','exchange.export','exchange.import','exchange.convert','extension.prepare','extension.run')
-ALLOWED=(*ALLOWED,'asset.preview.prepare','dependency.plan-relink','dependency.prepare','sculpt.replay','rig.package')
-ALLOWED=(*ALLOWED,'tracking.prepare','tracking.inspect','tracking.solve')
-ALLOWED=(*ALLOWED,'inspect','project.verify','project.prepare_copy','project.link.prepare','project.override.prepare','project.override.resync','exchange.analyze','production.run')
+
+def admitted_commands(registry):
+    """Load explicit admissions, excluding host entry points and nested schedulers."""
+    try:
+        groups = [registry['pipeline']['core_allowed']]
+        groups.extend(plugin['pipeline_allowed'] for plugin in registry['plugins'])
+    except (KeyError, TypeError) as exc:
+        raise Failure('CONFLICT', 'Registry lacks a complete pipeline admission declaration') from exc
+    workers = set(COMMANDS) - set(HOST_COMMANDS)
+    result = []
+    for group in groups:
+        if not isinstance(group, list):
+            raise Failure('CONFLICT', 'Pipeline admission must be a list of worker commands')
+        for command in group:
+            if not isinstance(command, str) or command not in workers:
+                raise Failure('CONFLICT', f'Pipeline admission is not a direct worker command: {command}')
+            if command in result:
+                raise Failure('CONFLICT', f'Duplicate pipeline admission: {command}')
+            result.append(command)
+    if not result:
+        raise Failure('CONFLICT', 'Registry has no pipeline worker admissions')
+    return tuple(result)
+
+
+REGISTRY = Path(__file__).with_name('registry.json')
+if os.name == 'nt':
+    from filesystem import FileGuard
+
+    with FileGuard(REGISTRY) as registry_guard:
+        REGISTRY_SHA256 = registry_guard.sha256()
+        ALLOWED = admitted_commands(read_json(REGISTRY))
+else:
+    REGISTRY_SHA256 = digest(REGISTRY)
+    ALLOWED = admitted_commands(read_json(REGISTRY))
 ID={'type':'string','pattern':'^[A-Za-z][A-Za-z0-9_-]{0,47}$'}
 POINTER={'type':'string','minLength':2,'maxLength':256,'pattern':'^/[^~]+$'}
 LIMITS=obj({'cpu_threads':integer(1,8),'memory_mb':integer(256,32768),'disk_mb':integer(1,32768),'gpu_mb':integer(0,32768)})
@@ -45,6 +75,16 @@ def normalize(v, schema=MANIFEST):
     if len(set(ids))!=len(ids):raise Failure('INVALID_REQUEST','Duplicate pipeline step ID')
     for s in steps:
         if s['id'] in s['depends_on'] or set(s['depends_on'])-set(ids):raise Failure('INVALID_REQUEST','Self/unknown dependency')
+        if s['command']=='modeling.import-local':
+            manifest=s['params'].get('manifest')
+            if not isinstance(manifest,dict) or manifest.get('operation')!='import_local':
+                raise Failure('INVALID_REQUEST','Modeling DAG work requires operation=import_local')
+            if s['limits']['cpu_threads']<2:
+                raise Failure('INVALID_REQUEST','Modeling DAG import requires two threads for the cold reader')
+        if s['command']=='video.inspect':
+            resources=s['params'].get('resources')
+            if not isinstance(resources,list) or len(resources)>100:
+                raise Failure('INVALID_REQUEST','Video DAG inspection requires 0..100 declared resources')
         targets=[]
         for b in s['bindings']:
             if b['step'] not in s['depends_on']:raise Failure('INVALID_REQUEST','Binding source must be an explicit direct dependency')
@@ -63,10 +103,13 @@ def normalize(v, schema=MANIFEST):
 
 def normalize_request(command,p):
     if command=='pipeline.resume':
-        if set(p)!={'job_id'}:raise Failure('INVALID_REQUEST','Resume requires job_id')
+        if 'job_id' not in p or set(p)-{'job_id','strict_rehash'}:
+            raise Failure('INVALID_REQUEST','Resume requires job_id')
     else:
         if 'manifest' not in p:raise Failure('INVALID_REQUEST','Pipeline requires manifest')
         p['manifest']=normalize(p['manifest'])
+    if 'strict_rehash' in p and not isinstance(p['strict_rehash'],bool):
+        raise Failure('INVALID_REQUEST','strict_rehash must be a boolean')
     for key in ('job_id','reuse_job'):
         if key in p and (not isinstance(p[key],str) or not re.fullmatch('[0-9a-f]{32}',p[key])):raise Failure('INVALID_REQUEST','Prior pipeline job ID must be 32 lowercase hex characters')
     return p

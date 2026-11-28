@@ -142,7 +142,7 @@ def peak_memory():
     return c.PeakWorkingSetSize
 def inspect(params,job):
     if 'hair_frames' in params:
-        import hair
+        from hair_compat import hair
         return hair.inspect(params,job)
     bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
     safe()
@@ -151,7 +151,7 @@ def inspect(params,job):
 def prepare(params,job):
     spec=normalize(params['manifest'])
     if any(op['op'].startswith('hair.') for op in spec['operations']):
-        import hair
+        from hair_compat import hair
         return hair.prepare(params,job)
     if params.get('file'):
         bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
@@ -214,7 +214,7 @@ def bake(params,job):
     if tuple(bpy.data.version[:2])!=tuple(bpy.app.version[:2]):raise Failure('UNSUPPORTED','Simulation bake requires matching Blender major/minor')
     # Reject external point caches and replay writes before any frame evaluation.
     if hair_mode:
-        import hair
+        from hair_compat import hair
         vertices=hair.preflight(params,job,for_bake=True)
         if receipt and receipt.get('driver_profile')!=profile:raise Failure('CONFLICT','Hair cache driver profile differs from candidate profile')
     elif mixed:
@@ -235,7 +235,7 @@ def bake(params,job):
     if receipt:
         actual_paths={str(p.resolve()).casefold() for o,m in fluids() for p in Path(bpy.path.abspath(m.domain_settings.cache_directory)).rglob('*') if p.is_file()}
         if hair_mode:
-            import hair_volume
+            from hair_compat import hair_volume
             actual_paths.update(str(Path(d['file']).resolve()).casefold() for d in hair_volume.documents())
         declared_paths={str(Path(d['file']).resolve()).casefold() for d in receipt['files']}
         if actual_paths!=declared_paths:raise Failure('CONFLICT','Receipt does not match the complete external cache file set')
@@ -286,7 +286,7 @@ def bake(params,job):
         if mismatch:raise Failure('VALIDATION_FAILED','Baked hair random-access reopen mismatch: '+mismatch)
     files=[{'file':str(p),'expected_sha256':digest(p),'bytes':p.stat().st_size} for p in sorted((job/'fluid-cache').rglob('*')) if p.is_file()]
     if hair_mode:
-        import hair_volume
+        from hair_compat import hair_volume
         files.extend(hair_volume.documents())
     if sum(p['bytes'] for p in files)>128*1024*1024:raise Failure('VALIDATION_FAILED','Cache exceeds 128 MiB acceptance limit')
     if fluids():

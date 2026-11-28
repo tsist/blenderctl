@@ -55,9 +55,13 @@ class MW_OT_handoff_retry(ui.MWOperator,bpy.types.Operator):
 
 class MW_PT_handoff(bpy.types.Panel):
     bl_label='独立快照与后台预览';bl_idname='MW_PT_handoff';bl_parent_id='MW_PT_panel'
-    bl_space_type='VIEW_3D';bl_region_type='UI';bl_category='Material Workflow'
+    bl_space_type='VIEW_3D';bl_region_type='UI';bl_category=ui.THEME.tab_label
     def draw(self,context):
-        s=context.scene;l=self.layout
+        MW_PT_handoff.draw_contents(self.layout, context)
+
+    @staticmethod
+    def draw_contents(l, context):
+        s=context.scene
         l.prop(s,'mw_cli_root');l.prop(s,'mw_handoff_root');l.prop(s,'mw_handoff_mode');l.prop(s,'mw_handoff_timeout')
         l.label(text='快照包含当前场景修改；后台结果保存在独立目录')
         l.label(text='批量只读取已提交草稿；不自动回写当前工程')
@@ -80,9 +84,15 @@ class MW_PT_handoff(bpy.types.Panel):
         l.operator('material_workflow.handoff_recover');l.operator('material_workflow.handoff_retry')
         if s.mw_last_error:l.label(text=s.mw_last_error[:120],icon='ERROR')
 
-CLASSES=(MW_OT_handoff,MW_OT_handoff_refresh,MW_OT_handoff_cancel,MW_OT_handoff_open,MW_OT_handoff_recover,MW_OT_handoff_retry,MW_PT_handoff)
-source_root=Path(__file__).resolve().parents[2]
-PROPS={'mw_cli_root':StringProperty(name='Blender AI 项目目录',subtype='DIR_PATH',default=str(source_root) if (source_root/'tools/blenderctl/cli.py').is_file() else ''),
+CLASSES=(MW_OT_handoff,MW_OT_handoff_refresh,MW_OT_handoff_cancel,MW_OT_handoff_open,MW_OT_handoff_recover,MW_OT_handoff_retry)
+
+
+def _project_root():
+    candidates = (Path(__file__).resolve().parents[2], *Path(bpy.app.binary_path).resolve().parents)
+    return next((str(path) for path in candidates if (path / 'tools/blenderctl/cli.py').is_file()), '')
+
+
+PROPS={'mw_cli_root':StringProperty(name='Blender AI 项目目录',subtype='DIR_PATH',default=_project_root()),
        'mw_handoff_root':StringProperty(name='持久快照根目录',subtype='DIR_PATH'),
        'mw_handoff_mode':EnumProperty(name='执行范围',items=[('SINGLE','单材质草稿','包含当前图层字段'),('BATCH','已提交批量草稿','先确认回写分配、目标和机位')]),
        'mw_handoff_timeout':IntProperty(name='后台期限（秒）',default=300,min=30,max=3600),

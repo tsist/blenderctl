@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg_rigging" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222733"/>
+      <stop offset="100%" stop-color="#141820"/>
+    </linearGradient>
+    <radialGradient id="glow_rigging" cx="30%" cy="25%" r="72%">
+      <stop offset="0%" stop-color="#2DD4BF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#115E59" stop-opacity="0.02"/>
+    </radialGradient>
+    <linearGradient id="badge_rigging" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#99F6E4"/>
+      <stop offset="35%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#2DD4BF"/>
+    </linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13.5" fill="url(#bg_rigging)" stroke="#2DD4BF" stroke-width="2.4" stroke-opacity="0.92"/>
+  <rect x="3.8" y="3.8" width="56.4" height="56.4" rx="12.2" fill="url(#glow_rigging)"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+          <polygon points="16,38 22,22 28,25 22,38" fill="#2DD4BF" fill-opacity="0.38" stroke="#F8FAFC" stroke-width="2.3"/>
+          <polygon points="24,22 41,13 43,18 28,26" fill="#2DD4BF" fill-opacity="0.55" stroke="#99F6E4" stroke-width="2.3"/>
+          <circle cx="25" cy="23.5" r="4.8" fill="#141820" stroke="#2DD4BF" stroke-width="2.8"/>
+          <circle cx="18.5" cy="39" r="3.6" fill="#99F6E4" stroke="#F8FAFC" stroke-width="2.0"/>
+          <circle cx="43.5" cy="14.5" r="3.6" fill="#F8FAFC" stroke="#2DD4BF" stroke-width="2.2"/>
+        
+  </g>
+  <rect x="34" y="34" width="28" height="28" rx="8" fill="#11141B"/>
+  <rect x="36.2" y="36.2" width="23.6" height="23.6" rx="6.2" fill="url(#badge_rigging)"/>
+  <text x="48" y="53.6" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-weight="900" font-size="16.5" fill="#042F2E">R</text>
+</svg>

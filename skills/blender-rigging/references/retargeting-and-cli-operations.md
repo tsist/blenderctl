@@ -22,14 +22,15 @@ $entry = $found.data.actions.items[0].launchers[0]
 
 ## 日常核心公共入口速查
 
-| 制作任务 | 公共命令前缀 | 常用子命令与关键用途 |
+| 制作任务 | 公共命令前缀 / 核心入口 | 常用子命令与关键用途 |
 |---|---|---|
-| 整角色检查、多域体素蒙皮、同作业转权与交付 | `rigging-workflow candidate-entry` | `inspect` \| `scope` \| `audition` \| `finish` \| `result` |
+| 整角色检查、多域体素蒙皮、同作业转权与交付（C94 人形） | `rigging-workflow candidate-entry` | `inspect` \| `scope` \| `audition` \| `finish` \| `result` |
+| 独立模块化人形与四足骨架（`HUMAN` / `QUADRUPED`）+ 体素蒙皮 | `work/rigging-agent-workflow-20261124-v003/rigging_workflow`（`modular_rig` + `modular_positioning` + `modular_neutral` + `modular_workflow`）；历史 5.2.1 CLI 见 `rc-modular` | `prepare_reference` \| `estimate` \| `confirm_reference` \| `generate` \| `start_binding` \| `apply`（见同目录 `MODULAR-AI-CALLS.md`；底层由插件合规调用 Rigify `segments=1, bbones=1` 并带 26 邻接体素求解） |
 | 选骨局部重算与拆点接缝核验 | `rigging-workflow candidate-selected-skin` | `inspect` \| `execute`（支持单件与 `targets` 多网格批量） |
 | 同骨架供体迁权（`RIGID` / `TRANSFER` / `LOCAL`） | `rigging-workflow candidate-skinning-policy` | `qualify` \| `plan` \| `preview` \| `apply` |
 | 作者返工、兼容重建与原骨架逐点修权 | `rigging-workflow candidate-repair` | `inspect` \| `review-handoff` \| `apply` \| `cancel` |
 | 接手现场打开窗口（播放、毛发开关、聚焦源对象） | `rigging-workflow session-live` | `inspect` \| `focus-source` \| `play-pause` \| `stop` \| `transport-enable` \| `transport-disable` \| `result` |
-| 角色定位、参考生成、姿态切换、表情、动力学与重定向 | 通过 `discover --product rigging --action <动作ID>` 查取 | 按返回的固定版面板会话或专用脚本参数执行 |
+| 角色定位、参考生成、姿态切换、表情、动力学与重定向 | 通过 `discover --product rigging --action <动作ID>`（含 `--query modular`）查取 | 按返回的固定版面板会话或专用脚本参数执行 |
 
 ## 参考骨定位、镜像与骨架生成
 

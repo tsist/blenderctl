@@ -36,7 +36,7 @@ $ctl = './blenderctl.ps1'
 
 ## 2. 最小建片请求与提交流程
 
-每次任务在 `work/audit/<batch>//jobs` 建独立作业目录。所有时间区间使用左闭右开 `[start, end_exclusive)`，帧率使用有理数 `[numerator, denominator]`。
+每次任务在 `work/audit/<batch>/>/jobs` 建独立作业目录。所有时间区间使用左闭右开 `[start, end_exclusive)`，帧率使用有理数 `[numerator, denominator]`。
 
 下面演示在已确认零外部引用的空源工程里创建新场景 `VideoCut`（`create` 需要尚不存在的场景名），实际制作时把 `file`、`expected_sha256` 和 `resources` 替换为现场实测值：
 
@@ -45,7 +45,7 @@ $ctl = './blenderctl.ps1'
   "schema_version": "1.0",
   "command": "video.run",
   "params": {
-    "file": "<PROJECT_ROOT>/work\\demo\\source.blend",
+    "file": "<PROJECT_ROOT>\\work\\demo\\source.blend",
     "expected_sha256": "<现场计算的64位小写SHA256>",
     "resources": [],
     "manifest": {

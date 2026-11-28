@@ -22,9 +22,9 @@
 
 - 部门卡：[UV 与材质部门](../../blender-work-methodology/references/departments/surfacing.md)
 - UV 与材质交接说明：`<PROJECT_ROOT>/docs/cli/workflows/uv-material-handoffs.md`
-- Material Workflow 插件说明：`tools/material_workflow_addon/README.md`
-- 公共 CLI 材质契约：`tools/blenderctl/material_interface.py`、`material_study_contract.py`、`material_procedural_contract.py`、`material_projection_contract.py`
-- 程序化配方生成器：`tools/material_workflow_addon/procedural_examples.py`
+- Material Workflow 插件说明：`<PROJECT_ROOT>/tools/material_workflow_addon/README.md`
+- 公共 CLI 材质契约：`<PROJECT_ROOT>/tools/blenderctl/material_interface.py`、`material_study_contract.py`、`material_procedural_contract.py`、`material_projection_contract.py`
+- 程序化配方生成器：`<PROJECT_ROOT>/tools/material_workflow_addon/procedural_examples.py`
 
 ## 3. 历史案例与实证审计路径
 

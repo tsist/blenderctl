@@ -35,13 +35,13 @@ $batch = 'work/audit/<batch>/'
 $jobs  = Join-Path $batch 'jobs'
 New-Item -ItemType Directory -Path $jobs -Force | Out-Null
 
-$src = '<PROJECT_ROOT>/work\prop\source.blend'
+$src = '<PROJECT_ROOT>\work\prop\source.blend'
 $sha = (Get-FileHash -LiteralPath $src -Algorithm SHA256).Hash.ToLowerInvariant()
 
 # 1) 构建可编辑主工程并出预览
 $out = & $ctl --jobs-dir $jobs --compact material procedural-run $src `
-  --expected-sha256 $sha --resources '<PROJECT_ROOT>/work\prop\resources.json' `
-  --manifest '<PROJECT_ROOT>/work\prop\procedural.manifest.json'
+  --expected-sha256 $sha --resources '<PROJECT_ROOT>\work\prop\resources.json' `
+  --manifest '<PROJECT_ROOT>\work\prop\procedural.manifest.json'
 $res = $out | ConvertFrom-Json
 
 # 2) 看图确认作者效果后，逐通道烘焙并生成纯贴图重建工程
@@ -52,9 +52,9 @@ $authorRes    = Join-Path $jobs "$($res.job_id)\procedural-resources.json"
 
 & $ctl --jobs-dir $jobs --compact --timeout 3600 material procedural-export $authorFile `
   --expected-sha256 $authorSha --resources $authorRes `
-  --context '<PROJECT_ROOT>/work\prop\export-context.json' `
-  --target  '<PROJECT_ROOT>/work\prop\export-target.json' `
-  --export  '<PROJECT_ROOT>/work\prop\export-settings.json'
+  --context '<PROJECT_ROOT>\work\prop\export-context.json' `
+  --target  '<PROJECT_ROOT>\work\prop\export-target.json' `
+  --export  '<PROJECT_ROOT>\work\prop\export-settings.json'
 ```
 
 异步提交后用 `& $ctl --jobs-dir $jobs --compact job wait $jobId --wait-seconds 30`（单次最长 55 秒）跟踪阶段进度，运行中沿用同一个 `$jobId` 继续等待。程序化作业失败后，先读 `procedural-report.json`、`procedural-progress.json` 与日志，定位失败环节后从最近已验证的持久快照新建作业。

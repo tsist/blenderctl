@@ -1,12 +1,14 @@
 """Deterministic managed lights. File saving and rendering belong to the CLI."""
+from array import array
 from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
 import json
 import math
+import sys
 
 from .contract import WorkflowError, normalize_manifest, LINK_FIELDS
-from . import advanced
+from . import advanced, commercial
 
 META = 'lighting_workflow_v1'
 OWNER = 'lw_owner'
@@ -21,9 +23,30 @@ def _fail(code, message):
     raise WorkflowError(code, message)
 
 
+def _canonical_json_bytes(value):
+    return json.dumps(value, sort_keys=True, ensure_ascii=False,
+                      allow_nan=False, separators=(',', ':')).encode()
+
+
 def _digest(value):
-    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
-                         allow_nan=False, separators=(',', ':')).encode()).hexdigest()
+    return hashlib.sha256(_canonical_json_bytes(value)).hexdigest()
+
+
+def _plain_snapshot_values(*snapshots):
+    """JSON text can alias Python inputs outside the snapshot's plain data types."""
+    pending = list(snapshots)
+    while pending:
+        value = pending.pop()
+        kind = type(value)
+        if kind is dict:
+            if any(type(key) is not str for key in value):
+                return False
+            pending.extend(value.values())
+        elif kind in (list, tuple):
+            pending.extend(value)
+        elif kind not in (str, int, float, bool, type(None)):
+            return False
+    return True
 
 
 def _close(a, b):
@@ -95,6 +118,63 @@ def _fresh(group, name):
     if group.get(name): _fail('CONFLICT', 'Name already exists: ' + name)
 
 
+_ATTRIBUTE_SCHEMAS = {
+    'FLOAT': ('FloatAttributeValue', (('value', 'FLOAT', 0),)),
+    'INT': ('IntAttributeValue', (('value', 'INT', 0),)),
+    'BOOLEAN': ('BoolAttributeValue', (('value', 'BOOLEAN', 0),)),
+    'INT8': ('ByteIntAttributeValue', (('value', 'INT', 0),)),
+    'INT16_2D': ('Short2AttributeValue', (('value', 'INT', 2),)),
+    'INT32_2D': ('Int2AttributeValue', (('value', 'INT', 2),)),
+    'FLOAT2': ('Float2AttributeValue', (('vector', 'FLOAT', 2),)),
+    'FLOAT_VECTOR': ('FloatVectorAttributeValue', (('vector', 'FLOAT', 3),)),
+    'FLOAT4': ('Float4AttributeValue', (('vector', 'FLOAT', 4),)),
+    'QUATERNION': ('QuaternionAttributeValue', (('value', 'FLOAT', 4),)),
+    'FLOAT_COLOR': ('FloatColorAttributeValue', (('color', 'FLOAT', 4), ('color_srgb', 'FLOAT', 4))),
+    'BYTE_COLOR': ('ByteColorAttributeValue', (('color', 'FLOAT', 4), ('color_srgb', 'FLOAT', 4))),
+}
+
+
+def _attribute_digest(attribute, read_rna):
+    """Hash every known RNA field with its ordered schema and little-endian bytes."""
+    data = attribute.data
+    count = len(data)
+    if not count:
+        return _digest([])
+    schema = _ATTRIBUTE_SCHEMAS.get(attribute.data_type)
+    if schema is not None and data[0].bl_rna.identifier == schema[0]:
+        properties = [p for p in data[0].bl_rna.properties
+                      if not p.is_readonly and p.identifier not in ('rna_type', 'id_data', 'tag')]
+        fields = tuple((p.identifier, p.type, getattr(p, 'array_length', 0)) for p in properties)
+        if fields == schema[1] and all(tuple(p.array_dimensions) == (p.array_length, 0, 0)
+                                       for p in properties):
+            buffers = []
+            try:
+                for name, kind, width in fields:
+                    typecode, itemsize = {'FLOAT': ('f', 4), 'INT': ('i', 4), 'BOOLEAN': ('b', 1)}[kind]
+                    values = array(typecode, [0]) * (count * (width or 1))
+                    if values.itemsize != itemsize:
+                        raise ValueError('Unsupported native scalar size')
+                    data.foreach_get(name, values)
+                    if kind == 'FLOAT' and not all(map(math.isfinite, values)):
+                        raise ValueError('Non-finite float attribute')
+                    if kind == 'BOOLEAN' and any(value not in (0, 1) for value in values):
+                        raise ValueError('Unsupported native boolean representation')
+                    if sys.byteorder != 'little' and itemsize > 1:
+                        values.byteswap()
+                    buffers.append((name, kind, width, values))
+            except (AttributeError, TypeError, ValueError, RuntimeError):
+                buffers.clear()
+            if buffers:
+                fields = [(name, kind, width, len(values) * values.itemsize)
+                          for name, kind, width, values in buffers]
+                header = ('lighting.rna-buffer.v1', schema[0], attribute.data_type, attribute.domain, count, fields)
+                fingerprint = hashlib.sha256(json.dumps(header, separators=(',', ':')).encode() + b'\0')
+                for _, _, _, values in buffers:
+                    fingerprint.update(memoryview(values))
+                return fingerprint.hexdigest()
+    return _digest([read_rna(v) for v in data])
+
+
 def _record(item):
     bpy = _bpy()
     def identity(value):
@@ -131,11 +211,12 @@ def _record(item):
             'hide_render': item.hide_render, 'modifiers': [rna(m) for m in item.modifiers],
             'constraints': [rna(c) for c in item.constraints],
             'vertex_groups': [g.name for g in item.vertex_groups]}
+        if item.type == 'LIGHT' and item.lightgroup:
+            row['object']['light_group'] = item.lightgroup
         if item.pose:
             row['pose'] = [{'name': p.name, 'matrix_basis': scalar(p.matrix_basis),
                             'constraints': [rna(c) for c in p.constraints]} for p in item.pose.bones]
     if isinstance(item, bpy.types.Mesh):
-        from array import array
         hashes = {}
         def field(name, collection, prop, width, kind):
             values = array(kind, [0]) * (len(collection) * width)
@@ -152,7 +233,7 @@ def _record(item):
         row['mesh'] = {'hashes': hashes, 'materials': [identity(m) if m else None for m in item.materials],
                        'weights': [[(g.group, g.weight) for g in v.groups] for v in item.vertices],
                        'attributes': [{'name': a.name, 'domain': a.domain, 'type': a.data_type,
-                                       'sha256': _digest([rna(v) for v in a.data])} for a in item.attributes]}
+                                       'sha256': _attribute_digest(a, rna)} for a in item.attributes]}
     if isinstance(item, (bpy.types.Light, bpy.types.Camera, bpy.types.World, bpy.types.Material, bpy.types.Curve)):
         row['settings'] = rna(item)
     tree = item if isinstance(item, bpy.types.NodeTree) else getattr(item, 'node_tree', None)
@@ -182,6 +263,8 @@ def _record(item):
             'frames': [item.frame_start, item.frame_end], 'fps': item.render.fps,
             'fps_base': item.render.fps_base, 'engine': item.render.engine,
             'resolution': [item.render.resolution_x, item.render.resolution_y, item.render.resolution_percentage]}
+    if isinstance(item, bpy.types.Text):
+        row['text_sha256'] = hashlib.sha256(item.as_string().encode()).hexdigest()
     return row
 
 
@@ -196,6 +279,15 @@ def _light_values(obj, include_links=False):
     return values
 
 
+def _set_light_values(obj, values):
+    for key, value in values.items():
+        if key in LINK_FIELDS: continue
+        if key == 'location': obj.location = value
+        elif key == 'enabled': obj.hide_render = obj.hide_viewport = not value
+        elif key == 'size': setattr(obj.data, 'size' if obj.data.type == 'AREA' else 'shadow_soft_size', value)
+        else: setattr(obj.data, key, value)
+
+
 def _light_structure(obj):
     obj_row, data_row = _record(obj), _record(obj.data)
     # Local translation and supported light fields have independent baselines.
@@ -204,9 +296,19 @@ def _light_structure(obj):
     obj_row['object'].pop('hide_render', None)
     for key in ('energy', 'color', 'size', 'size_y', 'shadow_soft_size', 'use_shadow'):
         data_row.get('settings', {}).pop(key, None)
-    return {'object': obj_row, 'data': data_row,
-            'hide_viewport_model': 'separate_visibility',
-            'layer_hidden': {layer.name: obj.hide_get(view_layer=layer) for layer in _scene_for_object(obj).view_layers}}
+    result = {'object': obj_row, 'data': data_row,
+              'hide_viewport_model': 'separate_visibility',
+              'layer_hidden': {layer.name: obj.hide_get(view_layer=layer) for layer in _scene_for_object(obj).view_layers}}
+    resources = {}
+    if tree := obj.data.node_tree:
+        for node in tree.nodes:
+            if node.bl_idname == 'ShaderNodeTexIES' and node.ies:
+                resources[node.name] = hashlib.sha256(node.ies.as_string().encode()).hexdigest()
+            elif node.bl_idname == 'ShaderNodeTexImage' and node.image and node.image.packed_file:
+                resources[node.name] = hashlib.sha256(node.image.packed_file.data).hexdigest()
+    if resources:
+        result['node_resource_sha256'] = resources
+    return result
 
 
 def _scene_for_object(obj):
@@ -223,11 +325,31 @@ def managed_world_matrix(obj, *, scene=None, view_layer=None):
     current dependency-graph evaluation, including its animation/constraints.
     """
     if not obj.get(OWNER): _fail('UNSUPPORTED', 'Rigid transform reader requires a managed object: ' + obj.name)
-    if obj.constraints or obj.animation_data or getattr(obj, 'rigid_body', None) or getattr(obj, 'rigid_body_constraint', None):
+    if obj.animation_data or getattr(obj, 'rigid_body', None) or getattr(obj, 'rigid_body_constraint', None):
         _fail('UNSUPPORTED', 'Managed rigid transform has unsupported constraints/animation/physics: ' + obj.name)
     if obj.parent and obj.parent_type != 'OBJECT':
         _fail('UNSUPPORTED', 'Managed rigid transform requires OBJECT parenting: ' + obj.name)
     basis = obj.matrix_basis.copy()
+    if obj.constraints:
+        constraint = obj.constraints[0]
+        if (len(obj.constraints) != 1 or obj.parent or constraint.type != 'COPY_LOCATION'
+                or constraint.name != 'Lighting Workflow Bone Follow' or constraint.target is None
+                or not constraint.use_offset or constraint.mute or constraint.influence != 1
+                or constraint.owner_space != 'WORLD' or constraint.target_space != 'WORLD'
+                or constraint.head_tail != 0 or not all((constraint.use_x, constraint.use_y, constraint.use_z))
+                or any((constraint.invert_x, constraint.invert_y, constraint.invert_z))):
+            _fail('UNSUPPORTED', 'Managed rigid transform has unsupported constraints: ' + obj.name)
+        scene = _scene(scene) if isinstance(scene, str) else scene or _scene_for_object(obj)
+        view_layer = view_layer or scene.view_layers[0].name
+        with _context(scene, view_layer) as layer:
+            layer.update()
+            graph = _bpy().context.evaluated_depsgraph_get()
+            rig = graph.objects.get(constraint.target.name)
+            bone = rig.pose.bones.get(constraint.subtarget) if rig and rig.pose else None
+            if bone is None:
+                _fail('UNSUPPORTED', 'Managed light bone is unavailable in the current dependency graph: ' + obj.name)
+            basis.translation += rig.matrix_world @ bone.head
+        return basis
     if not obj.parent: return basis
     parent = obj.parent
     if parent.type == 'CURVE' and getattr(parent.data, 'use_path', False):
@@ -464,8 +586,12 @@ def _extras_witness(state):
 def _create(scene, manifest):
     bpy = _bpy()
     states = _states(scene)
-    if states: _fail('CONFLICT', 'Restore the existing rig before creating another active rig in this scene')
     rig_id = manifest['rig_id']
+    if rig_id in states:
+        _fail('CONFLICT', 'Active rig already exists: ' + rig_id)
+    if states and (manifest['mode'] != 'adapt' or {'world', 'exposure', 'eevee'} & manifest.keys()):
+        _fail('CONFLICT', 'Additional rigs can add lights and local fog using adapt mode')
+    commercial.validate(scene, manifest)
     if any(item.get(OWNER) == rig_id for item in bpy.data.objects): _fail('CONFLICT', 'rig_id already exists in another scene')
     box = _box(scene, manifest['targets'])
     source_eevee = _eevee_settings(scene)
@@ -505,13 +631,15 @@ def _create(scene, manifest):
         _fresh(bpy.data.materials, name + '.Material')
     for row in manifest['lights']:
         for key in advanced.LINK_PROPERTIES:
-            if row.get(key): _fresh(bpy.data.collections, advanced.link_name(rig_id, row['id'], key))
+            if row.get(key) or row.get(key + '_members'):
+                _fresh(bpy.data.collections, advanced.link_name(rig_id, row['id'], key))
     # Validate writable native properties before creating scene IDs.
     light_type = bpy.types.Light.bl_rna.properties
     if any(not row['use_shadow'] for row in manifest['lights']) and 'use_shadow' not in light_type:
         _fail('UNSUPPORTED', 'use_shadow is unavailable in the actual Blender light API')
     state = {'version': '1.0', 'rig_id': rig_id, 'scene': scene.name, 'view_layer': manifest['view_layer'],
              'mode': manifest['mode'], 'anchor': manifest['anchor'], 'targets': manifest['targets'],
+             'overlay': bool(states),
              'box': box, 'collection': prefix + '.Lights', 'objects': [], 'materials': [], 'lights': {},
              'source_world': scene.world.name if scene.world else None,
              'source_world_fake_user': bool(scene.world.use_fake_user) if scene.world else None,
@@ -522,8 +650,11 @@ def _create(scene, manifest):
     for obj in originals:
         state['original_lights'][obj.name] = {'original': _visibility(obj), 'structure': _original_structure(obj)}
     collection = _mark(bpy.data.collections.new(state['collection']), rig_id)
+    if hasattr(collection, 'color_tag'):
+        collection.color_tag = 'COLOR_03'
     scene.collection.children.link(collection)
-    if scene.world: scene.world.use_fake_user = True
+    if scene.world and 'world' in manifest:
+        scene.world.use_fake_user = True
     if scene.camera is None:
         state['objects'].append(_created_camera(scene, collection, box, rig_id, prefix).name)
     if manifest['anchor'] == 'camera':
@@ -532,7 +663,6 @@ def _create(scene, manifest):
     for row in manifest['lights']:
         name = prefix + '.' + row['id']
         data = _mark(bpy.data.lights.new(name + '.Data', row['type']), rig_id)
-        data.use_nodes = False
         data.energy = row['energy']
         data.color = row['color']
         advanced.apply_native_controls(data, row)
@@ -551,13 +681,27 @@ def _create(scene, manifest):
         obj['lw_id'] = row['id']
         obj['lw_role'] = row['role']
         collection.objects.link(obj)
+        commercial.light_graph(obj, row, state)
         if parent:
             obj.parent = parent
             obj.matrix_parent_inverse = parent.matrix_world.inverted()
         _transform(obj, _position(box, row['location']), _position(box, row['aim']))
+        if 'follow_bone' in row:
+            commercial.bone_follow(scene, obj, row['follow_bone'])
+        if 'light_group' in row:
+            groups = scene.view_layers[manifest['view_layer']].lightgroups
+            group = row['light_group']
+            if groups.get(group) is None:
+                groups.add(name=group)
+                state.setdefault('created_light_groups', []).append(group)
+            obj.lightgroup = group
+            if obj.lightgroup != group:
+                _fail('VALIDATION_FAILED', 'Light Group assignment was truncated: ' + group)
         obj.hide_render = obj.hide_viewport = not row['enabled']
         state['objects'].append(obj.name)
         state['lights'][row['id']] = {'object': obj.name, 'role': row['role'], 'type': row['type'], 'recipe': row}
+    if 'fog' in manifest:
+        commercial.local_fog(manifest['fog'], box, collection, state)
     for spec in manifest.get('boards', []):
         board, material = advanced.create_board(spec, box, collection, rig_id)
         state['objects'].append(board.name)
@@ -566,9 +710,8 @@ def _create(scene, manifest):
             'recipe': deepcopy(spec), 'baseline': advanced.board_values(board),
             'structure': advanced.board_structure(board), 'visibility': _visibility(board)}
     for row in manifest['lights']:
-        advanced.configure_links(scene, state, row['id'], {
-            **{key: row.get(key, []) for key in advanced.LINK_PROPERTIES},
-            **{key + '_mode': row.get(key + '_mode', 'INCLUDE') for key in advanced.LINK_PROPERTIES}})
+        links = {key: row[key] for key in row if key in LINK_FIELDS or key.endswith('_members')}
+        advanced.configure_links(scene, state, row['id'], links)
     if 'background' in manifest:
         background, material = _background(manifest['background'], box, collection, rig_id, prefix)
         state['objects'].append(background.name)
@@ -578,6 +721,17 @@ def _create(scene, manifest):
         scene.world = world
         state['world'] = world.name
         state['images'] = [image.name for image in bpy.data.images if image.get(OWNER) == rig_id]
+        if 'volume' in manifest['world']:
+            output = next(n for n in world.node_tree.nodes if n.bl_idname == 'ShaderNodeOutputWorld')
+            commercial.volume(world.node_tree, output, manifest['world']['volume'])
+        if any(row.get('align_to_hdri') for row in manifest['lights']):
+            direction = commercial.hdri_direction(world, manifest['world'].get('rotation_deg', 0))
+            state['hdri_direction'] = list(direction)
+            for row in manifest['lights']:
+                if row.get('align_to_hdri'):
+                    light = bpy.data.objects[state['lights'][row['id']]['object']]
+                    position = _position(box, row['location'])
+                    _transform(light, position, position - direction)
     if 'exposure' in manifest: scene.view_settings.exposure = manifest['exposure']
     if 'eevee' in manifest:
         scene.eevee.use_raytracing = manifest['eevee']['use_raytracing']
@@ -598,8 +752,10 @@ def _create(scene, manifest):
     state['applied_exposure'] = float(scene.view_settings.exposure)
     state['applied_camera'] = scene.camera.name if scene.camera else None
     state['applied_eevee_use_raytracing'] = _eevee_settings(scene).get('use_raytracing')
-    _save_states(scene, {rig_id: state})
+    states[rig_id] = state
+    _save_states(scene, states)
     return {'operation': 'create', 'rig_id': rig_id, 'changed_objects': state['objects'],
+            'hdri_direction': state.get('hdri_direction'),
             'disabled_originals': list(state['original_lights']), 'box': box, 'anchor': state['anchor'],
             'eevee_change': {'source': state['source_eevee_use_raytracing'],
                              'applied': state['applied_eevee_use_raytracing'],
@@ -616,14 +772,17 @@ def _check_structure(scene, state):
     advanced.check_links(scene, state)
     for row in state['lights'].values():
         obj = objects[row['object']]
-        if not _close(_light_structure(obj), row['structure']):
+        observed = _light_structure(obj)
+        if 'node_resource_sha256' not in row['structure']:
+            observed.pop('node_resource_sha256', None)
+        if not _close(observed, row['structure']):
             _fail('CONFLICT', 'Light nodes/rotation/scale/parent/constraint/animation changed: ' + obj.name)
     actual_extras, expected_extras = _extras_witness(state), deepcopy(state['extras'])
     for board in state.get('boards', {}).values():
         for witness in (actual_extras, expected_extras):
             if witness.get(board['object']): witness[board['object']].pop('values', None)
     if not _close(actual_extras, expected_extras): _fail('CONFLICT', 'Managed camera/background/board structure changed; no safe field merge')
-    if (scene.camera.name if scene.camera else None) != state['applied_camera']:
+    if state['source_camera'] is None and (scene.camera.name if scene.camera else None) != state['applied_camera']:
         _fail('CONFLICT', 'Scene camera binding changed')
     return collection, objects
 
@@ -641,6 +800,8 @@ def _patch(scene, manifest, state):
         desired = deepcopy(patch['values'])
         advanced.validate_links(scene, desired)
         for key in advanced.LINK_PROPERTIES:
+            if key + '_members' in current and ({key, key + '_mode'} & desired.keys()):
+                _fail('UNSUPPORTED', 'Legacy link patch cannot replace explicit object/collection members: ' + obj.name)
             if key + '_mode' in desired and key not in desired and not current[key]:
                 _fail('INVALID_REQUEST', 'Mode patch requires nonempty existing or requested members: ' + key)
         for key in advanced.LINK_PROPERTIES:
@@ -678,12 +839,7 @@ def _patch(scene, manifest, state):
         board_operations.append((patch, row, obj, desired))
     # All conflicts are checked before any parameter mutation.
     for patch, row, obj, desired in operations:
-        for key, value in desired.items():
-            if key in LINK_FIELDS: continue
-            if key == 'location': obj.location = value
-            elif key == 'enabled': obj.hide_render = obj.hide_viewport = not value
-            elif key == 'size': setattr(obj.data, 'size' if obj.data.type == 'AREA' else 'shadow_soft_size', value)
-            else: setattr(obj.data, key, value)
+        _set_light_values(obj, desired)
         scene.view_layers[manifest['view_layer']].update()
         advanced.configure_links(scene, state, patch['id'], desired)
         observed = _light_values(obj, True)
@@ -727,6 +883,10 @@ def _patch(scene, manifest, state):
 
 def _restore(scene, manifest, state):
     bpy = _bpy()
+    states = _states(scene)
+    if len(states) > 1 and (state['world'] or state['original_lights'] or state['source_camera'] is None
+                            or {'exposure', 'eevee'} & state['manifest'].keys()):
+        _fail('CONFLICT', 'Restore the additive rigs before their scene-wide base rig')
     collection, objects = _check_structure(scene, state)
     mode = manifest['conflict']
     for light_id, row in state['lights'].items():
@@ -763,14 +923,19 @@ def _restore(scene, manifest, state):
         original_objects.append((obj, row))
     for name in state.get('images', []):
         image = _owned(bpy.data.images.get(name), state['rig_id'])
-        if image.users != 1: _fail('CONFLICT', 'Managed HDRI has outside consumers: ' + name)
+        if image.users != 1: _fail('CONFLICT', 'Managed lighting image has outside consumers: ' + name)
+    for name in state.get('texts', []):
+        text = _owned(bpy.data.texts.get(name), state['rig_id'])
+        if text.users - int(text.use_fake_user) != 1:
+            _fail('CONFLICT', 'Managed IES profile has outside consumers: ' + name)
     # No deletion before complete ownership, consumer and conflict checks.
     advanced.cleanup_links(state)
     scene.world = original_world
     if original_world: original_world.use_fake_user = state['source_world_fake_user']
     scene.view_settings.exposure = state['source_exposure']
     if restore_eevee: scene.eevee.use_raytracing = state['source_eevee_use_raytracing']
-    scene.camera = bpy.data.objects.get(state['source_camera']) if state['source_camera'] else None
+    if state['source_camera'] is None:
+        scene.camera = None
     for obj, row in original_objects:
         for key, value in row['original'].items(): setattr(obj, key, value)
     owned_data = [obj.data for obj in objects.values() if obj.data]
@@ -787,7 +952,17 @@ def _restore(scene, manifest, state):
     for name in state.get('images', []):
         image = bpy.data.images.get(name)
         if image and image.get(OWNER) == state['rig_id'] and image.users == 0: bpy.data.images.remove(image)
-    states = _states(scene)
+    for name in state.get('texts', []):
+        bpy.data.texts.remove(bpy.data.texts[name])
+    groups = scene.view_layers[state['view_layer']].lightgroups
+    for name in state.get('created_light_groups', []):
+        if any(o.type == 'LIGHT' and o.lightgroup == name for o in scene.objects):
+            continue
+        if scene.world and scene.world.lightgroup == name:
+            continue
+        item = groups.get(name)
+        if item is not None:
+            groups.remove(item)
     del states[state['rig_id']]
     _save_states(scene, states)
     return {'operation': 'restore', 'rig_id': state['rig_id'], 'removed_managed_objects': list(objects),
@@ -857,6 +1032,11 @@ def inspect(scene, rig_id=None):
                 'spot_size_deg': math.degrees(obj.data.spot_size) if obj.data.type == 'SPOT' else None,
                 'spot_blend': getattr(obj.data, 'spot_blend', None),
                 'native_controls': advanced.native_controls(obj),
+                'light_group': obj.lightgroup or None,
+                'kelvin': float(obj.data.temperature) if obj.data.use_temperature else None,
+                'ies': obj.data.node_tree and any(n.bl_idname == 'ShaderNodeTexIES' for n in obj.data.node_tree.nodes) or False,
+                'gobo': obj.data.node_tree and any(n.bl_idname == 'ShaderNodeTexImage' for n in obj.data.node_tree.nodes) or False,
+                'follow_bone': row['recipe'].get('follow_bone'),
                 'native_controls_edit_policy': 'create-only',
                 'link_collections': {key: getattr(obj.light_linking, prop).name if getattr(obj.light_linking, prop) else None for key, prop in advanced.LINK_PROPERTIES.items()},
                 'manual_fields': [k for k, v in actual.items() if not _close(v, row['baseline'].get(k, 'INCLUDE' if k.endswith('_mode') else [] if k in advanced.LINK_PROPERTIES else None))]})
@@ -882,7 +1062,7 @@ def inspect(scene, rig_id=None):
                              'managed': o.get(OWNER)} for o in scene.objects if o.type == 'LIGHT']}
 
 
-def snapshot_protection(scene, excluded_names=()):
+def snapshot_protection(scene, excluded_names=(), *, include_managed=False):
     """Content witnesses; only listed original LIGHT visibility may change."""
     scene = _scene(scene) if isinstance(scene, str) else scene
     bpy = _bpy()
@@ -891,17 +1071,16 @@ def snapshot_protection(scene, excluded_names=()):
     # Exempt only IDs enumerated by the active target Scene's state. Owned IDs
     # belonging to another Scene or unrecorded IDs keep full protection.
     managed = set()
-    managed_collections = set()
     for state in _states(scene).values():
         if state.get('source_world'): retained_source_worlds.add(state['source_world'])
         names = {state['collection'], *[r['collection'] for fields in state.get('links', {}).values() for r in fields.values() if r['collection']]}
-        managed_collections.update(names)
         for name in names:
             item = bpy.data.collections.get(name)
             if item and item.get(OWNER) == state['rig_id']: managed.add(item.as_pointer())
         ids = [bpy.data.objects.get(name) for name in state['objects']]
         ids.extend(bpy.data.materials.get(name) for name in state.get('materials', []))
         ids.extend(bpy.data.images.get(name) for name in state.get('images', []))
+        ids.extend(bpy.data.texts.get(name) for name in state.get('texts', []))
         if state.get('world'): ids.append(bpy.data.worlds.get(state['world']))
         for item in ids:
             if not item or item.get(OWNER) != state['rig_id']: continue
@@ -911,8 +1090,8 @@ def snapshot_protection(scene, excluded_names=()):
             for tree in (getattr(item, 'node_tree', None), getattr(data, 'node_tree', None)):
                 if tree and tree.get(OWNER) == state['rig_id']: managed.add(tree.as_pointer())
     def exempt(item):
-        return item.as_pointer() in managed
-    result = {'version': '1.0', 'scene': scene.name, 'records': {}, 'scene_memberships': {},
+        return not include_managed and item.as_pointer() in managed
+    result = {'version': '1.1', 'scene': scene.name, 'records': {}, 'scene_memberships': {},
               'coverage': 'inspection.record mesh/UV/material/nodes/camera/animation; raw object transforms, collection membership and other-scene World/exposure; not arbitrary plugin side effects'}
     def identity(item):
         return {'type': item.bl_rna.identifier, 'name': item.name,
@@ -973,6 +1152,18 @@ def verify_protection(before, after, allowed_eevee_scene=None):
                 if delta: return delta
         elif not _close(a, b): return path
         return None
+    before_bytes = after_bytes = None
+    if allowed_eevee_scene is None:
+        try:
+            before_bytes, after_bytes = _canonical_json_bytes(before), _canonical_json_bytes(after)
+        except (TypeError, ValueError, OverflowError, RecursionError):
+            # Give the original comparison and digest order its original errors.
+            pass
+        if (before_bytes is not None and before_bytes == after_bytes
+                and _plain_snapshot_values(before, after)):
+            checksum = hashlib.sha256(before_bytes).hexdigest()
+            return {'status': 'pass', 'difference': None, 'before_sha256': checksum, 'after_sha256': checksum,
+                    'coverage': before.get('coverage'), 'declared_changes': []}
     comparable_before = deepcopy(before)
     declared_changes = []
     if allowed_eevee_scene is not None:
@@ -984,6 +1175,8 @@ def verify_protection(before, after, allowed_eevee_scene=None):
         declared_changes.append({'scene': allowed_eevee_scene, 'field': 'eevee.use_raytracing',
                                  'source': old['use_raytracing'], 'applied': new['use_raytracing']})
     difference = compare(comparable_before, after)
+    before_sha = _digest(before) if before_bytes is None else hashlib.sha256(before_bytes).hexdigest()
+    after_sha = _digest(after) if after_bytes is None else hashlib.sha256(after_bytes).hexdigest()
     return {'status': 'fail' if difference else 'pass', 'difference': difference,
-            'before_sha256': _digest(before), 'after_sha256': _digest(after), 'coverage': before.get('coverage'),
+            'before_sha256': before_sha, 'after_sha256': after_sha, 'coverage': before.get('coverage'),
             'declared_changes': declared_changes}

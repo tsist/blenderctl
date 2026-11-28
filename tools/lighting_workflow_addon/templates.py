@@ -80,9 +80,18 @@ def normalize_template(value):
     for resource in value['resources']: resource['file'] = _absolute(resource['file'])
     _unique([r['file'] for r in value['resources']], 'resource file')
     world = manifest.get('world', {})
+    declared = {row['file']: row['expected_sha256'] for row in value['resources']}
     expected = {world['file']} if world.get('kind') == 'hdri' else set()
-    if {r['file'] for r in value['resources']} != expected:
-        _fail('template resources must exactly close the HDRI file reference')
+    for row in manifest['lights']:
+        for key in ('ies', 'gobo'):
+            if key not in row:
+                continue
+            resource = row[key]
+            expected.add(resource['file'])
+            if declared.get(resource['file']) != resource['expected_sha256']:
+                _fail('template resource SHA must match its light profile reference')
+    if set(declared) != expected:
+        _fail('template resources must exactly close HDRI, IES and Gobo references')
     if 'source' in value: value['source']['file'] = _absolute(value['source']['file'])
     return value
 
@@ -124,6 +133,8 @@ def _world_export(scene, state, resource_directory):
     background = backgrounds[0]
     recipe = state['manifest']['world']
     spec = {'kind': recipe['kind'], 'strength': float(background.inputs['Strength'].default_value)}
+    if 'volume' in recipe:
+        spec['volume'] = deepcopy(recipe['volume'])
     resources = []
     if spec['kind'] == 'constant':
         color = list(background.inputs['Color'].default_value)
@@ -172,6 +183,22 @@ def _world_export(scene, state, resource_directory):
     return spec, resources
 
 
+def _export_light_resource(raw, suffix, resource_directory):
+    if resource_directory is None:
+        _fail('Packed lighting profiles require an owned resource_directory')
+    directory = Path(_absolute(str(resource_directory)))
+    directory.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha256(raw).hexdigest()
+    path = directory / (digest + suffix)
+    if path.exists():
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            _fail('Packed lighting profile path is occupied', 'CONFLICT')
+    else:
+        with path.open('xb') as output:
+            output.write(raw)
+    return {'file': str(path), 'expected_sha256': digest}
+
+
 def export(scene_name, rig_id, resource_directory=None):
     from . import core, advanced
     from mathutils import Vector
@@ -185,11 +212,15 @@ def export(scene_name, rig_id, resource_directory=None):
         box = core._box(scene, state['targets'])
         manifest = {'version': '1.0', 'scene': scene.name, 'view_layer': state['view_layer'],
                     'rig_id': rig_id, 'action': 'create', 'targets': deepcopy(state['targets']),
-                    'mode': state['mode'], 'anchor': state['anchor'], 'lights': [],
-                    'exposure': float(scene.view_settings.exposure)}
+                    'mode': state['mode'], 'anchor': state['anchor'], 'lights': []}
+        if not state.get('overlay'):
+            manifest['exposure'] = float(scene.view_settings.exposure)
+        profile_resources = {}
         for light_id, row in state['lights'].items():
             obj = objects[row['object']]
             actual, expected = core._light_structure(obj), deepcopy(row['structure'])
+            if 'node_resource_sha256' not in expected:
+                actual.pop('node_resource_sha256', None)
             for witness in (actual, expected):
                 witness['object']['object'].pop('matrix_basis', None)
                 for field in ('shape', 'angle', 'spot_size', 'spot_blend', 'normalize', 'spread', 'diffuse_factor', 'specular_factor'):
@@ -208,6 +239,29 @@ def export(scene_name, rig_id, resource_directory=None):
                 'energy': float(data.energy), 'color': list(data.color), 'enabled': not obj.hide_render,
                 'use_shadow': bool(getattr(data, 'use_shadow', True)), **advanced.native_controls(obj),
                 **advanced.link_values(obj)}
+            if obj.lightgroup:
+                values['light_group'] = obj.lightgroup
+            if data.use_temperature:
+                values['kelvin'] = float(data.temperature)
+            for key in ('follow_bone', 'align_to_hdri'):
+                if key in row['recipe']:
+                    values[key] = deepcopy(row['recipe'][key])
+            for key in ('receivers', 'blockers'):
+                if key + '_members' in values:
+                    del values[key], values[key + '_mode']
+            for key, node_type in (('ies', 'ShaderNodeTexIES'), ('gobo', 'ShaderNodeTexImage')):
+                if key not in row['recipe']:
+                    continue
+                node = next(node for node in data.node_tree.nodes if node.bl_idname == node_type)
+                if key == 'ies':
+                    raw, suffix = node.ies.as_string().encode(), '.ies'
+                else:
+                    raw = bytes(node.image.packed_file.data)
+                    suffix = Path(row['recipe'][key]['file']).suffix.lower()
+                    if suffix not in ('.png', '.jpg', '.jpeg', '.exr', '.hdr', '.tif', '.tiff', '.tga', '.bmp', '.webp'):
+                        _fail('Packed Gobo extension is unsupported', 'UNSUPPORTED')
+                values[key] = _export_light_resource(raw, suffix, resource_directory)
+                profile_resources[values[key]['file']] = values[key]
             # RNA stores radians in float32; PI round-trips a few microdegrees
             # above the strict 180 degree contract boundary.
             if 'spread_deg' in values and 180 < values['spread_deg'] < 180.0001:
@@ -244,13 +298,16 @@ def export(scene_name, rig_id, resource_directory=None):
                 _fail('Background placement does not fit current target box', 'CONFLICT')
             spec['size'] = float(obj.dimensions.x) / box['size']
             manifest['background'] = spec
+        if 'fog' in state['manifest']:
+            manifest['fog'] = deepcopy(state['manifest']['fog'])
         world, resources = _world_export(scene, state, resource_directory)
         if world is not None: manifest['world'] = world
-        if 'use_raytracing' in core._eevee_settings(scene): manifest['eevee'] = core._eevee_settings(scene)
+        if not state.get('overlay') and 'use_raytracing' in core._eevee_settings(scene):
+            manifest['eevee'] = core._eevee_settings(scene)
         manifest['keep_lights'] = deepcopy(state['manifest'].get('keep_lights', []))
         return normalize_template({'version': '1.0', 'template_id': rig_id, 'revision': 1,
             'reference': {'targets': deepcopy(state['targets']), 'box': box, 'boards': reference_boards},
-            'manifest': manifest, 'resources': resources})
+            'manifest': manifest, 'resources': [*resources, *profile_resources.values()]})
 
 
 def instantiate(template, target):
@@ -266,12 +323,16 @@ def instantiate(template, target):
     mapping.update({row['object']: advanced.board_name(target['rig_id'], row['id']) for row in template['reference']['boards']})
     if set(mapping) & set(target['bindings']): _fail('Explicit bindings may not replace automatic target/board mappings')
     used = set()
-    def bind(name):
-        if name in mapping: return mapping[name]
+    def bind(name, *, collection=False):
+        if not collection and name in mapping: return mapping[name]
         if name not in target['bindings']: _fail('Missing explicit binding for external object: ' + name)
         used.add(name)
         result = target['bindings'][name]
-        if not scene.objects.get(result): _fail('Binding target not in scene: ' + result, 'NOT_FOUND')
+        if collection:
+            if not any(row.name == result for row in scene.collection.children_recursive):
+                _fail('Binding collection not in scene: ' + result, 'NOT_FOUND')
+        elif not scene.objects.get(result):
+            _fail('Binding target not in scene: ' + result, 'NOT_FOUND')
         return result
     manifest = deepcopy(template['manifest'])
     for key in ('scene', 'view_layer', 'rig_id', 'targets', 'mode', 'anchor'): manifest[key] = deepcopy(target[key])
@@ -280,6 +341,10 @@ def instantiate(template, target):
         if target['power_policy'] == 'scale_squared' and row['type'] != 'SUN': row['energy'] *= ratio ** 2
         for key in ('receivers', 'blockers'):
             if key in row: row[key] = [bind(name) for name in row[key]]
+            for member in row.get(key + '_members', []):
+                member['name'] = bind(member['name'], collection=member['kind'] == 'COLLECTION')
+        if 'follow_bone' in row:
+            row['follow_bone']['armature'] = bind(row['follow_bone']['armature'])
     if 'keep_lights' in target:
         manifest['keep_lights'] = deepcopy(target['keep_lights'])
     else: manifest['keep_lights'] = [bind(name) for name in manifest.get('keep_lights', [])]

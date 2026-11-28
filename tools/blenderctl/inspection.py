@@ -1,14 +1,54 @@
 """Versioned read-only content snapshots. The legacy transaction inspector stays frozen."""
 from array import array
+from collections import OrderedDict
 import hashlib
 import json
 import math
 import os
+import sys
 from pathlib import Path
 import uuid
 
 import bpy
 from protocol import Failure, atomic_json
+
+# Pure-content worker/module lifetime cache; module reload always creates a new
+# empty OrderedDict. A file reopen may reuse equal content only after full reads.
+_ATTRIBUTE_CACHE_PROTOCOL = 'legacy_canonical_json_newline_v1'
+_ATTRIBUTE_CACHE_LIMIT = 512
+_ATTRIBUTE_FINGERPRINT_CACHE = OrderedDict()
+_ATTRIBUTE_CACHE_COUNTS = {'hits': 0, 'misses': 0, 'evictions': 0}
+
+
+def _clear_attribute_fingerprint_cache():
+    _ATTRIBUTE_FINGERPRINT_CACHE.clear()
+    _ATTRIBUTE_CACHE_COUNTS.update(hits=0, misses=0, evictions=0)
+
+
+def _attribute_fingerprint_cache_stats():
+    return {**_ATTRIBUTE_CACHE_COUNTS, 'entries': len(_ATTRIBUTE_FINGERPRINT_CACHE),
+            'capacity': _ATTRIBUTE_CACHE_LIMIT, 'protocol': _ATTRIBUTE_CACHE_PROTOCOL}
+
+
+def _attribute_cache_key(attribute, buffers, count):
+    # Complete fields were already validated/read. The key contains only small
+    # metadata and full-byte digests, including the second color-space field.
+    props = {p.identifier: p for p in attribute.data[0].bl_rna.properties}
+    return (_ATTRIBUTE_CACHE_PROTOCOL, attribute.data_type,
+            attribute.data[0].bl_rna.identifier, count,
+            tuple((name, kind, width, tuple(props[name].array_dimensions),
+                   buffer.typecode, buffer.itemsize, sys.byteorder, len(buffer),
+                   hashlib.sha256(memoryview(buffer)).digest())
+                  for name, kind, width, buffer in buffers))
+
+
+def _store_attribute_fingerprint(cache_key, fingerprint):
+    _ATTRIBUTE_FINGERPRINT_CACHE[cache_key] = fingerprint
+    if len(_ATTRIBUTE_FINGERPRINT_CACHE) > _ATTRIBUTE_CACHE_LIMIT:
+        _ATTRIBUTE_FINGERPRINT_CACHE.popitem(last=False)
+        _ATTRIBUTE_CACHE_COUNTS['evictions'] += 1
+    return fingerprint
+
 
 UI_TYPES = {"Screen", "WorkSpace", "WindowManager"}
 
@@ -114,6 +154,129 @@ def configuration(item):
     return out
 
 
+def _attribute_buffers(attribute):
+    """Return all verified bulk fields or None; never expose partial buffers."""
+    schemas = {
+        'FLOAT': ('FloatAttributeValue', (('value', 'FLOAT', 0),)),
+        'INT': ('IntAttributeValue', (('value', 'INT', 0),)),
+        'BOOLEAN': ('BoolAttributeValue', (('value', 'BOOLEAN', 0),)),
+        'INT8': ('ByteIntAttributeValue', (('value', 'INT', 0),)),
+        'INT16_2D': ('Short2AttributeValue', (('value', 'INT', 2),)),
+        'INT32_2D': ('Int2AttributeValue', (('value', 'INT', 2),)),
+        'FLOAT2': ('Float2AttributeValue', (('vector', 'FLOAT', 2),)),
+        'FLOAT_VECTOR': ('FloatVectorAttributeValue', (('vector', 'FLOAT', 3),)),
+        'FLOAT4': ('Float4AttributeValue', (('vector', 'FLOAT', 4),)),
+        'QUATERNION': ('QuaternionAttributeValue', (('value', 'FLOAT', 4),)),
+        'FLOAT_COLOR': ('FloatColorAttributeValue', (('color', 'FLOAT', 4), ('color_srgb', 'FLOAT', 4))),
+        'BYTE_COLOR': ('ByteColorAttributeValue', (('color', 'FLOAT', 4), ('color_srgb', 'FLOAT', 4))),
+    }
+    data = attribute.data
+    count = len(data)
+    if not count:
+        return
+    schema = schemas.get(attribute.data_type)
+    if schema is not None and data[0].bl_rna.identifier == schema[0]:
+        props = [p for p in data[0].bl_rna.properties
+                 if not p.is_readonly and p.identifier not in {'rna_type', 'pixels', 'tag'}]
+        if (tuple((p.identifier, p.type, getattr(p, 'array_length', 0)) for p in props) == schema[1]
+                and all(tuple(p.array_dimensions) == (p.array_length, 0, 0) for p in props)):
+            buffers = []
+            try:
+                for prop in props:
+                    width = prop.array_length or 1
+                    buffer = array({'FLOAT': 'f', 'INT': 'i', 'BOOLEAN': 'b'}[prop.type], [0]) * (count * width)
+                    data.foreach_get(prop.identifier, buffer)
+                    buffers.append((prop.identifier, prop.type, prop.array_length, buffer))
+            except (AttributeError, TypeError, ValueError, RuntimeError):
+                buffers = []  # Unsupported bulk getter keeps the complete legacy path.
+            if buffers:
+                return buffers
+    return None
+
+
+def _attribute_payloads(attribute):
+    """Bulk-read verified flat numeric RNA fields; preserve legacy JSON payloads."""
+    data = attribute.data
+    count = len(data)
+    buffers = _attribute_buffers(attribute)
+    if buffers:
+        for index in range(count):
+            payload = {}
+            for name, kind, width, buffer in buffers:
+                raw = buffer[index * width:(index + 1) * width] if width else buffer[index]
+                if kind == 'BOOLEAN':
+                    raw = [bool(v) for v in raw] if width else bool(raw)
+                payload[name] = value(raw)
+            yield payload
+        return
+    for entry in data:
+        yield properties(entry)
+
+
+def _attribute_fingerprint(attribute, chunk_size=8192):
+    """Hash the unchanged per-entry canonical JSON/newline stream in chunks.
+
+    Numeric finite fields contain no strings or nested dictionaries, so the
+    known array/outer-record separators can be restored without ambiguity.
+    Unknown schemas, incomplete getters and non-finite fields use the complete
+    original per-entry writer. No native hash or coverage boundary is changed.
+    """
+    count = len(attribute.data)
+    fingerprint = hashlib.sha256()
+    if not count:
+        return fingerprint.hexdigest(), 0
+    buffers = _attribute_buffers(attribute)
+    non_finite = (sum(not math.isfinite(v) for _, kind, _, buffer in buffers
+                      if kind == 'FLOAT' for v in buffer) if buffers else 0)
+    if not buffers or non_finite:
+        # Read entries directly: never retry a failed bulk getter or retain a
+        # partial color field. Original value() handles non-finite sentinels.
+        non_finite = 0
+        for entry in attribute.data:
+            payload = properties(entry)
+            non_finite += sum(not math.isfinite(v) for v in _numbers(payload))
+            fingerprint.update((key(payload) + '\n').encode('utf-8'))
+        return fingerprint.hexdigest(), non_finite
+    cache_key = _attribute_cache_key(attribute, buffers, count)
+    if cache_key in _ATTRIBUTE_FINGERPRINT_CACHE:
+        fingerprint = _ATTRIBUTE_FINGERPRINT_CACHE.pop(cache_key)
+        _ATTRIBUTE_FINGERPRINT_CACHE[cache_key] = fingerprint
+        _ATTRIBUTE_CACHE_COUNTS['hits'] += 1
+        return fingerprint, 0
+    _ATTRIBUTE_CACHE_COUNTS['misses'] += 1
+    if len(buffers) == 1:
+        name, kind, width, buffer = buffers[0]
+        prefix = '{' + key(name) + ':'
+        separator = '}\n' + prefix
+        for start in range(0, count, chunk_size):
+            end = min(start + chunk_size, count)
+            if width:
+                flat = buffer[start * width:end * width]
+                rows = list(zip(*(iter(flat),) * width))
+                body = key(rows)[1:-1].replace('],[', ']' + separator + '[')
+            else:
+                rows = buffer[start:end].tolist()
+                if kind == 'BOOLEAN':
+                    rows = [bool(v) for v in rows]
+                body = key(rows)[1:-1].replace(',', separator)
+            fingerprint.update((prefix + body + '}\n').encode('utf-8'))
+        return _store_attribute_fingerprint(cache_key, fingerprint.hexdigest()), 0
+    # Both finite color fields remain present with their canonical key order.
+    for start in range(0, count, chunk_size):
+        rows = []
+        for index in range(start, min(start + chunk_size, count)):
+            payload = {}
+            for name, kind, width, buffer in buffers:
+                raw = buffer[index * width:(index + 1) * width].tolist() if width else buffer[index]
+                if kind == 'BOOLEAN':
+                    raw = [bool(v) for v in raw] if width else bool(raw)
+                payload[name] = raw
+            rows.append(payload)
+        fingerprint.update((key(rows)[1:-1].replace('},{', '}\n{') + '\n').encode('utf-8'))
+    return _store_attribute_fingerprint(cache_key, fingerprint.hexdigest()), 0
+
+
+
 def mesh_content(mesh):
     hashes, non_finite = {}, 0
     def field(name, collection, prop, width, kind):
@@ -142,13 +305,10 @@ def mesh_content(mesh):
     hashes["deform_weights"] = weights.hexdigest()
     attributes = []
     for attribute in mesh.attributes:
-        fingerprint = hashlib.sha256()
-        for entry in attribute.data:
-            payload = properties(entry)
-            non_finite += sum(not math.isfinite(v) for v in _numbers(payload))
-            fingerprint.update((key(payload) + "\n").encode("utf-8"))
+        fingerprint, attribute_non_finite = _attribute_fingerprint(attribute)
+        non_finite += attribute_non_finite
         attributes.append({"name": attribute.name, "domain": attribute.domain, "data_type": attribute.data_type,
-                           "count": len(attribute.data), "sha256": fingerprint.hexdigest()})
+                           "count": len(attribute.data), "sha256": fingerprint})
     return {"counts": {"vertices": len(mesh.vertices), "edges": len(mesh.edges), "polygons": len(mesh.polygons)},
             "hashes": hashes, "materials": [identity(m) if m else None for m in mesh.materials],
             "attributes": sorted(attributes, key=key), "non_finite_values": non_finite,
@@ -208,7 +368,7 @@ def curve_content(curve):
             "modifiers": [properties(m) for m in curve.modifiers]}
 
 
-def record(item):
+def record(item, mesh_reader=None):
     result = {**identity(item), "asset_id": None, "asset": None, "fake_user": item.use_fake_user}
     result["custom_properties"] = {k: custom_value(item[k]) for k in sorted(item.keys()) if k != "_RNA_UI"}
     raw_id = item.get("asset_id")
@@ -247,7 +407,7 @@ def record(item):
             result["pose"] = [{"name": p.name, "matrix_basis": value(p.matrix_basis),
                                "settings": properties(p), "constraints": [configuration(c) for c in p.constraints]} for p in item.pose.bones]
     if isinstance(item, bpy.types.Mesh):
-        result["mesh"] = mesh_content(item)
+        result["mesh"] = (mesh_reader or mesh_content)(item)
     if isinstance(item, bpy.types.Curve):
         excluded={"tag"}
         if item.use_auto_texspace:excluded.update(("texspace_location","texspace_size"))

@@ -12,7 +12,7 @@
 2. 为 `ffmpeg` 和 `ffprobe` 各写一份带路径与 SHA 的工具描述符 JSON。
 3. 指定一个新建的绝对输出目录运行：
    ```powershell
-   $py = '<PROJECT_ROOT>/runtime\blender\releases\5.3.0\blender-5.3.0-windows-x64\5.3\python\bin\python.exe'
+   $py = '<PROJECT_ROOT>\runtime\blender\releases\5.3.0\blender-5.3.0-windows-x64\5.3\python\bin\python.exe'
    & $py -B './.agents/skills\blender-video-editing\scripts\prepare_media.py' `
      --source-manifest $srcJson --ffmpeg $ffmpegDesc --ffprobe $ffprobeDesc `
      --output-dir $outDir --max-frames 100000 --timeout-seconds 60
@@ -51,7 +51,7 @@
 
 ```powershell
 & $py -B './.agents/skills\blender-video-editing\scripts\srt_to_clips.py' `
-  --root '<PROJECT_ROOT>/runtime\video-editing\0.1.5' `
+  --root '<PROJECT_ROOT>\runtime\video-editing\0.1.5' `
   --srt $srtPath --output $clipsJson `
   --font 'C:\Windows\Fonts\msyh.ttc' --fps '24/1' --timeline-start 1 --channel 10 --font-size 24
 ```

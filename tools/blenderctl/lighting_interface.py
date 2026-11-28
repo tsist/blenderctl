@@ -5,7 +5,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from protocol import Failure,read_json,digest,VERSION
 def descriptor(path): return {'file':str(path),'sha256':digest(path)}
 def describe(operation=None,schema=False,section=None):
-    from lighting_workflow_addon import contract
+    from lighting_workflow_addon import bl_info, contract
     from lighting_workflow_contract import schemas as domain_schemas
     schemas=domain_schemas()
     if section:
@@ -15,10 +15,14 @@ def describe(operation=None,schema=False,section=None):
     if schema:
         if operation not in schemas: raise Failure('INVALID_REQUEST','--schema requires a lighting operation')
         return {'operation':operation,'schema':schemas[operation]}
-    return {'cli_version':VERSION,'plugin_version':'0.2.1','lighting_schema_version':'1.0',
+    return {'cli_version':VERSION,'plugin_version':'.'.join(map(str, bl_info['version'])),
+        'lighting_schema_version':contract.SCHEMA_VERSION,
         'operations':['lighting.run','lighting.inspect','lighting.template-save','lighting.template-edit','lighting.batch'],'actions':['create','patch','restore'],
         'state_source':'SAVED_DISK_V1; GUI handoff through explicit saved snapshot',
-        'milestone':'M2: native controls, boards, linking, HDRI/sky, actual-state templates and bounded batches',
+        'authoring':['native controls','boards','object/collection linking','IES/Gobo','Kelvin',
+                     'Light Groups','bone-follow','rig layers','volume and HDRI alignment'],
+        'goal_solve':{'command':'production.run','domain':'lighting',
+                      'sampling_device':['CPU','CUDA','OPTIX'],'gpu_requires_exact_device_id':True},
         'later_milestones':['character/NPR/interior/exterior','motion acceptance'],
         'contract':descriptor(Path(contract.__file__)),'compact':'--compact request/job result/wait; full report persists',
         'verification':'Scene protection, independent Blender reader, decoded renders; visual quality requires observation'}

@@ -38,7 +38,7 @@
 想在不启动 Blender 的情况下直查看底层点号命令对应的 JSON Schema 路径和分支，可运行本技能自带的只读脚本：
 
 ```powershell
-$py = '<PROJECT_ROOT>/runtime\blender\releases\5.3.0\blender-5.3.0-windows-x64\5.3\python\bin\python.exe'
+$py = '<PROJECT_ROOT>\runtime\blender\releases\5.3.0\blender-5.3.0-windows-x64\5.3\python\bin\python.exe'
 & $py '<本技能目录>\scripts\discover.py' --root '<PROJECT_ROOT>' --query 'project.link'
 & $py '<本技能目录>\scripts\discover.py' --root '<PROJECT_ROOT>' --command project.override.resync --schema
 ```

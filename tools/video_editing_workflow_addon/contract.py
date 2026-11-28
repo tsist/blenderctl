@@ -89,7 +89,11 @@ KIND_FIELDS = {
     'MOVIE': {'source': SINGLE_SOURCE, **VISUAL},
     'SOUND': {'source': SOUND_SOURCE, 'volume': number(0, 1000), 'pan': number(-1, 1)},
     'TEXT': {'text': {'type': 'string', 'minLength': 1, 'maxLength': 100000},
-             'font': FILE, 'font_size': integer(1, 4096), 'color': COLOR, **VISUAL},
+             'font': FILE, 'font_size': integer(1, 4096), 'color': COLOR,
+             'wrap_width': number(0, 1), 'use_outline': BOOL, 'outline_color': COLOR,
+             'outline_width': number(0, 1), 'use_shadow': BOOL, 'shadow_color': COLOR,
+             'use_box': BOOL, 'box_color': COLOR, 'alignment_x': {'enum': ['LEFT', 'CENTER', 'RIGHT']},
+             **VISUAL},
 }
 CLIP_VARIANTS = []
 for _kind, _fields in KIND_FIELDS.items():
@@ -151,6 +155,16 @@ RUN_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(
 INSPECT_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(FILE),
     'scene': NAME, 'workflow_id': ID, 'implementation_sha256': SHA},
     ('file', 'expected_sha256', 'resources', 'scene'))
+RIPPLE_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(FILE),
+    'scene': NAME, 'workflow_id': ID, 'clip_id': ID, 'duration': DURATION,
+    'edge': {'enum': ['END']}, 'implementation_sha256': SHA},
+    ('file', 'expected_sha256', 'resources', 'scene', 'workflow_id', 'clip_id', 'duration'))
+OTIO_EXPORT_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(FILE),
+    'scene': NAME, 'workflow_id': ID, 'implementation_sha256': SHA},
+    ('file', 'expected_sha256', 'resources', 'scene', 'workflow_id'))
+OTIO_IMPORT_PARAMS_SCHEMA = obj({'file': PATH, 'expected_sha256': SHA, 'resources': arr(FILE),
+    'otio': FILE, 'scene': NAME, 'workflow_id': ID, 'implementation_sha256': SHA},
+    ('file', 'expected_sha256', 'resources', 'otio', 'scene', 'workflow_id'))
 
 
 def _fail(message):
@@ -513,16 +527,22 @@ def _inputs(value, schema):
     return value
 
 
+def _clip_descriptors(clip):
+    if 'font' in clip:
+        yield clip['font']
+    sources = [clip['source']] if 'source' in clip else []
+    sources.extend(row['source'] for row in clip.get('alternatives', []))
+    for source in sources:
+        yield from source['files']
+
+
 def _descriptors(manifest):
     clips = manifest.get('clips', [])
     if manifest['action'] == 'patch':
         clips = [e['clip'] if e['op'] == 'add' else e['changes']
                  for e in manifest['edits'] if e['op'] in ('add', 'update')]
     for clip in clips:
-        if 'font' in clip:
-            yield clip['font']
-        for source in ([clip['source']] if 'source' in clip else []) + [a['source'] for a in clip.get('alternatives', [])]:
-            yield from source['files']
+        yield from _clip_descriptors(clip)
 
 
 def normalize_params(value):
@@ -556,3 +576,23 @@ def normalize_params(value):
 
 def normalize_inspect_params(value):
     return _inputs(value, INSPECT_PARAMS_SCHEMA)
+
+
+def normalize_ripple_params(value):
+    value = _inputs(value, RIPPLE_PARAMS_SCHEMA)
+    value.setdefault('edge', 'END')
+    return value
+
+
+def normalize_otio_export_params(value):
+    return _inputs(value, OTIO_EXPORT_PARAMS_SCHEMA)
+
+
+def normalize_otio_import_params(value):
+    value = _inputs(value, OTIO_IMPORT_PARAMS_SCHEMA)
+    value['otio'] = _normalize_file(value['otio'])
+    declared = {row['file'].casefold(): row for row in value['resources']}
+    row = declared.get(value['otio']['file'].casefold())
+    if row is None or row['expected_sha256'] != value['otio']['expected_sha256']:
+        _fail('Resource closure/SHA mismatch: ' + value['otio']['file'])
+    return value

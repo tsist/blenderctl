@@ -8,7 +8,7 @@ from pathlib import Path
 
 import bpy
 from protocol import Failure, atomic_json, digest, read_json
-from video_identity import implementation_sha256
+from video_identity import implementation_sha256, package_source
 from video_workflow_contract import (_call, input_documents, normalize_params,
                                      normalize_inspect_params, signature)
 from video_verifier import mismatch, runtime_identity
@@ -66,9 +66,19 @@ def _reopen(candidate, params, report, job, progress):
               'saved_expectation': report['saved_expectation'],
               'resources': input_documents(params), 'output': str(output)}
     atomic_json(request, config)
-    command = [bpy.app.binary_path, '--background', '--factory-startup', '--disable-autoexec',
-               '--offline-mode', '--python-exit-code', '23', '--python',
-               str(Path(__file__).with_name('video_verifier.py')), '--', str(request)]
+    command = [bpy.app.binary_path, '--background', '--factory-startup', '--disable-autoexec', '--offline-mode']
+    argv_file = job / 'command.json'
+    if argv_file.is_file():
+        # Blender exposes the worker's process-level thread cap through scene RNA.
+        # Apply the same cap in the fresh reader so persisted settings compare in
+        # the same runtime context.
+        launch_argv = read_json(argv_file)
+        for option in ('--threads', '-t'):
+            if option in launch_argv:
+                command += ['--threads', launch_argv[launch_argv.index(option) + 1]]
+                break
+    command += ['--python-exit-code', '23', '--python', str(Path(__file__).with_name('video_verifier.py')),
+                '--', str(request)]
     deadline = time.monotonic() + 120
     with (job / 'video-reopen.stdout.log').open('wb') as stdout, (job / 'video-reopen.stderr.log').open('wb') as stderr:
         process = subprocess.Popen(command, stdout=stdout, stderr=stderr)
@@ -130,7 +140,7 @@ def run(params, job, *, cancel_parent=None):
     params = normalize_params(params)
     job = Path(job)
     started = time.monotonic()
-    report = {'video_report_version': '1.0', 'addon_version': '0.1-dev', 'status': 'running',
+    report = {'video_report_version': '1.0', 'addon_version': package_source()[0]['version'], 'status': 'running',
               'source': {'file': params['file'], 'sha256': params['expected_sha256']},
               'runtime': runtime_identity(bpy), 'implementation_sha256': params['implementation_sha256'],
               'signature': signature(params), 'recovery': {'available': False}, 'output_files': [],
@@ -263,7 +273,7 @@ def inspect(params, job):
     bpy.ops.wm.open_mainfile(filepath=params['file'], load_ui=False, use_scripts=False)
     paths = _resource_closure(params)
     inspection = _json(_call(core.inspect, params['scene'], params.get('workflow_id')))
-    report = {'video_report_version': '1.0', 'addon_version': '0.1-dev', 'status': 'passed',
+    report = {'video_report_version': '1.0', 'addon_version': package_source()[0]['version'], 'status': 'passed',
               'source': {'file': params['file'], 'sha256': params['expected_sha256']},
               'implementation_sha256': params['implementation_sha256'], 'runtime': runtime_identity(bpy),
               'inspection': inspection, 'resource_paths': paths, 'source_saved': False,

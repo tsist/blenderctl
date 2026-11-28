@@ -51,7 +51,7 @@ $py = (Get-ChildItem -Path (Split-Path $d.data.selected_blender.file -Parent) -R
 
 ### 第四步：按发布事务链正式写入库
 
-在注册库外部建独立批次目录 `work/audit/<batch>//`，分设 `jobs` 和 `transactions` 两个目录，源工程保持完好留作对照。全程固定同一套目录，按下面顺序走完四步：
+在注册库外部建独立批次目录 `work/audit/<batch>/>/`，分设 `jobs` 和 `transactions` 两个目录，源工程保持完好留作对照。全程固定同一套目录，按下面顺序走完四步：
 
 1. **生成发布候选（`asset prepare`）**：基于源工程与实测 SHA-256 生成工作副本，写入集合资产与独立复用件的标记、Catalog UUID、标签和显示名。
 2. **生成单文件分片（`asset index`）**：为发布候选产出覆盖该文件全部活动资产的索引分片，保证多资产文件里每条记录都完整登记。

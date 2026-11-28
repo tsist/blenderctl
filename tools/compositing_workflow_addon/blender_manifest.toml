@@ -1,9 +1,9 @@
 schema_version = "1.0.0"
 id = "compositing_workflow_addon"
-version = "0.4.0"
-name = "Compositing Workflow"
-tagline = "Editable managed compositor groups with explicit conflicts"
+version = "1.0.0"
+name = "合成工作台"
+tagline = "现场深度补光、光组混光、遮罩调色与场景效果"
 maintainer = "Blender AI"
 type = "add-on"
-blender_version_min = "5.2.1"
+blender_version_min = "5.3.0"
 license = ["SPDX:GPL-3.0-or-later"]

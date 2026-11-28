@@ -26,7 +26,8 @@ CONTEXT = obj({'scene': TEXT, 'view_layer': TEXT, 'frame': {'type': 'integer'}},
 SOCKET = obj({'key': ID, 'name': TEXT, 'direction': {'enum': ['INPUT', 'OUTPUT']},
               'type': TEXT, 'default': VALUE, 'min': NUMBER, 'max': NUMBER,
               'unit': {'type': 'string'}, 'semantic': {'type': 'string'}}, ('key', 'name', 'direction', 'type'))
-RESOURCE = obj({'kind': {'enum': ['OBJECT', 'COLLECTION', 'MATERIAL', 'IMAGE', 'GROUP']}, 'name': TEXT}, ('kind', 'name'))
+RESOURCE = obj({'kind': {'enum': ['OBJECT', 'COLLECTION', 'MATERIAL', 'IMAGE', 'GROUP']}, 'name': TEXT,
+                'library_file': TEXT, 'override': {'type': 'boolean'}}, ('kind', 'name'))
 NODE = obj({'id': ID, 'type': TEXT, 'properties': {'type': 'object', 'additionalProperties': VALUE},
             'inputs': {'type': 'object', 'additionalProperties': VALUE},
             'resources': {'type': 'object', 'additionalProperties': RESOURCE},
@@ -37,18 +38,32 @@ LINK = obj({'from': END, 'to': END}, ('from', 'to'))
 ZONE = obj({'input': ID, 'output': ID, 'items': {'type': 'array', 'items': obj({'name': TEXT, 'type': TEXT}, ('name', 'type'))}}, ('input', 'output', 'items'))
 STATE_ITEM = obj({'name': TEXT, 'type': TEXT, 'attribute_domain': TEXT}, ('name', 'type'))
 SIMULATION_ZONE = obj({'input': ID, 'output': ID, 'items': {'type': 'array', 'items': STATE_ITEM}}, ('input', 'output', 'items'))
+FOREACH_ITEM = obj({'name': TEXT, 'type': TEXT, 'domain': TEXT}, ('name', 'type'))
+FOREACH_ZONE = obj({'input': ID, 'output': ID,
+                   'domain': {'enum': ['POINT', 'EDGE', 'FACE', 'CORNER', 'CURVE', 'INSTANCE', 'LAYER']},
+                   'input_items': {'type': 'array', 'items': FOREACH_ITEM},
+                   'main_items': {'type': 'array', 'items': FOREACH_ITEM},
+                   'generation_items': {'type': 'array', 'items': FOREACH_ITEM}},
+                  ('input', 'output', 'domain', 'input_items', 'main_items', 'generation_items'))
 BAKE_NODE = obj({'node': ID, 'items': {'type': 'array', 'items': obj({'name': TEXT, 'type': TEXT,
                 'attribute_domain': TEXT, 'is_attribute': {'type': 'boolean'}}, ('name', 'type'))}}, ('node', 'items'))
 GRAPH_SCHEMA = obj({'id': ID, 'interface': {'type': 'array', 'items': SOCKET},
                     'nodes': {'type': 'array', 'items': NODE}, 'links': {'type': 'array', 'items': LINK},
                     'repeat_zones': {'type': 'array', 'items': ZONE},
+                    'foreach_zones': {'type': 'array', 'items': FOREACH_ZONE},
                     'simulation_zones': {'type': 'array', 'items': SIMULATION_ZONE},
                     'bake_nodes': {'type': 'array', 'items': BAKE_NODE},
                     'groups': {'type': 'array', 'items': {'$ref': '#/$defs/blueprint'}}}, ('id', 'interface', 'nodes', 'links'))
+PARAMETER_BINDING = {'anyOf': [
+    obj({'type': {'const': 'ATTRIBUTE'}, 'attribute_name': TEXT}, ('type', 'attribute_name')),
+    obj({'type': {'const': 'VALUE'}, 'value': VALUE}, ('type', 'value')),
+]}
 TARGET_SCHEMA = obj({'id': ID, 'object': TEXT, 'modifier': TEXT,
                      'action': {'enum': ['build', 'update', 'parameters', 'adopt']}, 'create': {'type': 'boolean'},
-                     'recipe': {'enum': ['spiral_stair', 'curve_fence', 'surface_scatter']}, 'graph': GRAPH_SCHEMA,
-                     'parameters': {'type': 'object', 'additionalProperties': VALUE}, 'source_group': TEXT,
+                     'recipe': {'enum': ['spiral_stair', 'curve_fence', 'surface_scatter', 'biome_scatter']}, 'graph': GRAPH_SCHEMA,
+                     'parameters': {'type': 'object', 'additionalProperties': VALUE},
+                     'parameter_bindings': {'type': 'object', 'additionalProperties': PARAMETER_BINDING},
+                     'source_group': TEXT,
                      'overwrite_core': {'type': 'boolean'}, 'expected_core_sha256': SHA, 'share_with': ID}, ('id', 'object', 'modifier', 'action'))
 OBSERVATION_SCHEMA = obj({'id': ID, 'node': TEXT, 'socket': TEXT, 'component': TEXT, 'attribute': TEXT,
                           'domain': {'enum': ['POINT', 'EDGE', 'FACE', 'CORNER', 'CURVE', 'INSTANCE']},
@@ -79,7 +94,7 @@ RUN_PARAMS_SCHEMA['$defs'] = {'blueprint': GRAPH_SCHEMA}
 INSPECT_PARAMS_SCHEMA = obj({'file': TEXT, 'expected_sha256': SHA, 'resources': {'type': 'array', 'items': FILE},
                              'context': CONTEXT, 'targets': {'type': 'array', 'items': obj({'object': TEXT, 'modifier': TEXT}, ('object',))},
                              'observations': {'type': 'array', 'items': OBSERVATION_SCHEMA}, 'discover': {'type': 'boolean'},
-                             'cache_manifest': FILE}, ('file', 'expected_sha256', 'resources'))
+                             'cache_manifest': FILE, 'compare_render': {'type': 'boolean'}}, ('file', 'expected_sha256', 'resources'))
 REPORT_SCHEMA = {'type': 'object', 'required': ['report_version', 'status', 'targets', 'checks'],
                  'properties': {'report_version': {'enum': ['1.0', '1.1']}, 'geometry_report_version': {'enum': ['1.0', '1.1']}, 'status': {'enum': ['passed', 'partial', 'failed']},
                                 'targets': {'type': 'array', 'items': {'type': 'object'}}, 'checks': {'type': 'object'}},
@@ -261,6 +276,20 @@ def normalize_blueprint(value):
             raise WorkflowError('INVALID_REQUEST', 'Repeat zone references missing node')
     types = {node['id']: node['type'] for node in result['nodes']}
     declared = set()
+    foreach_types = ('GeometryNodeForeachGeometryElementInput', 'GeometryNodeForeachGeometryElementOutput')
+    for zone in result.get('foreach_zones', []):
+        for key, kind in zip(('input', 'output'), foreach_types):
+            node_id = zone[key]
+            if types.get(node_id) != kind or node_id in declared:
+                raise WorkflowError('INVALID_REQUEST', 'For Each requires a unique ' + kind)
+            declared.add(node_id)
+        for kind in ('input_items', 'main_items', 'generation_items'):
+            items = zone[kind]
+            names = [item['name'] for item in items]
+            if len(names) != len(set(names)):
+                raise WorkflowError('INVALID_REQUEST', 'Duplicate For Each item name in ' + kind)
+            if kind != 'generation_items' and any('domain' in item for item in items):
+                raise WorkflowError('INVALID_REQUEST', 'For Each item domain requires generation_items')
     for zone in result.get('simulation_zones', []):
         for key, kind in (('input', 'GeometryNodeSimulationInput'), ('output', 'GeometryNodeSimulationOutput')):
             node_id = zone[key]
@@ -278,10 +307,11 @@ def normalize_blueprint(value):
         names = [item['name'] for item in bake['items']]
         if len(names) != len(set(names)): raise WorkflowError('INVALID_REQUEST', 'Duplicate Bake item name')
     for node_id, kind in types.items():
-        if kind in ('GeometryNodeSimulationInput', 'GeometryNodeSimulationOutput', 'GeometryNodeBake') and node_id not in declared:
+        if kind in (*foreach_types, 'GeometryNodeSimulationInput', 'GeometryNodeSimulationOutput', 'GeometryNodeBake') and node_id not in declared:
             raise WorkflowError('INVALID_REQUEST', 'Dynamic node requires explicit declaration: ' + node_id)
     for group in result.get('groups', []): normalize_blueprint(group)
     result.setdefault('groups', []); result.setdefault('repeat_zones', [])
+    result.setdefault('foreach_zones', [])
     result.setdefault('simulation_zones', []); result.setdefault('bake_nodes', [])
     return result
 
@@ -309,6 +339,12 @@ def normalize_manifest(value):
             raise WorkflowError('INVALID_REQUEST', 'adopt requires source_group')
         if action == 'parameters' and ('graph' in target or 'recipe' in target or 'source_group' in target):
             raise WorkflowError('INVALID_REQUEST', 'parameters cannot change graph/source')
+        if 'parameter_bindings' in target:
+            if action != 'parameters':
+                raise WorkflowError('INVALID_REQUEST', 'parameter_bindings require action=parameters')
+            overlap = target.get('parameters', {}).keys() & target['parameter_bindings'].keys()
+            if overlap:
+                raise WorkflowError('INVALID_REQUEST', 'Parameter has both a value and a binding: ' + ', '.join(sorted(overlap)))
         if target.get('overwrite_core') and not target.get('expected_core_sha256'):
             raise WorkflowError('INVALID_REQUEST', 'Core overwrite requires expected_core_sha256')
         if 'graph' in target: target['graph'] = normalize_blueprint(target['graph'])

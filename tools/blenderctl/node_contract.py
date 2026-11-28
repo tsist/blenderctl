@@ -42,7 +42,7 @@ operation('image.configure',{'image':NAME,'scope':enum('reject_shared','shared')
 operation('image.sequence',{'tree':TREE,'node':NAME,'frame_start':integer(-100000,100000),'frame_offset':integer(-10000,10000),'frame_duration':integer(1,100),'cyclic':BOOL})
 from zone_contract import operations as zone_operations
 OPS.update(zone_operations(TREE))
-MANIFEST=obj({'initial_scene':NAME,'context':CONTEXT,'deformation_guard':obj({'frames':array(integer(-100000,100000),1,32),'evaluated_uv_tolerance':number(0,0.00001)},['frames']),'operations':array({'oneOf':[*MODEL_MANIFEST['properties']['operations']['items']['oneOf'],*OPS.values()]},1,500)},['context','operations'])
+MANIFEST=obj({'snapshot_mode':enum('full','material_only_v1'),'initial_scene':NAME,'context':CONTEXT,'deformation_guard':obj({'frames':array(integer(-100000,100000),1,32),'evaluated_uv_tolerance':number(0,0.00001)},['frames']),'operations':array({'oneOf':[*MODEL_MANIFEST['properties']['operations']['items']['oneOf'],*OPS.values()]},1,500)},['context','operations'])
 PREVIEW=obj({'file':TEXT,'expected_sha256':SHA,'material':NAME,'resolution':integer(64,1024),'samples':integer(1,128),'frame':integer(1,100000),'resources':array(FILE,0,100)},['file','expected_sha256','material','resolution','samples','frame'])
 BAKE=obj({'file':TEXT,'expected_sha256':SHA,'object':NAME,'scene':NAME,'view_layer':NAME,'uv_layer':NAME,'type':enum('EMIT','DIFFUSE_COLOR','NORMAL'),'resolution':integer(16,2048),'samples':integer(1,128),'margin':integer(0,64),'frame':integer(1,100000),'resources':array(FILE,0,100)},['file','expected_sha256','object','scene','view_layer','uv_layer','type','resolution','samples','margin','frame'])
 
@@ -54,6 +54,9 @@ def file_contract(item):
 
 def normalize(manifest):
     validate(manifest,MANIFEST)
+    if manifest.get('snapshot_mode','full')=='material_only_v1':
+        from material_node_snapshot import validate_manifest
+        validate_manifest(manifest,NODE_TYPES['ShaderNodeTree'])
     if 'deformation_guard' in manifest:
         if 'initial_scene' in manifest or any(op['op'] not in ('material.create','material.assign','material.faces') for op in manifest['operations']):
             raise Failure('UNSUPPORTED','deformation_guard requires an existing file and material.create/assign/faces only')
@@ -61,7 +64,7 @@ def normalize(manifest):
         if frames!=sorted(set(frames)):
             raise Failure('INVALID_REQUEST','Deformation sample frames must be unique and increasing')
     prior=[op for op in manifest['operations'] if op['op'] in MODEL_OPS or op['op'] in SCENE_OPS]
-    if prior:model_normalize({**manifest,'operations':prior})
+    if prior:model_normalize({**{k:v for k,v in manifest.items() if k!='snapshot_mode'},'operations':prior})
     for op in manifest['operations']:
         if op['op']=='node.properties' and not op['properties']:raise Failure('INVALID_REQUEST','Empty properties')
         if op['op']=='node.ramp':

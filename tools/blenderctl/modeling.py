@@ -1,15 +1,26 @@
 """Local static modeling candidates, explicit data ownership and geometry evidence."""
 import hashlib,json,math
+import sys
 from contextlib import contextmanager
+from pathlib import Path
 import bpy,bmesh
 from mathutils import Vector
-from protocol import Failure,atomic_json,digest
+from protocol import Failure,SCHEMA,atomic_json,digest
 from inspection import all_ids,identity
 import scenes
 from model_contract import normalize,SCENE_OPS
 
 MAX_VERTICES=200000
 MAX_LOOPS=1000000
+
+
+def require_hard_surface():
+    from hard_surface_workflow_addon import require_supported_blender
+
+    try:
+        require_supported_blender()
+    except RuntimeError as exc:
+        raise Failure('UNSUPPORTED', str(exc)) from exc
 
 def sha(value):return hashlib.sha256(json.dumps(value,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 def topology(mesh):return sha({'vertices':len(mesh.vertices),'edges':[list(e.vertices) for e in mesh.edges],'faces':[list(f.vertices) for f in mesh.polygons]})
@@ -68,7 +79,7 @@ def mesh_edit(item,op):
     try:
         bm.from_mesh(mesh)
         for domain in (bm.verts,bm.edges,bm.faces):domain.ensure_lookup_table()
-        domain=bm.edges if kind in ('mesh.bevel','mesh.subdivide') else bm.faces
+        domain=bm.edges if kind in ('mesh.bevel','mesh.subdivide','mesh.dissolve_limited') else bm.faces
         chosen=select(mesh,domain,op['selection']) if 'selection' in op else []
         if 'selection' in op and not chosen:raise Failure('INVALID_REQUEST','Operation requires a nonempty selection')
         if kind=='mesh.extrude':
@@ -82,6 +93,12 @@ def mesh_edit(item,op):
             bmesh.ops.subdivide_edges(bm,edges=chosen,cuts=op['cuts'],use_grid_fill=True)
         elif kind=='mesh.delete_faces':bmesh.ops.delete(bm,geom=chosen,context='FACES_ONLY')
         elif kind=='mesh.triangulate':bmesh.ops.triangulate(bm,faces=chosen,quad_method='BEAUTY',ngon_method='BEAUTY')
+        elif kind=='mesh.dissolve_limited':
+            verts=list(bm.verts) if op['selection']=='ALL' else sorted({v for e in chosen for v in e.verts},key=lambda v:v.index)
+            bmesh.ops.dissolve_limit(bm,angle_limit=math.radians(op['angle_limit_deg']),use_dissolve_boundaries=bool(op.get('use_dissolve_boundaries',False)),verts=verts,edges=chosen,delimit=set(op.get('delimit',('NORMAL',))))
+            if op.get('triangulate_ngons'):
+                ngons=[f for f in bm.faces if len(f.verts)>4]
+                if ngons:bmesh.ops.triangulate(bm,faces=ngons,quad_method='BEAUTY',ngon_method='BEAUTY')
         elif kind=='mesh.merge_distance':bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=op['distance'])
         elif kind=='mesh.normals':
             if op['recalculate']:bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
@@ -112,7 +129,14 @@ def modifier_add(op):
     elif typ=='SOLIDIFY':mod.thickness=settings['thickness'];mod.offset=settings['offset']
     elif typ=='SUBSURF':mod.levels=settings['levels'];mod.render_levels=settings['levels']
     elif typ=='MIRROR':mod.use_axis=tuple(a in settings['axes'] for a in 'XYZ');mod.merge_threshold=settings['merge_threshold'];mod.use_clip=settings['clip']
-    elif typ=='DECIMATE':mod.decimate_type='COLLAPSE';mod.ratio=settings['ratio']
+    elif typ=='DECIMATE':
+        if settings.get('mode','COLLAPSE')=='DISSOLVE':
+            mod.decimate_type='DISSOLVE'
+            mod.angle_limit=math.radians(settings['angle_limit_deg'])
+            mod.delimit=set(settings.get('delimit',()))
+            mod.use_dissolve_boundaries=bool(settings.get('use_dissolve_boundaries',False))
+        else:
+            mod.decimate_type='COLLAPSE';mod.ratio=settings['ratio']
     elif typ=='WELD':mod.merge_threshold=settings['merge_threshold']
 
 def uv_edit(item,op,context):
@@ -143,14 +167,43 @@ def uv_edit(item,op,context):
         finished(bpy.ops.object.mode_set(mode='EDIT'));finished(bpy.ops.mesh.select_all(action='SELECT'));finished(bpy.ops.uv.select_all(action='SELECT'))
         if kind=='uv.pack':result=bpy.ops.uv.pack_islands(rotate=op['rotate'],scale=True,margin_method='FRACTION',margin=op['margin'],udim_source='ORIGINAL_AABB',pin=False)
         elif op['method']=='SMART':result=bpy.ops.uv.smart_project(angle_limit=math.radians(66),island_margin=op['margin'],correct_aspect=False,scale_to_bounds=True)
+        elif op['method']=='MINIMUM_STRETCH':
+            result=bpy.ops.uv.unwrap(
+                method='MINIMUM_STRETCH',
+                iterations=op.get('iterations',10),
+                no_flip=op.get('no_flip',True),
+                margin=op['margin'],
+                correct_aspect=False,
+            )
         else:result=bpy.ops.uv.unwrap(method=op['method'],margin=op['margin'],correct_aspect=False)
         finished(result)
 
 def execute(op,context):
     kind=op['op']
+    if kind in ('mesh.flow','hard_surface.stack'):
+        require_hard_surface()
+        from hard_surface_workflow_addon import core, object_tools
+        item=scenes.find(bpy.data.objects,op['object'],True)
+        if item.name not in bpy.context.view_layer.objects:
+            raise Failure('INVALID_REQUEST','Hard-surface target is outside the active view layer')
+        try:
+            if kind=='hard_surface.stack':
+                return object_tools.execute(item,op['tool'],op.get('params',{}))
+            return core.execute(item,op['tool'],op['selector'],params=op.get('params',{}),
+                                repeat=op.get('repeat',1),protect=op.get('protect',[]),
+                                allow_expansion=op.get('allow_expansion',False))
+        except (RuntimeError,ValueError) as exc:
+            code='CONFLICT' if 'stale' in str(exc).lower() or 'expected cutter' in str(exc).lower() else 'INVALID_REQUEST'
+            raise Failure(code,str(exc)) from exc
     if kind=='mesh.retopology':
         from retopology import execute as remesh
         return remesh(op,context)
+    if kind=='reference.stage':
+        tools_path = str(Path(__file__).resolve().parents[1])
+        if tools_path not in sys.path:
+            sys.path.append(tools_path)
+        from bridges.reference_stage import stage
+        return stage(op)
     if kind in SCENE_OPS:
         scenes.execute(op);return
     if kind=='mesh.create':
@@ -216,6 +269,22 @@ def execute(op,context):
     elif kind=='uv.layout':
         import uv_layout
         result=uv_layout.run(op);scenes.update();return result
+    elif kind=='qa.fix_safe':
+        import mesh_qa
+        opts={k:v for k,v in op.items() if k!='op'}
+        result=mesh_qa.fix_safe(**opts);scenes.update();return result
+    elif kind == 'mesh.scale_absolute':
+        from mesh_scale_absolute import scale_selection
+
+        item = editable(op)
+        vertices = select(item.data, item.data.vertices, op['selection'])
+        layer = bpy.context.view_layer
+        if layer.objects.get(item.name) != item or not item.visible_get(view_layer=layer):
+            raise Failure('INVALID_REQUEST', 'Absolute scale target must be visible in the requested view layer')
+        layer.update()
+        result = scale_selection(item, vertices, op, bpy.context.scene)
+        scenes.update()
+        return result
     elif kind.startswith('uv.'):
         item=editable(op);uv_edit(item,op,context);item.data.update()
     elif kind.startswith('mesh.'):mesh_edit(editable(op),op)
@@ -265,20 +334,147 @@ def state(evaluation_coordinates=False):
         objects.append(entry)
     return {'model_report_version':'1.0','scene':base,'objects':objects,'coverage':'local_mesh_topology_geometry_UV_and_active_view_layer_evaluation; no_self_intersection_or_UV_overlap_proof'}
 
+def flow_selection_report(lookup, job):
+    from hard_surface_workflow_addon import selection
+
+    item = scenes.find(bpy.data.objects, lookup['object'])
+    try:
+        region = selection.resolve(item, lookup['selector'])
+    except (RuntimeError, ValueError) as exc:
+        raise Failure('CONFLICT' if 'stale' in str(exc).lower() else 'INVALID_REQUEST', str(exc)) from exc
+    selector = lookup['selector']
+    region = {'object': item.name, 'mesh': item.data.name, 'count': len(region['indices']),
+              'diagnostics': selection.diagnose(item, region), 'selector_kind': selector['kind'],
+              'fingerprint_scope': 'Vertex count, ordered edge endpoints and face corners only; coordinates and object transforms are excluded.',
+              **region}
+    if selector['kind'] == 'box':
+        region['box'] = {key: selector[key] for key in ('space', 'minimum', 'maximum')}
+    path = job / 'flow-selection.json'
+    atomic_json(path, region)
+    return {'flow_selection': region, 'flow_selection_report': str(path)}
+
+
+def face_flow_report(params, job):
+    from hard_surface_workflow_addon import face_flow
+
+    request = dict(params['face_flow'])
+    obj = scenes.find(bpy.context.view_layer.objects, request.pop('object'))
+    try:
+        report = face_flow.inspect_face_flow(bpy.context, obj, request)
+    except face_flow.StaleSeed as exc:
+        raise Failure('CONFLICT', str(exc)) from exc
+    except ValueError as exc:
+        raise Failure('INVALID_REQUEST', str(exc)) from exc
+    report['source'] = {'file': params['file'], 'sha256': params['expected_sha256'], 'kind': 'saved_disk'}
+    path = job / 'face-flow-report.json'
+    atomic_json(path, report)
+    return {'face_flow': report, 'face_flow_report': str(path)}
+
+
+def surface_sweep_report(params, job):
+    from hard_surface_workflow_addon import bl_info, surface_sweep
+
+    if sys.platform != 'win32' or bpy.app.version < (5, 3, 0):
+        raise Failure('UNSUPPORTED', 'Surface-sweep inspection requires Windows Blender 5.3 or later')
+    request = params['surface_sweep']
+    target = scenes.find(bpy.context.view_layer.objects, request['object'])
+    if target.type != 'MESH':
+        raise Failure('INVALID_REQUEST', 'Surface-sweep target must be a mesh in the current View Layer')
+    try:
+        report = surface_sweep.preview_geometry(target, request['params'])['report']
+    except (ValueError, OverflowError) as exc:
+        message = str(exc)
+        code = 'CONFLICT' if 'stale' in message.lower() or 'changed after preview' in message.lower() else 'INVALID_REQUEST'
+        raise Failure(code, message) from exc
+    report.update(
+        read_only=True,
+        source_file={'file': params['file'], 'sha256': params['expected_sha256']},
+        blender={'version': bpy.app.version_string, 'build_hash': bpy.app.build_hash.decode()},
+        addon_version='.'.join(map(str, bl_info['version'])),
+    )
+    path = job / 'surface-sweep-report.json'
+    atomic_json(path, report)
+    return {'surface_sweep': report,
+            'surface_sweep_report': {'file': str(path), 'expected_sha256': digest(path)}}
+
+
 def inspect(params,job):
+    if params.keys() & {'flow_selection', 'geometry_audit', 'review_grid', 'face_flow', 'surface_sweep'}:
+        require_hard_surface()
     bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
     if 'context' in params:scenes.activate(params['context'])
-    report=state();atomic_json(job/'model-report.json',report);return report
+    review_grid=None
+    audit=None
+    if 'geometry_audit' in params:
+        from hard_surface_workflow_addon import geometry_audit
+        try:
+            audit=geometry_audit.run(params['geometry_audit'])
+        except ValueError as exc:
+            raise Failure('INVALID_REQUEST',str(exc)) from exc
+        atomic_json(job/'geometry-audit.json',audit)
+    selection_result = flow_selection_report(params['flow_selection'], job) if 'flow_selection' in params else {}
+    if 'face_flow' in params:
+        selection_result.update(face_flow_report(params, job))
+    if 'surface_sweep' in params:
+        selection_result.update(surface_sweep_report(params, job))
+    if 'review_grid' in params:
+        from hard_surface_workflow_addon import review_grid as review_grid_runtime
+        image=job/'review-grid.png'
+        if image.exists() or image.is_symlink():raise Failure('CONFLICT','Review grid output already exists')
+        try:
+            detail=review_grid_runtime.produce(bpy.context.scene,params['review_grid'],output_path=str(image))
+        except ValueError as exc:
+            raise Failure('INVALID_REQUEST',str(exc)) from exc
+        except OSError as exc:
+            raise Failure('IO_ERROR',str(exc)) from exc
+        if not image.is_file():raise Failure('WORKER_FAILED','Review grid did not produce review-grid.png')
+        if Path(detail.get('output','')).resolve()!=image.resolve():raise Failure('CONFLICT','Review grid output path differs from the fixed job artifact')
+        review_grid={'read_only':True,**detail,'review_grid_report':str(job/'review-grid.json')}
+        atomic_json(job/'review-grid.json',review_grid)
+    if (selection_result or audit is not None) and 'qa' not in params:
+        result={'read_only':True, **selection_result}
+        if audit is not None:result['geometry_audit']=audit
+        if review_grid is not None:result['review_grid']=review_grid
+        return result
+    report=state()
+    if audit is not None:report['geometry_audit']=audit
+    if 'qa' in params:
+        import mesh_qa
+        try:
+            qa_report=mesh_qa.run(**dict(params['qa']))
+        except mesh_qa.UVLayerNotFound as exc:
+            raise Failure('NOT_FOUND', str(exc)) from exc
+        qa_report['source'] = {'file': params['file'], 'sha256': params.get('expected_sha256') or digest(params['file'])}
+        atomic_json(job/'qa-report.json',qa_report)
+        report['qa']={
+            'qa_report_version':qa_report['qa_report_version'],
+            'source':qa_report['source'],
+            'read_only':qa_report['read_only'],
+            'profile':qa_report['profile'],
+            'status':qa_report['status'],
+            'stats':qa_report['stats'],
+            'counts':qa_report['counts'],
+            'hard_blockers':qa_report['hard_blockers'],
+            'review_signals':qa_report['review_signals'],
+            'skipped':qa_report['skipped'],
+            'qa_report':str(job/'qa-report.json'),
+        }
+    if review_grid is not None:report['review_grid']=review_grid
+    atomic_json(job/'model-report.json',report)
+    return {**report, **selection_result}
 
 def prepare(params,job):
     manifest=normalize(params['manifest'])
+    if 'flow_selection' in params or any(op['op'] in ('mesh.flow', 'hard_surface.stack') for op in manifest['operations']):
+        require_hard_surface()
     uv_only=all(op['op']=='uv.layout' for op in manifest['operations'])
     if params.get('file'):
         bpy.ops.wm.open_mainfile(filepath=params['file'],load_ui=False,use_scripts=False)
         if tuple(bpy.data.version[:2])!=tuple(bpy.app.version[:2]):raise Failure('UNSUPPORTED','Modeling requires matching Blender major/minor')
     else:bpy.ops.wm.read_factory_settings(use_empty=True);scenes.named(bpy.context.scene,manifest.get('initial_scene','Scene'))
     if bpy.context.mode!='OBJECT':raise Failure('UNSUPPORTED','Source must be saved in object mode')
-    atomic_json(job/'model-before.json',state());actions=[];layouts=[];conversions=[]
+    atomic_json(job/'model-before.json',state());actions=[];layouts=[];conversions=[];qa_fixes=[];hard_surface=[]
+    addon_version = None
     for index,op in enumerate(manifest['operations']):
         scenes.prepare_context(manifest['context'])
         try:detail=execute(op,manifest['context'])
@@ -287,6 +483,16 @@ def prepare(params,job):
         if detail is not None and op['op']=='uv.layout':
             layouts.append({'operation_index':index,**detail})
             atomic_json(job/'uv-layout-report.json',{'version':'1.0','layouts':layouts})
+        elif detail is not None and op['op']=='qa.fix_safe':
+            qa_fixes.append({'operation_index':index,**detail})
+            atomic_json(job/'qa-fix-report.json',{'qa_fix_report_version':'1.0','operations':qa_fixes})
+        elif detail is not None and op['op'] in ('mesh.flow','hard_surface.stack'):
+            if addon_version is None:
+                from hard_surface_workflow_addon import bl_info
+                addon_version = '.'.join(map(str, bl_info['version']))
+            hard_surface.append({'operation_index':index,'object':op['object'],**detail})
+            atomic_json(job/'hard-surface-report.json', {
+                'version': '1.0', 'addon_version': addon_version, 'operations': hard_surface})
         elif detail is not None:
             conversions.append({'operation_index':index,**detail});atomic_json(job/'geometry-operation-report.json',{'version':'1.0','operations':conversions})
         atomic_json(job/'model-actions.json',actions)
@@ -306,4 +512,19 @@ def prepare(params,job):
     else:mismatch=scenes.compare(expected,observed)
     if mismatch:raise Failure('VALIDATION_FAILED','Model candidate reopen mismatch at '+mismatch)
     atomic_json(job/'model-change.json',{'operations':manifest['operations'],'context':manifest['context'],'retained_orphans':retained,'reopen':'pass'})
-    return {'candidate':str(candidate),'candidate_sha256':digest(candidate),'operations':len(actions),'context':manifest['context'],'reopen':'pass','report':str(job/'model-report.json'),'retained_orphans':retained,'publication':'working_candidate_only','next_step':'project plan-copy/plan-files; transaction apply; model inspect/validate final path',**({'uv_layout_report':str(job/'uv-layout-report.json')} if layouts else {})}
+    result={'candidate':str(candidate),'candidate_sha256':digest(candidate),'operations':len(actions),'context':manifest['context'],'reopen':'pass','report':str(job/'model-report.json'),'retained_orphans':retained,'publication':'working_candidate_only','next_step':'project plan-copy/plan-files; transaction apply; model inspect/validate final path',**({'uv_layout_report':str(job/'uv-layout-report.json')} if layouts else {}),**({'qa_fix_report':str(job/'qa-fix-report.json'),'qa_fix':{'operations':len(qa_fixes),'changes_count':sum(len(x['changes']) for x in qa_fixes),'skipped_count':sum(len(x['skipped_unfixable']) for x in qa_fixes),'before_status':qa_fixes[0]['qa_before']['status'],'after_status':qa_fixes[-1]['qa_after']['status']}} if qa_fixes else {})}
+    if hard_surface:
+        result['hard_surface_report']=str(job/'hard-surface-report.json')
+        result['addon_version'] = addon_version
+    if 'flow_selection' in params:
+        try:
+            result.update(flow_selection_report(params['flow_selection'], job))
+        except Failure:
+            # The saved model already passed reopen verification. Retry just the lookup.
+            atomic_json(job / 'flow-selection-recovery.json', {
+                'schema_version': SCHEMA, 'command': 'model.inspect',
+                'params': {'file': str(candidate), 'expected_sha256': result['candidate_sha256'],
+                           'flow_selection': params['flow_selection']},
+            })
+            raise
+    return result

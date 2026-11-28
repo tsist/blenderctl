@@ -126,7 +126,10 @@ def create(items, root, launch, checkpoint, mixed=False):
             if item.get("mode") == "replace":
                 with FileGuard(item["output"]) as old:
                     item["target_before"] = {"output_sha256": old.sha256(checkpoint), "file_identity": old.identity()}
-                    item["target_backup"] = str(Path(item["output"]).parent / f".blenderctl-{directory.name}-{index}.original")
+                    target_parent = Path(item["output"]).parent
+                    backup_name = f".blenderctl-{directory.name}-{index}.original"
+                    item["pending_backup"] = str(target_parent / backup_name)
+                    item["target_backup"] = str(target_parent / "_transaction-archives" / directory.name / f"{index}.original")
                     if source.identity() == old.identity():
                         raise Failure("CONFLICT", "Source and replacement target are the same file object")
                     if item.get("kind") in ("catalog", "catalog_repair"):
@@ -298,9 +301,10 @@ def reconcile(plan, state, checkpoint):
 
 
 def reconcile_replacement(item, record, state, checkpoint):
-    backup_exists = os.path.lexists(item["target_backup"])
+    backup = preserved_original(item)
+    backup_exists = backup is not None
     if backup_exists:
-        with check_owned(item["target_backup"], item["target_before"], checkpoint):
+        with check_owned(backup, item["target_before"], checkpoint):
             pass
     else:
         if record.get("old_preserved") and not (state["intent"] == "rollback" and record.get("restore_started")):
@@ -328,6 +332,47 @@ def reconcile_replacement(item, record, state, checkpoint):
             raise Failure("CONFLICT", "Archived version without rollback intent")
         label = "archived" if backup_exists else "rolled_back"
     record["state"] = label
+
+
+def preserved_original(item):
+    """Locate the original after either durable rename, including older plans."""
+    paths = (item.get("pending_backup"), item["target_backup"])
+    existing = [path for path in paths if path is not None and os.path.lexists(path)]
+    if len(existing) > 1:
+        raise Failure("CONFLICT", "Both original preservation paths exist")
+    return existing[0] if existing else None
+
+
+def target_original(item, record):
+    if not record.get("old_preserved"):
+        return item["output"]
+    path = preserved_original(item)
+    if path is None:
+        raise Failure("CONFLICT", "Preserved original disappeared")
+    return path
+
+
+def archive_originals(directory, plan, state, checkpoint):
+    for item, record in zip(plan["items"], state["items"]):
+        if not item.get("pending_backup"):
+            continue
+        checkpoint()
+        source = target_original(item, record)
+        archive = Path(item["target_backup"])
+        if source != str(archive):
+            with ExitStack() as guards:
+                for folder in (archive.parent.parent, archive.parent):
+                    folder.mkdir(exist_ok=True)
+                    if folder.is_symlink() or (hasattr(folder, "is_junction") and folder.is_junction()):
+                        raise Failure("CONFLICT", "Original archive cannot use a symbolic link or junction")
+                    guards.enter_context(FileGuard(folder, directory=True))
+                original = guards.enter_context(check_owned(source, item["target_before"], checkpoint, renameable=True))
+                event("before_archive_original", {"item": item, "record": record})
+                original.rename_new(archive)
+                event("after_archive_original", {"item": item, "record": record})
+        with check_owned(archive, item["target_before"], checkpoint):
+            record["original_archive"] = str(archive)
+            persist(directory, state)
 
 
 def make_stage(directory, launch, item, record, source, state, checkpoint):
@@ -442,7 +487,7 @@ def apply(directory, plan, state, launch, checkpoint):
         with ExitStack() as originals:
             for item, record in zip(plan["items"], state["items"]):
                 if item["target_before"]:
-                    path = item["target_backup"] if record.get("old_preserved") else item["output"]
+                    path = target_original(item, record)
                     old = originals.enter_context(check_owned(path, item["target_before"], checkpoint))
                     snapshot_original(directory, item, record, old, state, checkpoint)
             for item, record in zip(plan["items"], state["items"]):
@@ -467,9 +512,9 @@ def apply(directory, plan, state, launch, checkpoint):
             # Revalidate all targets and all staged versions before the first rename.
             for index, (item, record) in enumerate(zip(plan["items"], state["items"])):
                 if item["target_before"]:
-                    path = item["target_backup"] if record.get("old_preserved") else item["output"]
+                    path = target_original(item, record)
                     old_guards[index] = committing.enter_context(check_owned(path, item["target_before"], checkpoint, renameable=True))
-                    if not record.get("old_preserved") and os.path.lexists(item["target_backup"]):
+                    if not record.get("old_preserved") and preserved_original(item) is not None:
                         raise Failure("CONFLICT", "Original preservation destination already exists")
                 if record["state"] == "committed":
                     committing.enter_context(check_owned(item["output"], record, checkpoint))
@@ -484,7 +529,7 @@ def apply(directory, plan, state, launch, checkpoint):
                     record["preserve_started"] = True
                     persist(directory, state)
                     event("before_preserve", {"item": item, "record": record})
-                    old_guards[index].rename_new(item["target_backup"])
+                    old_guards[index].rename_new(item.get("pending_backup", item["target_backup"]))
                     event("after_preserve", {"item": item, "record": record})
                     record["old_preserved"] = True
                     persist(directory, state)
@@ -501,7 +546,8 @@ def apply(directory, plan, state, launch, checkpoint):
             for item, record in zip(plan["items"], state["items"]):
                 verifying.enter_context(check_owned(item["output"], record, checkpoint))
                 if item["target_before"]:
-                    verifying.enter_context(check_owned(item["target_backup"], item["target_before"], checkpoint))
+                    with check_owned(target_original(item, record), item["target_before"], checkpoint):
+                        pass
             for item, record in zip(plan["items"], state["items"]):
                 if item.get("kind", "blend") in ("blend", "blend_exact"):
                     final = worker(directory, launch, {"schema_version": SCHEMA, "command": "inspect", "params": {"file": item["output"]}}, checkpoint, record)
@@ -512,6 +558,10 @@ def apply(directory, plan, state, launch, checkpoint):
                 record["verification"]["final_path_reopen"] = "pass"
             if 'asset_scope' in plan:
                 validate_transaction(directory,plan,state,launch,checkpoint,final=True)
+            if any(item.get("pending_backup") for item in plan["items"]):
+                state["phase"] = "archiving_originals"
+                persist(directory, state)
+                archive_originals(directory, plan, state, checkpoint)
             state["phase"] = "committed"
             state["last_error"] = None
             persist(directory, state)
@@ -525,7 +575,7 @@ def rollback(directory, plan, state, checkpoint):
         guards, originals = {}, {}
         for index, (item, record) in enumerate(zip(plan["items"], state["items"])):
             if item["target_before"]:
-                path = item["target_backup"] if record.get("old_preserved") else item["output"]
+                path = target_original(item, record)
                 old = stack.enter_context(check_owned(path, item["target_before"], checkpoint, renameable=record.get("old_preserved", False)))
                 if record.get("old_preserved"):
                     originals[index] = old
@@ -567,7 +617,7 @@ def run(request, launch, job, checkpoint):
     root = Path(launch["transactions_root"])
     if command=='asset.plan':
         from library import plan
-        return plan(params['manifest'],launch,job,checkpoint)
+        return plan(params['manifest'],launch,job,checkpoint,force=params.get('force',False))
     if command.startswith("project.plan_"):
         items = [params] if command == "project.plan_copy" else params["items"]
         for item in items:

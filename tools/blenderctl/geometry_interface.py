@@ -24,7 +24,7 @@ def describe(operation=None, schema=False, section=None):
             'geometry_schema_version': '1.1',
             'operations': ['geometry.run', 'geometry.inspect', 'geometry.session'],
             'contract': {'file': str(source), 'sha256': hashlib.sha256(source.read_bytes()).hexdigest()},
-            'recipes': ['spiral_stair', 'curve_fence', 'surface_scatter'],
+            'recipes': contract.TARGET_SCHEMA['properties']['recipe']['enum'],
             'state': 'SAVED_DISK_V1 for worker; explicit owned live-session capture/apply for GUI',
             'ownership': 'Stable user wrapper, replaceable managed core; isolated targets by default',
             'verification': 'Independent Blender reopen; temporal runs also compare scrambled baked-frame witnesses',
@@ -81,6 +81,8 @@ def compact(result, requested_command=None):
     summary['operation'] = command
     summary.update(pick(original_data, ('discovered_count',)))
     summary.update(pick(data, ('cache_validation',)))
+    if isinstance(data.get('render_comparison'), dict):
+        summary['render_comparison'] = pick(data['render_comparison'], ('status', 'different_objects', 'elapsed_seconds', 'backend'))
     if isinstance(data.get('cache_replay'), dict):
         summary['cache_replay'] = pick(data['cache_replay'], ('status', 'frames', 'order', 'mismatch', 'error'))
     if request:

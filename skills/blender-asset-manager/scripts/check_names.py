@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only preflight for NEW published .blend filenames, not legacy names."""
 from __future__ import annotations
 
@@ -10,7 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 
 
-# Bundled asset-standard.md v1.0 sections 3-4. No semantic classification proof.
+# STANDARD.md v1.0, section 3. These codes do not prove semantic classification.
 TYPES = frozenset("MOD MAT TEX HDR LGT GEO SHD CMP RIG ANI SCN BRU".split())
 RESERVED = {"CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$"} | {
     prefix + number for prefix in ("COM", "LPT") for number in "123456789¹²³"

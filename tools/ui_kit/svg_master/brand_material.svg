@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg_material" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222733"/>
+      <stop offset="100%" stop-color="#141820"/>
+    </linearGradient>
+    <radialGradient id="glow_material" cx="30%" cy="25%" r="72%">
+      <stop offset="0%" stop-color="#F43F5E" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#881337" stop-opacity="0.02"/>
+    </radialGradient>
+    <linearGradient id="badge_material" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FECDD3"/>
+      <stop offset="35%" stop-color="#F43F5E"/>
+      <stop offset="100%" stop-color="#F43F5E"/>
+    </linearGradient>
+  </defs>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13.5" fill="url(#bg_material)" stroke="#F43F5E" stroke-width="2.4" stroke-opacity="0.92"/>
+  <rect x="3.8" y="3.8" width="56.4" height="56.4" rx="12.2" fill="url(#glow_material)"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+          <polygon points="12,35 28,28 44,35 28,43" fill="#F43F5E" fill-opacity="0.22" stroke="#FECDD3" stroke-width="2.0"/>
+          <circle cx="27" cy="25" r="14" fill="#F43F5E" fill-opacity="0.28" stroke="#F8FAFC" stroke-width="2.6"/>
+          <path d="M18,22 A10,10 0 0 1 28,14" fill="none" stroke="#FFFFFF" stroke-width="3.0"/>
+          <circle cx="22.5" cy="19.5" r="2.8" fill="#FECDD3"/>
+          <path d="M16,32 Q27,37 38,31" fill="none" stroke="#F43F5E" stroke-width="2.4"/>
+        
+  </g>
+  <rect x="34" y="34" width="28" height="28" rx="8" fill="#11141B"/>
+  <rect x="36.2" y="36.2" width="23.6" height="23.6" rx="6.2" fill="url(#badge_material)"/>
+  <text x="48" y="53.6" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-weight="900" font-size="16.5" fill="#FFFFFF">S</text>
+</svg>

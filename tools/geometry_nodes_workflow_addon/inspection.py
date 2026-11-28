@@ -1,35 +1,87 @@
 """Bounded real geometry inspection and isolated intermediate observations."""
 import hashlib
 import json
+import math
 import uuid
 import bpy
+import numpy as np
 from mathutils import Vector
 from .contract import WorkflowError
 from . import core
 
 
-def _context():
-    return {'scene': bpy.context.scene.name, 'view_layer': bpy.context.view_layer.name,
-            'frame': bpy.context.scene.frame_current, 'evaluation_mode': 'VIEWPORT'}
+def _context(depsgraph=None):
+    scene = depsgraph.scene if depsgraph is not None else bpy.context.scene
+    layer = depsgraph.view_layer if depsgraph is not None else bpy.context.view_layer
+    return {'scene': scene.name, 'view_layer': layer.name, 'frame': scene.frame_current,
+            'evaluation_mode': depsgraph.mode if depsgraph is not None else 'VIEWPORT'}
 
 
 def _bounds(points):
-    points = list(points)
+    points = [point for point in points if all(math.isfinite(value) for value in point)]
     if not points: return None
     lo = [min(p[i] for p in points) for i in range(3)]; hi = [max(p[i] for p in points) for i in range(3)]
     return {'min': lo, 'max': hi, 'size': [hi[i] - lo[i] for i in range(3)], 'space': 'WORLD'}
+
+
+def _json_number(value):
+    if isinstance(value, list):
+        return [_json_number(item) for item in value]
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
+
+
+_NUMERIC_ATTRIBUTES = {
+    'FLOAT': ('value', np.float32, 1), 'INT': ('value', np.int32, 1),
+    'INT8': ('value', np.int32, 1), 'INT16_2D': ('value', np.int32, 2),
+    'INT32_2D': ('value', np.int32, 2), 'BOOLEAN': ('value', np.bool_, 1),
+    'FLOAT_VECTOR': ('vector', np.float32, 3), 'FLOAT2': ('vector', np.float32, 2),
+    'FLOAT_COLOR': ('color', np.float32, 4), 'BYTE_COLOR': ('color', np.float32, 4),
+    'QUATERNION': ('value', np.float32, 4), 'FLOAT4X4': ('value', np.float32, 16),
+}
+
+
+def _statistics(attr, limit):
+    data = attr.data
+    count = len(data)
+    if not count:
+        return {'samples': [], 'stats': {'status': 'empty', 'checked': 0}}
+    field = next((name for name in ('value', 'vector', 'color', 'matrix') if hasattr(data[0], name)), None)
+    if field is None:
+        return {'samples': [], 'stats': {'status': 'unreadable', 'checked': 0}}
+    native = _NUMERIC_ATTRIBUTES.get(attr.data_type)
+    if native and native[0] == field:
+        _, dtype, width = native
+        values = np.empty(count * width, dtype=dtype)
+        try:
+            data.foreach_get(field, values)
+            values = values.reshape(count, width)
+        except (TypeError, RuntimeError, ValueError):
+            values = np.asarray([getattr(row, field) for row in data], dtype=dtype).reshape(count, -1)
+    else:
+        values = np.asarray([getattr(row, field) for row in data]).reshape(count, -1)
+    samples = [_json_number(np.asarray(getattr(row, field)).tolist()) for row in data[:limit]]
+    if values.dtype.kind not in 'fibu':
+        digest = hashlib.sha256(json.dumps(values.tolist(), ensure_ascii=False).encode('utf-8')).hexdigest()
+        return {'samples': samples, 'stats': {'status': 'non_numeric', 'checked': count, 'sha256': digest}}
+    finite = np.isfinite(values)
+    valid_columns = [column[valid] for column, valid in zip(values.T, finite.T)]
+    return {'samples': samples, 'stats': {
+        'status': 'finite' if finite.all() else 'non_finite', 'checked': count,
+        'min': [col.min().item() if len(col) else None for col in valid_columns],
+        'max': [col.max().item() if len(col) else None for col in valid_columns],
+        'nan_count': int(np.isnan(values).sum()), 'infinity_count': int(np.isinf(values).sum()),
+        'sha256': hashlib.sha256(values.tobytes()).hexdigest(),
+    }}
 
 
 def _attributes(data, limit=8, skip_names=()):
     result = []
     for attr in getattr(data, 'attributes', []):
         if attr.name in skip_names: continue
-        samples = []
-        for value in list(attr.data[:limit]):
-            name = next((n for n in ('value', 'vector', 'color', 'matrix') if hasattr(value, n)), None)
-            samples.append(core.plain(getattr(value, name)) if name else None)
         result.append({'name': attr.name, 'type': attr.data_type, 'domain': attr.domain,
-                       'count': len(attr.data), 'samples': samples, 'sample_limit': limit})
+                       'count': len(attr.data), 'sample_limit': limit, **_statistics(attr, limit)})
     return sorted(result, key=lambda row: (row['name'], row['domain'], row['type']))
 
 
@@ -57,21 +109,22 @@ def _component(data, matrix, limit=8, instance_component=False):
                       'reason': 'Synthetic instance position RNA view is not readable in this build; origins are derived from instance_transform'})
         result = {'type': data.bl_rna.identifier, 'attributes': attrs,
                   'bounds': _bounds(matrix @ p for p in origins),
-                  'origins': {'source': 'instance_transform.translation', 'samples': [list(v) for v in origins[:limit]], 'count': len(origins)}}
+                  'origins': {'source': 'instance_transform.translation', 'samples': _json_number([list(v) for v in origins[:limit]]), 'count': len(origins)}}
     else:
         result = {'type': data.bl_rna.identifier, 'attributes': _attributes(data, limit),
                   'bounds': _bounds(matrix @ p for p in _positions(data))}
     if isinstance(data, bpy.types.Mesh):
         result.update(vertices=len(data.vertices), edges=len(data.edges), faces=len(data.polygons),
-                      loops=len(data.loops), samples=[list(v.co) for v in data.vertices[:limit]])
+                      loops=len(data.loops), samples=_json_number([list(v.co) for v in data.vertices[:limit]]))
     elif hasattr(data, 'points'): result['points'] = len(data.points)
     elif hasattr(data, 'curves'): result['curves'] = len(data.curves)
     elif isinstance(data, bpy.types.Curve): result['splines'] = len(data.splines)
     return result
 
 
-def _evaluated(obj, limit=8):
-    deps = bpy.context.evaluated_depsgraph_get(); evaluated = obj.evaluated_get(deps)
+def _evaluated(obj, limit=8, depsgraph=None):
+    deps = depsgraph if depsgraph is not None else bpy.context.evaluated_depsgraph_get()
+    evaluated = obj.evaluated_get(deps)
     geometry = evaluated.evaluated_geometry()
     components = {}
     for name in ('mesh', 'curves', 'pointcloud', 'instances_pointcloud', 'volume', 'grease_pencil'):
@@ -81,26 +134,44 @@ def _evaluated(obj, limit=8):
     mesh = components.get('mesh')
     pointcloud = components.get('instances_pointcloud')
     instance_rows = []; all_bounds = []
+    reference_counts = {}
+    reference_keys = {}
     for instance in deps.object_instances:
         if not instance.is_instance or not instance.parent or instance.parent.original != obj: continue
         matrix = instance.matrix_world.copy(); instance_obj = instance.object
         bounds = _bounds(matrix @ Vector(p) for p in instance_obj.bound_box)
         if bounds: all_bounds.extend((bounds['min'], bounds['max']))
+        original = instance_obj.original
+        pointer = original.as_pointer()
+        if pointer not in reference_keys:
+            reference_keys[pointer] = json.dumps(core.plain(original), sort_keys=True, ensure_ascii=False)
+        key = reference_keys[pointer]
+        reference_counts[key] = reference_counts.get(key, 0) + 1
         if len(instance_rows) < limit:
-            instance_rows.append({'object': instance_obj.original.name, 'matrix_world': [list(r) for r in matrix], 'bounds': bounds})
+            instance_rows.append({'object': original.name, 'matrix_world': _json_number([list(r) for r in matrix]), 'bounds': bounds})
     if mesh and mesh['bounds']: all_bounds.extend((mesh['bounds']['min'], mesh['bounds']['max']))
     if not all_bounds:
         for comp in components.values():
             if comp and comp.get('bounds'): all_bounds.extend((comp['bounds']['min'], comp['bounds']['max']))
     instances = {'count': pointcloud.get('points', 0) if pointcloud else 0, 'samples': instance_rows,
                  'references': len(geometry.instance_references()), 'sample_limit': limit,
+                 'reference_counts': [{'resource': json.loads(key), 'count': count} for key, count in sorted(reference_counts.items())],
                  'semantics': 'top-level instance component count; depsgraph samples may include nested instances'}
+    issues = [{'component': name, 'attribute': attr['name'], **attr['stats']}
+              for name, component in components.items() for attr in component.get('attributes', [])
+              if attr.get('stats', {}).get('status') == 'non_finite']
     return {'vertices': mesh['vertices'] if mesh else 0, 'faces': mesh['faces'] if mesh else 0,
             'edges': mesh['edges'] if mesh else 0, 'bounds': _bounds(all_bounds),
             'attributes': mesh['attributes'] if mesh else [], 'components': components,
-            'instances': instances, 'context': _context(),
-            'limitations': ['VIEWPORT dependency graph; RENDER result requires separate render validation',
-                            'Counts are component-specific; instances are not realized for inspection']}
+            'instances': instances, 'context': _context(deps),
+            'attribute_health': {'status': 'non_finite' if issues else 'passed', 'issues': issues},
+            'limitations': ['Counts are component-specific; instances are not realized for inspection']}
+
+
+def _modifier_timings(obj, depsgraph):
+    return [{'modifier': item.name, 'seconds': float(item.execution_time)}
+            for item in obj.evaluated_get(depsgraph).modifiers
+            if item.type == 'NODES' and item.node_group and hasattr(item, 'execution_time')]
 
 
 def _consumers(tree):
@@ -121,6 +192,7 @@ def inspect_target(object_name, modifier_name=None, observations=None):
     bindings = [core.inspect_binding(obj.name, m.name) for m in modifiers]
     consumers = {}
     dependencies = []
+    zones = {}
     for modifier in modifiers:
         tree = modifier.node_group; consumers[tree.name] = _consumers(tree)
         if tree.get(core.ROLE) == 'wrapper':
@@ -129,7 +201,14 @@ def inspect_target(object_name, modifier_name=None, observations=None):
         def visit(group):
             if group.as_pointer() in seen: return
             seen.add(group.as_pointer())
+            declarations = core.foreach_zones(group)
+            if declarations:
+                zones[group.name] = {'foreach_zones': declarations, 'links': core.foreach_zone_links(group)}
             for node in group.nodes:
+                for socket in node.inputs:
+                    value = getattr(socket, 'default_value', None)
+                    if isinstance(value, bpy.types.ID):
+                        dependencies.append({'group': group.name, 'node': node.name, 'socket': socket.identifier, **core.plain(value)})
                 for prop in node.bl_rna.properties:
                     if prop.type != 'POINTER' or prop.identifier in ('rna_type', 'parent'): continue
                     value = getattr(node, prop.identifier)
@@ -137,12 +216,19 @@ def inspect_target(object_name, modifier_name=None, observations=None):
                         dependencies.append({'group': group.name, 'node': node.name, 'property': prop.identifier, **core.plain(value)})
                         if isinstance(value, bpy.types.NodeTree): visit(value)
         visit(tree)
+        for key, value in core.parameter_values(modifier).items():
+            if isinstance(value, dict) and value.get('kind') in {'OBJECT', 'COLLECTION'}:
+                item = core._resource(value)
+                identity = {field: item[field] for field in ('asset_uuid', 'asset_id', 'asset_version') if field in item}
+                dependencies.append({'modifier': modifier.name, 'parameter': key, **value, **identity})
     result = {'object': obj.name, 'binding': bindings[0] if len(bindings) == 1 else None, 'bindings': bindings,
               'base': _component(obj.data, obj.matrix_world) if obj.data else None,
               'evaluated': _evaluated(obj), 'consumers': consumers, 'dependencies': dependencies,
-              'context': _context(), 'observations': []}
+              'context': _context(), 'observations': [], 'foreach_zones': zones,
+              'runtime': {'modifier_timings': _modifier_timings(obj, bpy.context.evaluated_depsgraph_get()), 'node_probes': []}}
     result['instances'] = result['evaluated']['instances']
-    for observation in observations or []: result['observations'].append(observe(object_name, observation))
+    for observation in observations or []:
+        result['observations'].append(observe(object_name, observation, result['runtime']['node_probes']))
     return result
 
 
@@ -177,8 +263,13 @@ def discover_native_nodes():
 
 
 def _rna_state(owner, persistence_exceptions=()):
+    ignored = {'rna_type'}
+    if isinstance(owner, bpy.types.Object):
+        # Blender fills these derived matrices when a hidden linked object first enters the depsgraph.
+        # The authored transform channels, parent and parent inverse remain part of the fingerprint.
+        ignored.update(('matrix_world', 'matrix_local'))
     result = {p.identifier: core.plain(getattr(owner, p.identifier)) for p in owner.bl_rna.properties
-              if not p.is_readonly and p.type not in ('COLLECTION',) and p.identifier not in ('rna_type',)}
+              if not p.is_readonly and p.type != 'COLLECTION' and p.identifier not in ignored}
     if isinstance(owner, bpy.types.ID):
         matches = []
         for record in persistence_exceptions:
@@ -193,6 +284,37 @@ def _rna_state(owner, persistence_exceptions=()):
                 raise WorkflowError('VALIDATION_FAILED', 'Invalid persistence transition: ' + owner.name)
             result['use_fake_user'] = False
     return result
+
+
+def _attribute_values(attr, bulk=False):
+    """Read the same RNA values in bulk for known scalar/vector storage types."""
+    import numpy as np
+    fields = {'FLOAT': ('value', np.float32, 1),
+              'INT': ('value', np.int32, 1),
+              'INT16_2D': ('value', np.int32, 2),
+              'INT32_2D': ('value', np.int32, 2),
+              'BOOLEAN': ('value', np.bool_, 1),
+              'FLOAT_VECTOR': ('vector', np.float32, 3),
+              'FLOAT2': ('vector', np.float32, 2)}
+    data = attr.data
+    if not len(data):
+        return []
+    spec = fields.get(attr.data_type) if bulk else None
+    if spec is not None:
+        field, dtype, width = spec
+        first_field = next((n for n in ('value', 'vector', 'color', 'matrix')
+                            if hasattr(data[0], n)), None)
+        if first_field == field:
+            values = np.empty(len(data) * width, dtype=dtype)
+            data.foreach_get(field, values)
+            if np.issubdtype(values.dtype, np.floating) and not np.isfinite(values).all():
+                raise WorkflowError('VALIDATION_FAILED', 'Non-finite RNA value')
+            return values.reshape(-1, width).tolist() if width > 1 else values.tolist()
+    values = []
+    for value in data:
+        name = next((n for n in ('value', 'vector', 'color', 'matrix') if hasattr(value, n)), None)
+        values.append(core.plain(getattr(value, name)) if name else None)
+    return values
 
 
 def _data_state(data, persistence_exceptions=()):
@@ -213,11 +335,7 @@ def _data_state(data, persistence_exceptions=()):
     # Full attribute content is hashed, while public observations remain bounded.
     result['attribute_content'] = []
     for attr in getattr(data, 'attributes', []):
-        values = []
-        for value in attr.data:
-            name = next((n for n in ('value', 'vector', 'color', 'matrix') if hasattr(value, n)), None)
-            values.append(core.plain(getattr(value, name)) if name else None)
-        result['attribute_content'].append({'name': attr.name, 'values': values})
+        result['attribute_content'].append({'name': attr.name, 'values': _attribute_values(attr, bulk=isinstance(data, bpy.types.Mesh))})
     return result
 
 
@@ -321,7 +439,7 @@ def _repeat_iterations(root, tree, chain, temporary, selector):
     return count
 
 
-def observe(object_name, observation):
+def observe(object_name, observation, timings=None):
     """Evaluate real nested/Repeat captures in copies, retaining parent inputs."""
     row = {'id': observation.get('id'), 'object': object_name, 'status': 'not_run', 'context': _context()}
     original = bpy.data.objects.get(object_name)
@@ -422,6 +540,10 @@ def observe(object_name, observation):
         _route_capture(root, tree, chain, source, token)
         tree.update_tag(); temporary.update_tag(); bpy.context.view_layer.update()
         result = _evaluated(temporary, observation.get('limit', 8))
+        if timings is not None:
+            timings.append({'node_path': row['node_path'], 'socket': socket.identifier,
+                            'scope': 'isolated_node_output_and_upstream',
+                            'modifier_timings': _modifier_timings(temporary, bpy.context.evaluated_depsgraph_get())})
         component = observation.get('component')
         if component and component not in result['components']:
             return {**row, 'status': 'unsupported', 'reason': 'Requested geometry component absent', 'result': result}
